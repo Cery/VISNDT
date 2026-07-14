@@ -1,0 +1,15 @@
+knowledge_article
+
+knowledge_case
+
+knowledge_solution
+
+knowledge_faq
+
+knowledge_video
+
+knowledge_download
+
+knowledge_attachment
+
+knowledge_tag

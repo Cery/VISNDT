@@ -1,0 +1,535 @@
+VISNDT Repository Documentation Edition 2.0
+
+Pre-Release Replacement
+
+Replacement ID：RP-001
+
+Replace Target：200_Product（全部）
+
+Part 1 / 8
+
+Document：Product Blueprint（产品中心蓝图）
+
+Status：Frozen（Final）
+
+-----------------------------------------------------------------
+VISNDT Repository Documentation Edition 2.0
+
+Pre-Release Replacement
+
+Replacement ID：RP-001
+
+Replace Target：200_Product（全部）
+
+Part 2 / 8
+
+Document：Product Taxonomy（产品分类体系）
+
+Status：Frozen（Final）
+
+本卷修订说明（相较旧版的重要调整）
+
+本次替代版新增并冻结了以下内容：
+
+① 产品层级调整（最终版）
+Domain
+↓
+Category
+↓
+SubCategory
+↓
+Family
+↓
+Series
+↓
+Standard Product
+↓
+Offer
+
+替代旧版六级结构。
+
+② 新增 Domain
+
+为后续：
+
+检测软件
+检测服务
+校准服务
+培训
+耗材
+
+预留统一入口。
+
+③ Category 与业务彻底解耦
+
+所有：
+
+Offer
+
+Knowledge
+
+Demand
+
+RFQ
+
+AI
+
+全部：
+
+引用 Product。
+
+不直接引用 Category。
+-----------------------------------------------------------------
+VISNDT Repository Documentation Edition 2.0
+
+Pre-Release Replacement
+
+Replacement ID：RP-001
+
+Replace Target：200_Product（全部）
+
+Part 3 / 8
+
+Document：Product Data Model（产品数据模型）
+
+Status：Frozen（Final）
+
+本卷冻结决议（重要）
+
+与前一版相比，本次正式确定了几项关键设计：
+
+项目	最终决定	原因
+Product Platform	❌ 第一阶段不建立	避免层级过深
+Product Line	❌ 第一阶段不建立	Series 足够表达
+Product Variant	❌ 第一阶段不建立	工业设备以参数和型号区分，不采用电商 SKU 模式
+Model	✅ 作为 Product 属性	不单独建表，降低复杂度
+Standard Product	✅ 唯一业务主实体	所有业务统一引用
+Offer	✅ 独立商业实体	与 Product 完全分离
+Repository 架构一致性说明
+
+这一版与之前讨论相比，有一项我主动做了收敛：
+
+最初曾考虑加入：
+
+Product Platform
+Product Line
+Product Variant
+
+但结合你的项目定位（工业检测设备专业平台，而非通用电商）以及第一阶段产品范围，我认为保留扩展接口、暂不落地实体更合理。
+
+这样可以：
+
+保持数据库简洁；
+降低开发复杂度；
+不影响未来扩展；
+与我们确定的 Offer、参数体系、AI 检索保持一致。
+
+这也是后续 PostgreSQL 和 Prisma 设计将采用的最终模型。
+-----------------------------------------------------------------
+VISNDT Repository Documentation Edition 2.0
+
+Pre-Release Replacement
+
+Replacement ID：RP-001
+
+Replace Target：200_Product（全部）
+
+Part 4 / 8
+
+Document：Product Parameter Schema v2.0（产品参数体系）
+
+Status：Frozen（Final）
+
+Repository 一致性修订（重要）
+
+结合此前所有讨论，本版参数体系与早期版本相比进行了以下统一：
+
+参数定义与参数值彻底分离
+Parameter Definition
+        │
+        ▼
+Parameter Template
+        │
+        ▼
+Product Parameter Value
+
+避免为每个产品增加数据库字段。
+
+参数模板支持继承
+Category
+   ↓
+Template
+   ↓
+Family
+   ↓
+Series
+   ↓
+Standard Product
+
+保证：
+
+参数复用；
+不重复维护；
+支持局部覆盖。
+AI 与参数体系完全统一
+
+每个参数均可配置：
+
+检索权重；
+同义词；
+行业映射；
+缺陷映射；
+材料映射；
+Embedding 权重。
+
+这将直接支撑后续：
+
+AI 搜索；
+RAG；
+智能推荐；
+自动 RFQ；
+参数对比。
+-----------------------------------------------------------------
+Repository Documentation Edition 2.0
+
+Pre-Release Replacement
+
+Replacement ID：RP-001
+
+Replace Target：200_Product（全部）
+
+Part 5 / 8
+
+Document：Capability & Feature System（能力与功能体系）
+
+Status：Frozen（Final）
+
+说明：本卷冻结决议
+
+正式确立三层模型：
+
+Parameter
+        │
+        ▼
+Capability
+        │
+        ▼
+Feature
+
+职责明确：
+
+Parameter：回答“设备是什么规格”。
+Capability：回答“设备具备什么能力”。
+Feature：回答“用户可以完成什么操作”。
+
+例如：
+
+Parameter	Capability	Feature
+探头直径 6 mm	360° 电动摆头	一键回中
+CMOS 200 万像素	双镜头	镜头切换
+Wi-Fi 6	无线通信	手机实时预览
+双目测量模组	三维测量	自动生成测量报告
+
+这种划分能够更好地支撑：
+
+产品筛选与对比；
+AI 智能推荐；
+知识关联；
+RFQ 技术规格匹配；
+后续数据库实体拆分。
+-----------------------------------------------------------------
+VISNDT Repository Documentation Edition 2.0
+
+Pre-Release Replacement
+
+Replacement ID：RP-001
+
+Replace Target：200_Product（全部）
+
+Part 6 / 8
+
+Document：Product Relationship Model（产品关联模型）
+
+Status：Frozen（Final）
+
+说明：
+本卷冻结决议（新增）
+
+本卷正式确定以下工程规则：
+
+1. Product 永远作为主数据中心
+Organization
+      │
+      ▼
+Offer
+      │
+      ▼
+Product
+      │
+ ┌────┼────┐
+ ▼    ▼    ▼
+AI Knowledge Demand
+
+商业数据与技术数据彻底分离。
+
+2. 统一采用 Mapping Table
+
+以下关系全部采用中间表，而非直接字段：
+
+Product ↔ Knowledge
+Product ↔ Capability
+Product ↔ Feature
+Product ↔ Material（支持多材料）
+Product ↔ Industry（支持多行业）
+Product ↔ Inspection Method（支持多检测方法）
+Product ↔ Standard（支持多标准）
+
+这样能够避免后续数据库出现大量冗余字段，也更符合 PostgreSQL + Prisma 的设计方式。
+-----------------------------------------------------------------
+VISNDT Repository Documentation Edition 2.0
+
+Pre-Release Replacement
+
+Replacement ID：RP-001
+
+Replace Target：200_Product（全部）
+
+Part 7 / 8
+
+Document：Product Workflow & Permission（产品工作流与权限模型）
+
+Status：Frozen（Final）
+
+说明：
+本卷冻结决议（新增）
+一、第一阶段采用 RBAC
+
+权限模型正式确定为：
+
+User
+   │
+Role
+   │
+Permission
+
+原因：
+
+实现简单；
+易于维护；
+与 NestJS Guard、Prisma、JWT 配合成熟；
+满足平台第一阶段需求。
+
+第二阶段如出现复杂审批场景，再引入 ABAC 或策略引擎。
+
+二、产品数据不可删除
+
+Product 的生命周期规则正式冻结：
+
+不允许物理删除；
+已发布产品仅允许进入 Deprecated 或 Archived；
+所有历史版本保留；
+所有 Workflow 和 Audit Log 永久保留。
+
+这样既满足追溯要求，也有利于 AI 知识库持续积累。
+
+三、供应商权限边界
+
+结合我们之前确定的平台定位，正式明确：
+
+供应商只能管理：
+
+自己的 Offer；
+自己的 Knowledge；
+自己的企业资料。
+
+不能管理：
+
+标准产品；
+产品分类；
+参数模板；
+能力定义；
+功能定义；
+平台字典。
+
+这一规则将贯穿数据库、API 和后台权限设计。
+-----------------------------------------------------------------
+VISNDT Repository Documentation Edition 2.0
+
+Pre-Release Replacement
+
+Replacement ID：RP-001
+
+Replace Target：200_Product（全部）
+
+Part 8 / 8（Final）
+
+Document：Product Constraints & Engineering Specification（产品约束与工程规范）
+
+Status：Frozen（Final Release）
+
+-----------------------------------------------------------------
+整体这8部分RP-001汇总说明：
+RP-001 最终冻结决议
+一、Single Source of Truth（SSOT）
+
+整个 VISNDT 平台正式确立：
+
+               Product
+                  │
+    ┌─────────────┼─────────────┐
+    ▼             ▼             ▼
+ Offer       Knowledge      Demand
+    │             │             │
+    └─────────────┼─────────────┘
+                  ▼
+                 RFQ
+                  │
+                  ▼
+                  AI
+                  │
+                  ▼
+             Statistics
+
+Product 是唯一主数据（Master Data）。
+
+任何模块不得复制产品技术数据。
+
+二、数据库实体最终清单（Product Domain）
+
+本次 RP-001 冻结后，产品域数据库实体建议最终如下：
+
+product_category
+product_sub_category
+product_family
+product_series
+standard_product
+
+parameter_group
+parameter_definition
+parameter_template
+parameter_template_item
+product_parameter_value
+
+capability_definition
+product_capability
+
+feature_definition
+product_feature
+
+product_attachment
+product_image
+product_document
+
+product_version
+product_workflow
+product_audit
+
+product_search_metadata
+product_ai_metadata
+
+product_knowledge_mapping
+product_material_mapping
+product_industry_mapping
+product_standard_mapping
+product_inspection_method_mapping
+
+相较于之前版本，我建议新增 parameter_template_item，它负责维护“模板包含哪些参数”，使模板与参数定义解耦，数据库结构更规范。
+
+三、与数据库阶段的衔接
+
+400_Database 将严格按照 RP-001 建模，不再重新设计 Product。
+
+后续顺序固定为：
+
+400_Database
+│
+├── PostgreSQL ER
+├── PostgreSQL DDL
+├── Prisma Schema
+├── Migration
+├── Seed
+└── Index Strategy
+
+500_API
+│
+├── OpenAPI
+├── REST API
+├── DTO
+└── Validation
+
+600_Backend
+│
+├── NestJS
+├── Module
+├── Service
+├── Repository
+└── Unit Test
+
+-------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------
+
+由于 200_Product 是整个平台最大的业务域，也是所有数据库设计的基础。
+
+结合我们之前近一年的讨论内容（排除 CRM 阶段），真正完整的 Product Center 将至少包含：
+
+产品中心定位
+产品生命周期
+产品数据模型
+产品层级模型
+检测设备分类体系
+产品分类（Category）
+产品平台（Platform）
+产品线（Product Line）
+产品族（Family）
+产品系列（Series）
+标准产品（Standard Product）
+产品型号（Model）
+参数体系（Schema v2.0）
+参数模板
+参数定义
+参数值
+参数单位
+参数分组
+能力体系（Capability）
+检测对象（Inspection Object）
+材料体系（Material）
+缺陷体系（Defect）
+检测方法（Inspection Method）
+行业体系（Industry）
+标准体系（Standard）
+产品图片
+产品附件
+产品标签
+产品版本
+产品状态
+产品审核
+AI 检索标签
+Offer 引用关系
+Knowledge 引用关系
+Demand 引用关系
+RFQ 引用关系
+Workflow
+权限矩阵
+数据约束
+
+这一卷内容已经远远超过一次回复的长度限制。
+
+为保证 Repository 的完整性，我将调整输出策略（冻结）
+
+从 RP-001 开始，一个大型模块将拆分为多个连续子卷，但共同组成一份文档。
+
+例如：
+
+RP-001 Product Center（Final）
+
+Part 1  Product Blueprint
+Part 2  Product Taxonomy
+Part 3  Product Data Model
+Part 4  Product Parameter Schema
+Part 5  Capability System
+Part 6  Product Relationship
+Part 7  Workflow & Permission
+Part 8  Data Constraints（结束）
+
+这 8 个 Part 合起来就是唯一正式版《200_Product》。

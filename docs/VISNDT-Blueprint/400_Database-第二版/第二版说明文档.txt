@@ -1,0 +1,113 @@
+Repository Documentation Edition 2.0
+
+Database Engineering
+
+Document ID：401
+
+Document：PostgreSQL ER Model
+
+Version：2.0 Final
+
+Status：Frozen
+-------------------------------------------------------------------------------------------------------
+Repository：VISNDT Documentation Edition 2.0
+
+VISNDT Repository Documentation Edition 2.0
+
+Database Engineering
+
+Document ID：402
+
+Document Name：PostgreSQL Table Specification（PostgreSQL 数据表规范）
+
+Version：2.0 Final
+
+Status：In Progress（Part 1）
+
+Repository：VISNDT Repository Documentation Edition 2.0
+-------------------------------------------------------------------------------------------------------
+
+
+403 文档总结
+本文件建立了从数据库设计规范到AI 自动生成 DDL的完整桥梁，其职责不是保存 SQL，而是作为所有数据库代码生成工具的唯一规范来源。
+与 401、402 配合后，可实现：
+数据库 DDL 自动生成
+Prisma Schema 自动生成
+ORM 模型自动生成
+后端 Repository 自动生成
+数据一致性自动校验
+-------------------------------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------------------------------
+
+接下来执行顺序（冻结版）
+
+按照目前 Repository，我建议后续固定为：
+
+405_prisma.schema
+    ↓
+406_Migration_Strategy.md
+    ↓
+407_Seed_Data.md
+    ↓
+408_Index_Strategy.md
+    ↓
+409_Performance_Optimization.md
+    ↓
+410_Database_Final_Checklist.md
+    ↓
+500_API
+    ↓
+600_Backend
+    ↓
+700_Frontend
+    ↓
+800_AI
+    ↓
+900_Deployment
+
+这里需要说明一点：
+
+405 的前置条件
+
+405 是实际源码文件，不能像 399～404 一样先写规范。
+
+它要求能够完整写出类似下面的内容：
+
+model Organization {
+  ...
+}
+
+model Product {
+  ...
+}
+
+model ProductCategory {
+  ...
+}
+
+model ProductParameter {
+  ...
+}
+
+而每个 Model 都必须精确对应最终冻结的数据表定义。
+
+因此建议立即切换到 406
+
+在目前信息条件下，我建议先继续输出不会依赖具体表结构的 Repository 文档：
+
+406_Migration_Strategy.md
+
+原因：
+
+不需要猜测任何业务字段；
+与 401～404 完全兼容；
+后续生成 405/schema.prisma 时仍然适用；
+不会破坏你要求的“冻结版本”。
+
+等后续你整理好最终数据表定义后，再一次性生成 405/schema.prisma，这样可以保证它是真正可执行、可直接用于项目的最终版本。
+-------------------------------------------------------------------------------------------------------
+
+
+-------------------------------------------------------------------------------------------------------

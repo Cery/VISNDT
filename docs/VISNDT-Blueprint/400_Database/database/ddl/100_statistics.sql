@@ -1,0 +1,13 @@
+statistics_daily
+
+statistics_monthly
+
+search_statistics
+
+product_statistics
+
+offer_statistics
+
+knowledge_statistics
+
+dashboard_snapshot
