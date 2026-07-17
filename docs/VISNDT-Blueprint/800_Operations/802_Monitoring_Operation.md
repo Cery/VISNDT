@@ -679,11 +679,11 @@ User Behavior
 监控：
 
 ```
-Requirement Submission
+Demand Submission
 
-Matching Event
+RFQ Event
 
-Supplier Response
+Organization Response
 
 Content Update
 ```
@@ -886,9 +886,9 @@ Suspicious Activity
 触发：
 
 ```
-Requirement Processing Error
+Demand Processing Error
 
-Matching Failure
+RFQ Failure
 
 Workflow Exception
 
@@ -1170,9 +1170,9 @@ Risk Analysis
 ```
 User Activity
 
-Requirement Volume
+Demand Volume
 
-Matching Activity
+RFQ Activity
 
 Business Event
 ```
@@ -1279,6 +1279,61 @@ Completed
 | Application Monitoring | Completed |
 | Alert Management       | Completed |
 | Monitoring Report      | Completed |
+| v1.0 Alignment         | Completed |
+
+------
+
+# Blueprint v1.0 Alignment
+
+## Terminology Alignment
+
+| Legacy Term | Canonical Term | Scope |
+|-------------|---------------|-------|
+| Requirement Submission | Demand Submission | Business Object |
+| Matching Event | RFQ Event | Business Object |
+| Supplier Response | Organization Response | Business Object |
+| Requirement Processing Error | Demand Processing Error | Business Object |
+| Matching Failure | RFQ Failure | Business Object |
+| Requirement Volume | Demand Volume | Business Object |
+| Matching Activity | RFQ Activity | Business Object |
+
+## Infrastructure Object Alignment
+
+VISNDT Blueprint v1.0 统一监控对象：
+
+| Monitoring Object | Focus |
+|-------------------|-------|
+| Frontend Application | Availability / Performance |
+| Backend API Service | Health / Response |
+| PostgreSQL Database | Health / Migration Status |
+| S3 Compatible Storage | Availability |
+| Container Runtime | Resource / Status |
+
+## Business Monitoring Alignment
+
+| Business Object | Monitoring Metric |
+|-----------------|-------------------|
+| Organization Activity | Active Organizations |
+| Offer Activity | Offer Creation / Update |
+| Demand Flow | Submission / Status |
+| RFQ Workflow | Matching / Response |
+| Notification Status | Delivery / Read |
+
+## Technology Baseline Reference
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js + TypeScript |
+| Backend | NestJS + TypeScript |
+| Database | PostgreSQL + Prisma |
+| Deployment | Container Based |
+| Storage | S3 Compatible Object Storage |
+
+## Migration Notes
+
+1. 所有业务对象术语已统一为 Canonical Naming Specification 标准。
+2. 监控对象已对齐：`Frontend Availability`、`Backend API Health`、`PostgreSQL Health`、`Migration Status`。
+3. 业务监控指标已统一：`Organization Activity`、`Offer Activity`、`Demand Flow`、`RFQ Workflow`、`Notification Status`。
 
 ------
 

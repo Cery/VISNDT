@@ -210,9 +210,19 @@ Feature Works Correctly
 覆盖：
 
 ```
-Product
+Standard Product
 
-Requirement
+Product Parameter
+
+Demand
+
+RFQ
+
+Offer
+
+Workflow
+
+Notification
 
 Content
 
@@ -326,7 +336,7 @@ Core Pages
 
 Product Flow
 
-Requirement Flow
+Demand Flow
 
 API
 ```
@@ -494,7 +504,7 @@ Homepage
 
 Product Center
 
-Requirement Center
+Demand Center
 
 Public Pages
 
@@ -541,12 +551,12 @@ Parameter Display
 
 ------
 
-# 29. Requirement Center Test Cases
+# 29. Demand Center Test Cases
 
 验证：
 
 ```
-Requirement Creation
+Demand Creation
 
 Form Validation
 
@@ -674,7 +684,7 @@ Product Browse
 
 Product Detail
 
-Requirement Submit
+Demand Submit
 
 Admin Operation
 ```
@@ -1249,7 +1259,7 @@ Homepage
 
 Product Center
 
-Requirement Center
+Demand Center
 
 Public Pages
 
@@ -1331,7 +1341,7 @@ Browse Product
 
 View Detail
 
-Submit Requirement
+Submit Demand
 
 Receive Response
 ```
@@ -1418,6 +1428,59 @@ PASS
 | Test Case Management | Completed |
 | Test Execution       | Completed |
 | Acceptance           | Completed |
+| v1.0 Alignment       | Completed |
+
+------
+
+# Blueprint v1.0 Alignment
+
+## Terminology Alignment
+
+| Legacy Term | Canonical Term | Scope |
+|-------------|---------------|-------|
+| Requirement Center | Demand Center | Business Object |
+| Requirement Form | Demand Form | Business Object |
+| Requirement Submission | Demand Submission | Business Object |
+| Requirement Workflow | Demand Workflow | Business Object |
+| Requirement API | Demand API | Business Object |
+| Requirement Matching | RFQ | Business Object |
+| Supplier | Organization | Business Object |
+| Requirement Review | Requirement Review | QA Process (unchanged) |
+| Business Requirement | Business Requirement | QA Process (unchanged) |
+| Requirement Driven Testing | Requirement Driven Testing | QA Process (unchanged) |
+
+## Test Object Alignment
+
+VISNDT Blueprint v1.0 统一测试对象：
+
+| Test Object | Domain |
+|-------------|--------|
+| Standard Product | Product |
+| Product Parameter Metadata | Product / Parameter |
+| Parameter Template | Product / Parameter |
+| Product Parameter Value | Product / Parameter |
+| Offer | Offer |
+| Demand | Demand |
+| RFQ | Demand / RFQ |
+| Workflow | Workflow |
+| Notification | Platform |
+
+## Technology Baseline Reference
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js + TypeScript |
+| Backend | NestJS + TypeScript |
+| Database | PostgreSQL + Prisma |
+| API | REST (OpenAPI) |
+| Testing | Jest + Playwright + Supertest |
+
+## Migration Notes
+
+1. 所有业务对象术语已统一为 Canonical Naming Specification 标准。
+2. QA 流程术语（Requirement Review、Business Requirement 等）保持不变。
+3. Test Case ID 中 `TC-REQ-*` 已迁移为 `TC-DEMAND-*`。
+4. 测试对象覆盖范围已对齐 Blueprint v1.0 的 9 个核心业务对象。
 
 ------
 

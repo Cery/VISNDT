@@ -356,9 +356,9 @@ Business Function Abnormality
 包括：
 
 ```
-Requirement Process Error
+Demand Process Error
 
-Matching Failure
+RFQ Failure
 
 Workflow Exception
 
@@ -1230,6 +1230,58 @@ Completed
 | Response Process        | Completed |
 | Root Cause Analysis     | Completed |
 | Review & Improvement    | Completed |
+| v1.0 Alignment          | Completed |
+
+------
+
+# Blueprint v1.0 Alignment
+
+## Terminology Alignment
+
+| Legacy Term | Canonical Term | Scope |
+|-------------|---------------|-------|
+| Requirement Process Error | Demand Process Error | Business Object |
+| Matching Failure | RFQ Failure | Business Object |
+
+## Incident Classification Alignment
+
+VISNDT Blueprint v1.0 统一事件分类：
+
+| Incident Type | Scope |
+|---------------|-------|
+| Application Incident | Frontend / Backend |
+| Database Incident | PostgreSQL |
+| Deployment Incident | Container / CI/CD |
+| Security Incident | Auth / Access |
+| Data Incident | Data Integrity / Loss |
+
+## Infrastructure Object Alignment
+
+| Infrastructure Object | Incident Coverage |
+|-----------------------|-------------------|
+| Next.js Frontend | Application Incident |
+| NestJS Backend | API / Service Incident |
+| PostgreSQL Database | Database Incident |
+| Container Runtime | Deployment Incident |
+| Object Storage | Data Incident |
+
+## Technology Baseline Reference
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js + TypeScript |
+| Backend | NestJS + TypeScript |
+| Database | PostgreSQL + Prisma |
+| Deployment | Container Based |
+| Storage | S3 Compatible Object Storage |
+
+## Migration Notes
+
+1. 所有业务对象术语已统一为 Canonical Naming Specification 标准。
+2. 事件分类已统一为五大类别：`Application`、`Database`、`Deployment`、`Security`、`Data`。
+3. 事件响应对象已对齐 Blueprint v1.0 基础设施对象。
+
+------
 
 # 804_Incident_Response
 

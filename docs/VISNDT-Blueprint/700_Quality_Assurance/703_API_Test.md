@@ -44,7 +44,7 @@ Database
 覆盖：
 
 ```
-Requirement API
+Demand API
 
 Product API
 
@@ -245,14 +245,14 @@ Example
 
 ------
 
-# 15. Requirement API Test
+# 15. Demand API Test
 
 范围：
 
 ```
-Create Requirement
+Create Demand
 
-Query Requirement
+Query Demand
 
 Update Status
 
@@ -312,7 +312,7 @@ Expiration
 编号：
 
 ```
-TC-API-REQ-001
+TC-API-DEMAND-001
 ```
 
 ------
@@ -320,7 +320,7 @@ TC-API-REQ-001
 场景：
 
 ```
-Create Requirement
+Create Demand
 ```
 
 ------
@@ -328,7 +328,7 @@ Create Requirement
 请求：
 
 ```
-POST /requirements
+POST /demands
 ```
 
 ------
@@ -383,11 +383,11 @@ Response Correct
 ```
 Product Service
 
-Requirement Service
+Demand Service
 
 Content Service
 
-Matching Service
+RFQ Service
 
 User Service
 ```
@@ -460,16 +460,16 @@ Empty Result
 
 ------
 
-# 24. Requirement API Test
+# 24. Demand API Test
 
 ------
 
-## 24.1 Create Requirement API
+## 24.1 Create Demand API
 
 接口：
 
 ```
-POST /requirements
+POST /demands
 ```
 
 输入：
@@ -498,18 +498,18 @@ Database Saved
 
 ------
 
-## 24.2 Query Requirement API
+## 24.2 Query Demand API
 
 接口：
 
 ```
-GET /requirements/{id}
+GET /demands/{id}
 ```
 
 验证：
 
 ```
-Requirement Detail
+Demand Detail
 
 Status
 
@@ -518,12 +518,12 @@ Timeline
 
 ------
 
-## 24.3 Update Requirement Status API
+## 24.3 Update Demand Status API
 
 接口：
 
 ```
-PUT /requirements/{id}/status
+PUT /demands/{id}/status
 ```
 
 验证：
@@ -536,14 +536,14 @@ History Recorded
 
 ------
 
-# 25. Matching API Test
+# 25. RFQ API Test
 
 验证：
 
 ```
-Requirement Matching
+Demand RFQ
 
-Supplier Response
+Organization Response
 
 Solution Data
 ```
@@ -553,11 +553,11 @@ Solution Data
 测试：
 
 ```
-Valid Requirement
+Valid Demand
 
 ↓
 
-Matching Result
+RFQ Result
 
 ↓
 
@@ -674,9 +674,9 @@ Timeout
 
 | Priority | API             |
 | -------- | --------------- |
-| P0       | Requirement API |
+| P0       | Demand API      |
 | P0       | Product API     |
-| P1       | Matching API    |
+| P1       | RFQ API         |
 | P1       | Content API     |
 | P2       | User API        |
 
@@ -687,8 +687,8 @@ Timeout
 | Item            | Status  |
 | --------------- | ------- |
 | Product API     | Defined |
-| Requirement API | Defined |
-| Matching API    | Defined |
+| Demand API      | Defined |
+| RFQ API         | Defined |
 | Content API     | Defined |
 | User API        | Defined |
 | Validation      | Defined |
@@ -776,18 +776,18 @@ Performance Stable
 
 ------
 
-# 37. Requirement API Regression
+# 37. Demand API Regression
 
 测试：
 
 ```
-Create Requirement
+Create Demand
 
-Query Requirement
+Query Demand
 
 Update Status
 
-Requirement Matching
+Demand RFQ
 
 Response Handling
 ```
@@ -804,16 +804,16 @@ Data Consistent
 
 ------
 
-# 38. Matching API Regression
+# 38. RFQ API Regression
 
 验证：
 
 ```
-Requirement Matching
+Demand RFQ
 
 Capability Matching
 
-Supplier Response
+Organization Response
 ```
 
 ------
@@ -979,8 +979,8 @@ Data Consistency Confirmed
 | Item            | Status  |
 | --------------- | ------- |
 | Product API     | Defined |
-| Requirement API | Defined |
-| Matching API    | Defined |
+| Demand API      | Defined |
+| RFQ API         | Defined |
 | Content API     | Defined |
 | Database Impact | Defined |
 | Compatibility   | Defined |
@@ -1114,9 +1114,9 @@ PASS
 ```
 Product Query
 
-Requirement Creation
+Demand Creation
 
-Requirement Matching
+RFQ
 
 Status Update
 ```
@@ -1229,6 +1229,66 @@ PASS
 | API Functional Test | Completed |
 | API Regression      | Completed |
 | Acceptance          | Completed |
+| v1.0 Alignment      | Completed |
+
+------
+
+# Blueprint v1.0 Alignment
+
+## Terminology Alignment
+
+| Legacy Term | Canonical Term | Scope |
+|-------------|---------------|-------|
+| Requirement API | Demand API | Business Object |
+| CREATE Requirement | Create Demand | Business Object |
+| Query Requirement | Query Demand | Business Object |
+| Requirement Matching | RFQ | Business Object |
+| Matching API | RFQ API | Business Object |
+| Matching Service | RFQ Service | Business Object |
+| Supplier Response | Organization Response | Business Object |
+| POST /requirements | POST /demands | API Endpoint |
+| GET /requirements/{id} | GET /demands/{id} | API Endpoint |
+| PUT /requirements/{id}/status | PUT /demands/{id}/status | API Endpoint |
+
+## Historical Test Case ID Mapping
+
+| Legacy ID | Canonical ID | Status |
+|-----------|-------------|--------|
+| TC-API-REQ-001 | TC-API-DEMAND-001 | Migrated |
+| TC-API-REQ-* | TC-API-DEMAND-* | Migrated |
+
+## Test Object Alignment
+
+VISNDT Blueprint v1.0 统一测试对象：
+
+| Test Object | API Endpoint |
+|-------------|-------------|
+| Standard Product | /products |
+| Product Parameter Metadata | /parameter-definitions |
+| Parameter Template | /parameter-templates |
+| Product Parameter Value | /product-parameter-values |
+| Offer | /offers |
+| Demand | /demands |
+| RFQ | /rfqs |
+| Workflow | /workflows |
+| Notification | /notifications |
+
+## Technology Baseline Reference
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js + TypeScript |
+| Backend | NestJS + TypeScript |
+| Database | PostgreSQL + Prisma |
+| API | REST (OpenAPI) |
+| API Testing | Supertest + Jest |
+
+## Migration Notes
+
+1. 所有 API 端点已统一为 Canonical Naming Specification 标准路径。
+2. API 测试用例编号已迁移：`TC-API-REQ-*` → `TC-API-DEMAND-*`。
+3. 业务服务名称已统一：`Requirement Service` → `Demand Service`，`Matching Service` → `RFQ Service`。
+4. 测试对象覆盖范围已对齐 Blueprint v1.0 的 9 个核心业务对象。
 
 ------
 

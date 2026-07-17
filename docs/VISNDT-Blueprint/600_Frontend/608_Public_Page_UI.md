@@ -1935,6 +1935,137 @@ PASS
 | Homepage Design   | Completed |
 | Content Pages     | Completed |
 | Acceptance        | Completed |
+| Next.js Alignment | Completed |
+
+------
+
+# Next.js Implementation Alignment
+
+## App Router
+
+VISNDT 公共页面使用 Next.js App Router 实现：
+
+```
+src/app/
+├── page.tsx              # Homepage (/)
+├── products/
+│   └── page.tsx          # Product Center (/products)
+├── solutions/
+│   └── page.tsx          # Solutions (/solutions)
+├── applications/
+│   └── page.tsx          # Applications (/applications)
+├── technology/
+│   └── page.tsx          # Technology Center (/technology)
+├── news/
+│   └── page.tsx          # News (/news)
+├── about/
+│   └── page.tsx          # About (/about)
+├── contact/
+│   └── page.tsx          # Contact (/contact)
+└── layout.tsx            # Root Layout（Header + Footer）
+```
+
+## Metadata API
+
+使用 Next.js Metadata API 管理 SEO：
+
+```typescript
+// app/layout.tsx
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: {
+    default: 'VISNDT - Industrial Inspection Equipment Platform',
+    template: '%s | VISNDT',
+  },
+  description: 'Find suitable industrial inspection solutions...',
+  keywords: ['Industrial Endoscope', 'Inspection Equipment', 'NDT Solution'],
+};
+```
+
+```typescript
+// app/products/page.tsx
+export const metadata: Metadata = {
+  title: 'Product Center',
+  description: 'Browse industrial inspection equipment by category and parameters.',
+};
+```
+
+## Structured Data
+
+使用 JSON-LD 实现结构化数据：
+
+```typescript
+// Product Schema
+<script type="application/ld+json">
+{JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": product.name,
+  "description": product.description,
+})}
+</script>
+```
+
+## Image Optimization
+
+使用 `next/image` 替代通用图片优化策略：
+
+```typescript
+import Image from 'next/image';
+
+<Image
+  src={product.image}
+  alt={product.name}
+  width={400}
+  height={300}
+  priority={isHero}       // 首屏图片优先加载
+  loading={isHero ? undefined : 'lazy'}
+/>
+```
+
+优势：
+
+- 自动 WebP/AVIF 格式转换
+- 自动响应式尺寸
+- 内置 Lazy Loading
+- 自动 blur-up placeholder
+
+## Rendering Strategy Principle
+
+VISNDT 公共页面渲染策略：
+
+| 页面类型 | 推荐策略 | 原因 |
+|----------|----------|------|
+| 首页 | Static Generation | 内容相对稳定，SEO 优先 |
+| 产品列表 | Static Generation + Revalidation | 产品数据更新频率中等 |
+| 产品详情 | Static Generation + Revalidation | SEO 关键页面 |
+| 新闻列表 | Static Generation + Revalidation | 内容更新频繁 |
+| 技术文章 | Static Generation | 长尾 SEO 内容 |
+| About/Contact | Static Generation | 静态内容 |
+
+> 以上为推荐策略，不做硬性冻结。具体渲染方式根据实际部署环境和内容更新频率灵活选择。
+
+## Internal Linking
+
+Next.js `<Link>` 组件实现内部互联：
+
+```typescript
+import Link from 'next/link';
+
+<Link href="/products/video-endoscope">Video Endoscope</Link>
+<Link href="/solutions/aerospace-inspection">Aerospace Inspection</Link>
+```
+
+## Performance
+
+Next.js 内置性能优化：
+
+- 自动 Code Splitting（按页面/路由）
+- Static Generation 预渲染
+- Image Optimization（next/image）
+- Font Optimization（next/font）
+- 自动 Bundle Analysis
 
 ------
 
@@ -1946,13 +2077,13 @@ Version:
 V1.0
 ```
 
-Status：
+Status:
 
 ```
 FINAL
 ```
 
-Completion：
+Completion:
 
 ```
 100%

@@ -22,8 +22,8 @@ Current Version:
 
 历史参考：
 
-- `200_Product-第一版`
-- `400_Database`
+- \- _archive/200_Product-第一版 - 
+- _archive/400_Database
 
 ## AI Recommended Reading Order
 
@@ -139,6 +139,7 @@ AI 与开发者建议按以下顺序阅读：
 - `607_Requirement_Center_UI.md`
 - `608_Public_Page_UI.md`
 - `609_Frontend_Deployment_UI.md`
+- `610_Supplier_Workflow_UI.md`
 
 ### 700_Quality_Assurance
 

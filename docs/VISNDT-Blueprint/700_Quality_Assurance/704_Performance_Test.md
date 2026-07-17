@@ -362,7 +362,7 @@ Product Center
 
 Product Detail
 
-Requirement Center
+Demand Center
 
 Content Pages
 ```
@@ -433,7 +433,7 @@ Related Content Loading
 
 ------
 
-# 26. Requirement Form Performance Test
+# 26. Demand Form Performance Test
 
 场景：
 
@@ -464,9 +464,9 @@ Submission Response
 ```
 Product API
 
-Requirement API
+Demand API
 
-Matching API
+RFQ API
 
 Content API
 ```
@@ -497,14 +497,14 @@ Error Rate
 
 ------
 
-# 29. Requirement API Performance
+# 29. Demand API Performance
 
 测试：
 
 ```
-Create Requirement
+Create Demand
 
-Query Requirement
+Query Demand
 
 Update Status
 ```
@@ -521,18 +521,18 @@ Response Stability
 
 ------
 
-# 30. Matching API Performance
+# 30. RFQ API Performance
 
 测试：
 
 ```
-Requirement Matching Request
+RFQ Request
 ```
 
 验证：
 
 ```
-Matching Calculation Time
+RFQ Calculation Time
 
 Result Return Time
 ```
@@ -596,7 +596,7 @@ Product Query
 
 Parameter Search
 
-Requirement Query
+Demand Query
 
 Data Insert
 ```
@@ -671,7 +671,7 @@ Result
 | ----------- | ---------- |
 | Homepage    | Load       |
 | Product     | Query      |
-| Requirement | Submit     |
+| Demand      | Submit     |
 | API         | Response   |
 | Database    | Query      |
 | System      | Concurrent |
@@ -684,7 +684,7 @@ Result
 | ----------------------- | ------- |
 | Frontend Performance    | Defined |
 | Product Performance     | Defined |
-| Requirement Performance | Defined |
+| Demand Performance      | Defined |
 | API Performance         | Defined |
 | Database Performance    | Defined |
 | Load Test               | Defined |
@@ -1096,6 +1096,58 @@ PASS
 | Performance Cases         | Completed |
 | Optimization Verification | Completed |
 | Acceptance                | Completed |
+| v1.0 Alignment            | Completed |
+
+------
+
+# Blueprint v1.0 Alignment
+
+## Terminology Alignment
+
+| Legacy Term | Canonical Term | Scope |
+|-------------|---------------|-------|
+| Requirement Center | Demand Center | Business Object |
+| Requirement Form Performance | Demand Form Performance | Business Object |
+| Requirement API | Demand API | Business Object |
+| Matching API | RFQ API | Business Object |
+| Create Requirement | Create Demand | Business Object |
+| Query Requirement | Query Demand | Business Object |
+| Requirement Matching Request | RFQ Request | Business Object |
+| Matching Calculation | RFQ Calculation | Business Object |
+| Performance Requirement | Performance Requirement | QA Process (unchanged) |
+
+## Test Object Alignment
+
+VISNDT Blueprint v1.0 统一测试对象：
+
+| Test Object | Performance Focus |
+|-------------|-------------------|
+| Identity | Auth / Session |
+| Organization | Load / Response |
+| Standard Product | Query / Browse |
+| Product Parameter | Search / Filter |
+| Offer | Create / Query |
+| Demand | Submit / Query |
+| RFQ | Match / Response |
+| Workflow | State Transition |
+| Notification | Delivery |
+
+## Technology Baseline Reference
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js + TypeScript |
+| Backend | NestJS + TypeScript |
+| Database | PostgreSQL + Prisma |
+| Deployment | Container Based |
+| Performance Tool | k6 / Lighthouse |
+
+## Migration Notes
+
+1. 所有业务对象术语已统一为 Canonical Naming Specification 标准。
+2. QA 流程术语（Performance Requirement）保持不变。
+3. 性能测试场景已对齐：`Organization Load Test`、`Demand Load Test`、`RFQ Workflow Performance`。
+4. API 性能测试端点已统一为 Blueprint v1.0 路径。
 
 ------
 

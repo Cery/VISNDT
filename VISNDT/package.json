@@ -1,0 +1,25 @@
+{
+  "name": "visndt",
+  "version": "0.1.0",
+  "private": true,
+  "description": "VISNDT Engineering Repository — Monorepo",
+  "scripts": {
+    "dev": "pnpm --parallel -r dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "clean": "pnpm -r clean",
+    "db:studio": "pnpm --filter @visndt/database exec prisma studio",
+    "db:migrate": "pnpm --filter @visndt/database exec prisma migrate dev",
+    "db:generate": "pnpm --filter @visndt/database exec prisma generate"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
+  }
+}

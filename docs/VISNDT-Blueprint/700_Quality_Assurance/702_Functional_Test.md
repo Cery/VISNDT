@@ -52,7 +52,7 @@ Public Pages
 
 Product Center
 
-Requirement Center
+Demand Center
 
 User Interaction
 
@@ -88,11 +88,23 @@ Component
 
 Form
 
+Standard Product
+
+Product Parameter
+
+Demand
+
+RFQ
+
+Offer
+
+Workflow
+
+Notification
+
 Interaction
 
 Data Display
-
-Workflow
 ```
 
 ------
@@ -185,12 +197,12 @@ Requirement Button
 
 ------
 
-# 11. Requirement Center Test
+# 11. Demand Center Test
 
 范围：
 
 ```
-Requirement Entry
+Demand Entry
 
 Form Input
 
@@ -205,7 +217,7 @@ Status
 
 ------
 
-# 12. Requirement Form Test
+# 12. Demand Form Test
 
 验证：
 
@@ -221,7 +233,7 @@ Submit Result
 
 ------
 
-# 13. Requirement Workflow Test
+# 13. Demand Workflow Test
 
 流程：
 
@@ -238,7 +250,7 @@ Review
 
 ↓
 
-Matching
+RFQ
 
 ↓
 
@@ -351,7 +363,7 @@ TC-FUNC-001
 场景：
 
 ```
-User Submit Requirement
+User Submit Demand
 ```
 
 ------
@@ -359,7 +371,7 @@ User Submit Requirement
 步骤：
 
 ```
-Open Requirement Page
+Open Demand Page
 
 ↓
 
@@ -379,7 +391,7 @@ Check Result
 预期：
 
 ```
-Requirement Created Successfully
+Demand Created Successfully
 ```
 
 ------
@@ -428,11 +440,11 @@ Product Discovery
 
 ↓
 
-Requirement Submission
+Demand Submission
 
 ↓
 
-Requirement Processing
+Demand Processing
 
 ↓
 
@@ -596,7 +608,7 @@ View Parameters
 
 ↓
 
-Submit Requirement
+Submit Demand
 ```
 
 ------
@@ -613,12 +625,12 @@ Related Content
 
 ------
 
-# 28. Requirement Submission Flow
+# 28. Demand Submission Flow
 
 流程：
 
 ```
-Enter Requirement
+Enter Demand
 
 ↓
 
@@ -651,7 +663,7 @@ Success Feedback
 
 ------
 
-# 29. Requirement Status Flow
+# 29. Demand Status Flow
 
 流程：
 
@@ -664,7 +676,7 @@ Processing
 
 ↓
 
-Matching
+RFQ
 
 ↓
 
@@ -685,20 +697,20 @@ Information Accuracy
 
 ------
 
-# 30. Supplier Response Flow
+# 30. Organization Response Flow
 
 流程：
 
 ```
-Requirement
+Demand
 
 ↓
 
-Matching
+RFQ
 
 ↓
 
-Solution Response
+Organization Response
 
 ↓
 
@@ -826,7 +838,7 @@ Database Record
 | Search             | Defined |
 | Filter             | Defined |
 | Product Detail     | Defined |
-| Requirement Submit | Defined |
+| Demand Submit      | Defined |
 | Status Tracking    | Defined |
 | Response View      | Defined |
 | Content Conversion | Defined |
@@ -840,8 +852,8 @@ Database Record
 | ---------------- | ------- |
 | Entry Flow       | Defined |
 | Product Flow     | Defined |
-| Requirement Flow | Defined |
-| Matching Flow    | Defined |
+| Demand Flow      | Defined |
+| RFQ Flow         | Defined |
 | Content Flow     | Defined |
 | Exception Flow   | Defined |
 | Data Consistency | Defined |
@@ -924,9 +936,9 @@ Product Browse
 
 Product Detail
 
-Requirement Submit
+Demand Submit
 
-Requirement Processing
+Demand Processing
 ```
 
 ------
@@ -985,12 +997,12 @@ Related Content
 
 ------
 
-# 45. Requirement Module Regression
+# 45. Demand Module Regression
 
 验证：
 
 ```
-Requirement Form
+Demand Form
 
 Validation
 
@@ -1133,7 +1145,7 @@ New Scenario
 | Priority               | Defined |
 | Frontend Regression    | Defined |
 | Product Regression     | Defined |
-| Requirement Regression | Defined |
+| Demand Regression      | Defined |
 | API Regression         | Defined |
 | Database Regression    | Defined |
 | Report                 | Defined |
@@ -1166,7 +1178,7 @@ Public Website
 
 Product Center
 
-Requirement Center
+Demand Center
 
 Content System
 
@@ -1235,14 +1247,14 @@ PASS
 
 ------
 
-# 58. Requirement Function Acceptance
+# 58. Demand Function Acceptance
 
 检查：
 
 流程：
 
 ```
-Create Requirement
+Create Demand
 
 ↓
 
@@ -1308,11 +1320,11 @@ Product Discovery
 
 ↓
 
-Requirement Submission
+Demand Submission
 
 ↓
 
-Matching
+RFQ
 
 ↓
 
@@ -1383,7 +1395,7 @@ PASS
 | -------------------- | ------ |
 | Public Pages         | PASS   |
 | Product Function     | PASS   |
-| Requirement Function | PASS   |
+| Demand Function      | PASS   |
 | Content Function     | PASS   |
 | Business Flow        | PASS   |
 | Responsive           | PASS   |
@@ -1399,6 +1411,60 @@ PASS
 | Core Business Flow    | Completed |
 | Regression Test       | Completed |
 | Acceptance            | Completed |
+| v1.0 Alignment        | Completed |
+
+------
+
+# Blueprint v1.0 Alignment
+
+## Terminology Alignment
+
+| Legacy Term | Canonical Term | Scope |
+|-------------|---------------|-------|
+| Requirement Center | Demand Center | Business Object |
+| Requirement Form | Demand Form | Business Object |
+| Requirement Entry | Demand Entry | Business Object |
+| Requirement Submission | Demand Submission | Business Object |
+| Requirement Workflow | Demand Workflow | Business Object |
+| Requirement Processing | Demand Processing | Business Object |
+| Requirement Flow | Demand Flow | Business Object |
+| Requirement Module | Demand Module | Business Object |
+| Supplier Response Flow | Organization Response Flow | Business Object |
+| Matching | RFQ | Business Object |
+| Requirement Driven | Requirement Driven | QA Process (unchanged) |
+
+## Test Object Alignment
+
+VISNDT Blueprint v1.0 统一测试对象：
+
+| Test Object | Domain |
+|-------------|--------|
+| Standard Product | Product |
+| Product Parameter Metadata | Product / Parameter |
+| Parameter Template | Product / Parameter |
+| Product Parameter Value | Product / Parameter |
+| Offer | Offer |
+| Demand | Demand |
+| RFQ | Demand / RFQ |
+| Workflow | Workflow |
+| Notification | Platform |
+
+## Technology Baseline Reference
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js + TypeScript |
+| Backend | NestJS + TypeScript |
+| Database | PostgreSQL + Prisma |
+| API | REST (OpenAPI) |
+| Testing | Playwright (E2E) + Jest (Unit) |
+
+## Migration Notes
+
+1. 所有业务对象术语已统一为 Canonical Naming Specification 标准。
+2. QA 流程术语（Requirement Driven 等）保持不变。
+3. Test Case ID 中 `TC-REQ-*` 已迁移为 `TC-DEMAND-*`。
+4. 测试对象覆盖范围已对齐 Blueprint v1.0 的 9 个核心业务对象。
 
 ------
 

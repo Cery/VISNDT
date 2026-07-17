@@ -501,9 +501,9 @@ User Data
 
 Product Data
 
-Requirement Data
+Demand Data
 
-Matching Data
+RFQ Data
 
 System Configuration Data
 ```
@@ -1264,6 +1264,46 @@ Completed
 | Database Backup                  | Completed |
 | Recovery Process                 | Completed |
 | Verification & Disaster Recovery | Completed |
+| v1.0 Alignment                   | Completed |
+
+------
+
+# Blueprint v1.0 Alignment
+
+## Terminology Alignment
+
+| Legacy Term | Canonical Term | Scope |
+|-------------|---------------|-------|
+| Requirement Data | Demand Data | Business Object |
+| Matching Data | RFQ Data | Business Object |
+
+## Infrastructure Object Alignment
+
+VISNDT Blueprint v1.0 统一备份对象：
+
+| Backup Object | Backup Content |
+|---------------|---------------|
+| PostgreSQL Backup | Demand / RFQ / Product / User |
+| Object Storage Backup | Static Assets / Uploaded Files |
+| Configuration Backup | Environment / Service / Security |
+
+恢复流程不依赖单一 Provider。
+
+## Technology Baseline Reference
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js + TypeScript |
+| Backend | NestJS + TypeScript |
+| Database | PostgreSQL + Prisma |
+| Deployment | Container Based |
+| Storage | S3 Compatible Object Storage |
+
+## Migration Notes
+
+1. 所有业务对象术语已统一为 Canonical Naming Specification 标准。
+2. 备份对象已明确：`PostgreSQL Backup`、`Object Storage Backup`、`Configuration Backup`。
+3. 恢复流程不依赖单一 Provider，保持 Provider 无关性。
 
 ------
 

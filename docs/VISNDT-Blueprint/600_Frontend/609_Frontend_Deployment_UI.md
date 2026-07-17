@@ -1530,6 +1530,142 @@ PASS
 | Build Pipeline        | Completed |
 | Release Management    | Completed |
 | Acceptance            | Completed |
+| Next.js Alignment     | Completed |
+
+------
+
+# Next.js Deployment Alignment
+
+## Build Command
+
+正式构建命令：
+
+```bash
+next build
+```
+
+> 替代通用 `npm run build`。Next.js 内置优化构建流程。
+
+## Build Output
+
+输出目录：
+
+```
+.next/
+├── static/          # 静态资源（JS, CSS, Images）
+├── server/          # Server 端代码
+├── cache/           # 构建缓存
+└── BUILD_ID         # 部署版本标识
+```
+
+> 替代通用 `dist/` 目录。`.next/` 为 Next.js 标准构建输出。
+
+## Environment Variables
+
+环境变量约定：
+
+```bash
+# .env.local（本地开发，不提交）
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+
+# .env.production（生产环境）
+NEXT_PUBLIC_API_URL=https://api.visndt.com
+```
+
+规则：
+
+- `NEXT_PUBLIC_` 前缀的变量可用于浏览器端
+- 无前缀的变量仅 Server 端可用
+- 禁止在代码中硬编码密钥
+
+## Deployment Target
+
+### Docker Deployment（推荐）
+
+```dockerfile
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
+EXPOSE 3000
+CMD ["node", "server.js"]
+```
+
+### Node.js Runtime
+
+```bash
+next start -p 3000
+```
+
+支持任意 Node.js 运行环境，不绑定特定云平台。
+
+### Provider 无关性
+
+部署可运行于：
+
+- Docker / Kubernetes
+- Vercel
+- AWS / Cloudflare
+- 阿里云 / 腾讯云
+- 任意 S3 Compatible + Node.js 环境
+
+架构约束与 `TECH_STACK_DECISION.md` 一致：
+
+- 业务代码不依赖具体 Provider
+- 环境切换通过配置完成
+
+## Asset Versioning
+
+Next.js 自动处理：
+
+```
+/_next/static/chunks/main-xxxxx.js
+/_next/static/css/style-xxxxx.css
+```
+
+构建时自动生成内容哈希，无需手动配置。
+
+## Cache Strategy
+
+| 资源类型 | 缓存策略 |
+|----------|----------|
+| 静态资源（JS/CSS） | 永久缓存（内容哈希） |
+| 图片 | CDN + Cache-Control |
+| HTML 页面 | ISR Revalidation |
+| API 响应 | TanStack Query staleTime |
+
+## CI/CD Pipeline
+
+```
+Developer Commit
+    ↓
+Git Repository
+    ↓
+CI: next build
+    ↓
+CI: next lint + type check
+    ↓
+Docker Build
+    ↓
+Deploy to Target
+    ↓
+Health Check
+```
+
+## Rollback Strategy
+
+- Docker：回滚到上一个 Image Tag
+- Static Export：回滚到上一个 CDN 版本
+- 支持版本标记和快速回滚
 
 ------
 

@@ -1,0 +1,496 @@
+// ===========================================
+// VISNDT Prisma Schema v1.0
+// Based on: VISNDT Blueprint v1.0
+// Reference: 400_Database-第二版 / 405_prisma.schema-第二版全新.md
+// ===========================================
+// 
+// Model naming: PascalCase (Prisma convention)
+// Database mapping: snake_case (@map)
+// 
+// Migration Plan per MVP Engineering Implementation Plan:
+//   Migration 001: Identity (User, Organization, OrganizationMember)
+//   Migration 002: Organization + Product
+//   Migration 003: Offer + Demand + RFQ
+//   Migration 004: Notification + Audit
+// ===========================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===========================================
+// Enums
+// ===========================================
+
+enum OrganizationStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum OfferStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+}
+
+enum DemandStatus {
+  DRAFT
+  SUBMITTED
+  PROCESSING
+  CLOSED
+  CANCELLED
+}
+
+enum RFQStatus {
+  DRAFT
+  OPEN
+  RESPONDING
+  CLOSED
+  CANCELLED
+}
+
+enum RFQResponseStatus {
+  SUBMITTED
+  VIEWED
+  ACCEPTED
+  REJECTED
+}
+
+enum WorkflowEntityType {
+  DEMAND
+  RFQ
+  RFQ_RESPONSE
+}
+
+enum WorkflowAction {
+  CREATED
+  SUBMITTED
+  OPENED
+  RESPONDED
+  ACCEPTED
+  REJECTED
+  CLOSED
+}
+
+enum NotificationType {
+  SYSTEM
+  DEMAND_UPDATE
+  RFQ_UPDATE
+  RESPONSE_UPDATE
+}
+
+enum NotificationStatus {
+  UNREAD
+  READ
+}
+
+enum FileEntityType {
+  PRODUCT
+  ORGANIZATION
+  DEMAND
+  RFQ
+  RFQ_RESPONSE
+}
+
+enum FileType {
+  IMAGE
+  DOCUMENT
+  CERTIFICATE
+  OTHER
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  STATUS_CHANGE
+  LOGIN
+}
+
+// ===========================================
+// Migration 001: Identity & Organization Domain
+// ===========================================
+
+model User {
+  id             String     @id @default(uuid()) @db.Uuid
+  email          String     @unique
+  passwordHash   String     @map("password_hash")
+  status         UserStatus @default(ACTIVE)
+  organizationId String?    @map("organization_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  organization   Organization?        @relation(fields: [organizationId], references: [id])
+  memberships    OrganizationMember[]
+  demands        Demand[]
+  workflowEvents WorkflowEvent[]
+  notifications  Notification[]
+  fileAssets     FileAsset[]
+  auditLogs      AuditLog[]
+  rfqs           RFQ[]
+
+  @@index([organizationId])
+  @@index([status])
+  @@map("user")
+}
+
+model Organization {
+  id     String             @id @default(uuid()) @db.Uuid
+  name   String
+  type   String             @map("organization_type")
+  status OrganizationStatus @default(ACTIVE)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  members      OrganizationMember[]
+  users        User[]
+  offers       Offer[]
+  demands      Demand[]
+  rfqResponses RFQResponse[]
+
+  @@index([status])
+  @@map("organization")
+}
+
+model OrganizationMember {
+  id             String @id @default(uuid()) @db.Uuid
+  organizationId String @map("organization_id") @db.Uuid
+  userId         String @map("user_id") @db.Uuid
+  role           String @default("MEMBER")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+  @@map("organization_member")
+}
+
+// ===========================================
+// Migration 002: Product Domain
+// ===========================================
+
+model ProductCategory {
+  id       String  @id @default(uuid()) @db.Uuid
+  name     String
+  slug     String  @unique
+  parentId String? @map("parent_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  parent   ProductCategory?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children ProductCategory[] @relation("CategoryTree")
+  products Product[]
+
+  @@index([parentId])
+  @@map("product_category")
+}
+
+model Product {
+  id          String  @id @default(uuid()) @db.Uuid
+  categoryId  String  @map("category_id") @db.Uuid
+  name        String
+  model       String?
+  description String?
+  status      String  @default("DRAFT")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  category              ProductCategory              @relation(fields: [categoryId], references: [id])
+  parameterAssociations ProductParameterDefinition[]
+  parameterValues       ProductParameterValue[]
+  offers                Offer[]
+
+  @@index([categoryId])
+  @@index([status])
+  @@map("product")
+}
+
+model ParameterGroup {
+  id          String  @id @default(uuid()) @db.Uuid
+  name        String
+  code        String  @unique
+  description String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  definitions ParameterDefinition[]
+
+  @@index([code])
+  @@map("parameter_group")
+}
+
+model ParameterDefinition {
+  id               String  @id @default(uuid()) @db.Uuid
+  parameterGroupId String? @map("parameter_group_id") @db.Uuid
+  name             String
+  code             String  @unique @map("parameter_code")
+  dataType         String  @map("data_type")
+  unit             String? @map("value_unit")
+  required         Boolean @default(false)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  group               ParameterGroup?              @relation(fields: [parameterGroupId], references: [id])
+  productAssociations ProductParameterDefinition[]
+  options             ParameterOption[]
+  productValues       ProductParameterValue[]
+
+  @@index([parameterGroupId])
+  @@index([code])
+  @@map("parameter_definition")
+}
+
+model ParameterOption {
+  id                    String @id @default(uuid()) @db.Uuid
+  parameterDefinitionId String @map("parameter_definition_id") @db.Uuid
+  value                 String
+  label                 String
+  sortOrder             Int    @default(0) @map("sort_order")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  parameterDefinition ParameterDefinition @relation(fields: [parameterDefinitionId], references: [id])
+
+  @@index([parameterDefinitionId])
+  @@map("parameter_option")
+}
+
+model ProductParameterValue {
+  id                    String @id @default(uuid()) @db.Uuid
+  productId             String @map("product_id") @db.Uuid
+  parameterDefinitionId String @map("parameter_definition_id") @db.Uuid
+  value                 String
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  product             Product             @relation(fields: [productId], references: [id])
+  parameterDefinition ParameterDefinition @relation(fields: [parameterDefinitionId], references: [id])
+
+  @@unique([productId, parameterDefinitionId])
+  @@index([parameterDefinitionId])
+  @@map("product_parameter_value")
+}
+
+model ProductParameterDefinition {
+  id                    String @id @default(uuid()) @db.Uuid
+  productId             String @map("product_id") @db.Uuid
+  parameterDefinitionId String @map("parameter_definition_id") @db.Uuid
+  displayOrder          Int    @default(0) @map("display_order")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  product             Product             @relation(fields: [productId], references: [id])
+  parameterDefinition ParameterDefinition @relation(fields: [parameterDefinitionId], references: [id])
+
+  @@unique([productId, parameterDefinitionId])
+  @@index([parameterDefinitionId])
+  @@map("product_parameter_definition")
+}
+
+// ===========================================
+// Migration 003: Offer Domain
+// ===========================================
+
+model Offer {
+  id             String      @id @default(uuid()) @db.Uuid
+  organizationId String      @map("organization_id") @db.Uuid
+  productId      String      @map("product_id") @db.Uuid
+  title          String
+  description    String?
+  status         OfferStatus @default(DRAFT)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  organization Organization  @relation(fields: [organizationId], references: [id])
+  product      Product       @relation(fields: [productId], references: [id])
+  rfqResponses RFQResponse[]
+
+  @@unique([organizationId, productId])
+  @@index([productId])
+  @@index([status])
+  @@map("offer")
+}
+
+// ===========================================
+// Migration 003: Demand & RFQ Domain
+// ===========================================
+
+model Demand {
+  id             String       @id @default(uuid()) @db.Uuid
+  title          String
+  description    String?
+  organizationId String?      @map("organization_id") @db.Uuid
+  createdBy      String       @map("created_by") @db.Uuid
+  status         DemandStatus @default(DRAFT)
+  parametersJson Json?        @map("parameters_json")
+  budgetRange    String?      @map("budget_range")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  createdByUser User          @relation(fields: [createdBy], references: [id])
+  organization  Organization? @relation(fields: [organizationId], references: [id])
+  rfq           RFQ?
+
+  @@index([organizationId])
+  @@index([createdBy])
+  @@index([status])
+  @@map("demand")
+}
+
+model RFQ {
+  id          String    @id @default(uuid()) @db.Uuid
+  demandId    String    @unique @map("demand_id") @db.Uuid
+  createdBy   String    @map("created_by") @db.Uuid
+  status      RFQStatus @default(DRAFT)
+  publishedAt DateTime? @map("published_at")
+  closedAt    DateTime? @map("closed_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  demand        Demand        @relation(fields: [demandId], references: [id])
+  createdByUser User          @relation(fields: [createdBy], references: [id])
+  responses     RFQResponse[]
+
+  @@index([createdBy])
+  @@index([status])
+  @@map("rfq")
+}
+
+model RFQResponse {
+  id             String            @id @default(uuid()) @db.Uuid
+  rfqId          String            @map("rfq_id") @db.Uuid
+  organizationId String            @map("organization_id") @db.Uuid
+  offerId        String?           @map("offer_id") @db.Uuid
+  message        String?
+  status         RFQResponseStatus @default(SUBMITTED)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  rfq          RFQ          @relation(fields: [rfqId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+  offer        Offer?       @relation(fields: [offerId], references: [id])
+
+  @@unique([rfqId, organizationId])
+  @@index([organizationId])
+  @@index([offerId])
+  @@index([status])
+  @@map("rfq_response")
+}
+
+// ===========================================
+// Migration 004: Workflow & Notification Domain
+// ===========================================
+
+model WorkflowEvent {
+  id         String             @id @default(uuid()) @db.Uuid
+  entityType WorkflowEntityType @map("entity_type")
+  entityId   String             @map("entity_id") @db.Uuid
+  action     WorkflowAction
+  operatorId String             @map("operator_id") @db.Uuid
+  metadata   Json?              @db.JsonB
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  operator User @relation(fields: [operatorId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([operatorId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("workflow_event")
+}
+
+model Notification {
+  id            String             @id @default(uuid()) @db.Uuid
+  userId        String             @map("user_id") @db.Uuid
+  type          NotificationType
+  status        NotificationStatus @default(UNREAD)
+  title         String
+  message       String
+  referenceType String?            @map("reference_type")
+  referenceId   String?            @map("reference_id") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, status])
+  @@index([type])
+  @@index([createdAt])
+  @@map("notification")
+}
+
+// ===========================================
+// Migration 004: File Asset & Audit Domain
+// ===========================================
+
+model FileAsset {
+  id         String         @id @default(uuid()) @db.Uuid
+  entityType FileEntityType @map("entity_type")
+  entityId   String         @map("entity_id") @db.Uuid
+  fileType   FileType       @map("file_type")
+  fileName   String         @map("file_name")
+  storageKey String         @map("storage_key")
+  mimeType   String         @map("mime_type")
+  fileSize   Int            @map("file_size")
+  uploadedBy String         @map("uploaded_by") @db.Uuid
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  uploader User @relation(fields: [uploadedBy], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([uploadedBy])
+  @@map("file_asset")
+}
+
+model AuditLog {
+  id         String      @id @default(uuid()) @db.Uuid
+  entityType String      @map("entity_type")
+  entityId   String      @map("entity_id") @db.Uuid
+  action     AuditAction
+  operatorId String      @map("operator_id") @db.Uuid
+  oldValue   Json?       @map("old_value") @db.JsonB
+  newValue   Json?       @map("new_value") @db.JsonB
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  operator User @relation(fields: [operatorId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([operatorId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_log")
+}

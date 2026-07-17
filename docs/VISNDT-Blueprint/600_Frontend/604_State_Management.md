@@ -517,11 +517,14 @@ error
 | Cache Strategy     | Defined |
 | Error Handling     | Defined |
 
-# Pinia Store Design Specification
+# Pinia Store Design Specification (Historical Reference)
+
+> 以下 Pinia Store 设计为 VISNDT Blueprint 早期方案，现已作为历史参考保留。
+> 当前正式技术栈参见文末 Current Implementation Target。
 
 ------
 
-# 22. Purpose
+# 22. Purpose (Historical)
 
 定义 VISNDT 前端 Pinia Store 设计规范。
 
@@ -1971,9 +1974,149 @@ Server Error
 | Module             | Status    |
 | ------------------ | --------- |
 | State Foundation   | Completed |
-| Pinia Store Design | Completed |
+| Pinia Store Design | Historical |
 | Data Flow          | Completed |
 | Acceptance         | Completed |
+| Next.js Alignment  | Completed |
+
+------
+
+# Historical Design Reference
+
+## Pinia State Management (Historical)
+
+以下内容为 VISNDT Blueprint 早期基于 Pinia 的状态管理设计，现已作为历史参考保留。
+
+主要历史设计元素：
+
+- Pinia Store 架构（appStore, userStore, productStore, searchStore, requirementStore）
+- Pinia Actions / Getters 模式
+- Pinia persist plugin
+- Vue 响应式状态绑定
+
+这些内容不再作为 `VISNDT Blueprint v1.0` 开发依据。
+
+------
+
+# Current Implementation Target
+
+## Next.js + React 状态管理方案
+
+VISNDT Blueprint v1.0 前端状态管理冻结为：
+
+### Client State: Zustand
+
+用于管理纯客户端全局状态。
+
+Store 架构：
+
+```
+src/stores/
+├── appStore.ts         # 应用级状态（语言、主题、系统配置）
+├── userStore.ts        # 用户会话状态
+├── productStore.ts     # 产品筛选、比较列表
+├── searchStore.ts      # 搜索关键词、历史
+└── requirementStore.ts # 需求草稿
+```
+
+Zustand Store 示例：
+
+```typescript
+// productStore.ts
+import { create } from 'zustand';
+
+interface ProductState {
+  products: Product[];
+  currentProduct: Product | null;
+  filters: FilterState;
+  setFilter: (filter: Partial<FilterState>) => void;
+  loadProducts: (query: ProductQuery) => Promise<void>;
+}
+
+export const useProductStore = create<ProductState>((set, get) => ({
+  products: [],
+  currentProduct: null,
+  filters: {},
+  setFilter: (filter) => set((s) => ({ filters: { ...s.filters, ...filter } })),
+  loadProducts: async (query) => { /* ... */ },
+}));
+```
+
+Client State 职责：
+
+| Store | 职责 |
+|-------|------|
+| appStore | 全局配置（语言、主题） |
+| userStore | 用户会话、Token |
+| productStore | 产品筛选状态、比较列表 |
+| searchStore | 搜索关键词、历史 |
+| requirementStore | 需求草稿、临时表单状态 |
+
+### Server State: TanStack Query
+
+用于管理服务端数据获取、缓存、同步。
+
+TanStack Query 接管：
+
+- 产品列表数据（替代 productStore 中的 products[]）
+- 产品详情数据
+- 需求状态查询
+- 分类/参数字典数据
+- 搜索结果数据
+
+Server State 示例：
+
+```typescript
+// hooks/useProducts.ts
+import { useQuery } from '@tanstack/react-query';
+
+export function useProducts(query: ProductQuery) {
+  return useQuery({
+    queryKey: ['products', query],
+    queryFn: () => productService.getProducts(query),
+    staleTime: 5 * 60 * 1000, // 5 min cache
+  });
+}
+```
+
+### Client State vs Server State 分离原则
+
+| 数据类型 | 管理方案 | 示例 |
+|----------|----------|------|
+| UI 交互状态 | Zustand | 筛选器展开/折叠、对话框显示 |
+| 用户临时选择 | Zustand | 产品比较列表、筛选条件 |
+| 服务端数据 | TanStack Query | 产品列表、产品详情、分类 |
+| 持久化会话 | Zustand + localStorage | Token、用户偏好 |
+| 草稿数据 | Zustand + localStorage | 需求草稿 |
+| 缓存数据 | TanStack Query | 参数字典、分类数据 |
+
+### Data Flow
+
+```
+Component
+    ↓
+Zustand Store (Client State)  /  TanStack Query (Server State)
+    ↓
+Service Layer
+    ↓
+Backend API
+```
+
+### Store Communication Rule
+
+- Zustand Store 之间禁止直接修改数据
+- TanStack Query 通过 queryKey 自动管理缓存失效
+- Component 通过 custom hooks 组合 Client State 和 Server State
+
+### Persistence Strategy
+
+| 数据 | 方案 |
+|------|------|
+| User Token | localStorage + Zustand persist middleware |
+| 用户偏好 | localStorage + Zustand persist middleware |
+| 需求草稿 | localStorage + Zustand persist middleware |
+| 产品列表 | TanStack Query cache（不持久化） |
+| 临时 UI 状态 | 不持久化 |
 
 ------
 

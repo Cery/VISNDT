@@ -1,0 +1,14 @@
+{
+  "name": "@visndt/database",
+  "version": "0.1.0",
+  "private": true,
+  "description": "VISNDT Database — Prisma Schema & Migrations",
+  "scripts": {
+    "generate": "prisma generate",
+    "migrate": "prisma migrate dev",
+    "studio": "prisma studio"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0"
+  }
+}

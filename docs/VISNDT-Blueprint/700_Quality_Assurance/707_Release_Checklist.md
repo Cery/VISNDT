@@ -434,7 +434,7 @@ Homepage Access
 
 Product Browse
 
-Requirement Submit
+Demand Submit
 
 API Request
 ```
@@ -656,9 +656,9 @@ Product Search
 
 Product Detail
 
-Requirement Submission
+Demand Submission
 
-Matching Flow
+RFQ Flow
 ```
 
 结果：
@@ -846,9 +846,9 @@ No Service Interruption
 ```
 Product Browse
 
-Requirement Submission
+Demand Submission
 
-Matching Workflow
+RFQ Workflow
 
 Content Display
 ```
@@ -1019,6 +1019,52 @@ PASS
 | Deployment Verification   | Completed |
 | Production Launch         | Completed |
 | Post Release Verification | Completed |
+| v1.0 Alignment            | Completed |
+
+------
+
+# Blueprint v1.0 Alignment
+
+## Terminology Alignment
+
+| Legacy Term | Canonical Term | Scope |
+|-------------|---------------|-------|
+| Requirement Submit | Demand Submit | Business Object |
+| Requirement Submission | Demand Submission | Business Object |
+| Matching Flow | RFQ Flow | Business Object |
+| Matching Workflow | RFQ Workflow | Business Object |
+
+## Test Object Alignment
+
+VISNDT Blueprint v1.0 统一测试对象：
+
+| Test Object | Release Check |
+|-------------|---------------|
+| Identity | Auth / Access |
+| Organization | Org Side Flow |
+| Standard Product | Product Display |
+| Product Parameter | Parameter Display |
+| Offer | Offer Flow |
+| Demand | Demand Flow |
+| RFQ | RFQ Flow |
+| Workflow | Status Flow |
+| Notification | Notification Delivery |
+
+## Technology Baseline Reference
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js + TypeScript (next build) |
+| Backend | NestJS + TypeScript (NestJS build) |
+| Database | PostgreSQL + Prisma (Migration) |
+| Deployment | Container Based (Docker) |
+
+## Migration Notes
+
+1. 所有业务对象术语已统一为 Canonical Naming Specification 标准。
+2. 构建命令已对齐：`next build`（Frontend）、`nest build`（Backend）。
+3. 数据库迁移：`prisma migrate deploy`（PostgreSQL）。
+4. Release Checklist 覆盖范围已对齐 Blueprint v1.0 的 9 个核心业务对象。
 
 ------
 

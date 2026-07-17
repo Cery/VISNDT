@@ -468,16 +468,16 @@ components/feedback/
 
 规则：
 
-Vue 组件：
+React 组件：
 
 PascalCase。
 
 例如：
 
 ```
-ProductCard.vue
+ProductCard.tsx
 
-ParameterTable.vue
+ParameterTable.tsx
 ```
 
 ------
@@ -488,16 +488,20 @@ ParameterTable.vue
 
 Props：
 
-明确类型。
+使用 TypeScript Interface 明确类型。
 
 例如：
 
-```
-Product
+```typescript
+interface ProductCardProps {
+  product: Product;
+  onSelect?: (id: string) => void;
+}
 
-Parameter
-
-Config
+interface ParameterTableProps {
+  parameters: Parameter[];
+  group?: string;
+}
 ```
 
 ------
@@ -512,18 +516,14 @@ Config
 
 事件：
 
-统一命名。
+使用 callback props。
 
 例如：
 
-```
-update
-
-change
-
-submit
-
-select
+```typescript
+onChange?: (value: string) => void;
+onSubmit?: (data: FormData) => void;
+onSelect?: (id: string) => void;
 ```
 
 ------
@@ -1820,9 +1820,9 @@ Service
 组件：
 
 ```
-ProductCard.vue
+ProductCard.tsx
 
-RequirementForm.vue
+RequirementForm.tsx
 ```
 
 ------
@@ -1940,6 +1940,86 @@ Responsive Layout
 | Product Components     | Completed |
 | Requirement Components | Completed |
 | Component Acceptance   | Completed |
+| Next.js Alignment      | Completed |
+
+------
+
+# Historical Design Reference
+
+## Vue 3 Component Design (Historical)
+
+以下内容为 VISNDT Blueprint 早期基于 Vue 3 的组件设计，现已作为历史参考保留。
+
+主要历史设计元素：
+
+- Vue 3 SFC（Single File Component）
+- Vue Props / Emits 事件模型
+- Vue 组件命名规范（`.vue` 扩展名）
+
+这些内容不再作为 `VISNDT Blueprint v1.0` 开发依据。
+
+------
+
+# Current Implementation Target
+
+## Next.js + React + TypeScript 组件体系
+
+VISNDT Blueprint v1.0 前端组件体系冻结为：
+
+### Framework
+
+- **Next.js** App Router
+- **React** 18+
+- **TypeScript** 严格模式
+
+### Component Model
+
+| 概念 | 实现 |
+|------|------|
+| 组件文件 | `.tsx`（React Component） |
+| Props 定义 | TypeScript Interface |
+| 事件传递 | callback props（`onXxx`） |
+| 子组件 | `children` prop |
+| 样式 | CSS Modules / Tailwind CSS |
+
+### Server Component / Client Component Boundary
+
+```
+'use client' 边界
+─────────────────────
+Server Components       Client Components
+- 静态渲染              - 交互状态
+- 数据获取              - 事件处理
+- SEO 内容              - 浏览器 API
+- 无交互组件            - 表单输入
+```
+
+默认规则：
+
+- 页面组件默认 Server Component
+- 需要交互的组件添加 `'use client'` directive
+- 业务组件（ProductCard、ParameterTable、RequirementForm）标记为 Client Component
+
+### Component Directory Structure
+
+```
+src/
+├── components/
+│   ├── base/          # 基础组件（Button, Input, Select, Dialog, Table）
+│   ├── layout/        # 布局组件（Header, Footer, Container, Sidebar）
+│   ├── business/      # 业务组件（ProductCard, ParameterTable, FilterPanel）
+│   └── feedback/      # 反馈组件（Loading, Empty, Error）
+├── app/               # Next.js App Router 页面
+└── lib/               # 工具函数、类型定义
+```
+
+### Component Reusability
+
+组件复用原则保持不变：
+
+- ProductCard 可用于首页、产品列表、搜索结果
+- ParameterTable 支持不同设备参数展示
+- RequirementForm 支持产品来源需求和独立需求提交
 
 ------
 

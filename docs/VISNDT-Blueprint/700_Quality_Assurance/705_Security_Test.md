@@ -158,7 +158,7 @@ Operation Permission
 ```
 User Information
 
-Requirement Data
+Demand Data
 
 Business Data
 
@@ -1129,6 +1129,53 @@ PASS
 | Security Test Cases   | Completed |
 | Security Verification | Completed |
 | Acceptance            | Completed |
+| v1.0 Alignment        | Completed |
+
+------
+
+# Blueprint v1.0 Alignment
+
+## Terminology Alignment
+
+| Legacy Term | Canonical Term | Scope |
+|-------------|---------------|-------|
+| Requirement Data | Demand Data | Business Object |
+| Supplier Permission | Organization Authorization | Business Object |
+| Requirement Access Control | Demand Access Control | Business Object |
+| Security Requirement | Security Requirement | QA Process (unchanged) |
+
+## Test Object Alignment
+
+VISNDT Blueprint v1.0 统一测试对象：
+
+| Test Object | Security Focus |
+|-------------|----------------|
+| Identity | Authentication / Session |
+| Organization | Authorization / Isolation |
+| Standard Product | Access Control |
+| Product Parameter | Data Validation |
+| Offer | Access Control |
+| Demand | Access Control / Data Protection |
+| RFQ | Permission / Flow Security |
+| Workflow | State Authority |
+| Notification | Data Privacy |
+
+## Technology Baseline Reference
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js + TypeScript |
+| Backend | NestJS + TypeScript |
+| Database | PostgreSQL + Prisma |
+| Deployment | Container Based |
+| Security | JWT / RBAC / CSP |
+
+## Migration Notes
+
+1. 所有业务对象术语已统一为 Canonical Naming Specification 标准。
+2. QA 流程术语（Security Requirement）保持不变。
+3. 权限控制已对齐：`Organization Authorization`、`Demand Access Control`、`RFQ Permission`。
+4. 测试对象覆盖范围已对齐 Blueprint v1.0 的 9 个核心业务对象。
 
 ------
 

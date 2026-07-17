@@ -1474,6 +1474,43 @@ Completed
 | Database Maintenance     | Completed |
 | Configuration Management | Completed |
 | Maintenance Review       | Completed |
+| v1.0 Alignment           | Completed |
+
+------
+
+# Blueprint v1.0 Alignment
+
+## Terminology Alignment
+
+Operations 文档以运维通用术语为主，无业务对象术语冲突。
+
+## Infrastructure Object Alignment
+
+VISNDT Blueprint v1.0 统一维护对象：
+
+| Maintenance Object | Maintenance Focus |
+|--------------------|-------------------|
+| Next.js Application | Frontend Update / Patch |
+| NestJS Service | Backend Update / Security |
+| Prisma Schema | Database Migration |
+| PostgreSQL Database | Performance / Storage |
+| Container Runtime | Version / Security |
+
+## Technology Baseline Reference
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | Next.js + TypeScript |
+| Backend | NestJS + TypeScript |
+| Database | PostgreSQL + Prisma |
+| Deployment | Container Based |
+| Storage | S3 Compatible Object Storage |
+
+## Migration Notes
+
+1. 维护对象已明确：`Next.js Application`、`NestJS Service`、`Prisma Schema`、`PostgreSQL Migration`。
+2. 所有维护流程已对齐 Blueprint v1.0 技术栈。
+3. 数据库维护流程包含 Prisma Schema 变更管理。
 
 ------
 
