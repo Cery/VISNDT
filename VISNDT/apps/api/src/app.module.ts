@@ -15,6 +15,7 @@ import { DemandsModule } from './demands/demands.module';
 import { RfqsModule } from './rfqs/rfqs.module';
 import { RfqResponsesModule } from './rfq-responses/rfq-responses.module';
 import { WorkflowEventsModule } from './workflow-events/workflow-events.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { WorkflowEventsModule } from './workflow-events/workflow-events.module';
     RfqsModule,
     RfqResponsesModule,
     WorkflowEventsModule,
+    AuthModule,
   ],
 })
 export class AppModule {}

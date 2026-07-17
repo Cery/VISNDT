@@ -28,6 +28,7 @@ async function bootstrap() {
     .setTitle('VISNDT API')
     .setDescription('VISNDT Platform API — MVP v1.0')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
