@@ -43,14 +43,46 @@ export class RfqResponsesService {
     return response;
   }
 
-  async create(rfqId: string, dto: CreateRfqResponseDto) {
+  async create(
+    rfqId: string,
+    dto: CreateRfqResponseDto,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    if (!user.organizationId) {
+      throw new BadRequestException(
+        'User must belong to an organization to respond to an RFQ',
+      );
+    }
+
     return this.prisma.rFQResponse.create({
-      data: { ...dto, rfqId },
+      data: {
+        rfqId,
+        organizationId: user.organizationId,
+        offerId: dto.offerId,
+        message: dto.message,
+      },
     });
   }
 
-  async update(id: string, dto: UpdateRfqResponseDto) {
-    const response = await this.findOne(id);
+  async update(
+    id: string,
+    dto: UpdateRfqResponseDto,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    const response = await this.prisma.rFQResponse.findUnique({
+      where: { id },
+    });
+
+    if (!response) {
+      throw new NotFoundException(`RFQ Response ${id} not found`);
+    }
+
+    // Ownership validation: only the organization that created the response can update it
+    if (user.organizationId && response.organizationId !== user.organizationId) {
+      throw new BadRequestException(
+        'You do not have permission to update this response',
+      );
+    }
 
     if (dto.status) {
       const allowed = RESPONSE_TRANSITIONS[response.status];

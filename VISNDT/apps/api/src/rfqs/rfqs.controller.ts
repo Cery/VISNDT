@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Patch, Param, Body, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { RfqsService } from './rfqs.service';
 import { CreateRfqDto } from './dto/create-rfq.dto';
 import { UpdateRfqDto } from './dto/update-rfq.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { ApiResponse } from '../common/dto/api-response.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AuthRequest } from '../auth/interfaces/auth-request.interface';
 
 @ApiTags('RFQs')
 @Controller('rfqs')
@@ -25,15 +28,26 @@ export class RfqsController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create a new RFQ' })
-  async create(@Body() dto: CreateRfqDto) {
-    return ApiResponse.ok(await this.service.create(dto), 'RFQ created');
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a new RFQ (authenticated)' })
+  async create(
+    @Body() dto: CreateRfqDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.create(dto, user), 'RFQ created');
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update RFQ' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update RFQ (authenticated, org-scoped)' })
   @ApiParam({ name: 'id', description: 'RFQ UUID' })
-  async update(@Param('id') id: string, @Body() dto: UpdateRfqDto) {
-    return ApiResponse.ok(await this.service.update(id, dto), 'RFQ updated');
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateRfqDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.update(id, dto, user), 'RFQ updated');
   }
 }

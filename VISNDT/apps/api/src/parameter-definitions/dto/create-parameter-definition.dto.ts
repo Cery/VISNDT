@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsBoolean } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsIn } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateParameterDefinitionDto {
@@ -10,8 +10,9 @@ export class CreateParameterDefinitionDto {
   @IsString()
   code: string;
 
-  @ApiProperty({ description: 'Data type', example: 'number' })
+  @ApiProperty({ description: 'Data type', example: 'NUMBER', enum: ['STRING', 'NUMBER', 'BOOLEAN', 'ENUM'] })
   @IsString()
+  @IsIn(['STRING', 'NUMBER', 'BOOLEAN', 'ENUM'])
   dataType: string;
 
   @ApiPropertyOptional({ description: 'Parameter group ID', example: 'uuid' })

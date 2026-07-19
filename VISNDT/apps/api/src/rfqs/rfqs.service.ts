@@ -43,12 +43,40 @@ export class RfqsService {
     return rfq;
   }
 
-  async create(dto: CreateRfqDto) {
-    return this.prisma.rFQ.create({ data: dto });
+  async create(
+    dto: CreateRfqDto,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    return this.prisma.rFQ.create({
+      data: {
+        demandId: dto.demandId,
+        createdBy: user.id,
+      },
+    });
   }
 
-  async update(id: string, dto: UpdateRfqDto) {
-    const rfq = await this.findOne(id);
+  async update(
+    id: string,
+    dto: UpdateRfqDto,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    const rfq = await this.prisma.rFQ.findUnique({
+      where: { id },
+      include: { demand: { select: { organizationId: true } } },
+    });
+
+    if (!rfq) {
+      throw new NotFoundException(`RFQ ${id} not found`);
+    }
+
+    // Ownership validation: user must be the creator or belong to the same org
+    const isCreator = rfq.createdBy === user.id;
+    const isSameOrg = user.organizationId && rfq.demand?.organizationId === user.organizationId;
+    if (!isCreator && !isSameOrg) {
+      throw new BadRequestException(
+        'You do not have permission to update this RFQ',
+      );
+    }
 
     if (dto.status) {
       const allowed = RFQ_TRANSITIONS[rfq.status];

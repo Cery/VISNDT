@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Patch, Param, Body, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { RfqResponsesService } from './rfq-responses.service';
 import { CreateRfqResponseDto } from './dto/create-rfq-response.dto';
 import { UpdateRfqResponseDto } from './dto/update-rfq-response.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { ApiResponse } from '../common/dto/api-response.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AuthRequest } from '../auth/interfaces/auth-request.interface';
 
 @ApiTags('RFQ Responses')
 @Controller()
@@ -19,10 +22,16 @@ export class RfqResponsesController {
   }
 
   @Post('rfqs/:id/responses')
-  @ApiOperation({ summary: 'Create a response for an RFQ' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a response for an RFQ (authenticated)' })
   @ApiParam({ name: 'id', description: 'RFQ UUID' })
-  async create(@Param('id') id: string, @Body() dto: CreateRfqResponseDto) {
-    return ApiResponse.ok(await this.service.create(id, dto), 'Response created');
+  async create(
+    @Param('id') id: string,
+    @Body() dto: CreateRfqResponseDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.create(id, dto, user), 'Response created');
   }
 
   @Get('rfq-responses/:id')
@@ -33,9 +42,15 @@ export class RfqResponsesController {
   }
 
   @Patch('rfq-responses/:id')
-  @ApiOperation({ summary: 'Update RFQ response' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update RFQ response (authenticated)' })
   @ApiParam({ name: 'id', description: 'Response UUID' })
-  async update(@Param('id') id: string, @Body() dto: UpdateRfqResponseDto) {
-    return ApiResponse.ok(await this.service.update(id, dto), 'Response updated');
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateRfqResponseDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.update(id, dto, user), 'Response updated');
   }
 }

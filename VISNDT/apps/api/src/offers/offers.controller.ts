@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Patch, Param, Body, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { OffersService } from './offers.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { ApiResponse } from '../common/dto/api-response.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AuthRequest } from '../auth/interfaces/auth-request.interface';
 
 @ApiTags('Offers')
 @Controller('offers')
@@ -25,15 +28,26 @@ export class OffersController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create a new offer' })
-  async create(@Body() dto: CreateOfferDto) {
-    return ApiResponse.ok(await this.service.create(dto), 'Offer created');
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a new offer (authenticated)' })
+  async create(
+    @Body() dto: CreateOfferDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.create(dto, user), 'Offer created');
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update offer' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update offer (authenticated, org-scoped)' })
   @ApiParam({ name: 'id', description: 'Offer UUID' })
-  async update(@Param('id') id: string, @Body() dto: UpdateOfferDto) {
-    return ApiResponse.ok(await this.service.update(id, dto), 'Offer updated');
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateOfferDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.update(id, dto, user), 'Offer updated');
   }
 }

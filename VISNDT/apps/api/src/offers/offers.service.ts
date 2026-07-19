@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
@@ -34,12 +38,43 @@ export class OffersService {
     return offer;
   }
 
-  async create(dto: CreateOfferDto) {
-    return this.prisma.offer.create({ data: dto });
+  async create(
+    dto: CreateOfferDto,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    if (!user.organizationId) {
+      throw new BadRequestException(
+        'User must belong to an organization to create an offer',
+      );
+    }
+
+    return this.prisma.offer.create({
+      data: {
+        ...dto,
+        organizationId: user.organizationId,
+      },
+    });
   }
 
-  async update(id: string, dto: UpdateOfferDto) {
-    await this.findOne(id);
+  async update(
+    id: string,
+    dto: UpdateOfferDto,
+    user: { organizationId?: string | null },
+  ) {
+    if (!user.organizationId) {
+      throw new BadRequestException(
+        'User must belong to an organization to update an offer',
+      );
+    }
+
+    const offer = await this.prisma.offer.findFirst({
+      where: { id, organizationId: user.organizationId },
+    });
+
+    if (!offer) {
+      throw new NotFoundException(`Offer ${id} not found`);
+    }
+
     return this.prisma.offer.update({ where: { id }, data: dto });
   }
 }

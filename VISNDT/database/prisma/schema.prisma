@@ -47,6 +47,7 @@ enum OfferStatus {
 
 enum DemandStatus {
   DRAFT
+  PUBLISHED
   SUBMITTED
   PROCESSING
   CLOSED
@@ -117,6 +118,22 @@ enum AuditAction {
   DELETE
   STATUS_CHANGE
   LOGIN
+}
+
+enum ParameterDataType {
+  STRING
+  NUMBER
+  BOOLEAN
+  ENUM
+}
+
+enum DemandMatchStatus {
+  PENDING
+  MATCHED
+  REVIEWED
+  ACCEPTED
+  REJECTED
+  EXPIRED
 }
 
 // ===========================================
@@ -220,10 +237,35 @@ model Product {
   parameterAssociations ProductParameterDefinition[]
   parameterValues       ProductParameterValue[]
   offers                Offer[]
+  media                 ProductMedia[]
+  demandMatches         DemandMatch[]
 
   @@index([categoryId])
   @@index([status])
+  @@index([name])
+  @@index([model])
   @@map("product")
+}
+
+model ProductMedia {
+  id           String   @id @default(uuid()) @db.Uuid
+  productId    String   @map("product_id") @db.Uuid
+  fileAssetId  String?  @map("file_asset_id") @db.Uuid
+  mediaType    FileType @map("media_type")
+  title        String?
+  description  String?
+  isPrimary    Boolean  @default(false) @map("is_primary")
+  displayOrder Int      @default(0) @map("display_order")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  product   Product    @relation(fields: [productId], references: [id])
+  fileAsset FileAsset? @relation(fields: [fileAssetId], references: [id])
+
+  @@index([productId])
+  @@index([fileAssetId])
+  @@map("product_media")
 }
 
 model ParameterGroup {
@@ -246,7 +288,7 @@ model ParameterDefinition {
   parameterGroupId String? @map("parameter_group_id") @db.Uuid
   name             String
   code             String  @unique @map("parameter_code")
-  dataType         String  @map("data_type")
+  dataType         ParameterDataType @default(STRING) @map("data_type")
   unit             String? @map("value_unit")
   required         Boolean @default(false)
 
@@ -257,6 +299,7 @@ model ParameterDefinition {
   productAssociations ProductParameterDefinition[]
   options             ParameterOption[]
   productValues       ProductParameterValue[]
+  demandParameters    DemandParameter[]
 
   @@index([parameterGroupId])
   @@index([code])
@@ -284,6 +327,7 @@ model ProductParameterValue {
   productId             String @map("product_id") @db.Uuid
   parameterDefinitionId String @map("parameter_definition_id") @db.Uuid
   value                 String
+  valueNumber           Float? @map("value_number")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -293,6 +337,8 @@ model ProductParameterValue {
 
   @@unique([productId, parameterDefinitionId])
   @@index([parameterDefinitionId])
+  @@index([parameterDefinitionId, value])
+  @@index([parameterDefinitionId, valueNumber])
   @@map("product_parameter_value")
 }
 
@@ -330,6 +376,7 @@ model Offer {
   organization Organization  @relation(fields: [organizationId], references: [id])
   product      Product       @relation(fields: [productId], references: [id])
   rfqResponses RFQResponse[]
+  demandMatches DemandMatch[]
 
   @@unique([organizationId, productId])
   @@index([productId])
@@ -351,17 +398,77 @@ model Demand {
   parametersJson Json?        @map("parameters_json")
   budgetRange    String?      @map("budget_range")
 
+  quantity             Int?       @map("quantity")
+  quantityUnit         String?    @map("quantity_unit")
+  expectedDeliveryDate DateTime?  @map("expected_delivery_date")
+  contactName          String?    @map("contact_name")
+  contactPhone         String?    @map("contact_phone")
+  contactEmail         String?    @map("contact_email")
+  contactVisible       Boolean    @default(false) @map("contact_visible")
+  publishedAt          DateTime?  @map("published_at")
+  closedAt             DateTime?  @map("closed_at")
+  closeReason          String?    @map("close_reason")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  createdByUser User          @relation(fields: [createdBy], references: [id])
-  organization  Organization? @relation(fields: [organizationId], references: [id])
+  createdByUser User              @relation(fields: [createdBy], references: [id])
+  organization  Organization?     @relation(fields: [organizationId], references: [id])
   rfq           RFQ?
+  parameters    DemandParameter[]
+  matches       DemandMatch[]
 
   @@index([organizationId])
   @@index([createdBy])
   @@index([status])
+  @@index([publishedAt])
   @@map("demand")
+}
+
+model DemandParameter {
+  id                    String  @id @default(uuid()) @db.Uuid
+  demandId              String  @map("demand_id") @db.Uuid
+  parameterDefinitionId String  @map("parameter_definition_id") @db.Uuid
+  value                 String?
+  valueMin              Float?  @map("value_min")
+  valueMax              Float?  @map("value_max")
+  required              Boolean @default(true)
+  priority              Int     @default(0)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  demand              Demand              @relation(fields: [demandId], references: [id])
+  parameterDefinition ParameterDefinition @relation(fields: [parameterDefinitionId], references: [id])
+
+  @@unique([demandId, parameterDefinitionId])
+  @@index([parameterDefinitionId])
+  @@map("demand_parameter")
+}
+
+model DemandMatch {
+  id          String             @id @default(uuid()) @db.Uuid
+  demandId    String             @map("demand_id") @db.Uuid
+  productId   String             @map("product_id") @db.Uuid
+  matchScore  Float              @map("match_score")
+  matchStatus DemandMatchStatus  @default(PENDING) @map("match_status")
+  matchDetails Json?              @map("match_details")
+  offerId     String?            @map("offer_id") @db.Uuid
+  matchedAt   DateTime?          @map("matched_at")
+  reviewedAt  DateTime?          @map("reviewed_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  demand  Demand  @relation(fields: [demandId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+  offer   Offer?  @relation(fields: [offerId], references: [id])
+
+  @@unique([demandId, productId])
+  @@index([productId])
+  @@index([matchStatus])
+  @@index([matchScore])
+  @@map("demand_match")
 }
 
 model RFQ {
@@ -470,6 +577,7 @@ model FileAsset {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   uploader User @relation(fields: [uploadedBy], references: [id])
+  media    ProductMedia[]
 
   @@index([entityType, entityId])
   @@index([uploadedBy])

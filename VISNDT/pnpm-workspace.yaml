@@ -2,3 +2,11 @@ packages:
   - "apps/*"
   - "packages/*"
   - "database/*"
+allowBuilds:
+  '@prisma/client': false
+  '@prisma/engines': false
+  '@scarf/scarf': false
+  bcrypt: false
+  prisma: false
+  sharp: false
+  unrs-resolver: false

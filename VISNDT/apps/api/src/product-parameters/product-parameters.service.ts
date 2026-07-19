@@ -33,9 +33,11 @@ export class ProductParametersService {
         productId,
         parameterDefinitionId: dto.parameterDefinitionId,
         value: dto.value,
+        valueNumber: dto.valueNumber ?? null,
       },
       update: {
         value: dto.value,
+        valueNumber: dto.valueNumber ?? null,
       },
     });
   }

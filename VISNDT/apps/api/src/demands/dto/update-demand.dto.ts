@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsEnum } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsInt, IsBoolean, IsDateString } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { DemandStatus } from '@prisma/client';
 
@@ -18,12 +18,43 @@ export class UpdateDemandDto {
   @IsEnum(DemandStatus)
   status?: DemandStatus;
 
-  @ApiPropertyOptional({ description: 'Dynamic parameters as JSON object' })
-  @IsOptional()
-  parametersJson?: Record<string, unknown>;
-
   @ApiPropertyOptional({ description: 'Budget range' })
   @IsOptional()
   @IsString()
   budgetRange?: string;
+
+  @ApiPropertyOptional({ description: 'Quantity required' })
+  @IsOptional()
+  @IsInt()
+  quantity?: number;
+
+  @ApiPropertyOptional({ description: 'Quantity unit' })
+  @IsOptional()
+  @IsString()
+  quantityUnit?: string;
+
+  @ApiPropertyOptional({ description: 'Expected delivery date (ISO 8601)' })
+  @IsOptional()
+  @IsDateString()
+  expectedDeliveryDate?: string;
+
+  @ApiPropertyOptional({ description: 'Contact person name' })
+  @IsOptional()
+  @IsString()
+  contactName?: string;
+
+  @ApiPropertyOptional({ description: 'Contact phone number' })
+  @IsOptional()
+  @IsString()
+  contactPhone?: string;
+
+  @ApiPropertyOptional({ description: 'Contact email' })
+  @IsOptional()
+  @IsString()
+  contactEmail?: string;
+
+  @ApiPropertyOptional({ description: 'Make contact info publicly visible' })
+  @IsOptional()
+  @IsBoolean()
+  contactVisible?: boolean;
 }

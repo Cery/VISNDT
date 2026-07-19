@@ -5,5 +5,6 @@ import { WorkflowEventsService } from './workflow-events.service';
 @Module({
   controllers: [WorkflowEventsController],
   providers: [WorkflowEventsService],
+  exports: [WorkflowEventsService],
 })
 export class WorkflowEventsModule {}

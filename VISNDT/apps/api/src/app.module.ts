@@ -10,12 +10,14 @@ import { ProductsModule } from './products/products.module';
 import { ParameterGroupsModule } from './parameter-groups/parameter-groups.module';
 import { ParameterDefinitionsModule } from './parameter-definitions/parameter-definitions.module';
 import { ProductParametersModule } from './product-parameters/product-parameters.module';
+import { ProductMediaModule } from './product-media/product-media.module';
 import { OffersModule } from './offers/offers.module';
 import { DemandsModule } from './demands/demands.module';
 import { RfqsModule } from './rfqs/rfqs.module';
 import { RfqResponsesModule } from './rfq-responses/rfq-responses.module';
 import { WorkflowEventsModule } from './workflow-events/workflow-events.module';
 import { AuthModule } from './auth/auth.module';
+import { SuppliersModule } from './suppliers/suppliers.module';
 
 @Module({
   imports: [
@@ -30,12 +32,14 @@ import { AuthModule } from './auth/auth.module';
     ParameterGroupsModule,
     ParameterDefinitionsModule,
     ProductParametersModule,
+    ProductMediaModule,
     OffersModule,
     DemandsModule,
     RfqsModule,
     RfqResponsesModule,
     WorkflowEventsModule,
     AuthModule,
+    SuppliersModule,
   ],
 })
 export class AppModule {}

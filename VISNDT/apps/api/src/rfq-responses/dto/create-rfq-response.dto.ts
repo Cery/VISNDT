@@ -1,11 +1,7 @@
 import { IsString, IsOptional } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateRfqResponseDto {
-  @ApiProperty({ description: 'Organization ID', example: 'uuid' })
-  @IsString()
-  organizationId: string;
-
   @ApiPropertyOptional({ description: 'Linked Offer ID', example: 'uuid' })
   @IsOptional()
   @IsString()

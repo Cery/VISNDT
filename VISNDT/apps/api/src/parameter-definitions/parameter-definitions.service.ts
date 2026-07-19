@@ -35,11 +35,11 @@ export class ParameterDefinitionsService {
   }
 
   async create(dto: CreateParameterDefinitionDto) {
-    return this.prisma.parameterDefinition.create({ data: dto });
+    return this.prisma.parameterDefinition.create({ data: dto as any });
   }
 
   async update(id: string, dto: UpdateParameterDefinitionDto) {
     await this.findOne(id);
-    return this.prisma.parameterDefinition.update({ where: { id }, data: dto });
+    return this.prisma.parameterDefinition.update({ where: { id }, data: dto as any });
   }
 }
