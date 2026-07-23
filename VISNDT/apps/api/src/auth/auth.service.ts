@@ -6,6 +6,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
+import { InvitationService } from './invitation.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
@@ -15,9 +16,25 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly invitationService: InvitationService,
   ) {}
 
   async register(dto: RegisterDto) {
+    // Validate invitation token
+    if (!dto.inviteToken) {
+      throw new UnauthorizedException('Invitation token is required');
+    }
+
+    const invitation = await this.invitationService.validateInvitation(dto.inviteToken);
+    if (!invitation) {
+      throw new UnauthorizedException('Invalid or expired invitation token');
+    }
+
+    // Verify email matches invitation
+    if (invitation.email !== dto.email) {
+      throw new UnauthorizedException('Email does not match invitation');
+    }
+
     const existing = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
@@ -31,8 +48,21 @@ export class AuthService {
         email: dto.email,
         passwordHash,
         name: dto.name,
+        organizationId: invitation.organizationId,
       },
     });
+
+    // Create OrganizationMember record
+    await this.prisma.organizationMember.create({
+      data: {
+        organizationId: invitation.organizationId,
+        userId: user.id,
+        role: invitation.role,
+      },
+    });
+
+    // Consume invitation
+    await this.invitationService.consumeInvitation(dto.inviteToken);
 
     const accessToken = this.generateToken({
       sub: user.id,
@@ -47,6 +77,7 @@ export class AuthService {
         id: user.id,
         email: user.email,
         name: user.name,
+        organizationId: user.organizationId,
       },
     };
   }

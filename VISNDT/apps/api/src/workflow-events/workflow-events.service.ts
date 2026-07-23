@@ -1,8 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateWorkflowEventDto } from './dto/create-workflow-event.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
+
+export interface WorkflowEventUser {
+  id: string;
+  organizationId?: string | null;
+}
 
 @Injectable()
 export class WorkflowEventsService {
@@ -34,10 +39,18 @@ export class WorkflowEventsService {
     return event;
   }
 
-  async create(dto: CreateWorkflowEventDto) {
+  async create(dto: CreateWorkflowEventDto, user: WorkflowEventUser) {
+    // Verify user is authenticated and has an organization
+    if (!user.organizationId) {
+      throw new ForbiddenException('User must belong to an organization to create workflow events');
+    }
+
     return this.prisma.workflowEvent.create({
       data: {
-        ...dto,
+        entityType: dto.entityType,
+        entityId: dto.entityId,
+        action: dto.action,
+        operatorId: user.id,
         metadata: dto.metadata as Prisma.InputJsonValue,
       },
     });

@@ -156,9 +156,10 @@ model User {
   demands        Demand[]
   workflowEvents WorkflowEvent[]
   notifications  Notification[]
-  fileAssets     FileAsset[]
-  auditLogs      AuditLog[]
-  rfqs           RFQ[]
+  fileAssets          FileAsset[]
+  auditLogs           AuditLog[]
+  rfqs                RFQ[]
+  createdInvitations  UserInvitation[]
 
   @@index([organizationId])
   @@index([status])
@@ -179,9 +180,32 @@ model Organization {
   offers       Offer[]
   demands      Demand[]
   rfqResponses RFQResponse[]
+  invitations  UserInvitation[]
 
   @@index([status])
   @@map("organization")
+}
+
+model UserInvitation {
+  id             String    @id @default(uuid()) @db.Uuid
+  email          String
+  token          String    @unique
+  organizationId String    @map("organization_id") @db.Uuid
+  role           String    @default("MEMBER")
+  status         String    @default("PENDING")
+  expiresAt      DateTime  @map("expires_at")
+  createdBy      String    @map("created_by") @db.Uuid
+  createdAt      DateTime  @default(now()) @map("created_at")
+  usedAt         DateTime? @map("used_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  creator      User         @relation(fields: [createdBy], references: [id])
+
+  @@index([email])
+  @@index([organizationId])
+  @@index([status])
+  @@index([token])
+  @@map("user_invitation")
 }
 
 model OrganizationMember {
@@ -217,6 +241,7 @@ model ProductCategory {
   parent   ProductCategory?  @relation("CategoryTree", fields: [parentId], references: [id])
   children ProductCategory[] @relation("CategoryTree")
   products Product[]
+  demands  Demand[]
 
   @@index([parentId])
   @@map("product_category")
@@ -408,12 +433,14 @@ model Demand {
   publishedAt          DateTime?  @map("published_at")
   closedAt             DateTime?  @map("closed_at")
   closeReason          String?    @map("close_reason")
+  categoryId           String?    @map("category_id") @db.Uuid
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   createdByUser User              @relation(fields: [createdBy], references: [id])
   organization  Organization?     @relation(fields: [organizationId], references: [id])
+  category      ProductCategory?  @relation(fields: [categoryId], references: [id])
   rfq           RFQ?
   parameters    DemandParameter[]
   matches       DemandMatch[]
@@ -422,6 +449,7 @@ model Demand {
   @@index([createdBy])
   @@index([status])
   @@index([publishedAt])
+  @@index([categoryId])
   @@map("demand")
 }
 

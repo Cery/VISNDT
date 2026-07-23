@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 import { DemandsService } from './demands.service';
@@ -114,6 +115,22 @@ export class DemandsController {
     return ApiResponse.ok(
       await this.service.close(id, dto.reason, user),
       'Demand closed',
+    );
+  }
+
+  @Post(':id/rematch')
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Re-match a demand (delete old matches, re-run matching)' })
+  @ApiParam({ name: 'id', description: 'Demand UUID' })
+  async rematch(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(
+      await this.service.rematch(id, user),
+      'Rematch completed',
     );
   }
 

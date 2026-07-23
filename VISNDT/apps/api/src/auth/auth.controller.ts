@@ -1,4 +1,5 @@
 import { Controller, Post, Get, Body, UseGuards } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse as SwaggerResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -15,18 +16,22 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Register a new user' })
   @SwaggerResponse({ status: 201, description: 'Registration successful', type: AuthResponseDto })
   @SwaggerResponse({ status: 409, description: 'Email already registered' })
+  @SwaggerResponse({ status: 429, description: 'Too many requests' })
   async register(@Body() dto: RegisterDto) {
     const result = await this.authService.register(dto);
     return ApiResponse.ok(result, 'Registration successful');
   }
 
   @Post('login')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Login with email and password' })
   @SwaggerResponse({ status: 200, description: 'Login successful', type: AuthResponseDto })
   @SwaggerResponse({ status: 401, description: 'Invalid email or password' })
+  @SwaggerResponse({ status: 429, description: 'Too many requests' })
   async login(@Body() dto: LoginDto) {
     const result = await this.authService.login(dto);
     return ApiResponse.ok(result, 'Login successful');

@@ -14,6 +14,7 @@ import { QueryMatchDto } from './dto/query-match.dto';
 import { UpdateMatchStatusDto } from './dto/update-match-status.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { WorkflowEventsService } from '../workflow-events/workflow-events.service';
+import { MatchingService } from '../matching/matching.service';
 
 const TERMINAL_STATUSES: DemandStatus[] = [DemandStatus.CLOSED, DemandStatus.CANCELLED];
 
@@ -35,6 +36,7 @@ export class DemandsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly workflowEvents: WorkflowEventsService,
+    private readonly matchingService: MatchingService,
   ) {}
 
   // ==========================================
@@ -229,8 +231,7 @@ export class DemandsService {
       entityType: WorkflowEntityType.DEMAND,
       entityId: demand.id,
       action: WorkflowAction.CREATED,
-      operatorId: user.id,
-    });
+    }, user);
 
     return demand;
   }
@@ -341,6 +342,12 @@ export class DemandsService {
       return [updatedDemand];
     });
 
+    // 触发异步匹配（不阻塞 publish 返回）
+    this.matchingService.match(id).catch((err) => {
+      // 匹配失败不影响 publish 结果
+      console.error(`Matching failed for demand ${id}:`, err);
+    });
+
     return updated;
   }
 
@@ -403,6 +410,26 @@ export class DemandsService {
     });
 
     return updated;
+  }
+
+  async rematch(
+    id: string,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    const demand = await this.validateDemandOwnership(id, user);
+
+    // 删除旧 DemandMatch 记录
+    await this.prisma.demandMatch.deleteMany({
+      where: { demandId: id },
+    });
+
+    // 重新执行匹配
+    const result = await this.matchingService.match(id);
+
+    return {
+      demandId: id,
+      ...result,
+    };
   }
 
   // ==========================================

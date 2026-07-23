@@ -15,10 +15,6 @@ export class CreateWorkflowEventDto {
   @IsEnum(WorkflowAction)
   action: WorkflowAction;
 
-  @ApiProperty({ description: 'Operator user ID', example: 'uuid' })
-  @IsString()
-  operatorId: string;
-
   @ApiPropertyOptional({ description: 'Additional metadata JSON' })
   @IsOptional()
   @IsObject()

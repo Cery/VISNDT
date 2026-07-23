@@ -15,4 +15,9 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   name?: string;
+
+  @ApiPropertyOptional({ description: 'Invitation token (required for registration)', example: 'uuid-token' })
+  @IsOptional()
+  @IsString()
+  inviteToken?: string;
 }

@@ -1,9 +1,13 @@
-import { Controller, Get, Post, Param, Body, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { Controller, Get, Post, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
+import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { WorkflowEventsService } from './workflow-events.service';
 import { CreateWorkflowEventDto } from './dto/create-workflow-event.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { ApiResponse } from '../common/dto/api-response.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AuthRequest } from '../auth/interfaces/auth-request.interface';
 
 @ApiTags('Workflow Events')
 @Controller('workflow-events')
@@ -24,8 +28,14 @@ export class WorkflowEventsController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create a workflow event' })
-  async create(@Body() dto: CreateWorkflowEventDto) {
-    return ApiResponse.ok(await this.service.create(dto), 'Event created');
+  @Throttle({ default: { limit: 60, ttl: 60000 } })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a workflow event (authenticated)' })
+  async create(
+    @Body() dto: CreateWorkflowEventDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.create(dto, user), 'Event created');
   }
 }
