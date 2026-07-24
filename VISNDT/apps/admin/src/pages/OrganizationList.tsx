@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Input, Select, Space, Spin, Alert, Button, Tag, Typography } from 'antd';
-import { SearchOutlined, ReloadOutlined, EyeOutlined } from '@ant-design/icons';
+import { SearchOutlined, ReloadOutlined, EyeOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { organizationService } from '../api';
 import type { Organization, SearchOrganizationParams } from '../types';
@@ -170,24 +170,42 @@ function OrganizationList() {
     {
       title: 'Action',
       key: 'action',
-      width: 80,
+      width: 160,
       render: (_: unknown, record: Organization) => (
-        <Button
-          type="text"
-          icon={<EyeOutlined />}
-          onClick={() => navigate(`/organizations/${record.id}`)}
-        >
-          View
-        </Button>
+        <Space>
+          <Button
+            type="text"
+            icon={<EyeOutlined />}
+            onClick={() => navigate(`/organizations/${record.id}`)}
+          >
+            View
+          </Button>
+          <Button
+            type="text"
+            icon={<EditOutlined />}
+            onClick={() => navigate(`/organizations/${record.id}/edit`)}
+          >
+            Edit
+          </Button>
+        </Space>
       ),
     },
   ];
 
   return (
     <div>
-      <Title level={4} style={{ marginBottom: 16 }}>
-        Organization Management
-      </Title>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <Title level={4} style={{ margin: 0 }}>
+          Organization Management
+        </Title>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => navigate('/organizations/create')}
+        >
+          Create Organization
+        </Button>
+      </div>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search

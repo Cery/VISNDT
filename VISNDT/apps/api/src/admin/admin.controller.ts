@@ -21,4 +21,25 @@ export class AdminController {
     const stats = await this.adminService.getDashboardStats();
     return ApiResponse.ok(stats);
   }
+
+  @Get('activities')
+  @ApiOperation({ summary: 'Get recent platform activities (ADMIN only)' })
+  async getActivities() {
+    const activities = await this.adminService.getRecentActivities();
+    return ApiResponse.ok(activities);
+  }
+
+  @Get('pending')
+  @ApiOperation({ summary: 'Get pending items requiring attention (ADMIN only)' })
+  async getPending() {
+    const pending = await this.adminService.getPendingItems();
+    return ApiResponse.ok(pending);
+  }
+
+  @Get('status')
+  @ApiOperation({ summary: 'Get system health summary (ADMIN only)' })
+  async getStatus() {
+    const status = await this.adminService.getSystemStatus();
+    return ApiResponse.ok(status);
+  }
 }

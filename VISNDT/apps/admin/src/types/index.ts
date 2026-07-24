@@ -13,6 +13,13 @@ export type {
   DashboardProductStats,
   DashboardDemandStats,
   DashboardMatchingStats,
+  DashboardActivities,
+  DashboardPending,
+  DashboardStatus,
+  RecentUser,
+  RecentDemand,
+  RecentMatch,
+  RecentNotification,
 } from './dashboard.types';
 export type {
   Product,
@@ -32,8 +39,17 @@ export type {
 } from './user.types';
 export type {
   Organization,
+  OrganizationFormData,
   OrganizationStatus,
   OrganizationListResponse,
   SearchOrganizationParams,
   OrganizationMember,
 } from './organization.types';
+export type {
+  Notification,
+  NotificationType,
+  NotificationStatus,
+  NotificationListResponse,
+  NotificationQueryParams,
+  UnreadCountResponse,
+} from './notification.types';

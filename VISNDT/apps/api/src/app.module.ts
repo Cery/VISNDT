@@ -21,6 +21,7 @@ import { WorkflowEventsModule } from './workflow-events/workflow-events.module';
 import { AuthModule } from './auth/auth.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
 import { AdminModule } from './admin/admin.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { AdminModule } from './admin/admin.module';
     AuthModule,
     SuppliersModule,
     AdminModule,
+    NotificationsModule,
   ],
   providers: [
     {

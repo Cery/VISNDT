@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { RequireAuth } from '../auth';
 import AdminLayout from '../layouts/AdminLayout';
-import { DemandDetail, DemandList, Home, Login, MatchingMonitor, NotFound, OrganizationDetail, OrganizationList, ProductCreate, ProductDetail, ProductEdit, ProductList, UserCreate, UserDetail, UserEdit, UserList } from '../pages';
+import { DemandDetail, DemandList, Home, Login, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ProductCreate, ProductDetail, ProductEdit, ProductList, UserCreate, UserDetail, UserEdit, UserList } from '../pages';
 
 const router = createBrowserRouter([
   {
@@ -30,7 +30,11 @@ const router = createBrowserRouter([
       { path: 'users/:id/edit', element: <UserEdit /> },
       { path: 'users/:id', element: <UserDetail /> },
       { path: 'organizations', element: <OrganizationList /> },
+      { path: 'organizations/create', element: <OrganizationCreate /> },
+      { path: 'organizations/:id/edit', element: <OrganizationEdit /> },
       { path: 'organizations/:id', element: <OrganizationDetail /> },
+      { path: 'notifications', element: <NotificationList /> },
+      { path: 'notifications/:id', element: <NotificationDetail /> },
     ],
   },
   {

@@ -9,6 +9,12 @@ export interface OrganizationMember {
   updatedAt: string;
 }
 
+export interface OrganizationFormData {
+  name: string;
+  type: string;
+  status?: OrganizationStatus;
+}
+
 export interface Organization {
   id: string;
   name: string;
