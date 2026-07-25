@@ -7,10 +7,15 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
+import { NotificationsService } from '../notifications/notifications.service';
+import { NotificationType } from '@prisma/client';
 
 @Injectable()
 export class OffersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async findAll(pagination: PaginationDto) {
     const { page = 1, pageSize = 20 } = pagination;
@@ -48,12 +53,30 @@ export class OffersService {
       );
     }
 
-    return this.prisma.offer.create({
+    const offer = await this.prisma.offer.create({
       data: {
         ...dto,
         organizationId: user.organizationId,
       },
     });
+
+    // E8: Offer Created — notify the organization's admin members
+    try {
+      await this.notificationsService.createForOrganization(
+        user.organizationId,
+        {
+          type: NotificationType.RESPONSE_UPDATE,
+          title: 'New Offer Created',
+          message: `A new offer has been created in your organization`,
+          referenceType: 'OFFER',
+          referenceId: offer.id,
+        },
+      );
+    } catch {
+      // Notification failure should not affect the main flow
+    }
+
+    return offer;
   }
 
   async update(

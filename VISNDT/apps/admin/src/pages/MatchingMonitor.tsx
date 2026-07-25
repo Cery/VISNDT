@@ -3,16 +3,19 @@ import { Card, Statistic, Row, Col, Spin, Alert, Typography, Button } from 'antd
 import {
   LinkOutlined,
   InfoCircleOutlined,
+  PercentageOutlined,
+  StopOutlined,
+  SyncOutlined,
 } from '@ant-design/icons';
-import { dashboardService } from '../api';
-import type { DashboardStats } from '../types';
+import { matchService } from '../api';
+import type { MatchingStats } from '../types';
 
 const { Title, Paragraph } = Typography;
 
 type PageState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
-  | { status: 'success'; stats: DashboardStats };
+  | { status: 'success'; stats: MatchingStats };
 
 function MatchingMonitor() {
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
@@ -20,7 +23,7 @@ function MatchingMonitor() {
   const fetchStats = useCallback(async () => {
     setPageState({ status: 'loading' });
     try {
-      const stats = await dashboardService.getStats();
+      const stats = await matchService.getMatchingStats();
       setPageState({ status: 'success', stats });
     } catch (err) {
       const message =
@@ -68,12 +71,42 @@ function MatchingMonitor() {
       </Title>
 
       <Row gutter={[16, 16]}>
-        <Col xs={24} sm={12} lg={8}>
+        <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
               title="Total Matches"
-              value={stats.matching.totalMatches}
+              value={stats.totalMatches}
               prefix={<LinkOutlined />}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="Average Score"
+              value={stats.averageScore}
+              prefix={<PercentageOutlined />}
+              suffix="%"
+              precision={1}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="Hard Fail Count"
+              value={stats.hardFailCount}
+              prefix={<StopOutlined />}
+              valueStyle={{ color: stats.hardFailCount > 0 ? '#cf1322' : undefined }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} lg={6}>
+          <Card>
+            <Statistic
+              title="Rematch Count"
+              value={stats.rematchCount}
+              prefix={<SyncOutlined />}
             />
           </Card>
         </Col>

@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { RFQStatus } from '@prisma/client';
+import { RFQStatus, NotificationType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRfqDto } from './dto/create-rfq.dto';
 import { UpdateRfqDto } from './dto/update-rfq.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 const RFQ_TRANSITIONS: Record<RFQStatus, RFQStatus[]> = {
   DRAFT: [RFQStatus.OPEN],
@@ -15,7 +16,10 @@ const RFQ_TRANSITIONS: Record<RFQStatus, RFQStatus[]> = {
 
 @Injectable()
 export class RfqsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async findAll(pagination: PaginationDto) {
     const { page = 1, pageSize = 20 } = pagination;
@@ -47,12 +51,34 @@ export class RfqsService {
     dto: CreateRfqDto,
     user: { id: string; organizationId?: string | null },
   ) {
-    return this.prisma.rFQ.create({
+    const rfq = await this.prisma.rFQ.create({
       data: {
         demandId: dto.demandId,
         createdBy: user.id,
       },
     });
+
+    // E1: RFQ Created — notify the demand creator
+    try {
+      const demand = await this.prisma.demand.findUnique({
+        where: { id: dto.demandId },
+        select: { createdBy: true, title: true },
+      });
+      if (demand) {
+        await this.notificationsService.create({
+          userId: demand.createdBy,
+          type: NotificationType.RFQ_UPDATE,
+          title: 'New RFQ Created',
+          message: `RFQ for demand "${demand.title || 'Untitled'}" has been created`,
+          referenceType: 'RFQ',
+          referenceId: rfq.id,
+        });
+      }
+    } catch {
+      // Notification failure should not affect the main flow
+    }
+
+    return rfq;
   }
 
   async update(
@@ -87,6 +113,24 @@ export class RfqsService {
       }
     }
 
-    return this.prisma.rFQ.update({ where: { id }, data: dto });
+    const updated = await this.prisma.rFQ.update({ where: { id }, data: dto });
+
+    // E2: RFQ Status Changed — notify the RFQ creator
+    if (dto.status) {
+      try {
+        await this.notificationsService.create({
+          userId: rfq.createdBy,
+          type: NotificationType.RFQ_UPDATE,
+          title: 'RFQ Status Updated',
+          message: `RFQ status changed to "${dto.status}"`,
+          referenceType: 'RFQ',
+          referenceId: rfq.id,
+        });
+      } catch {
+        // Notification failure should not affect the main flow
+      }
+    }
+
+    return updated;
   }
 }

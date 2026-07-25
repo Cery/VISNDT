@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { RFQResponseStatus } from '@prisma/client';
+import { RFQResponseStatus, NotificationType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRfqResponseDto } from './dto/create-rfq-response.dto';
 import { UpdateRfqResponseDto } from './dto/update-rfq-response.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 const RESPONSE_TRANSITIONS: Record<RFQResponseStatus, RFQResponseStatus[]> = {
   SUBMITTED: [RFQResponseStatus.VIEWED],
@@ -14,7 +15,10 @@ const RESPONSE_TRANSITIONS: Record<RFQResponseStatus, RFQResponseStatus[]> = {
 
 @Injectable()
 export class RfqResponsesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async findByRfq(rfqId: string, pagination: PaginationDto) {
     const { page = 1, pageSize = 20 } = pagination;
@@ -54,7 +58,7 @@ export class RfqResponsesService {
       );
     }
 
-    return this.prisma.rFQResponse.create({
+    const response = await this.prisma.rFQResponse.create({
       data: {
         rfqId,
         organizationId: user.organizationId,
@@ -62,6 +66,28 @@ export class RfqResponsesService {
         message: dto.message,
       },
     });
+
+    // E3: RFQ Response Submitted — notify the RFQ creator
+    try {
+      const rfq = await this.prisma.rFQ.findUnique({
+        where: { id: rfqId },
+        select: { createdBy: true },
+      });
+      if (rfq) {
+        await this.notificationsService.create({
+          userId: rfq.createdBy,
+          type: NotificationType.RESPONSE_UPDATE,
+          title: 'New RFQ Response',
+          message: `A supplier has submitted a response to your RFQ`,
+          referenceType: 'RFQ_RESPONSE',
+          referenceId: response.id,
+        });
+      }
+    } catch {
+      // Notification failure should not affect the main flow
+    }
+
+    return response;
   }
 
   async update(
@@ -93,6 +119,27 @@ export class RfqResponsesService {
       }
     }
 
-    return this.prisma.rFQResponse.update({ where: { id }, data: dto });
+    const updated = await this.prisma.rFQResponse.update({ where: { id }, data: dto });
+
+    // E4/E5: Response Accepted/Rejected — notify the response organization's admins
+    if (dto.status === RFQResponseStatus.ACCEPTED || dto.status === RFQResponseStatus.REJECTED) {
+      try {
+        const statusLabel = dto.status === RFQResponseStatus.ACCEPTED ? 'accepted' : 'rejected';
+        await this.notificationsService.createForOrganization(
+          response.organizationId,
+          {
+            type: NotificationType.RESPONSE_UPDATE,
+            title: `Response ${statusLabel.charAt(0).toUpperCase() + statusLabel.slice(1)}`,
+            message: `Your RFQ response has been ${statusLabel}`,
+            referenceType: 'RFQ_RESPONSE',
+            referenceId: response.id,
+          },
+        );
+      } catch {
+        // Notification failure should not affect the main flow
+      }
+    }
+
+    return updated;
   }
 }

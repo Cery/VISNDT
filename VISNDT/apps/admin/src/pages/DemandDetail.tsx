@@ -11,10 +11,12 @@ import {
   Table,
   Empty,
   Typography,
+  Modal,
+  message,
 } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
-import { demandService } from '../api';
-import type { Demand, DemandParameter } from '../types';
+import { ArrowLeftOutlined, ReloadOutlined } from '@ant-design/icons';
+import { demandService, matchService } from '../api';
+import type { Demand, DemandParameter, DemandMatch } from '../types';
 
 const { Title } = Typography;
 
@@ -30,6 +32,21 @@ const STATUS_COLOR: Record<string, string> = {
   PROCESSING: 'blue',
   CLOSED: 'default',
   CANCELLED: 'red',
+};
+
+const MATCH_STATUS_COLOR: Record<string, string> = {
+  PENDING: 'orange',
+  MATCHED: 'blue',
+  REVIEWED: 'cyan',
+  ACCEPTED: 'green',
+  REJECTED: 'red',
+  EXPIRED: 'default',
+};
+
+const MATCH_SCORE_COLOR = (score: number): string => {
+  if (score >= 80) return '#52c41a';
+  if (score >= 60) return '#faad14';
+  return '#ff4d4f';
 };
 
 const PARAM_COLUMNS = [
@@ -69,6 +86,9 @@ export default function DemandDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
+  const [matches, setMatches] = useState<DemandMatch[]>([]);
+  const [matchesLoading, setMatchesLoading] = useState(false);
+  const [rematching, setRematching] = useState(false);
 
   const fetchDemand = useCallback(async () => {
     if (!id) return;
@@ -82,9 +102,49 @@ export default function DemandDetailPage() {
     }
   }, [id]);
 
+  const fetchMatches = useCallback(async () => {
+    if (!id) return;
+    setMatchesLoading(true);
+    try {
+      const result = await matchService.getDemandMatches(id, 1, 50);
+      setMatches(result.data);
+    } catch {
+      setMatches([]);
+    } finally {
+      setMatchesLoading(false);
+    }
+  }, [id]);
+
   useEffect(() => {
     fetchDemand();
-  }, [fetchDemand]);
+    fetchMatches();
+  }, [fetchDemand, fetchMatches]);
+
+  const handleRematch = async () => {
+    if (!id) return;
+    try {
+      setRematching(true);
+      await matchService.rematch(id);
+      message.success('Rematch completed successfully');
+      fetchMatches();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to rematch';
+      message.error(msg);
+    } finally {
+      setRematching(false);
+    }
+  };
+
+  const showRematchConfirm = () => {
+    Modal.confirm({
+      title: 'Confirm Rematch',
+      content:
+        'This will delete all existing matches and re-run the matching engine. Continue?',
+      okText: 'Yes, Rematch',
+      cancelText: 'Cancel',
+      onOk: handleRematch,
+    });
+  };
 
   if (pageState.status === 'loading') {
     return (
@@ -124,6 +184,55 @@ export default function DemandDetailPage() {
 
   const formatDate = (date: string | undefined) =>
     date ? new Date(date).toLocaleString() : '-';
+
+  const matchColumns = [
+    {
+      title: 'Product',
+      dataIndex: ['product', 'name'],
+      key: 'product',
+    },
+    {
+      title: 'Score',
+      dataIndex: 'matchScore',
+      key: 'score',
+      width: 100,
+      render: (score: number) => (
+        <span style={{ color: MATCH_SCORE_COLOR(score), fontWeight: 600 }}>
+          {score}%
+        </span>
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'matchStatus',
+      key: 'status',
+      width: 120,
+      render: (status: string) => (
+        <Tag color={MATCH_STATUS_COLOR[status] || 'default'}>{status}</Tag>
+      ),
+    },
+    {
+      title: 'Matched At',
+      dataIndex: 'matchedAt',
+      key: 'matchedAt',
+      render: (date: string | undefined) => formatDate(date),
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      width: 100,
+      render: (_: unknown, record: DemandMatch) => (
+        <Button
+          type="link"
+          onClick={() =>
+            navigate(`/demands/${id}/matches/${record.id}`)
+          }
+        >
+          View
+        </Button>
+      ),
+    },
+  ];
 
   return (
     <div>
@@ -174,6 +283,47 @@ export default function DemandDetailPage() {
           />
         ) : (
           <Empty description="No parameters" />
+        )}
+      </Card>
+
+      <Card
+        title="Matches"
+        style={{ marginBottom: 16 }}
+        extra={
+          <Space>
+            <Button
+              size="small"
+              icon={<ReloadOutlined />}
+              onClick={fetchMatches}
+              loading={matchesLoading}
+            >
+              Refresh
+            </Button>
+            <Button
+              size="small"
+              type="primary"
+              onClick={showRematchConfirm}
+              loading={rematching}
+            >
+              Rematch
+            </Button>
+          </Space>
+        }
+      >
+        {matchesLoading ? (
+          <div style={{ textAlign: 'center', padding: 40 }}>
+            <Spin />
+          </div>
+        ) : matches.length > 0 ? (
+          <Table
+            dataSource={matches}
+            columns={matchColumns}
+            rowKey="id"
+            pagination={false}
+            size="small"
+          />
+        ) : (
+          <Empty description="No matches yet" />
         )}
       </Card>
 

@@ -8,6 +8,10 @@ import {
   NodeIndexOutlined,
   UserOutlined,
   BankOutlined,
+  BellOutlined,
+  SnippetsOutlined,
+  TagsOutlined,
+  TeamOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from '@ant-design/icons';
@@ -18,9 +22,13 @@ const menuItems = [
   { key: '/home', icon: <DashboardOutlined />, label: 'Dashboard' },
   { key: '/products', icon: <ShoppingOutlined />, label: 'Products' },
   { key: '/demands', icon: <FileTextOutlined />, label: 'Demands' },
+  { key: '/rfqs', icon: <SnippetsOutlined />, label: 'RFQs' },
+  { key: '/offers', icon: <TagsOutlined />, label: 'Offers' },
   { key: '/matching', icon: <NodeIndexOutlined />, label: 'Matching' },
   { key: '/users', icon: <UserOutlined />, label: 'Users' },
   { key: '/organizations', icon: <BankOutlined />, label: 'Organizations' },
+  { key: '/suppliers', icon: <TeamOutlined />, label: 'Suppliers' },
+  { key: '/notifications', icon: <BellOutlined />, label: 'Notifications' },
 ];
 
 function AdminLayout() {

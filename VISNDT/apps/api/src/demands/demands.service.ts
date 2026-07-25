@@ -3,7 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { DemandStatus, DemandMatchStatus, WorkflowEntityType, WorkflowAction } from '@prisma/client';
+import { DemandStatus, DemandMatchStatus, WorkflowEntityType, WorkflowAction, NotificationType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateDemandDto } from './dto/create-demand.dto';
 import { UpdateDemandDto } from './dto/update-demand.dto';
@@ -15,6 +15,7 @@ import { UpdateMatchStatusDto } from './dto/update-match-status.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { WorkflowEventsService } from '../workflow-events/workflow-events.service';
 import { MatchingService } from '../matching/matching.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 const TERMINAL_STATUSES: DemandStatus[] = [DemandStatus.CLOSED, DemandStatus.CANCELLED];
 
@@ -37,6 +38,7 @@ export class DemandsService {
     private readonly prisma: PrismaService,
     private readonly workflowEvents: WorkflowEventsService,
     private readonly matchingService: MatchingService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   // ==========================================
@@ -426,6 +428,20 @@ export class DemandsService {
     // 重新执行匹配
     const result = await this.matchingService.match(id);
 
+    // E6: Match Completed — notify the demand creator
+    try {
+      await this.notificationsService.create({
+        userId: demand.createdBy,
+        type: NotificationType.DEMAND_UPDATE,
+        title: 'Matching Completed',
+        message: `${result.matched} out of ${result.totalCandidates} products matched for your demand`,
+        referenceType: 'MATCH',
+        referenceId: id,
+      });
+    } catch {
+      // Notification failure should not affect the main flow
+    }
+
     return {
       demandId: id,
       ...result,
@@ -694,6 +710,26 @@ export class DemandsService {
 
       return [updatedMatch];
     });
+
+    // E7: Match Status Changed — notify the demand creator
+    try {
+      const demand = await this.prisma.demand.findUnique({
+        where: { id: demandId },
+        select: { createdBy: true, title: true },
+      });
+      if (demand) {
+        await this.notificationsService.create({
+          userId: demand.createdBy,
+          type: NotificationType.DEMAND_UPDATE,
+          title: 'Match Status Updated',
+          message: `Match status changed to "${dto.status}" for demand "${demand.title || 'Untitled'}"`,
+          referenceType: 'MATCH',
+          referenceId: matchId,
+        });
+      }
+    } catch {
+      // Notification failure should not affect the main flow
+    }
 
     return updated;
   }

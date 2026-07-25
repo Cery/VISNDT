@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { QueryNotificationsDto } from './dto/query-notifications.dto';
-import { NotificationStatus } from '@prisma/client';
+import { CreateNotificationDto } from './dto/create-notification.dto';
+import { NotificationStatus, Prisma } from '@prisma/client';
 
 interface RequestUser {
   id: string;
@@ -167,5 +168,66 @@ export class NotificationsService {
     }
 
     throw new ForbiddenException('You do not have access to this notification');
+  }
+
+  /**
+   * Create a notification for a specific user.
+   * This is an internal method — not exposed via API.
+   */
+  async create(dto: CreateNotificationDto) {
+    return this.prisma.notification.create({
+      data: {
+        userId: dto.userId,
+        type: dto.type,
+        title: dto.title,
+        message: dto.message,
+        referenceType: dto.referenceType,
+        referenceId: dto.referenceId,
+      },
+    });
+  }
+
+  /**
+   * Create notifications for all ADMIN members of an organization.
+   * Gracefully returns [] if no members are found.
+   * This is an internal method — not exposed via API.
+   */
+  async createForOrganization(
+    organizationId: string,
+    dto: Omit<CreateNotificationDto, 'userId'>,
+  ) {
+    // Query ADMIN members of the organization
+    const members = await this.prisma.organizationMember.findMany({
+      where: { organizationId, role: 'ADMIN' },
+      select: { userId: true },
+    });
+
+    if (members.length === 0) {
+      return [];
+    }
+
+    const data: Prisma.NotificationCreateManyInput[] = members.map(
+      (member) => ({
+        userId: member.userId,
+        type: dto.type,
+        title: dto.title,
+        message: dto.message,
+        referenceType: dto.referenceType,
+        referenceId: dto.referenceId,
+      }),
+    );
+
+    await this.prisma.notification.createMany({ data });
+
+    // Return the created notifications
+    return this.prisma.notification.findMany({
+      where: {
+        userId: { in: members.map((m) => m.userId) },
+        type: dto.type,
+        title: dto.title,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: members.length,
+    });
   }
 }

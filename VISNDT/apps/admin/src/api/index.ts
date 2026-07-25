@@ -6,3 +6,8 @@ export { productService } from './product.service';
 export { userService } from './user.service';
 export { organizationService } from './organization.service';
 export { notificationService } from './notification.service';
+export { rfqService } from './rfq.service';
+export { rfqResponseService } from './rfq-response.service';
+export { matchService } from './match.service';
+export { offerService } from './offer.service';
+export { supplierService } from './supplier.service';

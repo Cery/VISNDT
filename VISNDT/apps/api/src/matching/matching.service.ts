@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { DemandMatchStatus } from '@prisma/client';
+import { DemandMatchStatus, NotificationType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ScoringService } from './scoring/scoring.service';
 import { CategoryHelper } from './helpers/category.helper';
 import { MatchResultDto } from './dto/match-result.dto';
 import { DEFAULT_MATCH_CONFIG } from './types/match-context';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class MatchingService {
@@ -14,6 +15,7 @@ export class MatchingService {
     private readonly prisma: PrismaService,
     private readonly scoring: ScoringService,
     private readonly categoryHelper: CategoryHelper,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   /**
