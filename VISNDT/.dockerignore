@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+**/dist/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Docker
+docker-compose.override.yml
+docker/
+
+# Git
+.git/
+.gitignore
+
+# Test
+coverage/
+.nyc_output/
+
+# Docs (not needed in build context)
+docs/
+
+# Misc
+.cache/
+.trae/
+.trae-cn/

@@ -1,0 +1,4 @@
+FROM visndt-api:latest
+WORKDIR /app/database
+ENV BINARY_TARGETS='["native","linux-musl-openssl-3.0.x"]'
+RUN npx prisma generate
