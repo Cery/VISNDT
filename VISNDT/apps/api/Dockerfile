@@ -63,8 +63,9 @@ COPY package.json ./
 COPY apps/api/package.json apps/api/
 COPY database/package.json database/
 
-# Copy Prisma schema (for migrations)
+# Copy Prisma schema and migrations (for migrate deploy)
 COPY database/prisma/schema.prisma database/prisma/
+COPY database/prisma/migrations/ database/prisma/migrations/
 
 EXPOSE 4000
 

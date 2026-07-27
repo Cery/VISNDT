@@ -38,11 +38,22 @@ export class UsersService {
     const { page = 1, pageSize = 20 } = pagination;
     const skip = (page - 1) * pageSize;
 
+    const userSelect = {
+      id: true,
+      email: true,
+      name: true,
+      status: true,
+      organizationId: true,
+      createdAt: true,
+      updatedAt: true,
+    };
+
     const [data, total] = await Promise.all([
       this.prisma.user.findMany({
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
+        select: userSelect,
       }),
       this.prisma.user.count(),
     ]);
@@ -57,7 +68,18 @@ export class UsersService {
   }
 
   async findOne(id: string, requestUser: RequestUser) {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        status: true,
+        organizationId: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
     if (!user) throw new NotFoundException(`User ${id} not found`);
 
     await this.checkOwnershipOrAdmin(id, requestUser);

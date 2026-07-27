@@ -23,7 +23,6 @@ build/
 Thumbs.db
 
 # Prisma
-database/prisma/migrations/
 
 # Docker
 docker/data/
