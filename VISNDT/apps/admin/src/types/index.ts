@@ -113,3 +113,4 @@ export type {
   ProductMediaListResponse,
   MediaType,
 } from './product-media.types';
+export type { FileAsset, UploadResponse } from './file-asset.types';

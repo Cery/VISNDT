@@ -4,6 +4,7 @@ export interface ProductMediaItem {
   id: string;
   productId: string;
   fileAssetId?: string;
+  fileAsset?: import('./file-asset.types').FileAsset | null;
   mediaType: MediaType;
   title?: string;
   description?: string;

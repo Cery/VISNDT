@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Form, Input, InputNumber, Button, Card, Select, Switch, Alert, Typography, message } from 'antd';
+import { Form, Input, InputNumber, Button, Card, Select, Switch, Upload, Typography, message } from 'antd';
+import { InboxOutlined } from '@ant-design/icons';
 import { productMediaService } from '../../api/product-media.service';
+import { fileAssetService } from '../../api/file-asset.service';
 import type { CreateProductMediaDto, MediaType } from '../../types/product-media.types';
 
 const { Title } = Typography;
+const { Dragger } = Upload;
 const { Option } = Select;
 
 const MEDIA_TYPE_OPTIONS: { value: MediaType; label: string }[] = [
@@ -16,6 +19,7 @@ const MEDIA_TYPE_OPTIONS: { value: MediaType; label: string }[] = [
 
 type PageState =
   | { status: 'idle' }
+  | { status: 'uploading'; fileName: string }
   | { status: 'submitting' }
   | { status: 'error'; message: string };
 
@@ -24,13 +28,34 @@ function ProductMediaCreate() {
   const navigate = useNavigate();
   const [form] = Form.useForm<CreateProductMediaDto>();
   const [pageState, setPageState] = useState<PageState>({ status: 'idle' });
+  const [uploadedFileAssetId, setUploadedFileAssetId] = useState<string | null>(null);
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+
+  const handleUpload = async (file: File) => {
+    if (!productId) return;
+    setPageState({ status: 'uploading', fileName: file.name });
+
+    try {
+      const fileAsset = await fileAssetService.upload(file);
+      setUploadedFileAssetId(fileAsset.id);
+      setUploadedFileName(file.name);
+      message.success(`File "${file.name}" uploaded successfully`);
+      setPageState({ status: 'idle' });
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Upload failed';
+      setPageState({ status: 'error', message: errorMessage });
+      message.error(errorMessage);
+    }
+
+    return false; // Prevent default upload behavior
+  };
 
   const handleSubmit = async (values: CreateProductMediaDto) => {
     if (!productId) return;
     setPageState({ status: 'submitting' });
     try {
       const payload: CreateProductMediaDto = {
-        fileAssetId: values.fileAssetId || undefined,
+        fileAssetId: uploadedFileAssetId || values.fileAssetId || undefined,
         mediaType: values.mediaType,
         title: values.title || undefined,
         description: values.description || undefined,
@@ -54,14 +79,6 @@ function ProductMediaCreate() {
         Add Media
       </Title>
 
-      <Alert
-        type="info"
-        showIcon
-        message="Current version does not support file upload"
-        description="Only existing FileAsset association is supported. Please enter a valid FileAsset ID."
-        style={{ marginBottom: 16 }}
-      />
-
       <Card>
         <Form<CreateProductMediaDto>
           form={form}
@@ -73,12 +90,38 @@ function ProductMediaCreate() {
             displayOrder: 0,
           }}
         >
-          <Form.Item
-            label="FileAsset ID"
-            name="fileAssetId"
-            rules={[{ required: true, message: 'Please enter a FileAsset ID' }]}
-          >
-            <Input placeholder="Enter existing FileAsset ID" />
+          <Form.Item label="Upload File">
+            <Dragger
+              name="file"
+              multiple={false}
+              accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv"
+              showUploadList={false}
+              beforeUpload={handleUpload}
+              disabled={pageState.status === 'uploading'}
+            >
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              {uploadedFileName ? (
+                <>
+                  <p className="ant-upload-text" style={{ color: '#52c41a' }}>
+                    ✅ {uploadedFileName}
+                  </p>
+                  <p className="ant-upload-hint">
+                    Drop or click to replace
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="ant-upload-text">
+                    Click or drag file to this area to upload
+                  </p>
+                  <p className="ant-upload-hint">
+                    Supports images, PDF, Office documents, TXT, CSV (max 10MB)
+                  </p>
+                </>
+              )}
+            </Dragger>
           </Form.Item>
 
           <Form.Item
@@ -119,7 +162,11 @@ function ProductMediaCreate() {
             <Button
               type="primary"
               htmlType="submit"
-              loading={pageState.status === 'submitting'}
+              loading={
+                pageState.status === 'uploading' ||
+                pageState.status === 'submitting'
+              }
+              disabled={!uploadedFileAssetId && pageState.status === 'idle'}
             >
               Add Media
             </Button>

@@ -22,6 +22,8 @@ import { AuthModule } from './auth/auth.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
 import { AdminModule } from './admin/admin.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { StorageModule } from './storage/storage.module';
+import { FileAssetModule } from './file-asset/file-asset.module';
 
 @Module({
   imports: [
@@ -52,6 +54,8 @@ import { NotificationsModule } from './notifications/notifications.module';
     SuppliersModule,
     AdminModule,
     NotificationsModule,
+    StorageModule,
+    FileAssetModule,
   ],
   providers: [
     {

@@ -15,3 +15,4 @@ export { parameterGroupService } from './parameter-group.service';
 export { parameterDefinitionService } from './parameter-definition.service';
 export { categoryService } from './category.service';
 export { productMediaService } from './product-media.service';
+export { fileAssetService } from './file-asset.service';

@@ -11,12 +11,60 @@ import {
   Table,
   Empty,
   Typography,
+  Image,
+  List,
+  Row,
+  Col,
+  message,
 } from 'antd';
-import { ArrowLeftOutlined, EditOutlined, PictureOutlined } from '@ant-design/icons';
+import {
+  ArrowLeftOutlined,
+  EditOutlined,
+  PictureOutlined,
+  DownloadOutlined,
+  FileImageOutlined,
+  FileTextOutlined,
+  FileProtectOutlined,
+  FileUnknownOutlined,
+} from '@ant-design/icons';
 import { productService } from '../api';
 import type { ProductDetail, ProductParameterValue } from '../types';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
+
+/** Get file type icon based on mediaType */
+function getFileTypeIcon(mediaType: string): React.ReactNode {
+  const iconStyle = { fontSize: 24 };
+  switch (mediaType) {
+    case 'IMAGE':
+      return <FileImageOutlined style={iconStyle} />;
+    case 'DOCUMENT':
+      return <FileTextOutlined style={iconStyle} />;
+    case 'CERTIFICATE':
+      return <FileProtectOutlined style={iconStyle} />;
+    default:
+      return <FileUnknownOutlined style={iconStyle} />;
+  }
+}
+
+/** Extended media type that may include fileAssetId from backend */
+interface MediaItem {
+  id: string;
+  productId: string;
+  mediaType: string;
+  title?: string;
+  url?: string;
+  fileAssetId?: string;
+  description?: string;
+  isPrimary?: boolean;
+  fileAsset?: {
+    id: string;
+    fileName: string;
+    fileSize: number;
+    mimeType: string;
+    fileType: string;
+  };
+}
 
 type PageState =
   | { status: 'loading' }
@@ -173,18 +221,151 @@ export default function ProductDetailPage() {
 
       <Card title="Product Media">
         {product.media && product.media.length > 0 ? (
-          <Table
-            dataSource={product.media}
-            columns={[
-              { title: 'Title', dataIndex: 'title', key: 'title' },
-              { title: 'Type', dataIndex: 'mediaType', key: 'mediaType', width: 120 },
-            ]}
-            rowKey="id"
-            pagination={false}
-            size="small"
-          />
+          (() => {
+            const mediaItems = product.media as MediaItem[];
+            const images = mediaItems.filter((m) => m.mediaType === 'IMAGE');
+            const documents = mediaItems.filter((m) => m.mediaType !== 'IMAGE');
+
+            const handleDownload = (item: MediaItem) => {
+              const url = item.url || (item.fileAssetId ? `/api/v1/files/${item.fileAssetId}/download` : null);
+              if (url) {
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = item.title || 'download';
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              } else {
+                message.warning('No download URL available');
+              }
+            };
+
+            return (
+              <>
+                {/* Image Gallery */}
+                {images.length > 0 && (
+                  <div style={{ marginBottom: documents.length > 0 ? 24 : 0 }}>
+                    <Title level={5} style={{ marginBottom: 12 }}>
+                      <FileImageOutlined /> Product Images ({images.length})
+                    </Title>
+                    <Image.PreviewGroup>
+                      <Row gutter={[16, 16]}>
+                        {images.map((item) => (
+                          <Col xs={12} sm={8} md={6} key={item.id}>
+                            <Card
+                              size="small"
+                              hoverable
+                              cover={
+                                item.url ? (
+                                  <Image
+                                    alt={item.title || 'Product image'}
+                                    src={item.url}
+                                    preview={{ mask: 'Preview' }}
+                                    height={160}
+                                    style={{ objectFit: 'cover' }}
+                                    fallback="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE2MCIgZmlsbD0iI2Y1ZjVmNSIvPjx0ZXh0IHg9IjEwMCIgeT0iODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjOTk5IiBmb250LXNpemU9IjE0Ij5JbWFnZTwvdGV4dD48L3N2Zz4="
+                                  />
+                                ) : (
+                                  <div
+                                    style={{
+                                      height: 160,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      background: '#fafafa',
+                                    }}
+                                  >
+                                    {getFileTypeIcon('IMAGE')}
+                                  </div>
+                                )
+                              }
+                              actions={[
+                                <Button
+                                  type="link"
+                                  size="small"
+                                  icon={<DownloadOutlined />}
+                                  onClick={() => handleDownload(item)}
+                                  key="download"
+                                >
+                                  Download
+                                </Button>,
+                              ]}
+                            >
+                              <Card.Meta
+                                title={item.title || 'Untitled image'}
+                                description={
+                                  item.isPrimary ? (
+                                    <Tag color="gold">Primary</Tag>
+                                  ) : undefined
+                                }
+                              />
+                            </Card>
+                          </Col>
+                        ))}
+                      </Row>
+                    </Image.PreviewGroup>
+                  </div>
+                )}
+
+                {/* Document List */}
+                {documents.length > 0 && (
+                  <div>
+                    <Title level={5} style={{ marginBottom: 12 }}>
+                      <FileTextOutlined /> Product Documents ({documents.length})
+                    </Title>
+                    <List
+                      dataSource={documents}
+                      itemLayout="horizontal"
+                      renderItem={(item: MediaItem) => (
+                        <List.Item
+                          actions={[
+                            <Button
+                              type="link"
+                              icon={<DownloadOutlined />}
+                              onClick={() => handleDownload(item)}
+                              key="download"
+                            >
+                              Download
+                            </Button>,
+                          ]}
+                        >
+                          <List.Item.Meta
+                            avatar={getFileTypeIcon(item.mediaType)}
+                            title={item.title || 'Untitled document'}
+                            description={
+                              <Space size="middle">
+                                <Tag>{item.mediaType}</Tag>
+                                {item.isPrimary && (
+                                  <Tag color="gold">Primary</Tag>
+                                )}
+                                {item.fileAsset?.fileName && (
+                                  <Text type="secondary">
+                                    {item.fileAsset.fileName}
+                                  </Text>
+                                )}
+                              </Space>
+                            }
+                          />
+                        </List.Item>
+                      )}
+                    />
+                  </div>
+                )}
+              </>
+            );
+          })()
         ) : (
-          <Empty description="No media attached" />
+          <Empty description="No media attached">
+            <Button
+              type="primary"
+              icon={<PictureOutlined />}
+              onClick={() => navigate(`/products/${id}/media`)}
+            >
+              Add Media
+            </Button>
+          </Empty>
         )}
       </Card>
     </div>
