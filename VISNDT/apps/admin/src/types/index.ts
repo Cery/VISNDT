@@ -86,3 +86,30 @@ export type {
   SupplierProductListResponse,
   SupplierListResponse,
 } from './supplier.types';
+export type {
+  ParameterGroup,
+  CreateParameterGroupDto,
+  UpdateParameterGroupDto,
+  ParameterGroupListResponse,
+} from './parameter.types';
+export type {
+  ParameterDefinition,
+  ParameterOption,
+  CreateParameterDefinitionDto,
+  UpdateParameterDefinitionDto,
+  ParameterDefinitionListResponse,
+  ParameterDataType,
+} from './parameter-definition.types';
+export type {
+  ProductCategory,
+  CreateProductCategoryDto,
+  UpdateProductCategoryDto,
+  ProductCategoryListResponse,
+} from './category.types';
+export type {
+  ProductMediaItem,
+  CreateProductMediaDto,
+  UpdateProductMediaDto,
+  ProductMediaListResponse,
+  MediaType,
+} from './product-media.types';

@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { RequireAuth } from '../auth';
 import AdminLayout from '../layouts/AdminLayout';
-import { DemandDetail, DemandList, Home, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ProductCreate, ProductDetail, ProductEdit, ProductList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, SupplierDetail, SupplierList, UserCreate, UserDetail, UserEdit, UserList } from '../pages';
+import { DemandDetail, DemandList, Home, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ParameterDefinitionCreate, ParameterDefinitionEdit, ParameterDefinitionList, ParameterGroupCreate, ParameterGroupEdit, ParameterGroupList, ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList, ProductCreate, ProductDetail, ProductEdit, ProductList, ProductMediaCreate, ProductMediaEdit, ProductMediaList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, SupplierDetail, SupplierList, UserCreate, UserDetail, UserEdit, UserList } from '../pages';
 
 const router = createBrowserRouter([
   {
@@ -22,6 +22,9 @@ const router = createBrowserRouter([
       { path: 'products/create', element: <ProductCreate /> },
       { path: 'products/:id/edit', element: <ProductEdit /> },
       { path: 'products/:id', element: <ProductDetail /> },
+      { path: 'products/:productId/media', element: <ProductMediaList /> },
+      { path: 'products/:productId/media/create', element: <ProductMediaCreate /> },
+      { path: 'products/:productId/media/:id/edit', element: <ProductMediaEdit /> },
       { path: 'demands', element: <DemandList /> },
       { path: 'demands/:id', element: <DemandDetail /> },
       { path: 'demands/:demandId/matches/:matchId', element: <MatchDetail /> },
@@ -44,6 +47,15 @@ const router = createBrowserRouter([
       { path: 'offers/:id', element: <OfferDetail /> },
       { path: 'suppliers', element: <SupplierList /> },
       { path: 'suppliers/:id', element: <SupplierDetail /> },
+      { path: 'parameter-groups', element: <ParameterGroupList /> },
+      { path: 'parameter-groups/create', element: <ParameterGroupCreate /> },
+      { path: 'parameter-groups/:id/edit', element: <ParameterGroupEdit /> },
+      { path: 'parameter-definitions', element: <ParameterDefinitionList /> },
+      { path: 'parameter-definitions/create', element: <ParameterDefinitionCreate /> },
+      { path: 'parameter-definitions/:id/edit', element: <ParameterDefinitionEdit /> },
+      { path: 'product-categories', element: <ProductCategoryList /> },
+      { path: 'product-categories/create', element: <ProductCategoryCreate /> },
+      { path: 'product-categories/:id/edit', element: <ProductCategoryEdit /> },
     ],
   },
   {

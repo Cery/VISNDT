@@ -11,3 +11,7 @@ export { rfqResponseService } from './rfq-response.service';
 export { matchService } from './match.service';
 export { offerService } from './offer.service';
 export { supplierService } from './supplier.service';
+export { parameterGroupService } from './parameter-group.service';
+export { parameterDefinitionService } from './parameter-definition.service';
+export { categoryService } from './category.service';
+export { productMediaService } from './product-media.service';

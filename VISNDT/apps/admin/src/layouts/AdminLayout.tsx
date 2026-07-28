@@ -14,6 +14,7 @@ import {
   TeamOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 
 const { Header, Sider, Content } = Layout;
@@ -28,11 +29,22 @@ const menuItems = [
   { key: '/users', icon: <UserOutlined />, label: 'Users' },
   { key: '/organizations', icon: <BankOutlined />, label: 'Organizations' },
   { key: '/suppliers', icon: <TeamOutlined />, label: 'Suppliers' },
+  {
+    key: 'parameters',
+    icon: <SettingOutlined />,
+    label: 'Parameters',
+    children: [
+      { key: '/parameter-groups', label: 'Parameter Groups' },
+      { key: '/parameter-definitions', label: 'Parameter Definitions' },
+      { key: '/product-categories', label: 'Categories' },
+    ],
+  },
   { key: '/notifications', icon: <BellOutlined />, label: 'Notifications' },
 ];
 
 function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
+  const [openKeys, setOpenKeys] = useState<string[]>(['parameters']);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -63,6 +75,8 @@ function AdminLayout() {
           theme="dark"
           mode="inline"
           selectedKeys={[location.pathname]}
+          openKeys={collapsed ? [] : openKeys}
+          onOpenChange={(keys) => setOpenKeys(keys)}
           items={menuItems}
           onClick={({ key }) => navigate(key)}
         />

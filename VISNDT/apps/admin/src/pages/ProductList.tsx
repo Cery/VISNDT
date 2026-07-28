@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, Input, Select, Space, Spin, Alert, Button, Tag, Typography } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
@@ -36,6 +37,7 @@ const STATUS_COLOR_MAP: Record<string, string> = {
 };
 
 function ProductList() {
+  const navigate = useNavigate();
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
   const [query, setQuery] = useState<QueryParams>({
     keyword: '',
@@ -189,6 +191,27 @@ function ProductList() {
             : 'descend'
           : undefined,
       render: (date: string) => new Date(date).toLocaleDateString(),
+    },
+  {
+      title: 'Actions',
+      key: 'actions',
+      width: 160,
+      render: (_: unknown, record: Product) => (
+        <Space>
+          <Button
+            type="link"
+            onClick={() => navigate(`/products/${record.id}`)}
+          >
+            View
+          </Button>
+          <Button
+            type="link"
+            onClick={() => navigate(`/products/${record.id}/edit`)}
+          >
+            Edit
+          </Button>
+        </Space>
+      ),
     },
   ];
 

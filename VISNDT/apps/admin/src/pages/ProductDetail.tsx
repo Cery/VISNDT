@@ -12,7 +12,7 @@ import {
   Empty,
   Typography,
 } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, EditOutlined, PictureOutlined } from '@ant-design/icons';
 import { productService } from '../api';
 import type { ProductDetail, ProductParameterValue } from '../types';
 
@@ -116,6 +116,18 @@ export default function ProductDetailPage() {
       <Space style={{ marginBottom: 16 }}>
         <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/products')}>
           Back to List
+        </Button>
+        <Button
+          icon={<EditOutlined />}
+          onClick={() => navigate(`/products/${id}/edit`)}
+        >
+          Edit Product
+        </Button>
+        <Button
+          icon={<PictureOutlined />}
+          onClick={() => navigate(`/products/${id}/media`)}
+        >
+          Manage Media
         </Button>
       </Space>
 
