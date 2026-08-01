@@ -20,6 +20,17 @@ export class RfqsController {
     return ApiResponse.ok(await this.service.findAll(pagination));
   }
 
+  @Get('mine')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get RFQs for current supplier organization' })
+  async findMine(@CurrentUser() user: AuthRequest['user']) {
+    if (!user.organizationId) {
+      return ApiResponse.ok({ data: [], total: 0 });
+    }
+    return ApiResponse.ok(await this.service.findMine(user.organizationId));
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get RFQ by ID' })
   @ApiParam({ name: 'id', description: 'RFQ UUID' })

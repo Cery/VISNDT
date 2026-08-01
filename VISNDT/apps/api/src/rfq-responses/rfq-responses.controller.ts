@@ -34,6 +34,17 @@ export class RfqResponsesController {
     return ApiResponse.ok(await this.service.create(id, dto, user), 'Response created');
   }
 
+  @Get('rfq-responses/mine')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get current organization RFQ responses' })
+  async findMine(@CurrentUser() user: AuthRequest['user']) {
+    if (!user.organizationId) {
+      return ApiResponse.ok({ data: [], total: 0 });
+    }
+    return ApiResponse.ok(await this.service.findMine(user.organizationId));
+  }
+
   @Get('rfq-responses/:id')
   @ApiOperation({ summary: 'Get RFQ response by ID' })
   @ApiParam({ name: 'id', description: 'Response UUID' })

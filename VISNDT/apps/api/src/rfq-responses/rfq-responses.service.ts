@@ -47,6 +47,19 @@ export class RfqResponsesService {
     return response;
   }
 
+  async findMine(organizationId: string) {
+    const [data, total] = await Promise.all([
+      this.prisma.rFQResponse.findMany({
+        where: { organizationId },
+        orderBy: { createdAt: 'desc' },
+        include: { rfq: true, organization: true, offer: true },
+      }),
+      this.prisma.rFQResponse.count({ where: { organizationId } }),
+    ]);
+
+    return { data, total };
+  }
+
   async create(
     rfqId: string,
     dto: CreateRfqResponseDto,

@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import PublicHeader from "@/components/layout/PublicHeader";
+import PublicFooter from "@/components/layout/PublicFooter";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "VISNDT",
@@ -12,7 +15,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN">
-      <body>{children}</body>
+      <body className="min-h-screen flex flex-col">
+        <Providers>
+          <PublicHeader />
+          <main className="flex-1">{children}</main>
+          <PublicFooter />
+        </Providers>
+      </body>
     </html>
   );
 }

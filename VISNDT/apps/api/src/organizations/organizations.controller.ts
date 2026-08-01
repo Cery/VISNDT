@@ -9,8 +9,6 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { AuthRequest } from '../auth/interfaces/auth-request.interface';
 
 @ApiTags('Organizations')
 @Controller('organizations')
@@ -28,15 +26,10 @@ export class OrganizationsController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get organization by ID (own org or ADMIN)' })
+  @ApiOperation({ summary: 'Get public organization information' })
   @ApiParam({ name: 'id', description: 'Organization UUID' })
-  async findOne(
-    @Param('id') id: string,
-    @CurrentUser() user: AuthRequest['user'],
-  ) {
-    const org = await this.orgsService.findOne(id, user);
+  async findOne(@Param('id') id: string) {
+    const org = await this.orgsService.findOnePublic(id);
     return ApiResponse.ok(org);
   }
 

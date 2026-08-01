@@ -49,6 +49,17 @@ export class DemandsController {
     return ApiResponse.ok(await this.service.findMy(pagination, user));
   }
 
+  @Get('mine')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get current user demands (compatibility alias for /demands/my)' })
+  async findMine(
+    @Query() pagination: PaginationDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.findMy(pagination, user));
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get demand by ID (public, contact info protected)' })
   @ApiParam({ name: 'id', description: 'Demand UUID' })

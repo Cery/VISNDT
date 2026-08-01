@@ -38,6 +38,29 @@ export class RfqsService {
     return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
   }
 
+  async findMine(organizationId: string) {
+    const [data, total] = await Promise.all([
+      this.prisma.rFQ.findMany({
+        where: {
+          demand: {
+            organizationId,
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        include: { demand: true, createdByUser: true },
+      }),
+      this.prisma.rFQ.count({
+        where: {
+          demand: {
+            organizationId,
+          },
+        },
+      }),
+    ]);
+
+    return { data, total };
+  }
+
   async findOne(id: string) {
     const rfq = await this.prisma.rFQ.findUnique({
       where: { id },

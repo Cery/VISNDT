@@ -66,6 +66,19 @@ export class OrganizationsService {
     return org;
   }
 
+  async findOnePublic(id: string) {
+    const org = await this.prisma.organization.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        type: true,
+      },
+    });
+    if (!org) throw new NotFoundException(`Organization ${id} not found`);
+    return org;
+  }
+
   async create(dto: CreateOrganizationDto) {
     return this.prisma.organization.create({ data: dto });
   }
