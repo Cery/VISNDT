@@ -153,4 +153,93 @@ export class FileAssetService {
       return FileType.DOCUMENT;
     return FileType.OTHER;
   }
+
+  /** Placeholder entityId used for FileAssets not yet linked to an entity */
+  private static readonly PLACEHOLDER_ENTITY_ID = '00000000-0000-0000-0000-000000000000';
+
+  /**
+   * Find orphan FileAssets — records with no associated ProductMedia
+   * and entityId still set to the placeholder.
+   */
+  async findOrphans() {
+    this.logger.log('Querying orphan FileAssets');
+
+    const orphans = await this.prisma.fileAsset.findMany({
+      where: {
+        entityId: FileAssetService.PLACEHOLDER_ENTITY_ID,
+        media: { none: {} },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    this.logger.log(`Found ${orphans.length} orphan FileAssets`);
+    return orphans;
+  }
+
+  /**
+   * Clean up specified orphan FileAssets.
+   * Each ID is re-validated before deletion:
+   * - FileAsset must exist
+   * - entityId must be placeholder
+   * - No ProductMedia references (media.length === 0)
+   *
+   * Only passing these checks will the file be deleted via {@link delete}.
+   *
+   * @param ids - Array of FileAsset IDs to delete (max 100)
+   * @returns Count of deleted and failed IDs
+   */
+  async cleanupOrphans(ids: string[]): Promise<{ deleted: number; failed: string[] }> {
+    this.logger.log(`Cleaning up ${ids.length} orphan FileAssets`);
+
+    let deleted = 0;
+    const failed: string[] = [];
+
+    for (const id of ids) {
+      try {
+        // Re-validate: must be a true orphan before deletion
+        const fileAsset = await this.prisma.fileAsset.findUnique({
+          where: { id },
+          include: {
+            _count: { select: { media: true } },
+          },
+        });
+
+        if (!fileAsset) {
+          this.logger.warn(`Skip orphan ${id}: not found`);
+          failed.push(id);
+          continue;
+        }
+
+        if (fileAsset.entityId !== FileAssetService.PLACEHOLDER_ENTITY_ID) {
+          this.logger.warn(
+            `Skip orphan ${id}: entityId is ${fileAsset.entityId} (not placeholder)`,
+          );
+          failed.push(id);
+          continue;
+        }
+
+        if (fileAsset._count.media > 0) {
+          this.logger.warn(
+            `Skip orphan ${id}: still referenced by ${fileAsset._count.media} ProductMedia`,
+          );
+          failed.push(id);
+          continue;
+        }
+
+        // Safe to delete — reuse existing delete() for DB + S3 cleanup
+        await this.delete(id);
+        deleted++;
+      } catch (err) {
+        this.logger.error(
+          `Failed to cleanup orphan ${id}: ${(err as Error).message}`,
+        );
+        failed.push(id);
+      }
+    }
+
+    this.logger.log(
+      `Orphan cleanup complete: ${deleted} deleted, ${failed.length} failed`,
+    );
+    return { deleted, failed };
+  }
 }

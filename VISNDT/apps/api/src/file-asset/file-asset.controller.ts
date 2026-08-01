@@ -5,6 +5,7 @@ import {
   Delete,
   Param,
   Req,
+  Body,
   UseGuards,
   UseInterceptors,
   UploadedFile,
@@ -21,6 +22,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
 import { ApiResponse } from '../common/dto/api-response.dto';
 import { AuthRequest } from '../auth/interfaces/auth-request.interface';
+import { CleanupOrphansDto } from './dto/cleanup-orphans.dto';
 
 @ApiTags('Files')
 @Controller('files')
@@ -44,6 +46,34 @@ export class FileAssetController {
   ) {
     const fileAsset = await this.service.upload(file, req.user.id);
     return ApiResponse.ok(fileAsset, 'File uploaded');
+  }
+
+  /**
+   * List orphan FileAssets with no associated ProductMedia.
+   * ADMIN only. Must be defined BEFORE :id routes to avoid route conflict.
+   */
+  @Get('orphans')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List orphan FileAssets (ADMIN only)' })
+  async findOrphans() {
+    const orphans = await this.service.findOrphans();
+    return ApiResponse.ok(orphans, 'Orphan files retrieved');
+  }
+
+  /**
+   * Clean up specified orphan FileAssets.
+   * ADMIN only. Must be defined BEFORE :id routes to avoid route conflict.
+   */
+  @Post('orphans/cleanup')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Clean up orphan FileAssets (ADMIN only, max 100 per request)' })
+  async cleanupOrphans(@Body() dto: CleanupOrphansDto) {
+    const result = await this.service.cleanupOrphans(dto.ids);
+    return ApiResponse.ok(result, 'Orphan cleanup completed');
   }
 
   /**

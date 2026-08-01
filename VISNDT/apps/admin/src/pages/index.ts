@@ -1,5 +1,6 @@
 export { default as DemandDetail } from './DemandDetail';
 export { default as DemandList } from './DemandList';
+export { default as FileAssetOrphanList } from './FileAssetOrphanList';
 export { default as Home } from './Home';
 export { default as Login } from './Login';
 export { default as MatchingMonitor } from './MatchingMonitor';

@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { UploadResponse, FileAsset } from '../types/file-asset.types';
+import type { UploadResponse, FileAsset, OrphanListResponse, CleanupOrphansResponse } from '../types/file-asset.types';
 
 const FILES_BASE = '/files';
 
@@ -40,5 +40,31 @@ export const fileAssetService = {
       return (response as { url: string }).url;
     }
     return String(response);
+  },
+
+  /**
+   * List orphan FileAssets (no ProductMedia, placeholder entityId).
+   * Calls GET /files/orphans (ADMIN only).
+   * @returns List of orphan FileAssets
+   */
+  async getOrphans(): Promise<FileAsset[]> {
+    const response = (await apiClient.get(
+      `${FILES_BASE}/orphans`,
+    )) as unknown as OrphanListResponse;
+    return response.data;
+  },
+
+  /**
+   * Clean up specified orphan FileAssets.
+   * Calls POST /files/orphans/cleanup (ADMIN only, max 100 IDs).
+   * @param ids - Array of FileAsset IDs to delete
+   * @returns Result with deleted count and failed IDs
+   */
+  async cleanupOrphans(ids: string[]): Promise<{ deleted: number; failed: string[] }> {
+    const response = (await apiClient.post(
+      `${FILES_BASE}/orphans/cleanup`,
+      { ids },
+    )) as unknown as CleanupOrphansResponse;
+    return response.data;
   },
 };

@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Input, InputNumber, Button, Card, Select, Switch, Upload, Typography, message } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { productMediaService } from '../../api/product-media.service';
-import { fileAssetService } from '../../api/file-asset.service';
 import type { CreateProductMediaDto, MediaType } from '../../types/product-media.types';
+import type { UploadFile } from 'antd/es/upload/interface';
 
 const { Title } = Typography;
 const { Dragger } = Upload;
@@ -19,8 +19,7 @@ const MEDIA_TYPE_OPTIONS: { value: MediaType; label: string }[] = [
 
 type PageState =
   | { status: 'idle' }
-  | { status: 'uploading'; fileName: string }
-  | { status: 'submitting' }
+  | { status: 'submitting'; fileName: string }
   | { status: 'error'; message: string };
 
 function ProductMediaCreate() {
@@ -28,41 +27,38 @@ function ProductMediaCreate() {
   const navigate = useNavigate();
   const [form] = Form.useForm<CreateProductMediaDto>();
   const [pageState, setPageState] = useState<PageState>({ status: 'idle' });
-  const [uploadedFileAssetId, setUploadedFileAssetId] = useState<string | null>(null);
-  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const selectedFileName = useRef<string | null>(null);
 
-  const handleUpload = async (file: File) => {
-    if (!productId) return;
-    setPageState({ status: 'uploading', fileName: file.name });
-
-    try {
-      const fileAsset = await fileAssetService.upload(file);
-      setUploadedFileAssetId(fileAsset.id);
-      setUploadedFileName(file.name);
-      message.success(`File "${file.name}" uploaded successfully`);
-      setPageState({ status: 'idle' });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Upload failed';
-      setPageState({ status: 'error', message: errorMessage });
-      message.error(errorMessage);
-    }
-
+  const handleFileSelect = (file: File) => {
+    setSelectedFile(file);
+    selectedFileName.current = file.name;
     return false; // Prevent default upload behavior
   };
 
+  const handleDrop = (info: { fileList: UploadFile[] }) => {
+    const file = info.fileList[0]?.originFileObj;
+    if (file) {
+      setSelectedFile(file);
+      selectedFileName.current = file.name;
+    }
+    return false;
+  };
+
   const handleSubmit = async (values: CreateProductMediaDto) => {
-    if (!productId) return;
-    setPageState({ status: 'submitting' });
+    if (!productId || !selectedFile) return;
+    setPageState({ status: 'submitting', fileName: selectedFile.name });
+
     try {
-      const payload: CreateProductMediaDto = {
-        fileAssetId: uploadedFileAssetId || values.fileAssetId || undefined,
+      const metadata: CreateProductMediaDto = {
         mediaType: values.mediaType,
         title: values.title || undefined,
         description: values.description || undefined,
         isPrimary: values.isPrimary ?? false,
         displayOrder: values.displayOrder ?? 0,
       };
-      await productMediaService.create(productId, payload);
+
+      await productMediaService.createWithUpload(productId, selectedFile, metadata);
       message.success('Media added successfully');
       navigate(`/products/${productId}/media`);
     } catch (err) {
@@ -71,6 +67,11 @@ function ProductMediaCreate() {
       setPageState({ status: 'error', message: errorMessage });
       message.error(errorMessage);
     }
+  };
+
+  const removeFile = () => {
+    setSelectedFile(null);
+    selectedFileName.current = null;
   };
 
   return (
@@ -96,16 +97,29 @@ function ProductMediaCreate() {
               multiple={false}
               accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv"
               showUploadList={false}
-              beforeUpload={handleUpload}
-              disabled={pageState.status === 'uploading'}
+              beforeUpload={handleFileSelect}
+              onDrop={handleDrop as any}
+              onRemove={removeFile}
+              disabled={pageState.status === 'submitting'}
+              fileList={
+                selectedFile
+                  ? ([
+                      {
+                        uid: '-1',
+                        name: selectedFile.name,
+                        status: 'done',
+                      },
+                    ] as UploadFile[])
+                  : []
+              }
             >
               <p className="ant-upload-drag-icon">
                 <InboxOutlined />
               </p>
-              {uploadedFileName ? (
+              {selectedFileName.current ? (
                 <>
                   <p className="ant-upload-text" style={{ color: '#52c41a' }}>
-                    ✅ {uploadedFileName}
+                    ✅ {selectedFileName.current}
                   </p>
                   <p className="ant-upload-hint">
                     Drop or click to replace
@@ -162,11 +176,8 @@ function ProductMediaCreate() {
             <Button
               type="primary"
               htmlType="submit"
-              loading={
-                pageState.status === 'uploading' ||
-                pageState.status === 'submitting'
-              }
-              disabled={!uploadedFileAssetId && pageState.status === 'idle'}
+              loading={pageState.status === 'submitting'}
+              disabled={!selectedFile || pageState.status === 'submitting'}
             >
               Add Media
             </Button>

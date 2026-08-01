@@ -6,9 +6,13 @@ import {
   Delete,
   Param,
   Body,
+  Req,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { ProductMediaService } from './product-media.service';
 import { CreateProductMediaDto } from './dto/create-product-media.dto';
 import { UpdateProductMediaDto } from './dto/update-product-media.dto';
@@ -17,6 +21,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
+import { AuthRequest } from '../auth/interfaces/auth-request.interface';
 
 @ApiTags('Product Media')
 @Controller('products/:productId/media')
@@ -54,6 +59,26 @@ export class ProductMediaController {
     return ApiResponse.ok(
       await this.service.create(productId, dto),
       'Product media created',
+    );
+  }
+
+  @Post('upload')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Upload file and create media in one step (ADMIN only)' })
+  @ApiParam({ name: 'productId', description: 'Product UUID' })
+  @UseInterceptors(FileInterceptor('file'))
+  async createWithUpload(
+    @Param('productId') productId: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: CreateProductMediaDto,
+    @Req() req: AuthRequest,
+  ) {
+    return ApiResponse.ok(
+      await this.service.createWithUpload(productId, file, dto, req.user.id),
+      'Product media created with upload',
     );
   }
 

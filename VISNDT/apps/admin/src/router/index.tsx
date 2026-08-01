@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { RequireAuth } from '../auth';
 import AdminLayout from '../layouts/AdminLayout';
-import { DemandDetail, DemandList, Home, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ParameterDefinitionCreate, ParameterDefinitionEdit, ParameterDefinitionList, ParameterGroupCreate, ParameterGroupEdit, ParameterGroupList, ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList, ProductCreate, ProductDetail, ProductEdit, ProductList, ProductMediaCreate, ProductMediaEdit, ProductMediaList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, SupplierDetail, SupplierList, UserCreate, UserDetail, UserEdit, UserList } from '../pages';
+import { DemandDetail, DemandList, FileAssetOrphanList, Home, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ParameterDefinitionCreate, ParameterDefinitionEdit, ParameterDefinitionList, ParameterGroupCreate, ParameterGroupEdit, ParameterGroupList, ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList, ProductCreate, ProductDetail, ProductEdit, ProductList, ProductMediaCreate, ProductMediaEdit, ProductMediaList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, SupplierDetail, SupplierList, UserCreate, UserDetail, UserEdit, UserList } from '../pages';
 
 const router = createBrowserRouter([
   {
@@ -56,6 +56,7 @@ const router = createBrowserRouter([
       { path: 'product-categories', element: <ProductCategoryList /> },
       { path: 'product-categories/create', element: <ProductCategoryCreate /> },
       { path: 'product-categories/:id/edit', element: <ProductCategoryEdit /> },
+      { path: 'files/orphans', element: <FileAssetOrphanList /> },
     ],
   },
   {
