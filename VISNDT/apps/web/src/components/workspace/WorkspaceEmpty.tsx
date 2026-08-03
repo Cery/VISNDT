@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 interface WorkspaceEmptyProps {
   title?: string;
   message?: string;
@@ -17,12 +19,12 @@ export default function WorkspaceEmpty({
       <h3 className="text-sm font-medium text-slate-700 mb-1">{title}</h3>
       <p className="text-sm text-slate-400 mb-4">{message}</p>
       {actionLabel && actionHref && (
-        <a
+        <Link
           href={actionHref}
           className="inline-flex text-sm font-medium text-slate-900 hover:underline"
         >
           {actionLabel}
-        </a>
+        </Link>
       )}
     </div>
   );

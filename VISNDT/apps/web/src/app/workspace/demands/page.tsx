@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import AuthGuard from '@/auth/AuthGuard';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
@@ -9,6 +9,9 @@ import { getDemands } from '@/services/demand.service';
 import type { DemandItem } from '@/lib/api/demands';
 
 function DemandsContent() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
+  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   const [demands, setDemands] = useState<DemandItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -28,9 +31,9 @@ function DemandsContent() {
 
   return (
     <div className="flex min-h-screen">
-      <WorkspaceSidebar />
-      <div className="flex-1 flex flex-col">
-        <WorkspaceHeader />
+      <WorkspaceSidebar mobileOpen={sidebarOpen} onClose={closeSidebar} />
+      <div className="flex-1 flex flex-col min-w-0">
+        <WorkspaceHeader onMenuToggle={toggleSidebar} />
         <div className="flex-1 bg-slate-50 p-6">
           <div className="max-w-5xl mx-auto space-y-6">
             <div>

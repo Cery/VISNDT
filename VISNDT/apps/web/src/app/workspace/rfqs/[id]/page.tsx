@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState, use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import AuthGuard from '@/auth/AuthGuard';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
@@ -12,6 +12,9 @@ import type { RfqDetailItem, RfqResponseItem } from '@/lib/api/rfqs';
 
 function RfqDetailContent({ id }: { id: string }) {
   const router = useRouter();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
+  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   const [rfq, setRfq] = useState<RfqDetailItem | null>(null);
   const [responses, setResponses] = useState<RfqResponseItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -48,9 +51,9 @@ function RfqDetailContent({ id }: { id: string }) {
 
   return (
     <div className="flex min-h-screen">
-      <WorkspaceSidebar />
-      <div className="flex-1 flex flex-col">
-        <WorkspaceHeader />
+      <WorkspaceSidebar mobileOpen={sidebarOpen} onClose={closeSidebar} />
+      <div className="flex-1 flex flex-col min-w-0">
+        <WorkspaceHeader onMenuToggle={toggleSidebar} />
         <div className="flex-1 bg-slate-50 p-6">
           <div className="max-w-4xl mx-auto">
             {/* Back button */}

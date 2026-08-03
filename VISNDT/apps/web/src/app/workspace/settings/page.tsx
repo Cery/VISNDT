@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useCallback } from 'react';
 import AuthGuard from '@/auth/AuthGuard';
 import { useAuth } from '@/auth/AuthProvider';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
@@ -7,12 +8,15 @@ import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
 
 function SettingsContent() {
   const { user, logout } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
+  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
 
   return (
     <div className="flex min-h-screen">
-      <WorkspaceSidebar />
-      <div className="flex-1 flex flex-col">
-        <WorkspaceHeader />
+      <WorkspaceSidebar mobileOpen={sidebarOpen} onClose={closeSidebar} />
+      <div className="flex-1 flex flex-col min-w-0">
+        <WorkspaceHeader onMenuToggle={toggleSidebar} />
         <div className="flex-1 bg-slate-50 p-6">
           <div className="max-w-2xl mx-auto space-y-6">
             <div>

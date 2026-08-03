@@ -3,9 +3,11 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { CsrfService } from './common/security/csrf/csrf.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,6 +15,55 @@ async function bootstrap() {
 
   // Security headers
   app.use(helmet());
+
+  // Cookie parser for HttpOnly cookie auth
+  app.use(cookieParser());
+
+  // CSRF Protection — Double Submit Cookie Pattern
+  const csrfService = app.get(CsrfService);
+  app.use((req: any, res: any, next: any) => {
+    // Skip safe methods
+    if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+      return next();
+    }
+
+    // Skip auth endpoints that set cookies
+    const path = req.path;
+    if (
+      path === '/api/v1/auth/login' ||
+      path === '/api/v1/auth/register' ||
+      path === '/api/v1/auth/refresh'
+    ) {
+      return next();
+    }
+
+    // CSRF token validation
+    const headerToken = req.headers['x-csrf-token'];
+    const cookieToken = req.cookies?.['csrf_token'];
+
+    if (!headerToken) {
+      return res.status(403).json({
+        statusCode: 403,
+        message: 'CSRF token missing in X-CSRF-Token header',
+      });
+    }
+
+    if (!cookieToken) {
+      return res.status(403).json({
+        statusCode: 403,
+        message: 'CSRF token missing in csrf_token cookie',
+      });
+    }
+
+    if (!csrfService.verifyToken(headerToken, cookieToken)) {
+      return res.status(403).json({
+        statusCode: 403,
+        message: 'CSRF token mismatch',
+      });
+    }
+
+    next();
+  });
 
   app.setGlobalPrefix('api/v1');
 

@@ -1,51 +1,31 @@
-import { AUTH_TOKEN_KEY, AUTH_USER_KEY } from './constants';
+/**
+ * Auth helpers — cookie-based auth (no localStorage).
+ *
+ * Authentication is managed via HttpOnly cookies set by the backend.
+ * The frontend checks auth status via the /auth/me endpoint.
+ */
 
-// --- Token ---
-
-export function getToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem(AUTH_TOKEN_KEY);
-}
-
-export function setToken(token: string): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(AUTH_TOKEN_KEY, token);
-}
-
-export function removeToken(): void {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem(AUTH_TOKEN_KEY);
-}
-
-export function isAuthenticated(): boolean {
-  return getToken() !== null;
-}
-
-// --- User ---
-
-export interface StoredUser {
+export interface AuthUser {
   id: string;
   email: string;
   name?: string | null;
   organizationId?: string | null;
 }
 
-export function getCurrentUser(): StoredUser | null {
-  if (typeof window === 'undefined') return null;
+/**
+ * Check if the user is authenticated by calling /auth/me.
+ * Returns the user object if authenticated, null otherwise.
+ */
+export async function checkAuth(): Promise<AuthUser | null> {
   try {
-    const raw = localStorage.getItem(AUTH_USER_KEY);
-    return raw ? JSON.parse(raw) : null;
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/me`,
+      { credentials: 'include' },
+    );
+    if (!res.ok) return null;
+    const body = await res.json();
+    return body?.data ?? null;
   } catch {
     return null;
   }
-}
-
-export function setCurrentUser(user: StoredUser): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
-}
-
-export function removeCurrentUser(): void {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem(AUTH_USER_KEY);
 }

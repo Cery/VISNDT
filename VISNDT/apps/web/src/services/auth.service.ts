@@ -1,10 +1,10 @@
 /**
  * Auth Service Layer
  *
- * Encapsulates Auth API calls (login, register, logout) for page-level consumption.
+ * Encapsulates Auth API calls (login, register, logout, refresh) for page-level consumption.
+ * Cookie-based auth — no localStorage.
  */
 import { apiClient } from '@/lib/api-client';
-import { setToken, removeToken, setCurrentUser, removeCurrentUser } from '@/lib/auth';
 
 // --- Types ---
 
@@ -16,7 +16,6 @@ export interface AuthUser {
 }
 
 export interface AuthResponse {
-  accessToken: string;
   user: AuthUser;
 }
 
@@ -37,41 +36,49 @@ interface RegisterPayload {
 /**
  * Login with email and password.
  * POST /auth/login
+ * Backend sets HttpOnly cookies (access_token, refresh_token).
  */
 export async function login(payload: LoginPayload): Promise<AuthResponse> {
   const res = await apiClient<{ data: AuthResponse }>('/auth/login', {
     method: 'POST',
     body: JSON.stringify(payload),
   });
-
-  const { accessToken, user } = res.data;
-  setToken(accessToken);
-  setCurrentUser(user);
-
   return res.data;
 }
 
 /**
  * Register a new user.
  * POST /auth/register
+ * Backend sets HttpOnly cookies (access_token, refresh_token).
  */
 export async function register(payload: RegisterPayload): Promise<AuthResponse> {
   const res = await apiClient<{ data: AuthResponse }>('/auth/register', {
     method: 'POST',
     body: JSON.stringify(payload),
   });
-
-  const { accessToken, user } = res.data;
-  setToken(accessToken);
-  setCurrentUser(user);
-
   return res.data;
 }
 
 /**
- * Logout: clear stored token and user.
+ * Logout: call backend to revoke refresh token, then clear cookies.
+ * POST /auth/logout
  */
-export function logout(): void {
-  removeToken();
-  removeCurrentUser();
+export async function logout(): Promise<void> {
+  try {
+    await apiClient('/auth/logout', { method: 'POST' });
+  } catch {
+    // Ignore errors — cookies will be cleared by backend regardless
+  }
+}
+
+/**
+ * Get current user from /auth/me.
+ */
+export async function getMe(): Promise<AuthUser | null> {
+  try {
+    const res = await apiClient<{ data: AuthUser }>('/auth/me');
+    return res.data;
+  } catch {
+    return null;
+  }
 }

@@ -4,8 +4,12 @@ import PublicFooter from "@/components/layout/PublicFooter";
 import Providers from "./providers";
 
 export const metadata: Metadata = {
-  title: "VISNDT",
-  description: "VISNDT Platform",
+  title: {
+    template: '%s',
+    default: 'VISNDT – Industrial Inspection Equipment Platform',
+  },
+  description:
+    'VISNDT is a professional platform for industrial non-destructive testing equipment — discover high-precision endoscopes, inspection cameras, and measurement systems.',
 };
 
 export default function RootLayout({

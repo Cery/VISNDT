@@ -1,17 +1,16 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { getToken, getCurrentUser } from '@/lib/auth';
-import { login as apiLogin, register as apiRegister, logout as apiLogout } from '@/services/auth.service';
+import { login as apiLogin, register as apiRegister, logout as apiLogout, getMe } from '@/services/auth.service';
+import { clearCsrfToken } from '@/lib/csrf';
 import type { AuthUser } from '@/services/auth.service';
 
 interface AuthContextType {
   user: AuthUser | null;
-  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   register: (email: string, password: string, name?: string, inviteToken?: string) => Promise<void>;
 }
 
@@ -19,36 +18,35 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [token, setTokenState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Hydrate from localStorage on mount
+  // Check auth status on mount via /auth/me (cookie-based)
   useEffect(() => {
-    const storedToken = getToken();
-    const storedUser = getCurrentUser();
-    if (storedToken && storedUser) {
-      setTokenState(storedToken);
-      setUser(storedUser);
-    }
-    setIsLoading(false);
+    let cancelled = false;
+    (async () => {
+      const currentUser = await getMe();
+      if (!cancelled) {
+        setUser(currentUser);
+        setIsLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
     const res = await apiLogin({ email, password });
-    setTokenState(res.accessToken);
     setUser(res.user);
   }, []);
 
-  const logout = useCallback(() => {
-    apiLogout();
-    setTokenState(null);
+  const logout = useCallback(async () => {
+    await apiLogout();
+    clearCsrfToken();
     setUser(null);
   }, []);
 
   const register = useCallback(
     async (email: string, password: string, name?: string, inviteToken?: string) => {
       const res = await apiRegister({ email, password, name, inviteToken });
-      setTokenState(res.accessToken);
       setUser(res.user);
     },
     [],
@@ -58,8 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
-        token,
-        isAuthenticated: !!token && !!user,
+        isAuthenticated: !!user,
         isLoading,
         login,
         logout,

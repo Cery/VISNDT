@@ -61,4 +61,28 @@ export class RfqsController {
   ) {
     return ApiResponse.ok(await this.service.update(id, dto, user), 'RFQ updated');
   }
+
+  @Post(':id/publish')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Publish RFQ (DRAFT → OPEN)' })
+  @ApiParam({ name: 'id', description: 'RFQ UUID' })
+  async publish(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.publish(id, user), 'RFQ published');
+  }
+
+  @Post(':id/close')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Close RFQ (OPEN → CLOSED)' })
+  @ApiParam({ name: 'id', description: 'RFQ UUID' })
+  async close(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.close(id, user), 'RFQ closed');
+  }
 }

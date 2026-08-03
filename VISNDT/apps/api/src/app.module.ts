@@ -19,7 +19,6 @@ import { RfqsModule } from './rfqs/rfqs.module';
 import { RfqResponsesModule } from './rfq-responses/rfq-responses.module';
 import { WorkflowEventsModule } from './workflow-events/workflow-events.module';
 import { AuthModule } from './auth/auth.module';
-import { SuppliersModule } from './suppliers/suppliers.module';
 import { AdminModule } from './admin/admin.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { InquiriesModule } from './inquiries/inquiries.module';
@@ -52,7 +51,6 @@ import { FileAssetModule } from './file-asset/file-asset.module';
     RfqResponsesModule,
     WorkflowEventsModule,
     AuthModule,
-    SuppliersModule,
     AdminModule,
     NotificationsModule,
     InquiriesModule,

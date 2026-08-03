@@ -1,10 +1,11 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { RFQStatus, NotificationType } from '@prisma/client';
+import { RFQStatus, NotificationType, WorkflowAction, WorkflowEntityType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRfqDto } from './dto/create-rfq.dto';
 import { UpdateRfqDto } from './dto/update-rfq.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { NotificationsService } from '../notifications/notifications.service';
+import { WorkflowEventsService } from '../workflow-events/workflow-events.service';
 
 const RFQ_TRANSITIONS: Record<RFQStatus, RFQStatus[]> = {
   DRAFT: [RFQStatus.OPEN],
@@ -19,6 +20,7 @@ export class RfqsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notificationsService: NotificationsService,
+    private readonly workflowEventsService: WorkflowEventsService,
   ) {}
 
   async findAll(pagination: PaginationDto) {
@@ -152,6 +154,128 @@ export class RfqsService {
       } catch {
         // Notification failure should not affect the main flow
       }
+    }
+
+    return updated;
+  }
+
+  /**
+   * Publish an RFQ: transition from DRAFT → OPEN.
+   * Only the creator or a user in the same organization can publish.
+   */
+  async publish(
+    id: string,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    const rfq = await this.prisma.rFQ.findUnique({
+      where: { id },
+      include: { demand: { select: { organizationId: true } } },
+    });
+
+    if (!rfq) {
+      throw new NotFoundException(`RFQ ${id} not found`);
+    }
+
+    // Permission: must be creator or same org
+    const isCreator = rfq.createdBy === user.id;
+    const isSameOrg =
+      user.organizationId &&
+      rfq.demand?.organizationId === user.organizationId;
+    if (!isCreator && !isSameOrg) {
+      throw new BadRequestException(
+        'You do not have permission to publish this RFQ',
+      );
+    }
+
+    // State validation: only DRAFT → OPEN
+    if (rfq.status !== RFQStatus.DRAFT) {
+      throw new BadRequestException(
+        `Cannot publish RFQ with status "${rfq.status}". Only DRAFT RFQs can be published.`,
+      );
+    }
+
+    const updated = await this.prisma.rFQ.update({
+      where: { id },
+      data: {
+        status: RFQStatus.OPEN,
+        publishedAt: new Date(),
+      },
+    });
+
+    // Create WorkflowEvent
+    try {
+      await this.workflowEventsService.create(
+        {
+          entityType: WorkflowEntityType.RFQ,
+          entityId: rfq.id,
+          action: WorkflowAction.OPENED,
+          metadata: { previousStatus: rfq.status, newStatus: RFQStatus.OPEN },
+        },
+        user,
+      );
+    } catch {
+      // Workflow event failure should not affect the main flow
+    }
+
+    return updated;
+  }
+
+  /**
+   * Close an RFQ: transition from OPEN → CLOSED.
+   * Only the creator or a user in the same organization can close.
+   */
+  async close(
+    id: string,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    const rfq = await this.prisma.rFQ.findUnique({
+      where: { id },
+      include: { demand: { select: { organizationId: true } } },
+    });
+
+    if (!rfq) {
+      throw new NotFoundException(`RFQ ${id} not found`);
+    }
+
+    // Permission: must be creator or same org
+    const isCreator = rfq.createdBy === user.id;
+    const isSameOrg =
+      user.organizationId &&
+      rfq.demand?.organizationId === user.organizationId;
+    if (!isCreator && !isSameOrg) {
+      throw new BadRequestException(
+        'You do not have permission to close this RFQ',
+      );
+    }
+
+    // State validation: only OPEN → CLOSED
+    if (rfq.status !== RFQStatus.OPEN) {
+      throw new BadRequestException(
+        `Cannot close RFQ with status "${rfq.status}". Only OPEN RFQs can be closed.`,
+      );
+    }
+
+    const updated = await this.prisma.rFQ.update({
+      where: { id },
+      data: {
+        status: RFQStatus.CLOSED,
+        closedAt: new Date(),
+      },
+    });
+
+    // Create WorkflowEvent
+    try {
+      await this.workflowEventsService.create(
+        {
+          entityType: WorkflowEntityType.RFQ,
+          entityId: rfq.id,
+          action: WorkflowAction.CLOSED,
+          metadata: { previousStatus: rfq.status, newStatus: RFQStatus.CLOSED },
+        },
+        user,
+      );
+    } catch {
+      // Workflow event failure should not affect the main flow
     }
 
     return updated;

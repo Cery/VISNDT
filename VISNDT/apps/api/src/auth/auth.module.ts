@@ -4,11 +4,13 @@ import { PassportModule } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { RefreshTokenService } from './refresh-token.service';
 import { InvitationController } from './invitation.controller';
 import { InvitationService } from './invitation.service';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { CsrfModule } from '../common/security/csrf/csrf.module';
 
 @Module({
   imports: [
@@ -22,9 +24,10 @@ import { RolesGuard } from './guards/roles.guard';
         },
       }),
     }),
+    CsrfModule,
   ],
   controllers: [AuthController, InvitationController],
-  providers: [AuthService, InvitationService, JwtStrategy, JwtAuthGuard, RolesGuard],
-  exports: [AuthService, InvitationService, JwtModule, PassportModule, JwtAuthGuard, RolesGuard],
+  providers: [AuthService, RefreshTokenService, InvitationService, JwtStrategy, JwtAuthGuard, RolesGuard],
+  exports: [AuthService, RefreshTokenService, InvitationService, JwtModule, PassportModule, JwtAuthGuard, RolesGuard],
 })
 export class AuthModule {}

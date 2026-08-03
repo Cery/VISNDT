@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { InvitationService } from './invitation.service';
+import { RefreshTokenService } from './refresh-token.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
@@ -17,6 +18,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly invitationService: InvitationService,
+    private readonly refreshTokenService: RefreshTokenService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -71,8 +73,11 @@ export class AuthService {
       organizationId: user.organizationId,
     });
 
+    const refreshToken = await this.refreshTokenService.createRefreshToken(user.id);
+
     return {
       accessToken,
+      refreshToken,
       user: {
         id: user.id,
         email: user.email,
@@ -103,8 +108,11 @@ export class AuthService {
       organizationId: user.organizationId,
     });
 
+    const refreshToken = await this.refreshTokenService.createRefreshToken(user.id);
+
     return {
       accessToken,
+      refreshToken,
       user: {
         id: user.id,
         email: user.email,
@@ -112,6 +120,48 @@ export class AuthService {
         organizationId: user.organizationId,
       },
     };
+  }
+
+  /**
+   * Refresh access token using a valid refresh token.
+   * Implements token rotation: old refresh token is revoked, new one is issued.
+   */
+  async refreshTokens(rawRefreshToken: string) {
+    const tokenRecord = await this.refreshTokenService.validateRefreshToken(rawRefreshToken);
+
+    // Revoke old refresh token (rotation)
+    await this.refreshTokenService.revokeRefreshToken(rawRefreshToken);
+
+    const user = tokenRecord.user;
+
+    const accessToken = this.generateToken({
+      sub: user.id,
+      email: user.email,
+      name: user.name,
+      organizationId: user.organizationId,
+    });
+
+    const refreshToken = await this.refreshTokenService.createRefreshToken(user.id);
+
+    return {
+      accessToken,
+      refreshToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        organizationId: user.organizationId,
+      },
+    };
+  }
+
+  /**
+   * Logout: revoke the refresh token.
+   */
+  async logout(rawRefreshToken?: string) {
+    if (rawRefreshToken) {
+      await this.refreshTokenService.revokeRefreshToken(rawRefreshToken);
+    }
   }
 
   async validateUser(payload: JwtPayload) {

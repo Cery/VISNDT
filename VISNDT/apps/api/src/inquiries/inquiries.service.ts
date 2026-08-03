@@ -1,8 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { NotificationType } from '@prisma/client';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { NotificationType, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { CreateInquiryDto } from './dto/create-inquiry.dto';
+
+interface RequestUser {
+  id: string;
+  email: string;
+  name?: string | null;
+  organizationId?: string | null;
+}
 
 @Injectable()
 export class InquiriesService {
@@ -50,28 +57,43 @@ export class InquiriesService {
       throw new NotFoundException(`Organization ${dto.organizationId} not found`);
     }
 
-    // Step 4: Find organization members to notify
+    // Step 4: Persist Inquiry entity
+    const inquiry = await this.prisma.inquiry.create({
+      data: {
+        productId: dto.productId,
+        organizationId: dto.organizationId,
+        contactName: dto.name,
+        contactEmail: dto.email,
+        contactPhone: dto.phone,
+        message: dto.message,
+      },
+    });
+
+    // Step 5: Find organization members to notify
     const members = await this.prisma.organizationMember.findMany({
       where: { organizationId: dto.organizationId },
       select: { userId: true },
     });
 
     if (members.length === 0) {
-      // No members to notify — still return success
       return {
         inquiry: {
-          productId: dto.productId,
+          id: inquiry.id,
+          productId: inquiry.productId,
           productName: product.name,
-          organizationId: dto.organizationId,
+          organizationId: inquiry.organizationId,
           organizationName: organization.name,
-          visitorName: dto.name,
-          visitorEmail: dto.email,
+          contactName: inquiry.contactName,
+          contactEmail: inquiry.contactEmail,
+          status: inquiry.status,
+          createdAt: inquiry.createdAt.toISOString(),
         },
         notificationsSent: 0,
       };
     }
 
-    // Step 5: Create notifications for all organization members
+    // Step 6: Create notifications for all organization members
+    // referenceId now points to inquiry.id (not productId)
     const phoneInfo = dto.phone ? ` Phone: ${dto.phone}.` : '';
     const notificationMessage =
       `Inquiry from ${dto.name} (${dto.email}).${phoneInfo} ` +
@@ -84,20 +106,114 @@ export class InquiriesService {
         title: `New Product Inquiry: ${product.name}`,
         message: notificationMessage,
         referenceType: 'INQUIRY',
-        referenceId: dto.productId,
+        referenceId: inquiry.id,
       });
     }
 
     return {
       inquiry: {
-        productId: dto.productId,
+        id: inquiry.id,
+        productId: inquiry.productId,
         productName: product.name,
-        organizationId: dto.organizationId,
+        organizationId: inquiry.organizationId,
         organizationName: organization.name,
-        visitorName: dto.name,
-        visitorEmail: dto.email,
+        contactName: inquiry.contactName,
+        contactEmail: inquiry.contactEmail,
+        status: inquiry.status,
+        createdAt: inquiry.createdAt.toISOString(),
       },
       notificationsSent: members.length,
+    };
+  }
+
+  /**
+   * Get inquiries for the current user's organization.
+   * Queries the Inquiry table directly with organization scope.
+   */
+  async getMyInquiries(user: RequestUser, page: number, pageSize: number) {
+    if (!user.organizationId) {
+      return { data: [], total: 0, page, pageSize, totalPages: 0 };
+    }
+
+    const where: Prisma.InquiryWhereInput = {
+      organizationId: user.organizationId,
+    };
+
+    const skip = (page - 1) * pageSize;
+
+    const [data, total] = await Promise.all([
+      this.prisma.inquiry.findMany({
+        where,
+        skip,
+        take: pageSize,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.inquiry.count({ where }),
+    ]);
+
+    return {
+      data: data.map((inquiry) => this.mapToInquiryResponse(inquiry)),
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
+  }
+
+  /**
+   * Get a single inquiry by its ID.
+   * Validates that the requesting user belongs to the same organization.
+   */
+  async getInquiryById(id: string, user: RequestUser) {
+    const inquiry = await this.prisma.inquiry.findUnique({
+      where: { id },
+    });
+
+    if (!inquiry) {
+      throw new NotFoundException(`Inquiry ${id} not found`);
+    }
+
+    // Organization scope check: user must belong to the same organization
+    if (
+      user.organizationId &&
+      inquiry.organizationId !== user.organizationId
+    ) {
+      throw new ForbiddenException(
+        'You do not have access to this inquiry',
+      );
+    }
+
+    return this.mapToInquiryResponse(inquiry);
+  }
+
+  /**
+   * Map an Inquiry entity to a response shape.
+   */
+  private mapToInquiryResponse(inquiry: {
+    id: string;
+    productId: string | null;
+    organizationId: string | null;
+    createdById: string | null;
+    contactName: string | null;
+    contactEmail: string | null;
+    contactPhone: string | null;
+    message: string;
+    status: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }) {
+    return {
+      id: inquiry.id,
+      productId: inquiry.productId,
+      organizationId: inquiry.organizationId,
+      createdById: inquiry.createdById,
+      contactName: inquiry.contactName,
+      contactEmail: inquiry.contactEmail,
+      contactPhone: inquiry.contactPhone,
+      message: inquiry.message,
+      status: inquiry.status,
+      createdAt: inquiry.createdAt.toISOString(),
+      updatedAt: inquiry.updatedAt.toISOString(),
     };
   }
 }

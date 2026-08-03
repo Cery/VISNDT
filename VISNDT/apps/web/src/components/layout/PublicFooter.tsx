@@ -1,49 +1,82 @@
 import Link from 'next/link';
 
-const FOOTER_LINKS = [
-  { href: '/products', label: 'Products' },
-  { href: '/categories', label: 'Categories' },
-  { href: '/solutions', label: 'Solutions' },
-  { href: '/knowledge', label: 'Knowledge' },
-  { href: '/about', label: 'About VISNDT' },
-  { href: '/business', label: 'Business Cooperation' },
+const FOOTER_SECTIONS = [
+  {
+    title: 'Company',
+    links: [
+      { href: '/about', label: 'About VISNDT' },
+      { href: '/business', label: 'Business Cooperation' },
+    ],
+  },
+  {
+    title: 'Products',
+    links: [
+      { href: '/products', label: 'All Products' },
+      { href: '/categories', label: 'Categories' },
+    ],
+  },
+  {
+    title: 'Solutions',
+    links: [
+      { href: '/solutions', label: 'Industry Solutions' },
+      { href: '/knowledge', label: 'Knowledge Center' },
+    ],
+  },
+  {
+    title: 'Resources',
+    links: [
+      { href: '/knowledge', label: 'Technical Articles' },
+      { href: '/solutions', label: 'Application Cases' },
+    ],
+  },
+  {
+    title: 'Contact',
+    links: [],
+    custom: (
+      <div className="space-y-2 text-sm text-muted-foreground">
+        <p>Email: contact@visndt.com</p>
+        <p>VISNDT Platform Team</p>
+      </div>
+    ),
+  },
 ];
 
 export default function PublicFooter() {
   return (
     <footer className="border-t bg-muted/30 mt-auto">
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
-          <div>
-            <h3 className="font-semibold mb-3">VISNDT</h3>
-            <p className="text-sm text-muted-foreground">
-              Industrial inspection equipment information platform
-            </p>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-3">Links</h3>
-            <ul className="space-y-2">
-              {FOOTER_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-3">Contact</h3>
-            <p className="text-sm text-muted-foreground">
-              Email: contact@visndt.com
-            </p>
-          </div>
+      <div className="container mx-auto px-4 py-10">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8">
+          {FOOTER_SECTIONS.map((section) => (
+            <div key={section.title}>
+              <h3 className="font-semibold text-sm mb-3 text-foreground">
+                {section.title}
+              </h3>
+              {section.custom ? (
+                section.custom
+              ) : (
+                <ul className="space-y-2">
+                  {section.links.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
         </div>
-        <div className="border-t mt-8 pt-4 text-center text-sm text-muted-foreground">
-          &copy; {new Date().getFullYear()} VISNDT. All rights reserved.
+      </div>
+
+      {/* Bottom Bar */}
+      <div className="border-t">
+        <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
+          <p>&copy; {new Date().getFullYear()} VISNDT. All rights reserved.</p>
+          <p>Industrial Inspection Equipment Information Platform</p>
         </div>
       </div>
     </footer>
