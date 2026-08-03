@@ -51,6 +51,27 @@ export async function getDemand(id: string): Promise<DemandDetailItem> {
   return res.data;
 }
 
+export interface CreateDemandParams {
+  title: string;
+  description?: string;
+  budgetRange?: string;
+  quantity?: number;
+  quantityUnit?: string;
+  expectedDeliveryDate?: string;
+}
+
+/**
+ * Create a new demand.
+ * POST /demands (JWT)
+ */
+export async function createDemand(params: CreateDemandParams): Promise<DemandItem> {
+  const res = await apiClient<ApiResponse<DemandItem>>('/demands', {
+    method: 'POST',
+    body: JSON.stringify(params),
+  });
+  return res.data;
+}
+
 /**
  * Get matches for a specific demand.
  * GET /demands/:id/matches (JWT)

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/auth/AuthProvider';
 import Link from 'next/link';
 
-type FormStatus = 'idle' | 'submitting' | 'error' | 'success';
+type FormStatus = 'idle' | 'submitting' | 'error';
 
 export default function RegisterPage() {
   const router = useRouter();

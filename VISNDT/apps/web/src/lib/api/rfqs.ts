@@ -49,6 +49,22 @@ export async function getRfq(id: string): Promise<RfqDetailItem> {
   return res.data;
 }
 
+export interface CreateRfqParams {
+  demandId: string;
+}
+
+/**
+ * Create a new RFQ from a demand.
+ * POST /rfqs (JWT)
+ */
+export async function createRfq(params: CreateRfqParams): Promise<RfqItem> {
+  const res = await apiClient<ApiResponse<RfqItem>>('/rfqs', {
+    method: 'POST',
+    body: JSON.stringify(params),
+  });
+  return res.data;
+}
+
 /**
  * Get current organization's RFQ responses.
  * GET /rfq-responses/mine (JWT)

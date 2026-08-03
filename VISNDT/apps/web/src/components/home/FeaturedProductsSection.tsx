@@ -1,15 +1,18 @@
+'use client';
+
 import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
+import { getProducts } from '@/lib/api/products';
 import ProductCard from '@/components/product/ProductCard';
 
-/** Mock product data — display only, no API */
-const MOCK_PRODUCTS = [
-  { id: 'mock-1', name: 'Industrial Video Endoscope HD-720P', category: { id: 'cat-1', name: 'Electronic Video Endoscope', slug: 'electronic-video-endoscope', parentId: null, createdAt: '', updatedAt: '' }, model: 'HDE-720P', categoryId: 'cat-1', description: null, status: 'ACTIVE', createdAt: '', updatedAt: '' },
-  { id: 'mock-2', name: 'Rigid Optical Borescope 6mm', category: { id: 'cat-2', name: 'Optical Endoscope', slug: 'optical-endoscope', parentId: null, createdAt: '', updatedAt: '' }, model: 'ROB-6MM', categoryId: 'cat-2', description: null, status: 'ACTIVE', createdAt: '', updatedAt: '' },
-  { id: 'mock-3', name: 'Flexible Fiber Optic Endoscope 4mm', category: { id: 'cat-3', name: 'Fiber Optic Endoscope', slug: 'fiber-optic-endoscope', parentId: null, createdAt: '', updatedAt: '' }, model: 'FFE-4MM', categoryId: 'cat-3', description: null, status: 'ACTIVE', createdAt: '', updatedAt: '' },
-  { id: 'mock-4', name: 'Pipeline Crawler Inspection Robot', category: { id: 'cat-4', name: 'Pipeline Inspection Camera', slug: 'pipeline-inspection-camera', parentId: null, createdAt: '', updatedAt: '' }, model: 'PCR-200', categoryId: 'cat-4', description: null, status: 'ACTIVE', createdAt: '', updatedAt: '' },
-];
-
 export default function FeaturedProductsSection() {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['featured-products'],
+    queryFn: () => getProducts({ status: 'ACTIVE', page: 1, pageSize: 4 }),
+  });
+
+  const products = data?.data ?? [];
+
   return (
     <section className="py-16 bg-slate-50">
       <div className="container mx-auto px-4">
@@ -30,11 +33,34 @@ export default function FeaturedProductsSection() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {MOCK_PRODUCTS.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="rounded-lg border border-slate-200 bg-white p-4 animate-pulse"
+              >
+                <div className="aspect-video bg-slate-100 rounded-md mb-4" />
+                <div className="h-4 bg-slate-100 rounded w-3/4 mb-2" />
+                <div className="h-3 bg-slate-100 rounded w-1/2" />
+              </div>
+            ))}
+          </div>
+        ) : isError ? (
+          <div className="text-center py-12 text-slate-400">
+            <p>Unable to load products. Please try again later.</p>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-12 text-slate-400">
+            <p>No products available.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
 
         <div className="mt-8 text-center sm:hidden">
           <Link
