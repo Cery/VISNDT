@@ -50,4 +50,52 @@ export class OffersController {
   ) {
     return ApiResponse.ok(await this.service.update(id, dto, user), 'Offer updated');
   }
+
+  @Post(':id/submit')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Submit offer (DRAFT → SUBMITTED)' })
+  @ApiParam({ name: 'id', description: 'Offer UUID' })
+  async submit(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.submit(id, user), 'Offer submitted');
+  }
+
+  @Post(':id/accept')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Accept offer (SUBMITTED → ACCEPTED)' })
+  @ApiParam({ name: 'id', description: 'Offer UUID' })
+  async accept(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.accept(id, user), 'Offer accepted');
+  }
+
+  @Post(':id/reject')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Reject offer (SUBMITTED → REJECTED)' })
+  @ApiParam({ name: 'id', description: 'Offer UUID' })
+  async reject(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.reject(id, user), 'Offer rejected');
+  }
+
+  @Post(':id/withdraw')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Withdraw offer (SUBMITTED → WITHDRAWN)' })
+  @ApiParam({ name: 'id', description: 'Offer UUID' })
+  async withdraw(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.withdraw(id, user), 'Offer withdrawn');
+  }
 }

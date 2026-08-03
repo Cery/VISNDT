@@ -9,6 +9,8 @@ import {
   Button,
   Space,
   Typography,
+  message,
+  Modal,
 } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { offerService } from '../api';
@@ -22,8 +24,12 @@ type PageState =
   | { status: 'success'; data: Offer };
 
 const STATUS_COLOR: Record<string, string> = {
-  DRAFT: 'orange',
-  ACTIVE: 'green',
+  DRAFT: 'default',
+  SUBMITTED: 'processing',
+  ACCEPTED: 'success',
+  REJECTED: 'error',
+  WITHDRAWN: 'warning',
+  ACTIVE: 'blue',
   INACTIVE: 'default',
 };
 
@@ -48,6 +54,84 @@ export default function OfferDetailPage() {
   useEffect(() => {
     fetchOffer();
   }, [fetchOffer]);
+
+  const handleSubmit = () => {
+    if (!id) return;
+    Modal.confirm({
+      title: 'Submit Offer',
+      content: 'Submit this offer?',
+      okText: 'Submit',
+      onOk: async () => {
+        try {
+          await offerService.submit(id);
+          message.success('Offer submitted successfully');
+          fetchOffer();
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : 'Failed to submit offer';
+          message.error(msg);
+        }
+      },
+    });
+  };
+
+  const handleAccept = () => {
+    if (!id) return;
+    Modal.confirm({
+      title: 'Accept Offer',
+      content: 'Accept this offer?',
+      okText: 'Accept',
+      onOk: async () => {
+        try {
+          await offerService.accept(id);
+          message.success('Offer accepted successfully');
+          fetchOffer();
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : 'Failed to accept offer';
+          message.error(msg);
+        }
+      },
+    });
+  };
+
+  const handleReject = () => {
+    if (!id) return;
+    Modal.confirm({
+      title: 'Reject Offer',
+      content: 'Reject this offer?',
+      okText: 'Reject',
+      okType: 'danger',
+      onOk: async () => {
+        try {
+          await offerService.reject(id);
+          message.success('Offer rejected successfully');
+          fetchOffer();
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : 'Failed to reject offer';
+          message.error(msg);
+        }
+      },
+    });
+  };
+
+  const handleWithdraw = () => {
+    if (!id) return;
+    Modal.confirm({
+      title: 'Withdraw Offer',
+      content: 'Withdraw this offer?',
+      okText: 'Withdraw',
+      okType: 'danger',
+      onOk: async () => {
+        try {
+          await offerService.withdraw(id);
+          message.success('Offer withdrawn successfully');
+          fetchOffer();
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : 'Failed to withdraw offer';
+          message.error(msg);
+        }
+      },
+    });
+  };
 
   if (pageState.status === 'loading') {
     return (
@@ -109,6 +193,32 @@ export default function OfferDetailPage() {
           </Descriptions.Item>
         </Descriptions>
       </Card>
+
+      {/* Lifecycle Actions */}
+      {['DRAFT', 'SUBMITTED'].includes(offer.status) && (
+        <Card title="Lifecycle Actions" style={{ marginBottom: 16 }}>
+          <Space>
+            {offer.status === 'DRAFT' && (
+              <Button type="primary" onClick={handleSubmit}>
+                Submit
+              </Button>
+            )}
+            {offer.status === 'SUBMITTED' && (
+              <>
+                <Button type="primary" onClick={handleAccept}>
+                  Accept
+                </Button>
+                <Button danger onClick={handleReject}>
+                  Reject
+                </Button>
+                <Button danger onClick={handleWithdraw}>
+                  Withdraw
+                </Button>
+              </>
+            )}
+          </Space>
+        </Card>
+      )}
 
       {/* Card 2: Product Info */}
       {offer.product && (

@@ -11,10 +11,11 @@ import {
   BellOutlined,
   SnippetsOutlined,
   TagsOutlined,
-  TeamOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   SettingOutlined,
+  MailOutlined,
+  AuditOutlined,
 } from '@ant-design/icons';
 
 const { Header, Sider, Content } = Layout;
@@ -25,10 +26,10 @@ const menuItems = [
   { key: '/demands', icon: <FileTextOutlined />, label: 'Demands' },
   { key: '/rfqs', icon: <SnippetsOutlined />, label: 'RFQs' },
   { key: '/offers', icon: <TagsOutlined />, label: 'Offers' },
+  { key: '/inquiries', icon: <MailOutlined />, label: 'Inquiries' },
   { key: '/matching', icon: <NodeIndexOutlined />, label: 'Matching' },
   { key: '/users', icon: <UserOutlined />, label: 'Users' },
   { key: '/organizations', icon: <BankOutlined />, label: 'Organizations' },
-  { key: '/suppliers', icon: <TeamOutlined />, label: 'Suppliers' },
   {
     key: 'parameters',
     icon: <SettingOutlined />,
@@ -40,6 +41,7 @@ const menuItems = [
     ],
   },
   { key: '/notifications', icon: <BellOutlined />, label: 'Notifications' },
+  { key: '/audit-logs', icon: <AuditOutlined />, label: 'Audit Log' },
 ];
 
 function AdminLayout() {

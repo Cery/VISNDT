@@ -8,13 +8,15 @@ import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { NotificationsService } from '../notifications/notifications.service';
-import { NotificationType } from '@prisma/client';
+import { WorkflowEventsService } from '../workflow-events/workflow-events.service';
+import { NotificationType, OfferStatus, WorkflowAction, WorkflowEntityType } from '@prisma/client';
 
 @Injectable()
 export class OffersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notificationsService: NotificationsService,
+    private readonly workflowEventsService: WorkflowEventsService,
   ) {}
 
   async findAll(pagination: PaginationDto) {
@@ -99,5 +101,172 @@ export class OffersService {
     }
 
     return this.prisma.offer.update({ where: { id }, data: dto });
+  }
+
+  /**
+   * Submit an offer: DRAFT → SUBMITTED.
+   * Only the owning organization can submit.
+   */
+  async submit(
+    id: string,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    const offer = await this.getOfferOrFail(id);
+
+    if (!user.organizationId || offer.organizationId !== user.organizationId) {
+      throw new BadRequestException(
+        'Only the owning organization can submit this offer',
+      );
+    }
+
+    if (offer.status !== OfferStatus.DRAFT) {
+      throw new BadRequestException(
+        `Cannot submit offer with status "${offer.status}". Only DRAFT offers can be submitted.`,
+      );
+    }
+
+    const updated = await this.prisma.offer.update({
+      where: { id },
+      data: { status: OfferStatus.SUBMITTED },
+    });
+
+    await this.createWorkflowEvent(id, offer.status, WorkflowAction.SUBMITTED, user);
+
+    return updated;
+  }
+
+  /**
+   * Accept an offer: SUBMITTED → ACCEPTED.
+   * Only the owning organization can accept.
+   */
+  async accept(
+    id: string,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    const offer = await this.getOfferOrFail(id);
+
+    if (!user.organizationId || offer.organizationId !== user.organizationId) {
+      throw new BadRequestException(
+        'Only the owning organization can accept this offer',
+      );
+    }
+
+    if (offer.status !== OfferStatus.SUBMITTED) {
+      throw new BadRequestException(
+        `Cannot accept offer with status "${offer.status}". Only SUBMITTED offers can be accepted.`,
+      );
+    }
+
+    const updated = await this.prisma.offer.update({
+      where: { id },
+      data: { status: OfferStatus.ACCEPTED },
+    });
+
+    await this.createWorkflowEvent(id, offer.status, WorkflowAction.ACCEPTED, user);
+
+    return updated;
+  }
+
+  /**
+   * Reject an offer: SUBMITTED → REJECTED.
+   * Only the owning organization can reject.
+   */
+  async reject(
+    id: string,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    const offer = await this.getOfferOrFail(id);
+
+    if (!user.organizationId || offer.organizationId !== user.organizationId) {
+      throw new BadRequestException(
+        'Only the owning organization can reject this offer',
+      );
+    }
+
+    if (offer.status !== OfferStatus.SUBMITTED) {
+      throw new BadRequestException(
+        `Cannot reject offer with status "${offer.status}". Only SUBMITTED offers can be rejected.`,
+      );
+    }
+
+    const updated = await this.prisma.offer.update({
+      where: { id },
+      data: { status: OfferStatus.REJECTED },
+    });
+
+    await this.createWorkflowEvent(id, offer.status, WorkflowAction.REJECTED, user);
+
+    return updated;
+  }
+
+  /**
+   * Withdraw an offer: SUBMITTED → WITHDRAWN.
+   * Only the owning organization can withdraw.
+   */
+  async withdraw(
+    id: string,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    const offer = await this.getOfferOrFail(id);
+
+    if (!user.organizationId || offer.organizationId !== user.organizationId) {
+      throw new BadRequestException(
+        'Only the owning organization can withdraw this offer',
+      );
+    }
+
+    if (offer.status !== OfferStatus.SUBMITTED) {
+      throw new BadRequestException(
+        `Cannot withdraw offer with status "${offer.status}". Only SUBMITTED offers can be withdrawn.`,
+      );
+    }
+
+    const updated = await this.prisma.offer.update({
+      where: { id },
+      data: { status: OfferStatus.WITHDRAWN },
+    });
+
+    await this.createWorkflowEvent(id, offer.status, WorkflowAction.WITHDRAWN, user);
+
+    return updated;
+  }
+
+  /**
+   * Fetch an offer by ID or throw NotFoundException.
+   */
+  private async getOfferOrFail(id: string) {
+    const offer = await this.prisma.offer.findUnique({
+      where: { id },
+      select: { id: true, organizationId: true, status: true },
+    });
+    if (!offer) {
+      throw new NotFoundException(`Offer ${id} not found`);
+    }
+    return offer;
+  }
+
+  /**
+   * Create a WorkflowEvent for an offer state change.
+   * Failure is silently ignored to avoid breaking the main flow.
+   */
+  private async createWorkflowEvent(
+    entityId: string,
+    previousStatus: string,
+    action: WorkflowAction,
+    user: { id: string },
+  ) {
+    try {
+      await this.workflowEventsService.create(
+        {
+          entityType: WorkflowEntityType.OFFER,
+          entityId,
+          action,
+          metadata: { previousStatus },
+        },
+        user,
+      );
+    } catch {
+      // Workflow event failure should not affect the main flow
+    }
   }
 }

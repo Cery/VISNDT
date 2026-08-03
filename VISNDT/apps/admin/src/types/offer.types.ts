@@ -1,4 +1,4 @@
-export type OfferStatus = 'DRAFT' | 'ACTIVE' | 'INACTIVE';
+export type OfferStatus = 'DRAFT' | 'ACTIVE' | 'INACTIVE' | 'SUBMITTED' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
 
 export interface Offer {
   id: string;

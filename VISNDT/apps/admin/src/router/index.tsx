@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { RequireAuth } from '../auth';
 import AdminLayout from '../layouts/AdminLayout';
-import { DemandDetail, DemandList, FileAssetOrphanList, Home, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ParameterDefinitionCreate, ParameterDefinitionEdit, ParameterDefinitionList, ParameterGroupCreate, ParameterGroupEdit, ParameterGroupList, ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList, ProductCreate, ProductDetail, ProductEdit, ProductList, ProductMediaCreate, ProductMediaEdit, ProductMediaList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, SupplierDetail, SupplierList, UserCreate, UserDetail, UserEdit, UserList } from '../pages';
+import { DemandDetail, DemandList, FileAssetOrphanList, Home, InquiryDetail, InquiryList, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ParameterDefinitionCreate, ParameterDefinitionEdit, ParameterDefinitionList, ParameterGroupCreate, ParameterGroupEdit, ParameterGroupList, ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList, ProductCreate, ProductDetail, ProductEdit, ProductList, ProductMediaCreate, ProductMediaEdit, ProductMediaList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, AuditLogList, UserCreate, UserDetail, UserEdit, UserList } from '../pages';
 
 const router = createBrowserRouter([
   {
@@ -45,8 +45,8 @@ const router = createBrowserRouter([
       { path: 'rfq-responses/:id', element: <RfqResponseDetail /> },
       { path: 'offers', element: <OfferList /> },
       { path: 'offers/:id', element: <OfferDetail /> },
-      { path: 'suppliers', element: <SupplierList /> },
-      { path: 'suppliers/:id', element: <SupplierDetail /> },
+      { path: 'inquiries', element: <InquiryList /> },
+      { path: 'inquiries/:id', element: <InquiryDetail /> },
       { path: 'parameter-groups', element: <ParameterGroupList /> },
       { path: 'parameter-groups/create', element: <ParameterGroupCreate /> },
       { path: 'parameter-groups/:id/edit', element: <ParameterGroupEdit /> },
@@ -57,6 +57,7 @@ const router = createBrowserRouter([
       { path: 'product-categories/create', element: <ProductCategoryCreate /> },
       { path: 'product-categories/:id/edit', element: <ProductCategoryEdit /> },
       { path: 'files/orphans', element: <FileAssetOrphanList /> },
+      { path: 'audit-logs', element: <AuditLogList /> },
     ],
   },
   {

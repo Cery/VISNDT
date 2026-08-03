@@ -50,4 +50,20 @@ export const rfqService = {
 
     return response.data;
   },
+
+  async publish(id: string): Promise<Rfq> {
+    const response = (await apiClient.post(
+      `/rfqs/${id}/publish`,
+    )) as unknown as ApiResponseWrapper<Rfq>;
+
+    return response.data;
+  },
+
+  async close(id: string): Promise<Rfq> {
+    const response = (await apiClient.post(
+      `/rfqs/${id}/close`,
+    )) as unknown as ApiResponseWrapper<Rfq>;
+
+    return response.data;
+  },
 };

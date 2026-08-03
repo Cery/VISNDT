@@ -61,7 +61,7 @@ export interface MatchDetail extends DemandMatch {
 }
 
 export interface UpdateMatchStatusParams {
-  status: 'ACCEPTED' | 'REJECTED';
+  status: 'REVIEWED' | 'ACCEPTED' | 'REJECTED';
 }
 
 export interface MatchingStats {

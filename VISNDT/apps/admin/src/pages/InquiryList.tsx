@@ -1,66 +1,54 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Table, Spin, Alert, Button, Input, Space, Typography } from 'antd';
-import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Table, Spin, Alert, Button, Tag, Typography } from 'antd';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
-import { supplierService } from '../api';
-import type { Supplier } from '../types';
+import { inquiryService } from '../api';
+import type { Inquiry } from '../types';
 
 const { Title } = Typography;
+
+const STATUS_COLOR: Record<string, string> = {
+  NEW: 'blue',
+  PROCESSING: 'orange',
+  REPLIED: 'green',
+  CLOSED: 'default',
+};
 
 type PageState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
   | { status: 'empty' }
-  | { status: 'success'; data: Supplier[]; total: number };
+  | { status: 'success'; data: Inquiry[]; total: number };
 
-function SupplierList() {
+function InquiryList() {
   const navigate = useNavigate();
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
-  const [keyword, setKeyword] = useState('');
-  const [searchKeyword, setSearchKeyword] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
 
-  const fetchSuppliers = useCallback(async () => {
+  const fetchInquiries = useCallback(async () => {
     setPageState({ status: 'loading' });
     try {
-      const result = await supplierService.getList(
-        page,
-        pageSize,
-        searchKeyword || undefined,
-      );
-      if (result.items.length === 0) {
+      const result = await inquiryService.getList(page, pageSize);
+      if (result.data.length === 0) {
         setPageState({ status: 'empty' });
       } else {
         setPageState({
           status: 'success',
-          data: result.items,
+          data: result.data,
           total: result.total,
         });
       }
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load suppliers';
+        err instanceof Error ? err.message : 'Failed to load inquiries';
       setPageState({ status: 'error', message });
     }
-  }, [page, pageSize, searchKeyword]);
+  }, [page, pageSize]);
 
   useEffect(() => {
-    fetchSuppliers();
-  }, [fetchSuppliers]);
-
-  const handleSearch = useCallback(() => {
-    setSearchKeyword(keyword);
-    setPage(1);
-  }, [keyword]);
-
-  const handleReset = useCallback(() => {
-    setKeyword('');
-    setSearchKeyword('');
-    setPage(1);
-    setPageSize(20);
-  }, []);
+    fetchInquiries();
+  }, [fetchInquiries]);
 
   const handleTableChange = useCallback(
     (pagination: TablePaginationConfig) => {
@@ -82,11 +70,11 @@ function SupplierList() {
     return (
       <Alert
         type="error"
-        message="Failed to load suppliers"
+        message="Failed to load inquiries"
         description={pageState.message}
         showIcon
         action={
-          <Button size="small" onClick={fetchSuppliers}>
+          <Button size="small" onClick={fetchInquiries}>
             Retry
           </Button>
         }
@@ -98,38 +86,66 @@ function SupplierList() {
     return (
       <div>
         <Title level={4} style={{ marginBottom: 16 }}>
-          Supplier Management
+          Inquiry Management
         </Title>
         <Alert
           type="info"
-          message="No suppliers"
-          description="No suppliers found in the system."
+          message="No inquiries"
+          description="No inquiries have been submitted yet."
           showIcon
         />
       </div>
     );
   }
 
-  const columns: ColumnsType<Supplier> = [
+  const columns: ColumnsType<Inquiry> = [
     {
-      title: 'Supplier Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: 'Contact',
+      dataIndex: 'contactName',
+      key: 'contactName',
+      render: (name: string) => name || '-',
     },
     {
-      title: 'Offers Count',
-      dataIndex: 'offersCount',
-      key: 'offersCount',
+      title: 'Email',
+      dataIndex: 'contactEmail',
+      key: 'contactEmail',
+      render: (email: string) => email || '-',
+    },
+    {
+      title: 'Organization',
+      dataIndex: 'organization',
+      key: 'organization',
+      render: (org: Inquiry['organization']) => org?.name || '-',
+    },
+    {
+      title: 'Product',
+      dataIndex: 'product',
+      key: 'product',
+      render: (product: Inquiry['product']) => product?.name || '-',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
       width: 120,
+      render: (status: string) => (
+        <Tag color={STATUS_COLOR[status] || 'default'}>{status}</Tag>
+      ),
+    },
+    {
+      title: 'Created At',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
       title: 'Actions',
       key: 'actions',
       width: 100,
-      render: (_: unknown, record: Supplier) => (
+      render: (_: unknown, record: Inquiry) => (
         <Button
           type="link"
-          onClick={() => navigate(`/suppliers/${record.id}`)}
+          onClick={() => navigate(`/inquiries/${record.id}`)}
         >
           View
         </Button>
@@ -140,27 +156,10 @@ function SupplierList() {
   return (
     <div>
       <Title level={4} style={{ marginBottom: 16 }}>
-        Supplier Management
+        Inquiry Management
       </Title>
 
-      <Space style={{ marginBottom: 16 }} wrap>
-        <Input
-          placeholder="Search by name"
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          onPressEnter={handleSearch}
-          style={{ width: 240 }}
-          prefix={<SearchOutlined />}
-        />
-        <Button type="primary" onClick={handleSearch}>
-          Search
-        </Button>
-        <Button icon={<ReloadOutlined />} onClick={handleReset}>
-          Reset
-        </Button>
-      </Space>
-
-      <Table<Supplier>
+      <Table<Inquiry>
         columns={columns}
         dataSource={pageState.data}
         rowKey="id"
@@ -178,4 +177,4 @@ function SupplierList() {
   );
 }
 
-export default SupplierList;
+export default InquiryList;

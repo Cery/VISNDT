@@ -51,6 +51,18 @@ export const matchService = {
     return response.data;
   },
 
+  async review(
+    demandId: string,
+    matchId: string,
+  ): Promise<DemandMatch> {
+    const response = (await apiClient.patch(
+      `/demands/${demandId}/matches/${matchId}`,
+      { status: 'REVIEWED' },
+    )) as unknown as ApiResponseWrapper<DemandMatch>;
+
+    return response.data;
+  },
+
   async rematch(demandId: string): Promise<{ message: string }> {
     const response = (await apiClient.post(
       `/demands/${demandId}/rematch`,

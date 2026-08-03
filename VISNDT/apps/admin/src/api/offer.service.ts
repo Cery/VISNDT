@@ -27,4 +27,36 @@ export const offerService = {
 
     return response.data;
   },
+
+  async submit(id: string): Promise<Offer> {
+    const response = (await apiClient.post(
+      `/offers/${id}/submit`,
+    )) as unknown as ApiResponseWrapper<Offer>;
+
+    return response.data;
+  },
+
+  async accept(id: string): Promise<Offer> {
+    const response = (await apiClient.post(
+      `/offers/${id}/accept`,
+    )) as unknown as ApiResponseWrapper<Offer>;
+
+    return response.data;
+  },
+
+  async reject(id: string): Promise<Offer> {
+    const response = (await apiClient.post(
+      `/offers/${id}/reject`,
+    )) as unknown as ApiResponseWrapper<Offer>;
+
+    return response.data;
+  },
+
+  async withdraw(id: string): Promise<Offer> {
+    const response = (await apiClient.post(
+      `/offers/${id}/withdraw`,
+    )) as unknown as ApiResponseWrapper<Offer>;
+
+    return response.data;
+  },
 };

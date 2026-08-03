@@ -1,11 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { DemandMatchStatus, NotificationType } from '@prisma/client';
+import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
+import { DemandMatchStatus, NotificationType, WorkflowAction, WorkflowEntityType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ScoringService } from './scoring/scoring.service';
 import { CategoryHelper } from './helpers/category.helper';
 import { MatchResultDto } from './dto/match-result.dto';
 import { DEFAULT_MATCH_CONFIG } from './types/match-context';
 import { NotificationsService } from '../notifications/notifications.service';
+import { WorkflowEventsService } from '../workflow-events/workflow-events.service';
 
 @Injectable()
 export class MatchingService {
@@ -16,6 +17,7 @@ export class MatchingService {
     private readonly scoring: ScoringService,
     private readonly categoryHelper: CategoryHelper,
     private readonly notificationsService: NotificationsService,
+    private readonly workflowEventsService: WorkflowEventsService,
   ) {}
 
   /**
@@ -130,6 +132,18 @@ export class MatchingService {
         matchScore: scoreResult.totalScore,
         matchDetails: {
           algorithm: 'weighted_v1',
+          explanation: {
+            score: scoreResult.totalScore,
+            factors: scoreResult.parameterScores.map((ps) => ({
+              name: ps.parameterName,
+              code: ps.parameterCode,
+              matched: ps.score > 0,
+              weight: ps.weight,
+              score: ps.score,
+              required: ps.required,
+              type: ps.type,
+            })),
+          },
           totalParameters: scoreResult.totalParameters,
           matchedParameters: scoreResult.matchedParameters,
           matchRate: scoreResult.matchRate,
@@ -173,13 +187,13 @@ export class MatchingService {
           productId: result.productId,
           offerId: result.offerId,
           matchScore: result.matchScore,
-          matchStatus: DemandMatchStatus.MATCHED,
+          matchStatus: DemandMatchStatus.PENDING,
           matchDetails: result.matchDetails as any,
           matchedAt: new Date(),
         },
         update: {
           matchScore: result.matchScore,
-          matchStatus: DemandMatchStatus.MATCHED,
+          matchStatus: DemandMatchStatus.PENDING,
           matchDetails: result.matchDetails as any,
           offerId: result.offerId,
           matchedAt: new Date(),
@@ -199,5 +213,171 @@ export class MatchingService {
       totalCandidates: candidates.length,
       elapsedMs,
     };
+  }
+
+  /**
+   * Review a match: PENDING → REVIEWED.
+   * Organization scope: user must belong to the demand's organization.
+   */
+  async review(
+    id: string,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    const match = await this.getMatchOrFail(id);
+
+    // Organization scope: demand.organizationId must match user's org
+    const demand = await this.prisma.demand.findUnique({
+      where: { id: match.demandId },
+      select: { organizationId: true },
+    });
+    if (!user.organizationId || demand?.organizationId !== user.organizationId) {
+      throw new BadRequestException(
+        'You do not have permission to review this match',
+      );
+    }
+
+    if (match.matchStatus !== DemandMatchStatus.PENDING) {
+      throw new BadRequestException(
+        `Cannot review match with status "${match.matchStatus}". Only PENDING matches can be reviewed.`,
+      );
+    }
+
+    const updated = await this.prisma.demandMatch.update({
+      where: { id },
+      data: {
+        matchStatus: DemandMatchStatus.REVIEWED,
+        reviewedAt: new Date(),
+      },
+    });
+
+    await this.createMatchWorkflowEvent(
+      id,
+      WorkflowAction.REVIEWED,
+      match.matchStatus,
+      user,
+    );
+
+    return updated;
+  }
+
+  /**
+   * Accept a match: REVIEWED → ACCEPTED.
+   * Organization scope: user must belong to the demand's organization.
+   */
+  async accept(
+    id: string,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    const match = await this.getMatchOrFail(id);
+
+    const demand = await this.prisma.demand.findUnique({
+      where: { id: match.demandId },
+      select: { organizationId: true },
+    });
+    if (!user.organizationId || demand?.organizationId !== user.organizationId) {
+      throw new BadRequestException(
+        'You do not have permission to accept this match',
+      );
+    }
+
+    if (match.matchStatus !== DemandMatchStatus.REVIEWED) {
+      throw new BadRequestException(
+        `Cannot accept match with status "${match.matchStatus}". Only REVIEWED matches can be accepted.`,
+      );
+    }
+
+    const updated = await this.prisma.demandMatch.update({
+      where: { id },
+      data: { matchStatus: DemandMatchStatus.ACCEPTED },
+    });
+
+    await this.createMatchWorkflowEvent(
+      id,
+      WorkflowAction.ACCEPTED,
+      match.matchStatus,
+      user,
+    );
+
+    return updated;
+  }
+
+  /**
+   * Reject a match: REVIEWED → REJECTED.
+   * Organization scope: user must belong to the demand's organization.
+   */
+  async reject(
+    id: string,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    const match = await this.getMatchOrFail(id);
+
+    const demand = await this.prisma.demand.findUnique({
+      where: { id: match.demandId },
+      select: { organizationId: true },
+    });
+    if (!user.organizationId || demand?.organizationId !== user.organizationId) {
+      throw new BadRequestException(
+        'You do not have permission to reject this match',
+      );
+    }
+
+    if (match.matchStatus !== DemandMatchStatus.REVIEWED) {
+      throw new BadRequestException(
+        `Cannot reject match with status "${match.matchStatus}". Only REVIEWED matches can be rejected.`,
+      );
+    }
+
+    const updated = await this.prisma.demandMatch.update({
+      where: { id },
+      data: { matchStatus: DemandMatchStatus.REJECTED },
+    });
+
+    await this.createMatchWorkflowEvent(
+      id,
+      WorkflowAction.REJECTED,
+      match.matchStatus,
+      user,
+    );
+
+    return updated;
+  }
+
+  /**
+   * Fetch a DemandMatch by ID or throw NotFoundException.
+   */
+  private async getMatchOrFail(id: string) {
+    const match = await this.prisma.demandMatch.findUnique({
+      where: { id },
+      select: { id: true, demandId: true, matchStatus: true },
+    });
+    if (!match) {
+      throw new NotFoundException(`Match ${id} not found`);
+    }
+    return match;
+  }
+
+  /**
+   * Create a WorkflowEvent for a match state change.
+   * Failure is silently ignored.
+   */
+  private async createMatchWorkflowEvent(
+    entityId: string,
+    action: WorkflowAction,
+    previousStatus: string,
+    user: { id: string },
+  ) {
+    try {
+      await this.workflowEventsService.create(
+        {
+          entityType: WorkflowEntityType.MATCH,
+          entityId,
+          action,
+          metadata: { previousStatus },
+        },
+        user,
+      );
+    } catch {
+      // Workflow event failure should not affect the main flow
+    }
   }
 }

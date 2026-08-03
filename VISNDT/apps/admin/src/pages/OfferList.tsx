@@ -14,8 +14,12 @@ type PageState =
   | { status: 'success'; data: Offer[]; total: number };
 
 const STATUS_COLOR: Record<string, string> = {
-  DRAFT: 'orange',
-  ACTIVE: 'green',
+  DRAFT: 'default',
+  SUBMITTED: 'processing',
+  ACCEPTED: 'success',
+  REJECTED: 'error',
+  WITHDRAWN: 'warning',
+  ACTIVE: 'blue',
   INACTIVE: 'default',
 };
 

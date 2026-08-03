@@ -80,12 +80,10 @@ export type {
   OfferDetail,
 } from './offer.types';
 export type {
-  Supplier,
-  SupplierDetail,
-  SupplierProduct,
-  SupplierProductListResponse,
-  SupplierListResponse,
-} from './supplier.types';
+  Inquiry,
+  InquiryStatus,
+  InquiryListResponse,
+} from './inquiry.types';
 export type {
   ParameterGroup,
   CreateParameterGroupDto,
@@ -114,3 +112,9 @@ export type {
   MediaType,
 } from './product-media.types';
 export type { FileAsset, UploadResponse } from './file-asset.types';
+export type {
+  AuditLog,
+  AuditAction,
+  AuditLogListResponse,
+  AuditLogQueryParams,
+} from './audit-log.types';

@@ -13,6 +13,7 @@ import {
   Typography,
   Select,
   message,
+  Modal,
 } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { rfqService, rfqResponseService } from '../api';
@@ -103,6 +104,45 @@ export default function RfqDetailPage() {
     } finally {
       setUpdating(false);
     }
+  };
+
+  const handlePublish = () => {
+    if (!id) return;
+    Modal.confirm({
+      title: 'Publish RFQ',
+      content: 'Are you sure you want to publish this RFQ? Once published, it will be visible to suppliers.',
+      okText: 'Publish',
+      onOk: async () => {
+        try {
+          await rfqService.publish(id);
+          message.success('RFQ published successfully');
+          fetchRfq();
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : 'Failed to publish RFQ';
+          message.error(msg);
+        }
+      },
+    });
+  };
+
+  const handleClose = () => {
+    if (!id) return;
+    Modal.confirm({
+      title: 'Close RFQ',
+      content: 'Are you sure you want to close this RFQ? This action cannot be undone.',
+      okText: 'Close',
+      okType: 'danger',
+      onOk: async () => {
+        try {
+          await rfqService.close(id);
+          message.success('RFQ closed successfully');
+          fetchRfq();
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : 'Failed to close RFQ';
+          message.error(msg);
+        }
+      },
+    });
   };
 
   if (pageState.status === 'loading') {
@@ -234,6 +274,23 @@ export default function RfqDetailPage() {
               }))}
               style={{ minWidth: 160 }}
             />
+          </Space>
+        </Card>
+      )}
+
+      {(rfq.status === 'DRAFT' || rfq.status === 'OPEN') && (
+        <Card title="Lifecycle Actions" style={{ marginBottom: 16 }}>
+          <Space>
+            {rfq.status === 'DRAFT' && (
+              <Button type="primary" onClick={handlePublish}>
+                Publish
+              </Button>
+            )}
+            {rfq.status === 'OPEN' && (
+              <Button danger onClick={handleClose}>
+                Close
+              </Button>
+            )}
           </Space>
         </Card>
       )}

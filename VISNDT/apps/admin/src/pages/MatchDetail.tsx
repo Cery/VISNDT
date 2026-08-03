@@ -12,6 +12,7 @@ import {
   Collapse,
   Typography,
   message,
+  Modal,
   Empty,
 } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
@@ -26,11 +27,11 @@ type PageState =
   | { status: 'success'; data: MatchDetail };
 
 const STATUS_COLOR: Record<string, string> = {
-  PENDING: 'orange',
+  PENDING: 'processing',
   MATCHED: 'blue',
-  REVIEWED: 'cyan',
-  ACCEPTED: 'green',
-  REJECTED: 'red',
+  REVIEWED: 'blue',
+  ACCEPTED: 'success',
+  REJECTED: 'error',
   EXPIRED: 'default',
 };
 
@@ -40,7 +41,20 @@ const SCORE_COLOR = (score: number): string => {
   return '#ff4d4f';
 };
 
-const REVIEWABLE_STATUSES = ['REVIEWED'];
+interface ExplanationFactor {
+  name?: string;
+  code?: string;
+  matched?: boolean;
+  weight?: number;
+  score?: number;
+  required?: boolean;
+  type?: string;
+}
+
+interface ExplanationData {
+  score?: number;
+  factors?: ExplanationFactor[];
+}
 
 export default function MatchDetailPage() {
   const { demandId, matchId } = useParams<{
@@ -68,19 +82,49 @@ export default function MatchDetailPage() {
     fetchMatch();
   }, [fetchMatch]);
 
-  const handleReview = async (status: 'ACCEPTED' | 'REJECTED') => {
+  const handleReviewMatch = () => {
     if (!demandId || !matchId) return;
-    try {
-      setReviewing(true);
-      await matchService.updateMatchStatus(demandId, matchId, { status });
-      message.success(`Match ${status.toLowerCase()}`);
-      fetchMatch();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to update match';
-      message.error(msg);
-    } finally {
-      setReviewing(false);
-    }
+    Modal.confirm({
+      title: 'Review this match?',
+      content: 'This will mark the match as reviewed.',
+      okText: 'Review',
+      onOk: async () => {
+        try {
+          setReviewing(true);
+          await matchService.review(demandId, matchId);
+          message.success('Match reviewed');
+          fetchMatch();
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : 'Failed to review match';
+          message.error(msg);
+        } finally {
+          setReviewing(false);
+        }
+      },
+    });
+  };
+
+  const handleAcceptReject = (status: 'ACCEPTED' | 'REJECTED') => {
+    if (!demandId || !matchId) return;
+    const label = status === 'ACCEPTED' ? 'Accept' : 'Reject';
+    Modal.confirm({
+      title: `${label} this match?`,
+      okText: label,
+      okButtonProps: { danger: status === 'REJECTED' },
+      onOk: async () => {
+        try {
+          setReviewing(true);
+          await matchService.updateMatchStatus(demandId, matchId, { status });
+          message.success(`Match ${status.toLowerCase()}`);
+          fetchMatch();
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : 'Failed to update match';
+          message.error(msg);
+        } finally {
+          setReviewing(false);
+        }
+      },
+    });
   };
 
   if (pageState.status === 'loading') {
@@ -118,7 +162,6 @@ export default function MatchDetailPage() {
   const match = pageState.data;
   const demandParams = match.demand?.parameters || [];
   const matchDetails = match.matchDetails as Record<string, unknown> | undefined;
-  const canReview = REVIEWABLE_STATUSES.includes(match.matchStatus);
 
   const formatDate = (date: string | undefined) =>
     date ? new Date(date).toLocaleString() : '-';
@@ -152,6 +195,49 @@ export default function MatchDetailPage() {
       render: (v: string | undefined) => v || '-',
     },
   ];
+
+  // Build explanation factors table columns
+  const factorColumns = [
+    {
+      title: 'Factor',
+      dataIndex: 'name',
+      key: 'name',
+      render: (name: string | undefined, record: ExplanationFactor) =>
+        name || record.code || '-',
+    },
+    {
+      title: 'Matched',
+      dataIndex: 'matched',
+      key: 'matched',
+      width: 80,
+      render: (v: boolean | undefined) =>
+        v === undefined ? '-' : v ? '✅' : '❌',
+    },
+    {
+      title: 'Weight',
+      dataIndex: 'weight',
+      key: 'weight',
+      width: 80,
+      render: (v: number | undefined) => (v !== undefined ? v : '-'),
+    },
+    {
+      title: 'Score',
+      dataIndex: 'score',
+      key: 'score',
+      width: 80,
+      render: (v: number | undefined) => (v !== undefined ? v : '-'),
+    },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
+      width: 80,
+      render: (v: string | undefined) => v || '-',
+    },
+  ];
+
+  // Extract explanation from matchDetails
+  const explanation = matchDetails?.explanation as ExplanationData | undefined;
 
   return (
     <div>
@@ -222,54 +308,130 @@ export default function MatchDetailPage() {
         )}
       </Card>
 
-      {/* Card 3: Match Details (JSON) */}
+      {/* Card 3: Match Details — structured explanation or raw JSON */}
       {matchDetails && (
         <Card title="Match Details" style={{ marginBottom: 16 }}>
-          <Collapse
-            items={[
-              {
-                key: 'json',
-                label: 'Raw Match Details',
-                children: (
-                  <pre
-                    style={{
-                      background: '#f5f5f5',
-                      padding: 16,
-                      borderRadius: 4,
-                      overflow: 'auto',
-                      maxHeight: 400,
-                      margin: 0,
-                    }}
-                  >
-                    {JSON.stringify(matchDetails, null, 2)}
-                  </pre>
-                ),
-              },
-            ]}
-          />
+          {explanation ? (
+            <>
+              {/* Match Score */}
+              {explanation.score !== undefined && (
+                <Descriptions
+                  bordered
+                  column={1}
+                  size="small"
+                  style={{ marginBottom: 16 }}
+                >
+                  <Descriptions.Item label="Match Score">
+                    <Text
+                      strong
+                      style={{
+                        color: SCORE_COLOR(explanation.score),
+                        fontSize: 16,
+                      }}
+                    >
+                      {explanation.score}%
+                    </Text>
+                  </Descriptions.Item>
+                </Descriptions>
+              )}
+
+              {/* Factors Table */}
+              {explanation.factors && explanation.factors.length > 0 && (
+                <Table
+                  dataSource={explanation.factors}
+                  columns={factorColumns}
+                  rowKey={(record, index) =>
+                    record.code || `factor-${index}`
+                  }
+                  pagination={false}
+                  size="small"
+                  style={{ marginBottom: 16 }}
+                />
+              )}
+
+              {/* Raw JSON Collapse */}
+              <Collapse
+                items={[
+                  {
+                    key: 'json',
+                    label: 'Show Raw JSON',
+                    children: (
+                      <pre
+                        style={{
+                          background: '#f5f5f5',
+                          padding: 16,
+                          borderRadius: 4,
+                          overflow: 'auto',
+                          maxHeight: 400,
+                          margin: 0,
+                        }}
+                      >
+                        {JSON.stringify(matchDetails, null, 2)}
+                      </pre>
+                    ),
+                  },
+                ]}
+              />
+            </>
+          ) : (
+            <Collapse
+              items={[
+                {
+                  key: 'json',
+                  label: 'Raw Match Details',
+                  children: (
+                    <pre
+                      style={{
+                        background: '#f5f5f5',
+                        padding: 16,
+                        borderRadius: 4,
+                        overflow: 'auto',
+                        maxHeight: 400,
+                        margin: 0,
+                      }}
+                    >
+                      {JSON.stringify(matchDetails, null, 2)}
+                    </pre>
+                  ),
+                },
+              ]}
+            />
+          )}
         </Card>
       )}
 
-      {/* Card 4: Review Actions */}
-      {canReview && (
-        <Card title="Review Actions" style={{ marginBottom: 16 }}>
-          <Space>
+      {/* Card 4: Lifecycle Actions */}
+      {(match.matchStatus === 'PENDING' || match.matchStatus === 'REVIEWED') && (
+        <Card title="Lifecycle Actions" style={{ marginBottom: 16 }}>
+          {match.matchStatus === 'PENDING' && (
             <Button
               type="primary"
-              style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
               loading={reviewing}
-              onClick={() => handleReview('ACCEPTED')}
+              onClick={handleReviewMatch}
             >
-              Accept
+              Review
             </Button>
-            <Button
-              danger
-              loading={reviewing}
-              onClick={() => handleReview('REJECTED')}
-            >
-              Reject
-            </Button>
-          </Space>
+          )}
+
+          {match.matchStatus === 'REVIEWED' && (
+            <Space>
+              <Button
+                type="primary"
+                style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+                loading={reviewing}
+                onClick={() => handleAcceptReject('ACCEPTED')}
+              >
+                Accept
+              </Button>
+              <Button
+                danger
+                loading={reviewing}
+                onClick={() => handleAcceptReject('REJECTED')}
+              >
+                Reject
+              </Button>
+            </Space>
+          )}
         </Card>
       )}
 
