@@ -19,7 +19,7 @@ async function seed() {
 
   const user = await prisma.user.create({
     data: {
-      email: 'admin@vip.com',
+      email: 'admin@visndt.com',
       passwordHash: hash,
       name: 'Admin',
       status: 'ACTIVE',
@@ -38,7 +38,7 @@ async function seed() {
   console.log('Member created:', member.id);
 
   console.log('\n=== Admin account ready ===');
-  console.log('Email:    admin@vip.com');
+  console.log('Email:    admin@visndt.com');
   console.log('Password: admin123456');
 }
 

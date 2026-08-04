@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "./globals.css";
 import PublicHeader from "@/components/layout/PublicHeader";
 import PublicFooter from "@/components/layout/PublicFooter";
 import Providers from "./providers";
