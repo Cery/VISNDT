@@ -14,6 +14,7 @@ function DemandsContent() {
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   const [demands, setDemands] = useState<DemandItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -21,7 +22,7 @@ function DemandsContent() {
         const res = await getDemands(1, 50);
         setDemands(res.data || []);
       } catch {
-        // graceful fallback
+        setError('Unable to load demands. Please try again.');
       } finally {
         setIsLoading(false);
       }
@@ -42,7 +43,28 @@ function DemandsContent() {
                 View and manage your demand listings.
               </p>
             </div>
-            <DemandList demands={demands} isLoading={isLoading} />
+            {error ? (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-8 text-center">
+                <p className="text-sm text-red-700">{error}</p>
+                <button
+                  onClick={() => {
+                    setError('');
+                    setIsLoading(true);
+                    getDemands(1, 50)
+                      .then((res) => setDemands(res.data || []))
+                      .catch(() =>
+                        setError('Unable to load demands. Please try again.'),
+                      )
+                      .finally(() => setIsLoading(false));
+                  }}
+                  className="mt-3 text-sm font-medium text-red-700 underline hover:text-red-800"
+                >
+                  Try again
+                </button>
+              </div>
+            ) : (
+              <DemandList demands={demands} isLoading={isLoading} />
+            )}
           </div>
         </div>
       </div>

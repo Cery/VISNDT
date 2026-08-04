@@ -14,6 +14,7 @@ function RfqsContent() {
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   const [rfqs, setRfqs] = useState<RfqItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -21,7 +22,7 @@ function RfqsContent() {
         const res = await getRfqs();
         setRfqs(res.data || []);
       } catch {
-        // graceful fallback
+        setError('Unable to load RFQs. Please try again.');
       } finally {
         setIsLoading(false);
       }
@@ -42,7 +43,28 @@ function RfqsContent() {
                 View and respond to Requests for Quotation.
               </p>
             </div>
-            <RFQList rfqs={rfqs} isLoading={isLoading} />
+            {error ? (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-8 text-center">
+                <p className="text-sm text-red-700">{error}</p>
+                <button
+                  onClick={() => {
+                    setError('');
+                    setIsLoading(true);
+                    getRfqs()
+                      .then((res) => setRfqs(res.data || []))
+                      .catch(() =>
+                        setError('Unable to load RFQs. Please try again.'),
+                      )
+                      .finally(() => setIsLoading(false));
+                  }}
+                  className="mt-3 text-sm font-medium text-red-700 underline hover:text-red-800"
+                >
+                  Try again
+                </button>
+              </div>
+            ) : (
+              <RFQList rfqs={rfqs} isLoading={isLoading} />
+            )}
           </div>
         </div>
       </div>

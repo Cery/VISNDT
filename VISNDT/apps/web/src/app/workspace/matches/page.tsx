@@ -14,6 +14,7 @@ function MatchesContent() {
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   const [matches, setMatches] = useState<MatchItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function load() {
@@ -21,7 +22,7 @@ function MatchesContent() {
         const data = await getAllMatches();
         setMatches(data);
       } catch {
-        // graceful fallback
+        setError('Unable to load matches. Please try again.');
       } finally {
         setIsLoading(false);
       }
@@ -42,7 +43,28 @@ function MatchesContent() {
                 Review product matches for your demands.
               </p>
             </div>
-            <MatchList matches={matches} isLoading={isLoading} />
+            {error ? (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-8 text-center">
+                <p className="text-sm text-red-700">{error}</p>
+                <button
+                  onClick={() => {
+                    setError('');
+                    setIsLoading(true);
+                    getAllMatches()
+                      .then((data) => setMatches(data))
+                      .catch(() =>
+                        setError('Unable to load matches. Please try again.'),
+                      )
+                      .finally(() => setIsLoading(false));
+                  }}
+                  className="mt-3 text-sm font-medium text-red-700 underline hover:text-red-800"
+                >
+                  Try again
+                </button>
+              </div>
+            ) : (
+              <MatchList matches={matches} isLoading={isLoading} />
+            )}
           </div>
         </div>
       </div>

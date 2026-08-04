@@ -14,7 +14,7 @@ export default function CategoriesPage() {
     isError,
     error,
   } = useQuery({
-    queryKey: ['categories', 'all'],
+    queryKey: ['categories'],
     queryFn: () => getCategories(1, 100),
   });
 
