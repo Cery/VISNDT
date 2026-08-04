@@ -59,11 +59,11 @@ function ProductMediaCreate() {
       };
 
       await productMediaService.createWithUpload(productId, selectedFile, metadata);
-      message.success('Media added successfully');
+      message.success('媒体添加成功');
       navigate(`/products/${productId}/media`);
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to add media';
+        err instanceof Error ? err.message : '添加媒体失败';
       setPageState({ status: 'error', message: errorMessage });
       message.error(errorMessage);
     }
@@ -77,7 +77,7 @@ function ProductMediaCreate() {
   return (
     <div style={{ maxWidth: 600 }}>
       <Title level={4} style={{ marginBottom: 24 }}>
-        Add Media
+        添加媒体
       </Title>
 
       <Card>
@@ -91,7 +91,7 @@ function ProductMediaCreate() {
             displayOrder: 0,
           }}
         >
-          <Form.Item label="Upload File">
+          <Form.Item label="上传文件">
             <Dragger
               name="file"
               multiple={false}
@@ -122,16 +122,16 @@ function ProductMediaCreate() {
                     ✅ {selectedFileName.current}
                   </p>
                   <p className="ant-upload-hint">
-                    Drop or click to replace
+                    拖动或点击以替换文件
                   </p>
                 </>
               ) : (
                 <>
                   <p className="ant-upload-text">
-                    Click or drag file to this area to upload
+                    点击或拖拽文件到此处上传
                   </p>
                   <p className="ant-upload-hint">
-                    Supports images, PDF, Office documents, TXT, CSV (max 10MB)
+                    支持图片、PDF、Office 文档、TXT、CSV（最大 10MB）
                   </p>
                 </>
               )}
@@ -139,11 +139,11 @@ function ProductMediaCreate() {
           </Form.Item>
 
           <Form.Item
-            label="Media Type"
+            label="媒体类型"
             name="mediaType"
-            rules={[{ required: true, message: 'Please select a media type' }]}
+            rules={[{ required: true, message: '请选择媒体类型' }]}
           >
-            <Select placeholder="Select media type">
+            <Select placeholder="请选择媒体类型">
               {MEDIA_TYPE_OPTIONS.map((opt) => (
                 <Option key={opt.value} value={opt.value}>
                   {opt.label}
@@ -152,23 +152,23 @@ function ProductMediaCreate() {
             </Select>
           </Form.Item>
 
-          <Form.Item label="Title" name="title">
-            <Input placeholder="e.g. Product front view" />
+          <Form.Item label="标题" name="title">
+            <Input placeholder="如：产品正面照" />
           </Form.Item>
 
-          <Form.Item label="Description" name="description">
-            <Input.TextArea placeholder="Optional description" rows={3} />
+          <Form.Item label="描述" name="description">
+            <Input.TextArea placeholder="可选描述" rows={3} />
           </Form.Item>
 
           <Form.Item
-            label="Primary"
+            label="主图"
             name="isPrimary"
             valuePropName="checked"
           >
             <Switch />
           </Form.Item>
 
-          <Form.Item label="Display Order" name="displayOrder">
+          <Form.Item label="显示顺序" name="displayOrder">
             <InputNumber min={0} style={{ width: '100%' }} />
           </Form.Item>
 
@@ -179,13 +179,13 @@ function ProductMediaCreate() {
               loading={pageState.status === 'submitting'}
               disabled={!selectedFile || pageState.status === 'submitting'}
             >
-              Add Media
+              添加媒体
             </Button>
             <Button
               style={{ marginLeft: 8 }}
               onClick={() => navigate(`/products/${productId}/media`)}
             >
-              Cancel
+              取消
             </Button>
           </Form.Item>
         </Form>

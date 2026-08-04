@@ -23,7 +23,7 @@ export default function ProductGallery({ media, productName }: ProductGalleryPro
   if (sortedImages.length === 0) {
     return (
       <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
-        <span className="text-muted-foreground text-sm">No Image Available</span>
+        <span className="text-muted-foreground text-sm">暂无图片</span>
       </div>
     );
   }

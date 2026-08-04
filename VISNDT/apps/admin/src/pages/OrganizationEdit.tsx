@@ -24,7 +24,7 @@ export default function OrganizationEdit() {
       setPageState({ status: 'ready', data });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load organization';
+        err instanceof Error ? err.message : '加载组织失败';
       setPageState({ status: 'error', message });
     }
   }, [id]);
@@ -54,17 +54,17 @@ export default function OrganizationEdit() {
     return (
       <Alert
         type="error"
-        message="Failed to Load Organization"
+        message="加载组织失败"
         description={pageState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={loadOrganization}>Retry</Button>
+            <Button onClick={loadOrganization}>重试</Button>
             <Button
               onClick={() => navigate('/organizations')}
               icon={<ArrowLeftOutlined />}
             >
-              Back to List
+              返回列表
             </Button>
           </Space>
         }

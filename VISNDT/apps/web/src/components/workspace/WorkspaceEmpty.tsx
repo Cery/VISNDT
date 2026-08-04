@@ -8,8 +8,8 @@ interface WorkspaceEmptyProps {
 }
 
 export default function WorkspaceEmpty({
-  title = 'No items yet',
-  message = 'There are no items to display at this time.',
+  title = '暂无内容',
+  message = '当前没有可显示的内容。',
   actionLabel,
   actionHref,
 }: WorkspaceEmptyProps) {

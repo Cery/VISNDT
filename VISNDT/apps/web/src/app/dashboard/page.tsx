@@ -39,34 +39,34 @@ function DashboardContent() {
       {/* Welcome */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-slate-900">
-          Welcome back{user?.name ? `, ${user.name}` : ''}
+          欢迎回来{user?.name ? `, ${user.name}` : ''}
         </h1>
         <p className="text-slate-500 mt-1">
           {user?.organizationId
-            ? 'Organization Dashboard'
-            : 'Your Dashboard'}
+            ? '组织仪表盘'
+            : '我的仪表盘'}
         </p>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         <StatCard
-          label="My Demands"
+          label="我的需求"
           value={isLoading ? '...' : stats.demands}
-          description="Active demands"
+          description="活跃需求"
           icon="📋"
         />
         <StatCard
-          label="RFQs Received"
+          label="收到的询价"
           value={isLoading ? '...' : stats.rfqs}
-          description="Incoming requests"
+          description="收到的请求"
           icon="📄"
         />
         <StatCard
-          label="Organization"
-          value={user?.organizationId ? 'Active' : 'Pending'}
+          label="组织"
+          value={user?.organizationId ? '已激活' : '待处理'}
           description={
-            user?.organizationId ? 'Member' : 'Join an organization'
+            user?.organizationId ? '成员' : '加入组织'
           }
           icon="🏢"
         />
@@ -75,7 +75,7 @@ function DashboardContent() {
       {/* Quick Actions */}
       <section>
         <h2 className="text-lg font-semibold text-slate-900 mb-4">
-          Quick Actions
+          快捷操作
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link
@@ -84,10 +84,10 @@ function DashboardContent() {
           >
             <span className="text-2xl mb-2 block">🔍</span>
             <h3 className="font-medium text-sm text-slate-900">
-              Browse Products
+              浏览产品
             </h3>
             <p className="text-xs text-slate-400 mt-1">
-              Explore industrial inspection equipment
+              探索工业检测设备
             </p>
           </Link>
           <Link
@@ -96,10 +96,10 @@ function DashboardContent() {
           >
             <span className="text-2xl mb-2 block">📋</span>
             <h3 className="font-medium text-sm text-slate-900">
-              My Demands
+              我的需求
             </h3>
             <p className="text-xs text-slate-400 mt-1">
-              Manage your demand listings
+              管理您的需求列表
             </p>
           </Link>
           <Link
@@ -107,9 +107,9 @@ function DashboardContent() {
             className="rounded-lg border border-slate-200 bg-white p-4 hover:border-slate-400 hover:shadow-sm transition-all"
           >
             <span className="text-2xl mb-2 block">📄</span>
-            <h3 className="font-medium text-sm text-slate-900">RFQs</h3>
+            <h3 className="font-medium text-sm text-slate-900">询价单</h3>
             <p className="text-xs text-slate-400 mt-1">
-              View and respond to RFQs
+              查看和回复询价
             </p>
           </Link>
           <Link
@@ -117,9 +117,9 @@ function DashboardContent() {
             className="rounded-lg border border-slate-200 bg-white p-4 hover:border-slate-400 hover:shadow-sm transition-all"
           >
             <span className="text-2xl mb-2 block">🔗</span>
-            <h3 className="font-medium text-sm text-slate-900">Matches</h3>
+            <h3 className="font-medium text-sm text-slate-900">匹配结果</h3>
             <p className="text-xs text-slate-400 mt-1">
-              Review demand-product matches
+              查看需求-产品匹配
             </p>
           </Link>
         </div>

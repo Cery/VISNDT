@@ -53,7 +53,7 @@ export default function InquiryDetailPage() {
       setSelectedStatus(data.status);
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load inquiry';
+        err instanceof Error ? err.message : '加载询价失败';
       setPageState({ status: 'error', message });
     }
   }, [id]);
@@ -67,11 +67,11 @@ export default function InquiryDetailPage() {
     setUpdating(true);
     try {
       await inquiryService.updateStatus(id, selectedStatus);
-      message.success('Status updated');
+      message.success('状态已更新');
       fetchInquiry();
     } catch (err) {
       const msg =
-        err instanceof Error ? err.message : 'Failed to update status';
+        err instanceof Error ? err.message : '更新状态失败';
       message.error(msg);
     } finally {
       setUpdating(false);
@@ -90,17 +90,17 @@ export default function InquiryDetailPage() {
     return (
       <Alert
         type="error"
-        message="Failed to load inquiry"
+        message="加载询价失败"
         description={pageState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={fetchInquiry}>Retry</Button>
+            <Button onClick={fetchInquiry}>重试</Button>
             <Button
               onClick={() => navigate('/inquiries')}
               icon={<ArrowLeftOutlined />}
             >
-              Back to List
+              返回列表
             </Button>
           </Space>
         }
@@ -120,60 +120,60 @@ export default function InquiryDetailPage() {
           icon={<ArrowLeftOutlined />}
           onClick={() => navigate('/inquiries')}
         >
-          Back to List
+          返回列表
         </Button>
       </Space>
 
-      <Title level={3}>Inquiry Detail</Title>
+      <Title level={3}>询价详情</Title>
 
       {/* Card 1: Inquiry Summary */}
-      <Card title="Inquiry Summary" style={{ marginBottom: 16 }}>
+      <Card title="询价摘要" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="Inquiry ID">{inquiry.id}</Descriptions.Item>
-          <Descriptions.Item label="Status">
+          <Descriptions.Item label="询价编号">{inquiry.id}</Descriptions.Item>
+          <Descriptions.Item label="状态">
             <Tag color={STATUS_COLOR[inquiry.status] || 'default'}>
               {inquiry.status}
             </Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Created At">
+          <Descriptions.Item label="创建时间">
             {formatDate(inquiry.createdAt)}
           </Descriptions.Item>
-          <Descriptions.Item label="Updated At">
+          <Descriptions.Item label="更新时间">
             {formatDate(inquiry.updatedAt)}
           </Descriptions.Item>
         </Descriptions>
       </Card>
 
       {/* Card 2: Contact Information */}
-      <Card title="Contact Information" style={{ marginBottom: 16 }}>
+      <Card title="联系信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="Name">
+          <Descriptions.Item label="姓名">
             {inquiry.contactName || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Email">
+          <Descriptions.Item label="邮箱">
             {inquiry.contactEmail || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Phone">
+          <Descriptions.Item label="电话">
             {inquiry.contactPhone || '-'}
           </Descriptions.Item>
         </Descriptions>
       </Card>
 
       {/* Card 3: Product & Organization */}
-      <Card title="Related Information" style={{ marginBottom: 16 }}>
+      <Card title="关联信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
           {inquiry.product && (
-            <Descriptions.Item label="Product">
+            <Descriptions.Item label="产品">
               {inquiry.product.name}
             </Descriptions.Item>
           )}
           {inquiry.organization && (
-            <Descriptions.Item label="Organization">
+            <Descriptions.Item label="组织">
               {inquiry.organization.name}
             </Descriptions.Item>
           )}
           {inquiry.createdBy && (
-            <Descriptions.Item label="Created By">
+            <Descriptions.Item label="创建者">
               {inquiry.createdBy.name || inquiry.createdBy.email}
             </Descriptions.Item>
           )}
@@ -181,7 +181,7 @@ export default function InquiryDetailPage() {
       </Card>
 
       {/* Card 4: Message */}
-      <Card title="Message" style={{ marginBottom: 16 }}>
+      <Card title="消息" style={{ marginBottom: 16 }}>
         <Paragraph
           style={{
             whiteSpace: 'pre-wrap',
@@ -196,7 +196,7 @@ export default function InquiryDetailPage() {
       </Card>
 
       {/* Card 5: Status Management */}
-      <Card title="Status Management" style={{ marginBottom: 16 }}>
+      <Card title="状态管理" style={{ marginBottom: 16 }}>
         <Space>
           <Select
             value={selectedStatus}
@@ -211,7 +211,7 @@ export default function InquiryDetailPage() {
             loading={updating}
             disabled={selectedStatus === inquiry.status}
           >
-            Update Status
+            更新状态
           </Button>
         </Space>
       </Card>
@@ -220,7 +220,7 @@ export default function InquiryDetailPage() {
         icon={<ArrowLeftOutlined />}
         onClick={() => navigate('/inquiries')}
       >
-        Back to List
+        返回列表
       </Button>
     </div>
   );

@@ -32,13 +32,13 @@ const STATUS_COLOR: Record<string, string> = {
 
 const MEMBER_COLUMNS: ColumnsType<OrganizationMember> = [
   {
-    title: 'User ID',
+    title: '用户ID',
     dataIndex: 'userId',
     key: 'userId',
     ellipsis: true,
   },
   {
-    title: 'Role',
+    title: '角色',
     dataIndex: 'role',
     key: 'role',
     width: 120,
@@ -47,7 +47,7 @@ const MEMBER_COLUMNS: ColumnsType<OrganizationMember> = [
     ),
   },
   {
-    title: 'Joined',
+    title: '加入时间',
     dataIndex: 'createdAt',
     key: 'createdAt',
     width: 180,
@@ -71,7 +71,7 @@ export default function OrganizationDetailPage() {
       setPageState({ status: 'success', data });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load organization';
+        err instanceof Error ? err.message : '加载组织失败';
       setPageState({ status: 'error', message });
     }
   }, [id]);
@@ -92,17 +92,17 @@ export default function OrganizationDetailPage() {
     return (
       <Alert
         type="error"
-        message="Failed to load organization"
+        message="加载组织失败"
         description={pageState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={fetchOrganization}>Retry</Button>
+            <Button onClick={fetchOrganization}>重试</Button>
             <Button
               onClick={() => navigate('/organizations')}
               icon={<ArrowLeftOutlined />}
             >
-              Back to List
+              返回列表
             </Button>
           </Space>
         }
@@ -120,18 +120,18 @@ export default function OrganizationDetailPage() {
           icon={<ArrowLeftOutlined />}
           onClick={() => navigate('/organizations')}
         >
-          Back to List
+          返回列表
         </Button>
       </Space>
 
-      <Title level={3}>Organization Detail</Title>
+      <Title level={3}>组织详情</Title>
 
-      <Card title="Basic Information" style={{ marginBottom: 16 }}>
+      <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
           <Descriptions.Item label="ID">{org.id}</Descriptions.Item>
-          <Descriptions.Item label="Name">{org.name}</Descriptions.Item>
-          <Descriptions.Item label="Type">{org.type || '-'}</Descriptions.Item>
-          <Descriptions.Item label="Status">
+          <Descriptions.Item label="名称">{org.name}</Descriptions.Item>
+          <Descriptions.Item label="类型">{org.type || '-'}</Descriptions.Item>
+          <Descriptions.Item label="状态">
             <Tag color={STATUS_COLOR[org.status] || 'default'}>
               {org.status}
             </Tag>
@@ -139,7 +139,7 @@ export default function OrganizationDetailPage() {
         </Descriptions>
       </Card>
 
-      <Card title="Members" style={{ marginBottom: 16 }}>
+      <Card title="成员" style={{ marginBottom: 16 }}>
         {members && members.length > 0 ? (
           <Table
             dataSource={members}
@@ -149,16 +149,16 @@ export default function OrganizationDetailPage() {
             size="small"
           />
         ) : (
-          <Empty description="No members found" />
+          <Empty description="未找到成员" />
         )}
       </Card>
 
-      <Card title="Timeline">
+      <Card title="时间线">
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="Created At">
+          <Descriptions.Item label="创建时间">
             {formatDate(org.createdAt)}
           </Descriptions.Item>
-          <Descriptions.Item label="Updated At">
+          <Descriptions.Item label="更新时间">
             {formatDate(org.updatedAt)}
           </Descriptions.Item>
         </Descriptions>

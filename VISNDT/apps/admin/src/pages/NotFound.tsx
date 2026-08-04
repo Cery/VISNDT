@@ -4,8 +4,8 @@ function NotFound() {
   return (
     <div style={{ textAlign: 'center', paddingTop: 80, fontFamily: 'system-ui, sans-serif' }}>
       <h1>404</h1>
-      <p>Page Not Found</p>
-      <Link to="/home">Back to Home</Link>
+      <p>页面未找到</p>
+      <Link to="/home">返回首页</Link>
     </div>
   );
 }

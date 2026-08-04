@@ -13,7 +13,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     >
       {/* Placeholder image */}
       <div className="aspect-video bg-muted rounded-md mb-3 flex items-center justify-center">
-        <span className="text-muted-foreground text-sm">No Image</span>
+        <span className="text-muted-foreground text-sm">暂无图片</span>
       </div>
 
       <div className="space-y-1.5">
@@ -22,7 +22,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </h3>
 
         {product.model && (
-          <p className="text-xs text-muted-foreground">Model: {product.model}</p>
+          <p className="text-xs text-muted-foreground">型号：{product.model}</p>
         )}
 
         {product.category && (

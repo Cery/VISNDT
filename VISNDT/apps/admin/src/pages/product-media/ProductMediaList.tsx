@@ -85,7 +85,7 @@ function ProductMediaList() {
       }
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to load media';
+        err instanceof Error ? err.message : '加载媒体失败';
       setPageState({ status: 'error', message: errorMessage });
     }
   }, [productId, query, signedUrlCache]);
@@ -94,20 +94,20 @@ function ProductMediaList() {
     fetchData();
   }, [fetchData]);
 
-  const handleDelete = async (id: string) => {
+  const handle删除 = async (id: string) => {
     if (!productId) return;
     try {
       await productMediaService.remove(productId, id);
-      message.success('Media deleted successfully');
+      message.success('媒体删除成功');
       fetchData();
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to delete media';
+        err instanceof Error ? err.message : '删除媒体失败';
       message.error(errorMessage);
     }
   };
 
-  const handleDownload = async (fileAssetId: string, fileName: string) => {
+  const handle下载 = async (fileAssetId: string, fileName: string) => {
     try {
       const url = await fileAssetService.getSignedUrl(fileAssetId);
       const link = document.createElement('a');
@@ -119,7 +119,7 @@ function ProductMediaList() {
       link.click();
       document.body.removeChild(link);
     } catch {
-      message.error('Failed to download file');
+      message.error('文件下载失败');
     }
   };
 
@@ -146,12 +146,12 @@ function ProductMediaList() {
     return (
       <Alert
         type="error"
-        message="Failed to load media"
+        message="加载媒体失败"
         description={pageState.message}
         showIcon
         action={
           <Button size="small" onClick={fetchData}>
-            Retry
+            重试
           </Button>
         }
       />
@@ -160,7 +160,7 @@ function ProductMediaList() {
 
   const columns: ColumnsType<ProductMediaItem> = [
     {
-      title: 'Preview',
+      title: '预览',
       key: 'preview',
       width: 80,
       render: (_: unknown, record: ProductMediaItem) => {
@@ -188,7 +188,7 @@ function ProductMediaList() {
       },
     },
     {
-      title: 'File Name',
+      title: '文件名',
       key: 'fileName',
       ellipsis: true,
       render: (_: unknown, record: ProductMediaItem) => {
@@ -206,13 +206,13 @@ function ProductMediaList() {
         }
         return (
           <Text type="secondary" italic>
-            No file attached
+            未附加文件
           </Text>
         );
       },
     },
     {
-      title: 'Media Type',
+      title: '媒体类型',
       dataIndex: 'mediaType',
       key: 'mediaType',
       width: 120,
@@ -223,34 +223,34 @@ function ProductMediaList() {
       ),
     },
     {
-      title: 'Title',
+      title: '标题',
       dataIndex: 'title',
       key: 'title',
       render: (title: string | undefined) => title || '-',
     },
     {
-      title: 'Primary',
+      title: '主图',
       dataIndex: 'isPrimary',
       key: 'isPrimary',
       width: 80,
       render: (isPrimary: boolean) =>
-        isPrimary ? <Tag color="gold">Yes</Tag> : <Tag>No</Tag>,
+        isPrimary ? <Tag color="gold">是</Tag> : <Tag>否</Tag>,
     },
     {
-      title: 'Display Order',
+      title: '显示顺序',
       dataIndex: 'displayOrder',
       key: 'displayOrder',
       width: 120,
     },
     {
-      title: 'Created At',
+      title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 160,
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       width: 220,
       render: (_: unknown, record: ProductMediaItem) => {
@@ -258,14 +258,14 @@ function ProductMediaList() {
         return (
           <Space size="small">
             {fa && (
-              <Tooltip title="Download file">
+              <Tooltip title="下载文件">
                 <Button
                   type="link"
                   size="small"
                   icon={<DownloadOutlined />}
-                  onClick={() => handleDownload(fa.id, fa.fileName)}
+                  onClick={() => handle下载(fa.id, fa.fileName)}
                 >
-                  Download
+                  下载
                 </Button>
               </Tooltip>
             )}
@@ -276,17 +276,17 @@ function ProductMediaList() {
                 navigate(`/products/${productId}/media/${record.id}/edit`)
               }
             >
-              Edit
+              编辑
             </Button>
             <Popconfirm
-              title="Delete this media?"
-              description="This action cannot be undone."
-              onConfirm={() => handleDelete(record.id)}
-              okText="Delete"
-              cancelText="Cancel"
+              title="确定要删除此媒体吗？"
+              description="此操作无法撤销。"
+              onConfirm={() => handle删除(record.id)}
+              okText="删除"
+              cancelText="取消"
             >
               <Button type="link" size="small" danger>
-                Delete
+                删除
               </Button>
             </Popconfirm>
           </Space>
@@ -306,22 +306,22 @@ function ProductMediaList() {
         }}
       >
         <Title level={4} style={{ margin: 0 }}>
-          Product Media
+          产品媒体
         </Title>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => navigate(`/products/${productId}/media/create`)}
         >
-          Add Media
+          添加媒体
         </Button>
       </div>
 
       {pageState.status === 'empty' ? (
         <Alert
           type="info"
-          message="No Media"
-          description="No media has been added to this product yet. Click 'Add Media' to associate an existing FileAsset."
+          message="暂无媒体"
+          description="该产品尚未添加媒体文件，请点击「添加媒体」关联文件。"
           showIcon
         />
       ) : (
@@ -336,7 +336,7 @@ function ProductMediaList() {
             total: pageState.total,
             showSizeChanger: true,
             pageSizeOptions: ['10', '20', '50'],
-            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+            showTotal: (total, range) => `${range[0]}-${range[1]} / 共 ${total} 条`,
           }}
         />
       )}

@@ -23,9 +23,9 @@ export default function CategoriesPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">Product Categories</h1>
+        <h1 className="text-2xl font-bold">产品分类</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Browse industrial inspection equipment by category
+          按分类浏览工业检测设备
         </p>
       </div>
 
@@ -33,10 +33,10 @@ export default function CategoriesPage() {
         <Loading />
       ) : isError ? (
         <ErrorState
-          message={error instanceof Error ? error.message : 'Failed to load categories'}
+          message={error instanceof Error ? error.message : '加载分类失败'}
         />
       ) : categories.length === 0 ? (
-        <EmptyState message="No categories available" />
+        <EmptyState message="暂无分类" />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {categories.map((cat) => (

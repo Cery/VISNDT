@@ -21,17 +21,17 @@ interface QueryParams {
 }
 
 const STATUS_OPTIONS = [
-  { value: '', label: 'All Statuses' },
-  { value: 'UNREAD', label: 'Unread' },
-  { value: 'READ', label: 'Read' },
+  { value: '', label: '全部状态' },
+  { value: 'UNREAD', label: '未读' },
+  { value: 'READ', label: '已读' },
 ];
 
 const TYPE_OPTIONS = [
-  { value: '', label: 'All Types' },
-  { value: 'SYSTEM', label: 'System' },
-  { value: 'DEMAND_UPDATE', label: 'Demand Update' },
-  { value: 'RFQ_UPDATE', label: 'RFQ Update' },
-  { value: 'RESPONSE_UPDATE', label: 'Response Update' },
+  { value: '', label: '全部类型' },
+  { value: 'SYSTEM', label: '系统' },
+  { value: 'DEMAND_UPDATE', label: '需求更新' },
+  { value: 'RFQ_UPDATE', label: '询价更新' },
+  { value: 'RESPONSE_UPDATE', label: '响应更新' },
 ];
 
 const TYPE_COLOR_MAP: Record<string, string> = {
@@ -78,7 +78,7 @@ function NotificationList() {
       });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load notifications';
+        err instanceof Error ? err.message : '加载通知列表失败';
       setPageState({ status: 'error', message });
     }
   }, [query]);
@@ -127,7 +127,7 @@ function NotificationList() {
     return (
       <Alert
         type="error"
-        message="Failed to load notifications"
+        message="加载通知列表失败"
         description={pageState.message}
         showIcon
         action={
@@ -141,7 +141,7 @@ function NotificationList() {
 
   const columns: ColumnsType<Notification> = [
     {
-      title: 'Title',
+      title: '标题',
       dataIndex: 'title',
       key: 'title',
       render: (title: string) => (
@@ -149,7 +149,7 @@ function NotificationList() {
       ),
     },
     {
-      title: 'Type',
+      title: '类型',
       dataIndex: 'type',
       key: 'type',
       width: 150,
@@ -158,7 +158,7 @@ function NotificationList() {
       ),
     },
     {
-      title: 'Status',
+      title: '状态',
       dataIndex: 'status',
       key: 'status',
       width: 100,
@@ -167,20 +167,20 @@ function NotificationList() {
       ),
     },
     {
-      title: 'Message',
+      title: '消息',
       dataIndex: 'message',
       key: 'message',
       ellipsis: true,
     },
     {
-      title: 'Created At',
+      title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 180,
       render: (date: string) => new Date(date).toLocaleString(),
     },
     {
-      title: 'Action',
+      title: '操作',
       key: 'action',
       width: 80,
       render: (_: unknown, record: Notification) => (
@@ -189,7 +189,7 @@ function NotificationList() {
           icon={<EyeOutlined />}
           onClick={() => navigate(`/notifications/${record.id}`)}
         >
-          View
+          查看
         </Button>
       ),
     },
@@ -198,12 +198,12 @@ function NotificationList() {
   return (
     <div>
       <Title level={4} style={{ marginBottom: 16 }}>
-        Notification Center
+        通知中心
       </Title>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Select
-          placeholder="Filter by status"
+          placeholder="按状态筛选"
           allowClear
           value={query.status || undefined}
           onChange={handleStatusChange}
@@ -211,7 +211,7 @@ function NotificationList() {
           style={{ width: 160 }}
         />
         <Select
-          placeholder="Filter by type"
+          placeholder="按类型筛选"
           allowClear
           value={query.type || undefined}
           onChange={handleTypeChange}
@@ -219,7 +219,7 @@ function NotificationList() {
           style={{ width: 180 }}
         />
         <Button icon={<ReloadOutlined />} onClick={handleReset}>
-          Reset
+          重置
         </Button>
       </Space>
 
@@ -234,7 +234,7 @@ function NotificationList() {
           total: pageState.total,
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '50'],
-          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+          showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
         }}
       />
     </div>

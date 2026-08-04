@@ -41,7 +41,7 @@ function InquiryList() {
       }
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load inquiries';
+        err instanceof Error ? err.message : '加载询价失败';
       setPageState({ status: 'error', message });
     }
   }, [page, pageSize]);
@@ -70,12 +70,12 @@ function InquiryList() {
     return (
       <Alert
         type="error"
-        message="Failed to load inquiries"
+        message="加载询价失败"
         description={pageState.message}
         showIcon
         action={
           <Button size="small" onClick={fetchInquiries}>
-            Retry
+            重试
           </Button>
         }
       />
@@ -86,12 +86,12 @@ function InquiryList() {
     return (
       <div>
         <Title level={4} style={{ marginBottom: 16 }}>
-          Inquiry Management
+          询价管理
         </Title>
         <Alert
           type="info"
-          message="No inquiries"
-          description="No inquiries have been submitted yet."
+          message="暂无询价"
+          description="暂无询价提交。"
           showIcon
         />
       </div>
@@ -100,31 +100,31 @@ function InquiryList() {
 
   const columns: ColumnsType<Inquiry> = [
     {
-      title: 'Contact',
+      title: '联系人',
       dataIndex: 'contactName',
       key: 'contactName',
       render: (name: string) => name || '-',
     },
     {
-      title: 'Email',
+      title: '邮箱',
       dataIndex: 'contactEmail',
       key: 'contactEmail',
       render: (email: string) => email || '-',
     },
     {
-      title: 'Organization',
+      title: '组织',
       dataIndex: 'organization',
       key: 'organization',
       render: (org: Inquiry['organization']) => org?.name || '-',
     },
     {
-      title: 'Product',
+      title: '产品',
       dataIndex: 'product',
       key: 'product',
       render: (product: Inquiry['product']) => product?.name || '-',
     },
     {
-      title: 'Status',
+      title: '状态',
       dataIndex: 'status',
       key: 'status',
       width: 120,
@@ -133,13 +133,13 @@ function InquiryList() {
       ),
     },
     {
-      title: 'Created At',
+      title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       width: 100,
       render: (_: unknown, record: Inquiry) => (
@@ -147,7 +147,7 @@ function InquiryList() {
           type="link"
           onClick={() => navigate(`/inquiries/${record.id}`)}
         >
-          View
+          查看
         </Button>
       ),
     },
@@ -156,7 +156,7 @@ function InquiryList() {
   return (
     <div>
       <Title level={4} style={{ marginBottom: 16 }}>
-        Inquiry Management
+        询价管理
       </Title>
 
       <Table<Inquiry>
@@ -170,7 +170,7 @@ function InquiryList() {
           total: pageState.total,
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '50'],
-          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+          showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
         }}
       />
     </div>

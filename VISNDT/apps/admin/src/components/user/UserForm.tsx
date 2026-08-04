@@ -11,9 +11,9 @@ interface UserFormProps {
 }
 
 const STATUS_OPTIONS = [
-  { value: 'ACTIVE', label: 'Active' },
-  { value: 'INACTIVE', label: 'Inactive' },
-  { value: 'SUSPENDED', label: 'Suspended' },
+  { value: 'ACTIVE', label: '激活' },
+  { value: 'INACTIVE', label: '未激活' },
+  { value: 'SUSPENDED', label: '已停用' },
 ];
 
 export default function UserForm({ mode, initialValues, onSubmit }: UserFormProps) {
@@ -26,7 +26,7 @@ export default function UserForm({ mode, initialValues, onSubmit }: UserFormProp
     try {
       await onSubmit(values);
       message.success(
-        mode === 'create' ? 'User created successfully' : 'User updated successfully',
+        mode === 'create' ? '用户创建成功' : '用户更新成功',
       );
       if (mode === 'create') {
         navigate('/users');
@@ -34,21 +34,21 @@ export default function UserForm({ mode, initialValues, onSubmit }: UserFormProp
         navigate(-1);
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to save user';
+      const errorMessage = err instanceof Error ? err.message : '保存用户失败';
       message.error(errorMessage);
     } finally {
       setSubmitting(false);
     }
   };
 
-  const title = mode === 'create' ? 'Create User' : 'Edit User';
-  const submitLabel = mode === 'create' ? 'Create User' : 'Update User';
+  const title = mode === 'create' ? '创建用户' : '编辑用户';
+  const submitLabel = mode === 'create' ? '创建用户' : '更新用户';
 
   return (
     <div>
       <Space style={{ marginBottom: 16 }}>
         <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>
-          Back
+          返回
         </Button>
       </Space>
       <h2>{title}</h2>
@@ -60,41 +60,41 @@ export default function UserForm({ mode, initialValues, onSubmit }: UserFormProp
         style={{ maxWidth: 600 }}
       >
         <Form.Item
-          label="Email"
+          label="邮箱"
           name="email"
           rules={[
-            { required: true, message: 'Please enter email' },
-            { type: 'email', message: 'Please enter a valid email' },
+            { required: true, message: '请输入邮箱' },
+            { type: 'email', message: '请输入有效的邮箱地址' },
           ]}
         >
-          <Input placeholder="Enter email address" />
+          <Input placeholder="请输入邮箱地址" />
         </Form.Item>
 
         <Form.Item
-          label="Password"
+          label="密码"
           name="passwordHash"
           rules={[
             ...(mode === 'create'
-              ? [{ required: true, message: 'Please enter password' }]
+              ? [{ required: true, message: '请输入密码' }]
               : []),
-            { min: 6, message: 'Password must be at least 6 characters' },
+            { min: 6, message: '密码至少需要6个字符' },
           ]}
         >
-          <Input.Password placeholder={mode === 'create' ? 'Enter password' : 'Leave blank to keep current'} />
+          <Input.Password placeholder={mode === 'create' ? '请输入密码' : '留空以保持当前密码'} />
         </Form.Item>
 
         {mode === 'edit' && (
-          <Form.Item label="Status" name="status">
+          <Form.Item label="状态" name="status">
             <Select
-              placeholder="Select status"
+              placeholder="请选择状态"
               allowClear
               options={STATUS_OPTIONS}
             />
           </Form.Item>
         )}
 
-        <Form.Item label="Organization ID" name="organizationId">
-          <Input placeholder="Enter organization ID (optional)" />
+        <Form.Item label="组织ID" name="organizationId">
+          <Input placeholder="请输入组织ID（可选）" />
         </Form.Item>
 
         <Form.Item>
@@ -102,7 +102,7 @@ export default function UserForm({ mode, initialValues, onSubmit }: UserFormProp
             <Button type="primary" htmlType="submit" loading={submitting}>
               {submitLabel}
             </Button>
-            <Button onClick={() => navigate(-1)}>Cancel</Button>
+            <Button onClick={() => navigate(-1)}>取消</Button>
           </Space>
         </Form.Item>
       </Form>

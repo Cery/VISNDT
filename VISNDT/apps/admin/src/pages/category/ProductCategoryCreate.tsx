@@ -29,7 +29,7 @@ function ProductCategoryCreate() {
       } catch (err) {
         if (!cancelled) {
           const errorMessage =
-            err instanceof Error ? err.message : 'Failed to load categories';
+            err instanceof Error ? err.message : '加载分类失败';
           setPageState({ status: 'error', message: errorMessage });
         }
       }
@@ -53,11 +53,11 @@ function ProductCategoryCreate() {
         parentId: values.parentId || undefined,
       };
       await categoryService.create(payload);
-      message.success('Category created successfully');
+      message.success('分类创建成功');
       navigate('/product-categories');
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to create category';
+        err instanceof Error ? err.message : '创建分类失败';
       setPageState((prev) =>
         prev.status === 'ready'
           ? ({ ...prev, status: 'ready' } as PageState)
@@ -79,12 +79,12 @@ function ProductCategoryCreate() {
     return (
       <Alert
         type="error"
-        message="Failed to load form data"
+        message="加载表单数据失败"
         description={pageState.message}
         showIcon
         action={
           <Button onClick={() => navigate('/product-categories')}>
-            Back to List
+            返回列表
           </Button>
         }
       />
@@ -99,7 +99,7 @@ function ProductCategoryCreate() {
   return (
     <div style={{ maxWidth: 600 }}>
       <Title level={4} style={{ marginBottom: 24 }}>
-        Create Category
+        创建分类
       </Title>
 
       <Card>
@@ -113,23 +113,23 @@ function ProductCategoryCreate() {
           }}
         >
           <Form.Item
-            label="Name"
+            label="名称"
             name="name"
-            rules={[{ required: true, message: 'Please enter a name' }]}
+            rules={[{ required: true, message: '请输入名称' }]}
           >
-            <Input placeholder="e.g. Electronics" />
+            <Input placeholder="如：电子产品" />
           </Form.Item>
 
           <Form.Item
-            label="Slug"
+            label="标识"
             name="slug"
-            rules={[{ required: true, message: 'Please enter a slug' }]}
+            rules={[{ required: true, message: '请输入标识' }]}
           >
-            <Input placeholder="e.g. electronics" />
+            <Input placeholder="如：electronics" />
           </Form.Item>
 
-          <Form.Item label="Parent Category" name="parentId">
-            <Select placeholder="Select a parent category (optional)" allowClear>
+          <Form.Item label="父级分类" name="parentId">
+            <Select placeholder="请选择父级分类（可选）" allowClear>
               {categories.map((c: ProductCategory) => (
                 <Option key={c.id} value={c.id}>
                   {c.name}
@@ -144,13 +144,13 @@ function ProductCategoryCreate() {
               htmlType="submit"
               loading={pageState.status === 'submitting'}
             >
-              Create Category
+              创建分类
             </Button>
             <Button
               style={{ marginLeft: 8 }}
               onClick={() => navigate('/product-categories')}
             >
-              Cancel
+              取消
             </Button>
           </Form.Item>
         </Form>

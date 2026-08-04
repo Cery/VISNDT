@@ -2,40 +2,40 @@ import Link from 'next/link';
 
 const FOOTER_SECTIONS = [
   {
-    title: 'Company',
+    title: '公司信息',
     links: [
-      { href: '/about', label: 'About VISNDT' },
-      { href: '/business', label: 'Business Cooperation' },
+      { href: '/about', label: '关于VISNDT' },
+      { href: '/business', label: '商务合作' },
     ],
   },
   {
-    title: 'Products',
+    title: '产品',
     links: [
-      { href: '/products', label: 'All Products' },
-      { href: '/categories', label: 'Categories' },
+      { href: '/products', label: '全部产品' },
+      { href: '/categories', label: '分类' },
     ],
   },
   {
-    title: 'Solutions',
+    title: '解决方案',
     links: [
-      { href: '/solutions', label: 'Industry Solutions' },
-      { href: '/knowledge', label: 'Knowledge Center' },
+      { href: '/solutions', label: '行业解决方案' },
+      { href: '/knowledge', label: '知识中心' },
     ],
   },
   {
-    title: 'Resources',
+    title: '资源',
     links: [
-      { href: '/knowledge', label: 'Technical Articles' },
-      { href: '/solutions', label: 'Application Cases' },
+      { href: '/knowledge', label: '技术文章' },
+      { href: '/solutions', label: '应用案例' },
     ],
   },
   {
-    title: 'Contact',
+    title: '联系我们',
     links: [],
     custom: (
       <div className="space-y-2 text-sm text-muted-foreground">
         <p>Email: contact@visndt.com</p>
-        <p>VISNDT Platform Team</p>
+        <p>VISNDT平台团队</p>
       </div>
     ),
   },
@@ -75,8 +75,8 @@ export default function PublicFooter() {
       {/* Bottom Bar */}
       <div className="border-t">
         <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
-          <p>&copy; {new Date().getFullYear()} VISNDT. All rights reserved.</p>
-          <p>Industrial Inspection Equipment Information Platform</p>
+          <p>&copy; {new Date().getFullYear()} VISNDT. 版权所有</p>
+          <p>工业检测设备信息平台</p>
         </div>
       </div>
     </footer>

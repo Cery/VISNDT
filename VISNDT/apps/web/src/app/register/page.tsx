@@ -36,14 +36,14 @@ export default function RegisterPage() {
       if (err instanceof Error) {
         const msg = err.message;
         if (msg.includes('409') || msg.includes('already')) {
-          setErrorMsg('This email is already registered. Please use a different email or login.');
+          setErrorMsg('该邮箱已注册，请使用其他邮箱或登录。');
         } else if (msg.includes('429')) {
-          setErrorMsg('Too many attempts. Please try again later.');
+          setErrorMsg('操作过于频繁，请稍后重试。');
         } else {
           setErrorMsg(msg);
         }
       } else {
-        setErrorMsg('An unexpected error occurred. Please try again.');
+        setErrorMsg('发生未知错误，请重试。');
       }
     }
   };
@@ -51,8 +51,8 @@ export default function RegisterPage() {
   return (
     <div className="container mx-auto px-4 py-16 max-w-md">
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-slate-900">Register</h1>
-        <p className="text-slate-500 mt-2">Create your account</p>
+        <h1 className="text-2xl font-bold text-slate-900">注册</h1>
+        <p className="text-slate-500 mt-2">创建您的账户</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -69,7 +69,7 @@ export default function RegisterPage() {
             htmlFor="reg-name"
             className="block text-sm font-medium text-slate-700 mb-1"
           >
-            Name <span className="text-slate-400 text-xs">(optional)</span>
+            姓名 <span className="text-slate-400 text-xs">（选填）</span>
           </label>
           <input
             id="reg-name"
@@ -78,7 +78,7 @@ export default function RegisterPage() {
             onChange={(e) => setName(e.target.value)}
             disabled={status === 'submitting'}
             className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
-            placeholder="Your name"
+            placeholder="您的姓名"
           />
         </div>
 
@@ -88,7 +88,7 @@ export default function RegisterPage() {
             htmlFor="reg-email"
             className="block text-sm font-medium text-slate-700 mb-1"
           >
-            Email <span className="text-red-500">*</span>
+            邮箱 <span className="text-red-500">*</span>
           </label>
           <input
             id="reg-email"
@@ -98,7 +98,7 @@ export default function RegisterPage() {
             required
             disabled={status === 'submitting'}
             className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
-            placeholder="your@email.com"
+            placeholder="请输入邮箱"
           />
         </div>
 
@@ -108,7 +108,7 @@ export default function RegisterPage() {
             htmlFor="reg-password"
             className="block text-sm font-medium text-slate-700 mb-1"
           >
-            Password <span className="text-red-500">*</span>
+            密码 <span className="text-red-500">*</span>
           </label>
           <input
             id="reg-password"
@@ -119,7 +119,7 @@ export default function RegisterPage() {
             minLength={8}
             disabled={status === 'submitting'}
             className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
-            placeholder="Minimum 8 characters"
+            placeholder="至少8个字符"
           />
         </div>
 
@@ -129,8 +129,8 @@ export default function RegisterPage() {
             htmlFor="reg-invite"
             className="block text-sm font-medium text-slate-700 mb-1"
           >
-            Invite Token{' '}
-            <span className="text-slate-400 text-xs">(optional)</span>
+            邀请码{' '}
+            <span className="text-slate-400 text-xs">（选填）</span>
           </label>
           <input
             id="reg-invite"
@@ -139,7 +139,7 @@ export default function RegisterPage() {
             onChange={(e) => setInviteToken(e.target.value)}
             disabled={status === 'submitting'}
             className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
-            placeholder="Invitation token if you have one"
+            placeholder="如有邀请码请填写"
           />
         </div>
 
@@ -170,21 +170,21 @@ export default function RegisterPage() {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                 />
               </svg>
-              Creating account...
+              创建中...
             </span>
           ) : (
-            'Create Account'
+            '创建账户'
           )}
         </button>
 
         {/* Login link */}
         <p className="text-center text-sm text-slate-500">
-          Already have an account?{' '}
+          已有账户？{' '}
           <Link
             href="/login"
             className="text-slate-900 font-medium hover:underline"
           >
-            Login
+            登录
           </Link>
         </p>
       </form>

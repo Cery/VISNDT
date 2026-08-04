@@ -68,7 +68,7 @@ export default function RfqDetailPage() {
       const data = await rfqService.getById(id);
       setPageState({ status: 'success', data });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load RFQ';
+      const message = err instanceof Error ? err.message : '加载询价单失败';
       setPageState({ status: 'error', message });
     }
   }, [id]);
@@ -81,7 +81,7 @@ export default function RfqDetailPage() {
       setResponseState({ status: 'success', data: result.data });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load responses';
+        err instanceof Error ? err.message : '加载响应列表失败';
       setResponseState({ status: 'error', message });
     }
   }, [id]);
@@ -96,10 +96,10 @@ export default function RfqDetailPage() {
     try {
       setUpdating(true);
       await rfqService.update(id, { status: newStatus as Rfq['status'] });
-      message.success(`RFQ status updated to ${newStatus}`);
+      message.success(`询价单状态已更新为 ${newStatus}`);
       fetchRfq();
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to update status';
+      const msg = err instanceof Error ? err.message : '更新状态失败';
       message.error(msg);
     } finally {
       setUpdating(false);
@@ -109,16 +109,16 @@ export default function RfqDetailPage() {
   const handlePublish = () => {
     if (!id) return;
     Modal.confirm({
-      title: 'Publish RFQ',
-      content: 'Are you sure you want to publish this RFQ? Once published, it will be visible to suppliers.',
-      okText: 'Publish',
+      title: '发布询价单',
+      content: '确定要发布此询价单吗？发布后供应商将可见。',
+      okText: '发布',
       onOk: async () => {
         try {
           await rfqService.publish(id);
-          message.success('RFQ published successfully');
+          message.success('询价单发布成功');
           fetchRfq();
         } catch (err) {
-          const msg = err instanceof Error ? err.message : 'Failed to publish RFQ';
+          const msg = err instanceof Error ? err.message : '发布询价单失败';
           message.error(msg);
         }
       },
@@ -128,17 +128,17 @@ export default function RfqDetailPage() {
   const handleClose = () => {
     if (!id) return;
     Modal.confirm({
-      title: 'Close RFQ',
-      content: 'Are you sure you want to close this RFQ? This action cannot be undone.',
-      okText: 'Close',
+      title: '关闭询价单',
+      content: '确定要关闭此询价单吗？此操作不可撤销。',
+      okText: '关闭',
       okType: 'danger',
       onOk: async () => {
         try {
           await rfqService.close(id);
-          message.success('RFQ closed successfully');
+          message.success('询价单已关闭');
           fetchRfq();
         } catch (err) {
-          const msg = err instanceof Error ? err.message : 'Failed to close RFQ';
+          const msg = err instanceof Error ? err.message : '关闭询价单失败';
           message.error(msg);
         }
       },
@@ -157,14 +157,14 @@ export default function RfqDetailPage() {
     return (
       <Alert
         type="error"
-        message="Failed to load RFQ"
+        message="加载询价单失败"
         description={pageState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={fetchRfq}>Retry</Button>
+            <Button onClick={fetchRfq}>重试</Button>
             <Button onClick={() => navigate('/rfqs')} icon={<ArrowLeftOutlined />}>
-              Back to List
+              返回列表
             </Button>
           </Space>
         }
@@ -180,19 +180,19 @@ export default function RfqDetailPage() {
 
   const responseColumns = [
     {
-      title: 'Organization',
+      title: '组织',
       dataIndex: 'organization',
       key: 'organization',
       render: (org: RfqResponse['organization']) => org?.name || '-',
     },
     {
-      title: 'Offer',
+      title: '报价',
       dataIndex: 'offer',
       key: 'offer',
       render: (offer: RfqResponse['offer']) => offer?.product?.name || '-',
     },
     {
-      title: 'Status',
+      title: '状态',
       dataIndex: 'status',
       key: 'status',
       width: 120,
@@ -201,20 +201,20 @@ export default function RfqDetailPage() {
       ),
     },
     {
-      title: 'Message',
+      title: '消息',
       dataIndex: 'message',
       key: 'message',
       ellipsis: true,
       render: (msg: string | undefined) => msg || '-',
     },
     {
-      title: 'Submitted At',
+      title: '提交时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: (date: string) => new Date(date).toLocaleString(),
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       width: 100,
       render: (_: unknown, record: RfqResponse) => (
@@ -222,7 +222,7 @@ export default function RfqDetailPage() {
           type="link"
           onClick={() => navigate(`/rfq-responses/${record.id}`)}
         >
-          View
+          查看
         </Button>
       ),
     },
@@ -232,39 +232,39 @@ export default function RfqDetailPage() {
     <div>
       <Space style={{ marginBottom: 16 }}>
         <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/rfqs')}>
-          Back to List
+          返回列表
         </Button>
       </Space>
 
-      <Title level={3}>RFQ Detail</Title>
+      <Title level={3}>询价单详情</Title>
 
-      <Card title="Basic Information" style={{ marginBottom: 16 }}>
+      <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
           <Descriptions.Item label="ID">{rfq.id}</Descriptions.Item>
-          <Descriptions.Item label="Status">
+          <Descriptions.Item label="状态">
             <Tag color={STATUS_COLOR[rfq.status] || 'default'}>{rfq.status}</Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Demand">
+          <Descriptions.Item label="需求">
             {rfq.demand?.title || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Creator">
+          <Descriptions.Item label="创建者">
             {rfq.createdByUser?.name || rfq.createdByUser?.email || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Published At">
+          <Descriptions.Item label="发布时间">
             {formatDate(rfq.publishedAt)}
           </Descriptions.Item>
-          <Descriptions.Item label="Closed At">
+          <Descriptions.Item label="关闭时间">
             {formatDate(rfq.closedAt)}
           </Descriptions.Item>
         </Descriptions>
       </Card>
 
       {allowedTransitions.length > 0 && (
-        <Card title="Status Management" style={{ marginBottom: 16 }}>
+        <Card title="状态管理" style={{ marginBottom: 16 }}>
           <Space>
-            <span>Transition to:</span>
+            <span>切换至：</span>
             <Select
-              placeholder="Select new status"
+              placeholder="选择新状态"
               loading={updating}
               disabled={updating}
               onChange={handleStatusChange}
@@ -279,23 +279,23 @@ export default function RfqDetailPage() {
       )}
 
       {(rfq.status === 'DRAFT' || rfq.status === 'OPEN') && (
-        <Card title="Lifecycle Actions" style={{ marginBottom: 16 }}>
+        <Card title="生命周期操作" style={{ marginBottom: 16 }}>
           <Space>
             {rfq.status === 'DRAFT' && (
               <Button type="primary" onClick={handlePublish}>
-                Publish
+                发布
               </Button>
             )}
             {rfq.status === 'OPEN' && (
               <Button danger onClick={handleClose}>
-                Close
+                关闭
               </Button>
             )}
           </Space>
         </Card>
       )}
 
-      <Card title="Responses" style={{ marginBottom: 16 }}>
+      <Card title="响应列表" style={{ marginBottom: 16 }}>
         {responseState.status === 'loading' ? (
           <div style={{ textAlign: 'center', padding: 40 }}>
             <Spin />
@@ -303,7 +303,7 @@ export default function RfqDetailPage() {
         ) : responseState.status === 'error' ? (
           <Alert
             type="warning"
-            message="Failed to load responses"
+            message="加载响应列表失败"
             description={responseState.message}
             action={
               <Button size="small" onClick={fetchResponses}>
@@ -320,23 +320,23 @@ export default function RfqDetailPage() {
             size="small"
           />
         ) : (
-          <Empty description="No responses yet" />
+          <Empty description="暂无响应" />
         )}
       </Card>
 
-      <Card title="Timeline" style={{ marginBottom: 16 }}>
+      <Card title="时间线" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="Created At">
+          <Descriptions.Item label="创建时间">
             {formatDate(rfq.createdAt)}
           </Descriptions.Item>
-          <Descriptions.Item label="Updated At">
+          <Descriptions.Item label="更新时间">
             {formatDate(rfq.updatedAt)}
           </Descriptions.Item>
         </Descriptions>
       </Card>
 
       <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/rfqs')}>
-        Back to List
+        返回列表
       </Button>
     </div>
   );

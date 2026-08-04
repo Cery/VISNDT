@@ -42,7 +42,7 @@ export default function UserDetailPage() {
       const data = await userService.getById(id);
       setPageState({ status: 'success', data });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load user';
+      const message = err instanceof Error ? err.message : '加载用户失败';
       setPageState({ status: 'error', message });
     }
   }, [id]);
@@ -63,14 +63,14 @@ export default function UserDetailPage() {
     return (
       <Alert
         type="error"
-        message="Failed to load user"
+        message="加载用户失败"
         description={pageState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={fetchUser}>Retry</Button>
+            <Button onClick={fetchUser}>重试</Button>
             <Button onClick={() => navigate('/users')} icon={<ArrowLeftOutlined />}>
-              Back to List
+              返回列表
             </Button>
           </Space>
         }
@@ -84,18 +84,18 @@ export default function UserDetailPage() {
     <div>
       <Space style={{ marginBottom: 16 }}>
         <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/users')}>
-          Back to List
+          返回列表
         </Button>
       </Space>
 
-      <Title level={3}>User Detail</Title>
+      <Title level={3}>用户详情</Title>
 
-      <Card title="Basic Information" style={{ marginBottom: 16 }}>
+      <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
           <Descriptions.Item label="ID">{user.id}</Descriptions.Item>
-          <Descriptions.Item label="Email">{user.email}</Descriptions.Item>
-          <Descriptions.Item label="Name">{user.name || '-'}</Descriptions.Item>
-          <Descriptions.Item label="Status">
+          <Descriptions.Item label="邮箱">{user.email}</Descriptions.Item>
+          <Descriptions.Item label="姓名">{user.name || '-'}</Descriptions.Item>
+          <Descriptions.Item label="状态">
             <Tag color={STATUS_COLOR[user.status] || 'default'}>
               {user.status}
             </Tag>
@@ -103,20 +103,20 @@ export default function UserDetailPage() {
         </Descriptions>
       </Card>
 
-      <Card title="Organization Information" style={{ marginBottom: 16 }}>
+      <Card title="组织信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="Organization ID">
+          <Descriptions.Item label="组织ID">
             {user.organizationId || '-'}
           </Descriptions.Item>
         </Descriptions>
       </Card>
 
-      <Card title="Timeline">
+      <Card title="时间线">
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="Created At">
+          <Descriptions.Item label="创建时间">
             {formatDate(user.createdAt)}
           </Descriptions.Item>
-          <Descriptions.Item label="Updated At">
+          <Descriptions.Item label="更新时间">
             {formatDate(user.updatedAt)}
           </Descriptions.Item>
         </Descriptions>

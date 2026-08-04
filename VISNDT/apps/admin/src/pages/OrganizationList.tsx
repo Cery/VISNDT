@@ -21,10 +21,10 @@ interface QueryParams {
 }
 
 const STATUS_OPTIONS = [
-  { value: '', label: 'All Statuses' },
-  { value: 'ACTIVE', label: 'Active' },
-  { value: 'INACTIVE', label: 'Inactive' },
-  { value: 'SUSPENDED', label: 'Suspended' },
+  { value: '', label: '全部状态' },
+  { value: 'ACTIVE', label: '活跃' },
+  { value: 'INACTIVE', label: '未激活' },
+  { value: 'SUSPENDED', label: '已停用' },
 ];
 
 const STATUS_COLOR_MAP: Record<string, string> = {
@@ -59,7 +59,7 @@ function OrganizationList() {
       });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load organizations';
+        err instanceof Error ? err.message : '加载组织失败';
       setPageState({ status: 'error', message });
     }
   }, [query]);
@@ -125,12 +125,12 @@ function OrganizationList() {
     return (
       <Alert
         type="error"
-        message="Failed to load organizations"
+        message="加载组织失败"
         description={pageState.message}
         showIcon
         action={
           <Button size="small" onClick={fetchOrganizations}>
-            Retry
+            重试
           </Button>
         }
       />
@@ -139,7 +139,7 @@ function OrganizationList() {
 
   const columns: ColumnsType<Organization> = [
     {
-      title: 'Name',
+      title: '名称',
       dataIndex: 'name',
       key: 'name',
       render: (name: string) => (
@@ -147,13 +147,13 @@ function OrganizationList() {
       ),
     },
     {
-      title: 'Type',
+      title: '类型',
       dataIndex: 'type',
       key: 'type',
       render: (type: string) => type || '-',
     },
     {
-      title: 'Status',
+      title: '状态',
       dataIndex: 'status',
       key: 'status',
       width: 120,
@@ -162,13 +162,13 @@ function OrganizationList() {
       ),
     },
     {
-      title: 'Created',
+      title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Action',
+      title: '操作',
       key: 'action',
       width: 160,
       render: (_: unknown, record: Organization) => (
@@ -177,16 +177,16 @@ function OrganizationList() {
             type="text"
             icon={<EyeOutlined />}
             onClick={() => navigate(`/organizations/${record.id}`)}
-          >
-            View
-          </Button>
+            >
+              查看
+            </Button>
           <Button
             type="text"
             icon={<EditOutlined />}
             onClick={() => navigate(`/organizations/${record.id}/edit`)}
-          >
-            Edit
-          </Button>
+            >
+              编辑
+            </Button>
         </Space>
       ),
     },
@@ -196,27 +196,27 @@ function OrganizationList() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <Title level={4} style={{ margin: 0 }}>
-          Organization Management
+          组织管理
         </Title>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => navigate('/organizations/create')}
         >
-          Create Organization
+          创建组织
         </Button>
       </div>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search
-          placeholder="Search by name or type"
+          placeholder="按名称或类型搜索"
           allowClear
           onSearch={handleSearch}
           style={{ width: 320 }}
           prefix={<SearchOutlined />}
         />
         <Select
-          placeholder="Filter by status"
+          placeholder="按状态筛选"
           allowClear
           value={query.status || undefined}
           onChange={handleStatusChange}
@@ -224,7 +224,7 @@ function OrganizationList() {
           style={{ width: 160 }}
         />
         <Button icon={<ReloadOutlined />} onClick={handleReset}>
-          Reset
+          重置
         </Button>
       </Space>
 
@@ -239,7 +239,7 @@ function OrganizationList() {
           total: pageState.total,
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '50'],
-          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+          showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
         }}
       />
     </div>

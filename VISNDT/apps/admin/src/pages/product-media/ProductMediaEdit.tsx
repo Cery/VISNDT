@@ -90,7 +90,7 @@ function ProductMediaEdit() {
       setPageState({ status: 'ready' });
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to load media';
+        err instanceof Error ? err.message : '加载媒体失败';
       setPageState({ status: 'error', message: errorMessage });
     }
   }, [productId, id, form]);
@@ -116,9 +116,9 @@ function ProductMediaEdit() {
           setSignedUrl(null);
         }
       }
-      message.success(`File "${file.name}" uploaded successfully`);
+      message.success(`文件 "${file.name}" 上传成功`);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Upload failed';
+      const errorMessage = err instanceof Error ? err.message : '上传失败';
       message.error(errorMessage);
     } finally {
       setUploading(false);
@@ -127,7 +127,7 @@ function ProductMediaEdit() {
   };
 
   /** Handle download of current file */
-  const handleDownload = async () => {
+  const handle下载 = async () => {
     if (!currentFileAsset) return;
     try {
       const url = await fileAssetService.getSignedUrl(currentFileAsset.id);
@@ -140,7 +140,7 @@ function ProductMediaEdit() {
       link.click();
       document.body.removeChild(link);
     } catch {
-      message.error('Failed to download file');
+      message.error('文件下载失败');
     }
   };
 
@@ -161,11 +161,11 @@ function ProductMediaEdit() {
         displayOrder: values.displayOrder ?? 0,
       };
       await productMediaService.update(productId, id, payload);
-      message.success('Media updated successfully');
+      message.success('媒体更新成功');
       navigate(`/products/${productId}/media`);
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to update media';
+        err instanceof Error ? err.message : '更新媒体失败';
       setPageState((prev) =>
         prev.status === 'ready'
           ? ({ ...prev, status: 'ready' } as PageState)
@@ -187,17 +187,17 @@ function ProductMediaEdit() {
     return (
       <Alert
         type="error"
-        message="Failed to Load Media"
+        message="加载媒体失败"
         description={pageState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={loadData}>Retry</Button>
+            <Button onClick={loadData}>重试</Button>
             <Button
               onClick={() => navigate(`/products/${productId}/media`)}
               icon={<ArrowLeftOutlined />}
             >
-              Back to List
+              返回列表
             </Button>
           </Space>
         }
@@ -208,21 +208,21 @@ function ProductMediaEdit() {
   return (
     <div style={{ maxWidth: 640 }}>
       <Title level={4} style={{ marginBottom: 24 }}>
-        Edit Media
+        编辑媒体
       </Title>
 
       {/* Current File Display */}
       <Card
-        title="Current File"
+        title="当前文件"
         style={{ marginBottom: 24 }}
         extra={
           currentFileAsset && (
             <Button
               type="link"
               icon={<DownloadOutlined />}
-              onClick={handleDownload}
+              onClick={handle下载}
             >
-              Download
+              下载
             </Button>
           )
         }
@@ -262,12 +262,12 @@ function ProductMediaEdit() {
             </Text>
           </Space>
         ) : (
-          <Text type="secondary">No file associated with this media</Text>
+          <Text type="secondary">该媒体未关联文件</Text>
         )}
       </Card>
 
       {/* File Replacement */}
-      <Card title="Replace File" style={{ marginBottom: 24 }}>
+      <Card title="替换文件" style={{ marginBottom: 24 }}>
         <Dragger
           name="file"
           multiple={false}
@@ -285,44 +285,44 @@ function ProductMediaEdit() {
                 ✅ {uploadedFileName}
               </p>
               <p className="ant-upload-hint">
-                Drop or click to replace again
+                拖动或点击以再次替换
               </p>
             </>
           ) : (
             <>
               <p className="ant-upload-text">
-                Click or drag file to replace current file
+                点击或拖拽文件以替换当前文件
               </p>
               <p className="ant-upload-hint">
-                Supports images, PDF, Office documents, TXT, CSV (max 10MB)
+                支持图片、PDF、Office 文档、TXT、CSV（最大 10MB）
               </p>
             </>
           )}
         </Dragger>
         {uploading && (
           <div style={{ textAlign: 'center', marginTop: 12 }}>
-            <Spin size="small" /> <Text type="secondary">Uploading...</Text>
+            <Spin size="small" /> <Text type="secondary">上传中...</Text>
           </div>
         )}
       </Card>
 
       {/* Metadata Edit Form */}
-      <Card title="Media Metadata">
+      <Card title="媒体元数据">
         <Form<UpdateProductMediaDto>
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
         >
-          <Form.Item label="FileAsset ID" name="fileAssetId">
-            <Input placeholder="Enter FileAsset ID" />
+          <Form.Item label="文件资源ID" name="fileAssetId">
+            <Input placeholder="输入文件资源ID" />
           </Form.Item>
 
           <Form.Item
-            label="Media Type"
+            label="媒体类型"
             name="mediaType"
-            rules={[{ required: true, message: 'Please select a media type' }]}
+            rules={[{ required: true, message: '请选择媒体类型' }]}
           >
-            <Select placeholder="Select media type">
+            <Select placeholder="请选择媒体类型">
               {MEDIA_TYPE_OPTIONS.map((opt) => (
                 <Option key={opt.value} value={opt.value}>
                   {opt.label}
@@ -331,23 +331,23 @@ function ProductMediaEdit() {
             </Select>
           </Form.Item>
 
-          <Form.Item label="Title" name="title">
-            <Input placeholder="e.g. Product front view" />
+          <Form.Item label="标题" name="title">
+            <Input placeholder="如：产品正面照" />
           </Form.Item>
 
-          <Form.Item label="Description" name="description">
-            <Input.TextArea placeholder="Optional description" rows={3} />
+          <Form.Item label="描述" name="description">
+            <Input.TextArea placeholder="可选描述" rows={3} />
           </Form.Item>
 
           <Form.Item
-            label="Primary"
+            label="主图"
             name="isPrimary"
             valuePropName="checked"
           >
             <Switch />
           </Form.Item>
 
-          <Form.Item label="Display Order" name="displayOrder">
+          <Form.Item label="显示顺序" name="displayOrder">
             <InputNumber min={0} style={{ width: '100%' }} />
           </Form.Item>
 
@@ -359,13 +359,13 @@ function ProductMediaEdit() {
               htmlType="submit"
               loading={pageState.status === 'submitting'}
             >
-              Update Media
+              更新媒体
             </Button>
             <Button
               style={{ marginLeft: 8 }}
               onClick={() => navigate(`/products/${productId}/media`)}
             >
-              Cancel
+              取消
             </Button>
           </Form.Item>
         </Form>

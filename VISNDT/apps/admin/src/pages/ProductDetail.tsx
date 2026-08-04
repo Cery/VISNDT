@@ -79,30 +79,30 @@ const STATUS_COLOR: Record<string, string> = {
 
 const PARAM_COLUMNS = [
   {
-    title: 'Parameter Name',
+    title: '参数名称',
     dataIndex: ['parameterDefinition', 'name'],
     key: 'name',
   },
   {
-    title: 'Code',
+    title: '编码',
     dataIndex: ['parameterDefinition', 'code'],
     key: 'code',
   },
   {
-    title: 'Data Type',
+    title: '数据类型',
     dataIndex: ['parameterDefinition', 'dataType'],
     key: 'dataType',
     width: 120,
   },
   {
-    title: 'Unit',
+    title: '单位',
     dataIndex: ['parameterDefinition', 'unit'],
     key: 'unit',
     width: 100,
     render: (v: string | undefined) => v || '-',
   },
   {
-    title: 'Value',
+    title: '值',
     key: 'value',
     render: (_: unknown, record: ProductParameterValue) =>
       record.value ?? record.valueNumber ?? '-',
@@ -121,7 +121,7 @@ export default function ProductDetailPage() {
       const data = await productService.getById(id);
       setPageState({ status: 'success', data });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load product detail';
+      const message = err instanceof Error ? err.message : '加载产品详情失败';
       setPageState({ status: 'error', message });
     }
   }, [id]);
@@ -142,14 +142,14 @@ export default function ProductDetailPage() {
     return (
       <Alert
         type="error"
-        message="Failed to Load Product"
+        message="加载产品失败"
         description={pageState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={fetchDetail}>Retry</Button>
+            <Button onClick={fetchDetail}>重试</Button>
             <Button onClick={() => navigate('/products')} icon={<ArrowLeftOutlined />}>
-              Back to List
+              返回列表
             </Button>
           </Space>
         }
@@ -163,49 +163,49 @@ export default function ProductDetailPage() {
     <div>
       <Space style={{ marginBottom: 16 }}>
         <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/products')}>
-          Back to List
+          返回列表
         </Button>
         <Button
           icon={<EditOutlined />}
           onClick={() => navigate(`/products/${id}/edit`)}
         >
-          Edit Product
+          编辑产品
         </Button>
         <Button
           icon={<PictureOutlined />}
           onClick={() => navigate(`/products/${id}/media`)}
         >
-          Manage Media
+          管理媒体
         </Button>
       </Space>
 
       <Title level={3}>{product.name}</Title>
 
-      <Card title="Basic Information" style={{ marginBottom: 16 }}>
+      <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="Name">{product.name}</Descriptions.Item>
-          <Descriptions.Item label="Model">{product.model || '-'}</Descriptions.Item>
-          <Descriptions.Item label="Category">
+          <Descriptions.Item label="名称">{product.name}</Descriptions.Item>
+          <Descriptions.Item label="型号">{product.model || '-'}</Descriptions.Item>
+          <Descriptions.Item label="分类">
             {product.category?.name || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Status">
+          <Descriptions.Item label="状态">
             <Tag color={STATUS_COLOR[product.status] || 'default'}>{product.status}</Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Created At">
+          <Descriptions.Item label="创建时间">
             {new Date(product.createdAt).toLocaleString()}
           </Descriptions.Item>
-          <Descriptions.Item label="Updated At">
+          <Descriptions.Item label="更新时间">
             {new Date(product.updatedAt).toLocaleString()}
           </Descriptions.Item>
         </Descriptions>
         {product.description && (
           <Descriptions bordered column={1} style={{ marginTop: 16 }}>
-            <Descriptions.Item label="Description">{product.description}</Descriptions.Item>
+            <Descriptions.Item label="描述">{product.description}</Descriptions.Item>
           </Descriptions>
         )}
       </Card>
 
-      <Card title="Product Parameters" style={{ marginBottom: 16 }}>
+      <Card title="产品参数" style={{ marginBottom: 16 }}>
         {product.parameterValues && product.parameterValues.length > 0 ? (
           <Table
             dataSource={product.parameterValues}
@@ -215,11 +215,11 @@ export default function ProductDetailPage() {
             size="small"
           />
         ) : (
-          <Empty description="No parameters defined" />
+          <Empty description="未定义参数" />
         )}
       </Card>
 
-      <Card title="Product Media">
+      <Card title="产品媒体">
         {product.media && product.media.length > 0 ? (
           (() => {
             const mediaItems = product.media as MediaItem[];
@@ -238,7 +238,7 @@ export default function ProductDetailPage() {
                 link.click();
                 document.body.removeChild(link);
               } else {
-                message.warning('No download URL available');
+                message.warning('无可用下载链接');
               }
             };
 
@@ -248,7 +248,7 @@ export default function ProductDetailPage() {
                 {images.length > 0 && (
                   <div style={{ marginBottom: documents.length > 0 ? 24 : 0 }}>
                     <Title level={5} style={{ marginBottom: 12 }}>
-                      <FileImageOutlined /> Product Images ({images.length})
+                      <FileImageOutlined /> 产品图片 ({images.length})
                     </Title>
                     <Image.PreviewGroup>
                       <Row gutter={[16, 16]}>
@@ -260,9 +260,9 @@ export default function ProductDetailPage() {
                               cover={
                                 item.url ? (
                                   <Image
-                                    alt={item.title || 'Product image'}
+                                    alt={item.title || '产品图片'}
                                     src={item.url}
-                                    preview={{ mask: 'Preview' }}
+                                    preview={{ mask: '预览' }}
                                     height={160}
                                     style={{ objectFit: 'cover' }}
                                     fallback="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE2MCIgZmlsbD0iI2Y1ZjVmNSIvPjx0ZXh0IHg9IjEwMCIgeT0iODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjOTk5IiBmb250LXNpemU9IjE0Ij5JbWFnZTwvdGV4dD48L3N2Zz4="
@@ -289,15 +289,15 @@ export default function ProductDetailPage() {
                                   onClick={() => handleDownload(item)}
                                   key="download"
                                 >
-                                  Download
+                                  下载
                                 </Button>,
                               ]}
                             >
                               <Card.Meta
-                                title={item.title || 'Untitled image'}
+                                title={item.title || '未命名图片'}
                                 description={
                                   item.isPrimary ? (
-                                    <Tag color="gold">Primary</Tag>
+                                    <Tag color="gold">主要</Tag>
                                   ) : undefined
                                 }
                               />
@@ -313,7 +313,7 @@ export default function ProductDetailPage() {
                 {documents.length > 0 && (
                   <div>
                     <Title level={5} style={{ marginBottom: 12 }}>
-                      <FileTextOutlined /> Product Documents ({documents.length})
+                      <FileTextOutlined /> 产品文档 ({documents.length})
                     </Title>
                     <List
                       dataSource={documents}
@@ -327,18 +327,18 @@ export default function ProductDetailPage() {
                               onClick={() => handleDownload(item)}
                               key="download"
                             >
-                              Download
+                              下载
                             </Button>,
                           ]}
                         >
                           <List.Item.Meta
                             avatar={getFileTypeIcon(item.mediaType)}
-                            title={item.title || 'Untitled document'}
+                            title={item.title || '未命名文档'}
                             description={
                               <Space size="middle">
                                 <Tag>{item.mediaType}</Tag>
                                 {item.isPrimary && (
-                                  <Tag color="gold">Primary</Tag>
+                                  <Tag color="gold">主要</Tag>
                                 )}
                                 {item.fileAsset?.fileName && (
                                   <Text type="secondary">
@@ -357,13 +357,13 @@ export default function ProductDetailPage() {
             );
           })()
         ) : (
-          <Empty description="No media attached">
+          <Empty description="未附加媒体">
             <Button
               type="primary"
               icon={<PictureOutlined />}
               onClick={() => navigate(`/products/${id}/media`)}
             >
-              Add Media
+              添加媒体
             </Button>
           </Empty>
         )}

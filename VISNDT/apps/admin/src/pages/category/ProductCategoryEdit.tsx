@@ -36,7 +36,7 @@ function ProductCategoryEdit() {
       setPageState({ status: 'ready', categories: listResult.data });
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to load category';
+        err instanceof Error ? err.message : '加载分类失败';
       setPageState({ status: 'error', message: errorMessage });
     }
   }, [id, form]);
@@ -59,11 +59,11 @@ function ProductCategoryEdit() {
         parentId: values.parentId || undefined,
       };
       await categoryService.update(id, payload);
-      message.success('Category updated successfully');
+      message.success('分类更新成功');
       navigate('/product-categories');
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to update category';
+        err instanceof Error ? err.message : '更新分类失败';
       setPageState((prev) =>
         prev.status === 'ready'
           ? ({ ...prev, status: 'ready' } as PageState)
@@ -85,17 +85,17 @@ function ProductCategoryEdit() {
     return (
       <Alert
         type="error"
-        message="Failed to Load Category"
+        message="加载分类失败"
         description={pageState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={loadData}>Retry</Button>
+            <Button onClick={loadData}>重试</Button>
             <Button
               onClick={() => navigate('/product-categories')}
               icon={<ArrowLeftOutlined />}
             >
-              Back to List
+              返回列表
             </Button>
           </Space>
         }
@@ -111,7 +111,7 @@ function ProductCategoryEdit() {
   return (
     <div style={{ maxWidth: 600 }}>
       <Title level={4} style={{ marginBottom: 24 }}>
-        Edit Category
+        编辑分类
       </Title>
 
       <Card>
@@ -121,23 +121,23 @@ function ProductCategoryEdit() {
           onFinish={handleSubmit}
         >
           <Form.Item
-            label="Name"
+            label="名称"
             name="name"
-            rules={[{ required: true, message: 'Please enter a name' }]}
+            rules={[{ required: true, message: '请输入名称' }]}
           >
-            <Input placeholder="e.g. Electronics" />
+            <Input placeholder="如：电子产品" />
           </Form.Item>
 
           <Form.Item
-            label="Slug"
+            label="标识"
             name="slug"
-            rules={[{ required: true, message: 'Please enter a slug' }]}
+            rules={[{ required: true, message: '请输入标识' }]}
           >
-            <Input placeholder="e.g. electronics" />
+            <Input placeholder="如：electronics" />
           </Form.Item>
 
-          <Form.Item label="Parent Category" name="parentId">
-            <Select placeholder="Select a parent category (optional)" allowClear>
+          <Form.Item label="父级分类" name="parentId">
+            <Select placeholder="请选择父级分类（可选）" allowClear>
               {categories.map((c: ProductCategory) => (
                 <Option key={c.id} value={c.id}>
                   {c.name}
@@ -152,13 +152,13 @@ function ProductCategoryEdit() {
               htmlType="submit"
               loading={pageState.status === 'submitting'}
             >
-              Update Category
+              更新分类
             </Button>
             <Button
               style={{ marginLeft: 8 }}
               onClick={() => navigate('/product-categories')}
             >
-              Cancel
+              取消
             </Button>
           </Form.Item>
         </Form>

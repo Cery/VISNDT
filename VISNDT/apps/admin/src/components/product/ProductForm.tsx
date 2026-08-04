@@ -37,7 +37,7 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
       const categories = await categoriesService.getList();
       setFormState({ status: 'ready', categories });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load categories';
+      const errorMessage = err instanceof Error ? err.message : '加载分类失败';
       setFormState({ status: 'error', message: errorMessage });
     }
   }, []);
@@ -56,10 +56,10 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
     setSubmitting(true);
     try {
       await onSubmit(values);
-      message.success(submitLabel === 'Create Product' ? 'Product created successfully' : 'Product updated successfully');
+      message.success(submitLabel === 'Create Product' ? '产品创建成功' : '产品更新成功');
       navigate('/products');
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to save product';
+      const errorMessage = err instanceof Error ? err.message : '保存产品失败';
       message.error(errorMessage);
     } finally {
       setSubmitting(false);
@@ -78,14 +78,14 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
     return (
       <Alert
         type="error"
-        message="Failed to Load Form Data"
+        message="加载表单数据失败"
         description={formState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={loadCategories}>Retry</Button>
+            <Button onClick={loadCategories}>重试</Button>
             <Button onClick={() => navigate('/products')} icon={<ArrowLeftOutlined />}>
-              Back to List
+              返回列表
             </Button>
           </Space>
         }
@@ -97,7 +97,7 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
     <div>
       <Space style={{ marginBottom: 16 }}>
         <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/products')}>
-          Back to List
+          返回列表
         </Button>
       </Space>
       <h2>{title}</h2>
@@ -109,24 +109,24 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
         style={{ maxWidth: 600 }}
       >
         <Form.Item
-          label="Name"
+          label="名称"
           name="name"
-          rules={[{ required: true, message: 'Please enter product name' }]}
+          rules={[{ required: true, message: '请输入产品名称' }]}
         >
-          <Input placeholder="Enter product name" />
+          <Input placeholder="请输入产品名称" />
         </Form.Item>
 
-        <Form.Item label="Model" name="model">
-          <Input placeholder="Enter model number" />
+        <Form.Item label="型号" name="model">
+          <Input placeholder="请输入型号" />
         </Form.Item>
 
         <Form.Item
-          label="Category"
+          label="分类"
           name="categoryId"
-          rules={[{ required: true, message: 'Please select a category' }]}
+          rules={[{ required: true, message: '请选择分类' }]}
         >
           <Select
-            placeholder="Select a category"
+            placeholder="请选择分类"
             options={formState.categories.map((c) => ({
               value: c.id,
               label: c.name,
@@ -134,18 +134,18 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
           />
         </Form.Item>
 
-        <Form.Item label="Status" name="status">
+        <Form.Item label="状态" name="status">
           <Select
             options={[
-              { value: 'DRAFT', label: 'Draft' },
-              { value: 'ACTIVE', label: 'Active' },
-              { value: 'INACTIVE', label: 'Inactive' },
+              { value: 'DRAFT', label: '草稿' },
+              { value: 'ACTIVE', label: '激活' },
+              { value: 'INACTIVE', label: '未激活' },
             ]}
           />
         </Form.Item>
 
-        <Form.Item label="Description" name="description">
-          <TextArea rows={4} placeholder="Enter product description" />
+        <Form.Item label="描述" name="description">
+          <TextArea rows={4} placeholder="请输入产品描述" />
         </Form.Item>
 
         <Form.Item>
@@ -153,7 +153,7 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
             <Button type="primary" htmlType="submit" loading={submitting}>
               {submitLabel}
             </Button>
-            <Button onClick={() => navigate('/products')}>Cancel</Button>
+            <Button onClick={() => navigate('/products')}>取消</Button>
           </Space>
         </Form.Item>
       </Form>

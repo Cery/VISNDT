@@ -26,16 +26,16 @@ export default function DemandList({ demands, isLoading }: DemandListProps) {
       <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-12 text-center">
         <div className="text-3xl mb-3">📋</div>
         <h3 className="text-sm font-medium text-slate-700 mb-1">
-          No demands yet
+          暂无需求
         </h3>
         <p className="text-sm text-slate-400 mb-4">
-          You have not created any demand listings yet.
+          您还没有创建任何需求。
         </p>
         <Link
           href="/products"
           className="inline-flex text-sm font-medium text-slate-900 hover:underline"
         >
-          Browse Products
+          浏览产品
         </Link>
       </div>
     );

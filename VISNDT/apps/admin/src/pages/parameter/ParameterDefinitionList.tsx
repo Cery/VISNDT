@@ -52,7 +52,7 @@ function ParameterDefinitionList() {
       }
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load parameter definitions';
+        err instanceof Error ? err.message : '加载参数定义失败';
       setPageState({ status: 'error', message });
     }
   }, [query]);
@@ -84,12 +84,12 @@ function ParameterDefinitionList() {
     return (
       <Alert
         type="error"
-        message="Failed to load parameter definitions"
+        message="加载参数定义失败"
         description={pageState.message}
         showIcon
         action={
           <Button size="small" onClick={fetchData}>
-            Retry
+            重试
           </Button>
         }
       />
@@ -98,7 +98,7 @@ function ParameterDefinitionList() {
 
   const columns: ColumnsType<ParameterDefinition> = [
     {
-      title: 'Name',
+      title: '名称',
       dataIndex: 'name',
       key: 'name',
       render: (name: string) => (
@@ -106,13 +106,13 @@ function ParameterDefinitionList() {
       ),
     },
     {
-      title: 'Code',
+      title: '编码',
       dataIndex: 'code',
       key: 'code',
       render: (code: string) => <code>{code}</code>,
     },
     {
-      title: 'Type',
+      title: '类型',
       dataIndex: 'dataType',
       key: 'dataType',
       width: 100,
@@ -121,29 +121,29 @@ function ParameterDefinitionList() {
       ),
     },
     {
-      title: 'Group',
+      title: '分组',
       dataIndex: 'group',
       key: 'group',
       render: (group: ParameterDefinition['group']) => group?.name || '-',
     },
     {
-      title: 'Required',
+      title: '必填',
       dataIndex: 'required',
       key: 'required',
       width: 100,
       render: (required: boolean) => (
-        required ? <Tag color="red">Yes</Tag> : <Tag>No</Tag>
+        required ? <Tag color="red">是</Tag> : <Tag>否</Tag>
       ),
     },
     {
-      title: 'Created At',
+      title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 160,
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       width: 80,
       render: (_: unknown, record: ParameterDefinition) => (
@@ -151,7 +151,7 @@ function ParameterDefinitionList() {
           type="link"
           onClick={() => navigate(`/parameter-definitions/${record.id}/edit`)}
         >
-          Edit
+          编辑
         </Button>
       ),
     },
@@ -168,22 +168,22 @@ function ParameterDefinitionList() {
         }}
       >
         <Title level={4} style={{ margin: 0 }}>
-          Parameter Definitions
+          参数定义管理
         </Title>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => navigate('/parameter-definitions/create')}
         >
-          Create Definition
+          创建定义
         </Button>
       </div>
 
       {pageState.status === 'empty' ? (
         <Alert
           type="info"
-          message="No Parameter Definitions"
-          description="No parameter definitions have been created yet. Click 'Create Definition' to add one."
+          message="暂无参数定义"
+          description="暂无参数定义数据，请点击「创建定义」添加。"
           showIcon
         />
       ) : (
@@ -198,7 +198,7 @@ function ParameterDefinitionList() {
             total: pageState.total,
             showSizeChanger: true,
             pageSizeOptions: ['10', '20', '50'],
-            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+            showTotal: (total, range) => `${range[0]}-${range[1]} / 共 ${total} 条`,
           }}
         />
       )}

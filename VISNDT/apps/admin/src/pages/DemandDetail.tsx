@@ -51,17 +51,17 @@ const MATCH_SCORE_COLOR = (score: number): string => {
 
 const PARAM_COLUMNS = [
   {
-    title: 'Name',
+    title: '名称',
     dataIndex: ['parameterDefinition', 'name'],
     key: 'name',
   },
   {
-    title: 'Code',
+    title: '代码',
     dataIndex: ['parameterDefinition', 'code'],
     key: 'code',
   },
   {
-    title: 'Value',
+    title: '值',
     key: 'value',
     render: (_: unknown, record: DemandParameter) => {
       if (record.value) return record.value;
@@ -74,7 +74,7 @@ const PARAM_COLUMNS = [
     },
   },
   {
-    title: 'Unit',
+    title: '单位',
     dataIndex: ['parameterDefinition', 'unit'],
     key: 'unit',
     width: 100,
@@ -97,7 +97,7 @@ export default function DemandDetailPage() {
       const data = await demandService.getById(id);
       setPageState({ status: 'success', data });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load demand';
+      const message = err instanceof Error ? err.message : '加载需求失败';
       setPageState({ status: 'error', message });
     }
   }, [id]);
@@ -125,10 +125,10 @@ export default function DemandDetailPage() {
     try {
       setRematching(true);
       await matchService.rematch(id);
-      message.success('Rematch completed successfully');
+      message.success('重新匹配成功');
       fetchMatches();
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to rematch';
+      const msg = err instanceof Error ? err.message : '重新匹配失败';
       message.error(msg);
     } finally {
       setRematching(false);
@@ -137,11 +137,11 @@ export default function DemandDetailPage() {
 
   const showRematchConfirm = () => {
     Modal.confirm({
-      title: 'Confirm Rematch',
+      title: '确认重新匹配',
       content:
-        'This will delete all existing matches and re-run the matching engine. Continue?',
-      okText: 'Yes, Rematch',
-      cancelText: 'Cancel',
+        '这将删除所有现有匹配并重新运行匹配引擎，是否继续？',
+      okText: '确认重新匹配',
+      cancelText: '取消',
       onOk: handleRematch,
     });
   };
@@ -158,14 +158,14 @@ export default function DemandDetailPage() {
     return (
       <Alert
         type="error"
-        message="Failed to load demand"
+        message="加载需求失败"
         description={pageState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={fetchDemand}>Retry</Button>
+            <Button onClick={fetchDemand}>重试</Button>
             <Button onClick={() => navigate('/demands')} icon={<ArrowLeftOutlined />}>
-              Back to List
+              返回列表
             </Button>
           </Space>
         }
@@ -187,12 +187,12 @@ export default function DemandDetailPage() {
 
   const matchColumns = [
     {
-      title: 'Product',
+      title: '产品',
       dataIndex: ['product', 'name'],
       key: 'product',
     },
     {
-      title: 'Score',
+      title: '匹配度',
       dataIndex: 'matchScore',
       key: 'score',
       width: 100,
@@ -203,7 +203,7 @@ export default function DemandDetailPage() {
       ),
     },
     {
-      title: 'Status',
+      title: '状态',
       dataIndex: 'matchStatus',
       key: 'status',
       width: 120,
@@ -212,13 +212,13 @@ export default function DemandDetailPage() {
       ),
     },
     {
-      title: 'Matched At',
+      title: '匹配时间',
       dataIndex: 'matchedAt',
       key: 'matchedAt',
       render: (date: string | undefined) => formatDate(date),
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       width: 100,
       render: (_: unknown, record: DemandMatch) => (
@@ -228,7 +228,7 @@ export default function DemandDetailPage() {
             navigate(`/demands/${id}/matches/${record.id}`)
           }
         >
-          View
+          查看
         </Button>
       ),
     },
@@ -238,41 +238,41 @@ export default function DemandDetailPage() {
     <div>
       <Space style={{ marginBottom: 16 }}>
         <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/demands')}>
-          Back to List
+          返回列表
         </Button>
       </Space>
 
-      <Title level={3}>Demand Detail</Title>
+      <Title level={3}>需求详情</Title>
 
-      <Card title="Basic Information" style={{ marginBottom: 16 }}>
+      <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="Title">{demand.title}</Descriptions.Item>
-          <Descriptions.Item label="Status">
+          <Descriptions.Item label="标题">{demand.title}</Descriptions.Item>
+          <Descriptions.Item label="状态">
             <Tag color={STATUS_COLOR[demand.status] || 'default'}>{demand.status}</Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Category">
+          <Descriptions.Item label="分类">
             {demand.category?.name || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Organization">
+          <Descriptions.Item label="组织">
             {demand.organization?.name || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Budget Range">
+          <Descriptions.Item label="预算范围">
             {demand.budgetRange || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Quantity">{formatQuantity()}</Descriptions.Item>
-          <Descriptions.Item label="Expected Delivery">
+          <Descriptions.Item label="数量">{formatQuantity()}</Descriptions.Item>
+          <Descriptions.Item label="预计交付">
             {formatDate(demand.expectedDeliveryDate)}
           </Descriptions.Item>
         </Descriptions>
       </Card>
 
       {demand.description && (
-        <Card title="Description" style={{ marginBottom: 16 }}>
+        <Card title="描述" style={{ marginBottom: 16 }}>
           <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>{demand.description}</p>
         </Card>
       )}
 
-      <Card title="Parameters" style={{ marginBottom: 16 }}>
+      <Card title="参数" style={{ marginBottom: 16 }}>
         {parameters && parameters.length > 0 ? (
           <Table
             dataSource={parameters}
@@ -282,12 +282,12 @@ export default function DemandDetailPage() {
             size="small"
           />
         ) : (
-          <Empty description="No parameters" />
+          <Empty description="暂无参数" />
         )}
       </Card>
 
       <Card
-        title="Matches"
+        title="匹配结果"
         style={{ marginBottom: 16 }}
         extra={
           <Space>
@@ -297,7 +297,7 @@ export default function DemandDetailPage() {
               onClick={fetchMatches}
               loading={matchesLoading}
             >
-              Refresh
+              刷新
             </Button>
             <Button
               size="small"
@@ -305,7 +305,7 @@ export default function DemandDetailPage() {
               onClick={showRematchConfirm}
               loading={rematching}
             >
-              Rematch
+              重新匹配
             </Button>
           </Space>
         }
@@ -323,29 +323,29 @@ export default function DemandDetailPage() {
             size="small"
           />
         ) : (
-          <Empty description="No matches yet" />
+          <Empty description="暂无匹配" />
         )}
       </Card>
 
-      <Card title="Timeline" style={{ marginBottom: 16 }}>
+      <Card title="时间线" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="Created At">
+          <Descriptions.Item label="创建时间">
             {formatDate(demand.createdAt)}
           </Descriptions.Item>
-          <Descriptions.Item label="Updated At">
+          <Descriptions.Item label="更新时间">
             {formatDate(demand.updatedAt)}
           </Descriptions.Item>
-          <Descriptions.Item label="Published At">
+          <Descriptions.Item label="发布时间">
             {formatDate(demand.publishedAt)}
           </Descriptions.Item>
-          <Descriptions.Item label="Closed At">
+          <Descriptions.Item label="关闭时间">
             {formatDate(demand.closedAt)}
           </Descriptions.Item>
         </Descriptions>
       </Card>
 
       <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/demands')}>
-        Back to List
+        返回列表
       </Button>
     </div>
   );

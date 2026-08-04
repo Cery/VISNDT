@@ -26,10 +26,10 @@ export default function RFQList({ rfqs, isLoading }: RFQListProps) {
       <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-12 text-center">
         <div className="text-3xl mb-3">📄</div>
         <h3 className="text-sm font-medium text-slate-700 mb-1">
-          No RFQs yet
+          暂无询价
         </h3>
         <p className="text-sm text-slate-400">
-          No RFQs have been received for your organization.
+          您的组织尚未收到任何询价。
         </p>
       </div>
     );

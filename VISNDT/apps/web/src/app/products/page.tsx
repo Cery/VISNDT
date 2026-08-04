@@ -62,9 +62,9 @@ export default function ProductsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">Products</h1>
+        <h1 className="text-2xl font-bold">产品</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Browse industrial inspection equipment
+          浏览工业检测设备
         </p>
       </div>
 
@@ -90,7 +90,7 @@ export default function ProductsPage() {
         <div className="flex-1 min-w-0">
           {isError ? (
             <ErrorState
-              message={error instanceof Error ? error.message : 'Failed to load products'}
+              message={error instanceof Error ? error.message : '加载产品失败'}
             />
           ) : (
             <>

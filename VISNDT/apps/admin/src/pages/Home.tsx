@@ -74,7 +74,7 @@ function Home() {
       });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load dashboard data';
+        err instanceof Error ? err.message : '加载仪表盘数据失败';
       setPageState({ status: 'error', message });
     }
   }, []);
@@ -96,12 +96,12 @@ function Home() {
       <div style={{ padding: 24 }}>
         <Alert
           type="error"
-          message="Failed to load dashboard"
+          message="加载仪表盘失败"
           description={pageState.message}
           showIcon
           action={
             <Button size="small" onClick={fetchData}>
-              Retry
+              重试
             </Button>
           }
         />
@@ -119,33 +119,33 @@ function Home() {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffMins < 1) return '刚刚';
+    if (diffMins < 60) return `${diffMins}分钟前`;
+    if (diffHours < 24) return `${diffHours}小时前`;
+    if (diffDays < 7) return `${diffDays}天前`;
     return d.toLocaleDateString();
   };
 
   return (
     <div style={{ padding: 24 }}>
       <Title level={4} style={{ marginBottom: 24 }}>
-        Dashboard Overview
+        仪表盘概览
       </Title>
 
       {/* Platform Stats */}
       <Title level={5} style={{ marginBottom: 12, color: '#666' }}>
-        Platform Stats
+        平台统计
       </Title>
       <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="Users"
+              title="用户"
               value={stats.users.total}
               prefix={<TeamOutlined />}
               suffix={
                 <span style={{ fontSize: 14, color: '#52c41a' }}>
-                  {stats.users.active} active
+                  {stats.users.active} 活跃
                 </span>
               }
             />
@@ -155,7 +155,7 @@ function Home() {
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="Organizations"
+              title="组织"
               value={stats.organizations.total}
               prefix={<BankOutlined />}
             />
@@ -165,7 +165,7 @@ function Home() {
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="Products"
+              title="产品"
               value={stats.products.total}
               prefix={<ShoppingOutlined />}
             />
@@ -175,12 +175,12 @@ function Home() {
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="Demands"
+              title="需求"
               value={stats.demands.total}
               prefix={<FileTextOutlined />}
               suffix={
                 <span style={{ fontSize: 14, color: '#1890ff' }}>
-                  {stats.demands.published} published
+                  {stats.demands.published} 已发布
                 </span>
               }
             />
@@ -190,13 +190,13 @@ function Home() {
 
       {/* Operations */}
       <Title level={5} style={{ marginBottom: 12, color: '#666' }}>
-        Operations
+        运营数据
       </Title>
       <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="Matches"
+              title="匹配"
               value={stats.matching.totalMatches}
               prefix={<LinkOutlined />}
             />
@@ -210,7 +210,7 @@ function Home() {
             style={{ cursor: 'pointer' }}
           >
             <Statistic
-              title="Notifications"
+              title="通知"
               value={unreadCount}
               prefix={
                 <Badge count={unreadCount} size="small" offset={[4, -2]}>
@@ -219,7 +219,7 @@ function Home() {
               }
               suffix={
                 <span style={{ fontSize: 14, color: unreadCount > 0 ? '#ff4d4f' : '#999' }}>
-                  unread
+                  未读
                 </span>
               }
             />
@@ -229,13 +229,13 @@ function Home() {
 
       {/* Pending Items */}
       <Title level={5} style={{ marginBottom: 12, color: '#666' }}>
-        Pending Items
+        待处理事项
       </Title>
       <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="Users Pending"
+              title="待处理用户"
               value={pending.usersPending}
               prefix={<ExclamationCircleOutlined />}
               valueStyle={{ color: pending.usersPending > 0 ? '#faad14' : undefined }}
@@ -245,7 +245,7 @@ function Home() {
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="Demands Pending"
+              title="待处理需求"
               value={pending.demandsPending}
               prefix={<FileSearchOutlined />}
               valueStyle={{ color: pending.demandsPending > 0 ? '#faad14' : undefined }}
@@ -255,7 +255,7 @@ function Home() {
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="RFQ Pending"
+              title="待处理询价"
               value={pending.rfqPending}
               prefix={<ThunderboltOutlined />}
               valueStyle={{ color: pending.rfqPending > 0 ? '#faad14' : undefined }}
@@ -269,7 +269,7 @@ function Home() {
             style={{ cursor: 'pointer' }}
           >
             <Statistic
-              title="Unread Notifications"
+              title="未读通知"
               value={pending.unreadNotifications}
               prefix={<NotificationOutlined />}
               valueStyle={{ color: pending.unreadNotifications > 0 ? '#ff4d4f' : undefined }}
@@ -281,12 +281,12 @@ function Home() {
       {/* Recent Activities */}
       <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
         <Col xs={24} lg={12}>
-          <Card title="Recent Activities" style={{ height: '100%' }}>
+          <Card title="最近活动" style={{ height: '100%' }}>
             {activities.users.length === 0 &&
             activities.demands.length === 0 &&
             activities.matches.length === 0 &&
             activities.notifications.length === 0 ? (
-              <Empty description="No recent activities" />
+              <Empty description="暂无最近活动" />
             ) : (
               <Timeline
                 items={[
@@ -295,7 +295,7 @@ function Home() {
                     dot: <UserOutlined style={{ fontSize: 16 }} />,
                     children: (
                       <div>
-                        <Text strong>New User Registered</Text>
+                        <Text strong>新用户注册</Text>
                         <br />
                         <Text type="secondary">{u.email}</Text>
                         <br />
@@ -310,7 +310,7 @@ function Home() {
                     dot: <FileTextOutlined style={{ fontSize: 16 }} />,
                     children: (
                       <div>
-                        <Text strong>New Demand Created</Text>
+                        <Text strong>新需求创建</Text>
                         <br />
                         <Text type="secondary">{d.title}</Text>
                         <Tag color={DEMAND_STATUS_COLOR[d.status] || 'default'} style={{ marginLeft: 4 }}>
@@ -328,9 +328,9 @@ function Home() {
                     dot: <LinkOutlined style={{ fontSize: 16 }} />,
                     children: (
                       <div>
-                        <Text strong>New Match Generated</Text>
+                        <Text strong>新匹配生成</Text>
                         <br />
-                        <Text type="secondary">Score: {(m.matchScore * 100).toFixed(0)}%</Text>
+                        <Text type="secondary">匹配度： {(m.matchScore * 100).toFixed(0)}%</Text>
                         <Tag color={MATCH_STATUS_COLOR[m.matchStatus] || 'default'} style={{ marginLeft: 4 }}>
                           {m.matchStatus}
                         </Tag>
@@ -346,7 +346,7 @@ function Home() {
                     dot: <BellOutlined style={{ fontSize: 16 }} />,
                     children: (
                       <div>
-                        <Text strong>Notification</Text>
+                        <Text strong>通知</Text>
                         <br />
                         <Text type="secondary">{n.title}</Text>
                         <Tag color={NOTIFICATION_TYPE_COLOR[n.type] || 'default'} style={{ marginLeft: 4 }}>
@@ -367,35 +367,35 @@ function Home() {
 
         {/* System Status */}
         <Col xs={24} lg={12}>
-          <Card title="System Status" style={{ height: '100%' }}>
+          <Card title="系统状态" style={{ height: '100%' }}>
             <Descriptions bordered column={1} size="small">
-              <Descriptions.Item label="Database">
+              <Descriptions.Item label="数据库">
                 <Tag color="green">{systemStatus.database}</Tag>
               </Descriptions.Item>
               <Descriptions.Item label="API">
                 <Tag color="green">{systemStatus.api}</Tag>
               </Descriptions.Item>
-              <Descriptions.Item label="Last Updated">
+              <Descriptions.Item label="最后更新">
                 {new Date(systemStatus.lastUpdated).toLocaleString()}
               </Descriptions.Item>
             </Descriptions>
             <Title level={5} style={{ marginTop: 16, marginBottom: 8 }}>
-              Entity Counts
+              实体数量
             </Title>
             <Descriptions bordered column={1} size="small">
-              <Descriptions.Item label="Users">
+              <Descriptions.Item label="用户">
                 {systemStatus.entityCounts.users}
               </Descriptions.Item>
-              <Descriptions.Item label="Organizations">
+              <Descriptions.Item label="组织">
                 {systemStatus.entityCounts.organizations}
               </Descriptions.Item>
-              <Descriptions.Item label="Products">
+              <Descriptions.Item label="产品">
                 {systemStatus.entityCounts.products}
               </Descriptions.Item>
-              <Descriptions.Item label="Demands">
+              <Descriptions.Item label="需求">
                 {systemStatus.entityCounts.demands}
               </Descriptions.Item>
-              <Descriptions.Item label="Matches">
+              <Descriptions.Item label="匹配">
                 {systemStatus.entityCounts.matches}
               </Descriptions.Item>
             </Descriptions>
@@ -405,7 +405,7 @@ function Home() {
 
       {/* Quick Actions */}
       <Title level={5} style={{ marginBottom: 12, color: '#666' }}>
-        Quick Actions
+        快捷操作
       </Title>
       <Card style={{ marginBottom: 16 }}>
         <Space wrap>
@@ -414,22 +414,22 @@ function Home() {
             icon={<UserAddOutlined />}
             onClick={() => navigate('/users/create')}
           >
-            Create User
+            创建用户
           </Button>
           <Button icon={<TeamOutlined />} onClick={() => navigate('/users')}>
-            View Users
+            查看用户
           </Button>
           <Button icon={<PlusOutlined />} onClick={() => navigate('/organizations/create')}>
-            Create Organization
+            创建组织
           </Button>
           <Button icon={<BankOutlined />} onClick={() => navigate('/organizations')}>
-            View Organizations
+            查看组织
           </Button>
           <Button icon={<ShoppingOutlined />} onClick={() => navigate('/products')}>
-            View Products
+            查看产品
           </Button>
           <Button icon={<BellOutlined />} onClick={() => navigate('/notifications')}>
-            Notification Center
+            通知中心
           </Button>
         </Space>
       </Card>

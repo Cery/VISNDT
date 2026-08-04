@@ -32,7 +32,7 @@ function ParameterGroupEdit() {
       setPageState({ status: 'ready' });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load parameter group';
+        err instanceof Error ? err.message : '加载参数组失败';
       setPageState({ status: 'error', message });
     }
   }, [id, form]);
@@ -46,11 +46,11 @@ function ParameterGroupEdit() {
     setPageState({ status: 'submitting' });
     try {
       await parameterGroupService.update(id, values);
-      message.success('Parameter group updated successfully');
+      message.success('参数组更新成功');
       navigate('/parameter-groups');
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to update parameter group';
+        err instanceof Error ? err.message : '更新参数组失败';
       setPageState({ status: 'error', message: errorMessage });
       message.error(errorMessage);
     }
@@ -68,17 +68,17 @@ function ParameterGroupEdit() {
     return (
       <Alert
         type="error"
-        message="Failed to Load Parameter Group"
+        message="加载参数组失败"
         description={pageState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={loadData}>Retry</Button>
+            <Button onClick={loadData}>重试</Button>
             <Button
               onClick={() => navigate('/parameter-groups')}
               icon={<ArrowLeftOutlined />}
             >
-              Back to List
+              返回列表
             </Button>
           </Space>
         }
@@ -89,7 +89,7 @@ function ParameterGroupEdit() {
   return (
     <div style={{ maxWidth: 600 }}>
       <Title level={4} style={{ marginBottom: 24 }}>
-        Edit Parameter Group
+        编辑参数组
       </Title>
 
       <Card>
@@ -99,27 +99,27 @@ function ParameterGroupEdit() {
           onFinish={handleSubmit}
         >
           <Form.Item
-            label="Name"
+            label="名称"
             name="name"
-            rules={[{ required: true, message: 'Please enter a name' }]}
+            rules={[{ required: true, message: '请输入名称' }]}
           >
-            <Input placeholder="e.g. Dimensions" />
+            <Input placeholder="如：尺寸" />
           </Form.Item>
 
           <Form.Item
-            label="Code"
+            label="编码"
             name="code"
-            rules={[{ required: true, message: 'Please enter a code' }]}
+            rules={[{ required: true, message: '请输入编码' }]}
           >
-            <Input placeholder="e.g. dimensions" />
+            <Input placeholder="如：dimensions" />
           </Form.Item>
 
           <Form.Item
-            label="Description"
+            label="描述"
             name="description"
           >
             <Input.TextArea
-              placeholder="Optional description"
+              placeholder="可选描述"
               rows={3}
             />
           </Form.Item>
@@ -130,13 +130,13 @@ function ParameterGroupEdit() {
               htmlType="submit"
               loading={pageState.status === 'submitting'}
             >
-              Update Parameter Group
+              更新参数组
             </Button>
             <Button
               style={{ marginLeft: 8 }}
               onClick={() => navigate('/parameter-groups')}
             >
-              Cancel
+              取消
             </Button>
           </Form.Item>
         </Form>

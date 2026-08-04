@@ -7,10 +7,10 @@ import Providers from "./providers";
 export const metadata: Metadata = {
   title: {
     template: '%s',
-    default: 'VISNDT – Industrial Inspection Equipment Platform',
+    default: 'VISNDT – 工业检测设备平台',
   },
   description:
-    'VISNDT is a professional platform for industrial non-destructive testing equipment — discover high-precision endoscopes, inspection cameras, and measurement systems.',
+    'VISNDT是一个专业的工业无损检测设备平台——发现高精度内窥镜、检测相机和测量系统。',
 };
 
 export default function RootLayout({

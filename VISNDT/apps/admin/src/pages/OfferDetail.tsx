@@ -46,7 +46,7 @@ export default function OfferDetailPage() {
       setPageState({ status: 'success', data });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load offer';
+        err instanceof Error ? err.message : '加载报价失败';
       setPageState({ status: 'error', message });
     }
   }, [id]);
@@ -64,10 +64,10 @@ export default function OfferDetailPage() {
       onOk: async () => {
         try {
           await offerService.submit(id);
-          message.success('Offer submitted successfully');
+          message.success('报价提交成功');
           fetchOffer();
         } catch (err) {
-          const msg = err instanceof Error ? err.message : 'Failed to submit offer';
+          const msg = err instanceof Error ? err.message : '提交报价失败';
           message.error(msg);
         }
       },
@@ -77,16 +77,16 @@ export default function OfferDetailPage() {
   const handleAccept = () => {
     if (!id) return;
     Modal.confirm({
-      title: 'Accept Offer',
-      content: 'Accept this offer?',
-      okText: 'Accept',
+      title: '接受报价',
+      content: '确认接受此报价？',
+      okText: '接受',
       onOk: async () => {
         try {
           await offerService.accept(id);
-          message.success('Offer accepted successfully');
+          message.success('报价已接受');
           fetchOffer();
         } catch (err) {
-          const msg = err instanceof Error ? err.message : 'Failed to accept offer';
+          const msg = err instanceof Error ? err.message : '接受报价失败';
           message.error(msg);
         }
       },
@@ -96,17 +96,17 @@ export default function OfferDetailPage() {
   const handleReject = () => {
     if (!id) return;
     Modal.confirm({
-      title: 'Reject Offer',
-      content: 'Reject this offer?',
-      okText: 'Reject',
+      title: '拒绝报价',
+      content: '确认拒绝此报价？',
+      okText: '拒绝',
       okType: 'danger',
       onOk: async () => {
         try {
           await offerService.reject(id);
-          message.success('Offer rejected successfully');
+          message.success('报价已拒绝');
           fetchOffer();
         } catch (err) {
-          const msg = err instanceof Error ? err.message : 'Failed to reject offer';
+          const msg = err instanceof Error ? err.message : '拒绝报价失败';
           message.error(msg);
         }
       },
@@ -116,17 +116,17 @@ export default function OfferDetailPage() {
   const handleWithdraw = () => {
     if (!id) return;
     Modal.confirm({
-      title: 'Withdraw Offer',
-      content: 'Withdraw this offer?',
-      okText: 'Withdraw',
+      title: '撤回报价',
+      content: '确认撤回此报价？',
+      okText: '撤回',
       okType: 'danger',
       onOk: async () => {
         try {
           await offerService.withdraw(id);
-          message.success('Offer withdrawn successfully');
+          message.success('报价已撤回');
           fetchOffer();
         } catch (err) {
-          const msg = err instanceof Error ? err.message : 'Failed to withdraw offer';
+          const msg = err instanceof Error ? err.message : '撤回报价失败';
           message.error(msg);
         }
       },
@@ -145,14 +145,14 @@ export default function OfferDetailPage() {
     return (
       <Alert
         type="error"
-        message="Failed to load offer"
+        message="加载报价失败"
         description={pageState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={fetchOffer}>Retry</Button>
+            <Button onClick={fetchOffer}>重试</Button>
             <Button onClick={() => navigate('/offers')} icon={<ArrowLeftOutlined />}>
-              Back to List
+              返回列表
             </Button>
           </Space>
         }
@@ -169,26 +169,26 @@ export default function OfferDetailPage() {
     <div>
       <Space style={{ marginBottom: 16 }}>
         <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/offers')}>
-          Back to List
+          返回列表
         </Button>
       </Space>
 
-      <Title level={3}>Offer Detail</Title>
+      <Title level={3}>报价详情</Title>
 
       {/* Card 1: Offer Summary */}
-      <Card title="Offer Summary" style={{ marginBottom: 16 }}>
+      <Card title="报价摘要" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="Offer ID">{offer.id}</Descriptions.Item>
-          <Descriptions.Item label="Status">
+          <Descriptions.Item label="报价编号">{offer.id}</Descriptions.Item>
+          <Descriptions.Item label="状态">
             <Tag color={STATUS_COLOR[offer.status] || 'default'}>
               {offer.status}
             </Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Title">{offer.title}</Descriptions.Item>
-          <Descriptions.Item label="Created At">
+          <Descriptions.Item label="标题">{offer.title}</Descriptions.Item>
+          <Descriptions.Item label="创建时间">
             {formatDate(offer.createdAt)}
           </Descriptions.Item>
-          <Descriptions.Item label="Updated At">
+          <Descriptions.Item label="更新时间">
             {formatDate(offer.updatedAt)}
           </Descriptions.Item>
         </Descriptions>
@@ -196,23 +196,23 @@ export default function OfferDetailPage() {
 
       {/* Lifecycle Actions */}
       {['DRAFT', 'SUBMITTED'].includes(offer.status) && (
-        <Card title="Lifecycle Actions" style={{ marginBottom: 16 }}>
+        <Card title="生命周期操作" style={{ marginBottom: 16 }}>
           <Space>
             {offer.status === 'DRAFT' && (
               <Button type="primary" onClick={handleSubmit}>
-                Submit
+                提交
               </Button>
             )}
             {offer.status === 'SUBMITTED' && (
               <>
                 <Button type="primary" onClick={handleAccept}>
-                  Accept
+                  接受
                 </Button>
                 <Button danger onClick={handleReject}>
-                  Reject
+                  拒绝
                 </Button>
                 <Button danger onClick={handleWithdraw}>
-                  Withdraw
+                  撤回
                 </Button>
               </>
             )}
@@ -222,15 +222,15 @@ export default function OfferDetailPage() {
 
       {/* Card 2: Product Info */}
       {offer.product && (
-        <Card title="Product Information" style={{ marginBottom: 16 }}>
+        <Card title="产品信息" style={{ marginBottom: 16 }}>
           <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-            <Descriptions.Item label="Product Name">
+            <Descriptions.Item label="产品名称">
               {offer.product.name}
             </Descriptions.Item>
-            <Descriptions.Item label="Model">
+            <Descriptions.Item label="型号">
               {offer.product.model || '-'}
             </Descriptions.Item>
-            <Descriptions.Item label="Status">
+            <Descriptions.Item label="状态">
               {offer.product.status || '-'}
             </Descriptions.Item>
           </Descriptions>
@@ -239,12 +239,12 @@ export default function OfferDetailPage() {
 
       {/* Card 3: Organization Info */}
       {offer.organization && (
-        <Card title="Organization Information" style={{ marginBottom: 16 }}>
+        <Card title="组织信息" style={{ marginBottom: 16 }}>
           <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-            <Descriptions.Item label="Organization Name">
+            <Descriptions.Item label="组织名称">
               {offer.organization.name}
             </Descriptions.Item>
-            <Descriptions.Item label="Type">
+            <Descriptions.Item label="类型">
               <Tag>{offer.organization.type || 'N/A'}</Tag>
             </Descriptions.Item>
           </Descriptions>
@@ -252,7 +252,7 @@ export default function OfferDetailPage() {
       )}
 
       {offer.description && (
-        <Card title="Description" style={{ marginBottom: 16 }}>
+        <Card title="描述" style={{ marginBottom: 16 }}>
           <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>
             {offer.description}
           </p>
@@ -260,7 +260,7 @@ export default function OfferDetailPage() {
       )}
 
       <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/offers')}>
-        Back to List
+        返回列表
       </Button>
     </div>
   );

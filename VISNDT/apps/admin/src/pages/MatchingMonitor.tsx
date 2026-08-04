@@ -27,7 +27,7 @@ function MatchingMonitor() {
       setPageState({ status: 'success', stats });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load matching data';
+        err instanceof Error ? err.message : '加载匹配数据失败';
       setPageState({ status: 'error', message });
     }
   }, []);
@@ -49,12 +49,12 @@ function MatchingMonitor() {
       <div style={{ padding: 24 }}>
         <Alert
           type="error"
-          message="Failed to load matching data"
+          message="加载匹配数据失败"
           description={pageState.message}
           showIcon
           action={
             <Button size="small" onClick={fetchStats}>
-              Retry
+              重试
             </Button>
           }
         />
@@ -67,14 +67,14 @@ function MatchingMonitor() {
   return (
     <div style={{ padding: 24 }}>
       <Title level={4} style={{ marginBottom: 24 }}>
-        Matching Monitor
+        匹配监控
       </Title>
 
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="Total Matches"
+              title="总匹配数"
               value={stats.totalMatches}
               prefix={<LinkOutlined />}
             />
@@ -83,7 +83,7 @@ function MatchingMonitor() {
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="Average Score"
+              title="平均匹配度"
               value={stats.averageScore}
               prefix={<PercentageOutlined />}
               suffix="%"
@@ -94,7 +94,7 @@ function MatchingMonitor() {
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="Hard Fail Count"
+              title="强制失败数"
               value={stats.hardFailCount}
               prefix={<StopOutlined />}
               valueStyle={{ color: stats.hardFailCount > 0 ? '#cf1322' : undefined }}
@@ -104,7 +104,7 @@ function MatchingMonitor() {
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="Rematch Count"
+              title="重新匹配次数"
               value={stats.rematchCount}
               prefix={<SyncOutlined />}
             />
@@ -118,12 +118,10 @@ function MatchingMonitor() {
       >
         <Paragraph style={{ marginBottom: 8 }}>
           <InfoCircleOutlined style={{ marginRight: 8, color: '#1890ff' }} />
-          Matching engine is integrated with the Demand workflow.
+          匹配引擎已与需求工作流集成。
         </Paragraph>
         <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-          For detailed match information, please check individual Demand Detail
-          pages. Each Demand displays its matched products, scores, and match
-          statuses.
+          如需查看详细的匹配信息，请检查各个需求详情页面。每个需求页面会展示其匹配的产品、匹配度和匹配状态。
         </Paragraph>
       </Card>
     </div>

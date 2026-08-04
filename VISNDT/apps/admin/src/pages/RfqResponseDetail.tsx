@@ -51,7 +51,7 @@ export default function RfqResponseDetailPage() {
       setPageState({ status: 'success', data });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load response';
+        err instanceof Error ? err.message : '加载响应详情失败';
       setPageState({ status: 'error', message });
     }
   }, [id]);
@@ -65,10 +65,10 @@ export default function RfqResponseDetailPage() {
     try {
       setUpdating(true);
       await rfqResponseService.update(id, { status: newStatus });
-      message.success(`Response status updated to ${newStatus}`);
+      message.success(`响应状态已更新为 ${newStatus}`);
       fetchResponse();
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to update status';
+      const msg = err instanceof Error ? err.message : '更新状态失败';
       message.error(msg);
     } finally {
       setUpdating(false);
@@ -87,14 +87,14 @@ export default function RfqResponseDetailPage() {
     return (
       <Alert
         type="error"
-        message="Failed to load response"
+        message="加载响应详情失败"
         description={pageState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={fetchResponse}>Retry</Button>
+            <Button onClick={fetchResponse}>重试</Button>
             <Button onClick={() => navigate(-1)} icon={<ArrowLeftOutlined />}>
-              Go Back
+              返回
             </Button>
           </Space>
         }
@@ -112,37 +112,37 @@ export default function RfqResponseDetailPage() {
     <div>
       <Space style={{ marginBottom: 16 }}>
         <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>
-          Go Back
+          返回
         </Button>
       </Space>
 
-      <Title level={3}>RFQ Response Detail</Title>
+      <Title level={3}>询价响应详情</Title>
 
-      <Card title="Basic Information" style={{ marginBottom: 16 }}>
+      <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
           <Descriptions.Item label="ID">{response.id}</Descriptions.Item>
-          <Descriptions.Item label="Status">
+          <Descriptions.Item label="状态">
             <Tag color={STATUS_COLOR[response.status] || 'default'}>
               {response.status}
             </Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Organization">
+          <Descriptions.Item label="组织">
             {response.organization?.name || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Offer">
+          <Descriptions.Item label="报价">
             {response.offer?.product?.name || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="RFQ ID">
+          <Descriptions.Item label="询价单ID">
             {response.rfqId}
           </Descriptions.Item>
-          <Descriptions.Item label="Submitted At">
+          <Descriptions.Item label="提交时间">
             {formatDate(response.createdAt)}
           </Descriptions.Item>
         </Descriptions>
       </Card>
 
       {response.message && (
-        <Card title="Message" style={{ marginBottom: 16 }}>
+        <Card title="消息" style={{ marginBottom: 16 }}>
           <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>
             {response.message}
           </p>
@@ -150,11 +150,11 @@ export default function RfqResponseDetailPage() {
       )}
 
       {allowedTransitions.length > 0 && (
-        <Card title="Status Management" style={{ marginBottom: 16 }}>
+        <Card title="状态管理" style={{ marginBottom: 16 }}>
           <Space>
-            <span>Transition to:</span>
+            <span>切换至：</span>
             <Select
-              placeholder="Select new status"
+              placeholder="选择新状态"
               loading={updating}
               disabled={updating}
               onChange={handleStatusChange}
@@ -168,19 +168,19 @@ export default function RfqResponseDetailPage() {
         </Card>
       )}
 
-      <Card title="Timeline" style={{ marginBottom: 16 }}>
+      <Card title="时间线" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="Created At">
+          <Descriptions.Item label="创建时间">
             {formatDate(response.createdAt)}
           </Descriptions.Item>
-          <Descriptions.Item label="Updated At">
+          <Descriptions.Item label="更新时间">
             {formatDate(response.updatedAt)}
           </Descriptions.Item>
         </Descriptions>
       </Card>
 
       <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>
-        Go Back
+        返回
       </Button>
     </div>
   );

@@ -14,12 +14,12 @@ type PageState =
   | { status: 'success'; data: Rfq[]; total: number };
 
 const STATUS_OPTIONS = [
-  { value: '', label: 'All Statuses' },
-  { value: 'DRAFT', label: 'Draft' },
-  { value: 'OPEN', label: 'Open' },
-  { value: 'RESPONDING', label: 'Responding' },
-  { value: 'CLOSED', label: 'Closed' },
-  { value: 'CANCELLED', label: 'Cancelled' },
+  { value: '', label: '全部状态' },
+  { value: 'DRAFT', label: '草稿' },
+  { value: 'OPEN', label: '开放' },
+  { value: 'RESPONDING', label: '响应中' },
+  { value: 'CLOSED', label: '已关闭' },
+  { value: 'CANCELLED', label: '已取消' },
 ];
 
 const STATUS_COLOR_MAP: Record<string, string> = {
@@ -54,7 +54,7 @@ function RfqList() {
       });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load RFQs';
+        err instanceof Error ? err.message : '加载询价失败';
       setPageState({ status: 'error', message });
     }
   }, [page, pageSize, statusFilter]);
@@ -94,12 +94,12 @@ function RfqList() {
     return (
       <Alert
         type="error"
-        message="Failed to load RFQs"
+        message="加载询价失败"
         description={pageState.message}
         showIcon
         action={
           <Button size="small" onClick={fetchRfqs}>
-            Retry
+            重试
           </Button>
         }
       />
@@ -108,14 +108,14 @@ function RfqList() {
 
   const columns: ColumnsType<Rfq> = [
     {
-      title: 'ID',
+      title: '编号',
       dataIndex: 'id',
       key: 'id',
       width: 100,
       render: (id: string) => id.slice(0, 8) + '...',
     },
     {
-      title: 'Status',
+      title: '状态',
       dataIndex: 'status',
       key: 'status',
       width: 120,
@@ -124,25 +124,25 @@ function RfqList() {
       ),
     },
     {
-      title: 'Demand',
+      title: '需求',
       dataIndex: 'demand',
       key: 'demand',
       render: (demand: Rfq['demand']) => demand?.title || '-',
     },
     {
-      title: 'Creator',
+      title: '创建者',
       dataIndex: 'createdByUser',
       key: 'creator',
       render: (user: Rfq['createdByUser']) => user?.name || user?.email || '-',
     },
     {
-      title: 'Created At',
+      title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       width: 100,
       render: (_: unknown, record: Rfq) => (
@@ -150,7 +150,7 @@ function RfqList() {
           type="link"
           onClick={() => navigate(`/rfqs/${record.id}`)}
         >
-          View
+          查看
         </Button>
       ),
     },
@@ -159,12 +159,12 @@ function RfqList() {
   return (
     <div>
       <Title level={4} style={{ marginBottom: 16 }}>
-        RFQ Management
+        询价管理
       </Title>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Select
-          placeholder="Filter by status"
+          placeholder="按状态筛选"
           allowClear
           value={statusFilter || undefined}
           onChange={handleStatusChange}
@@ -172,14 +172,14 @@ function RfqList() {
           style={{ width: 160 }}
         />
         <Button icon={<ReloadOutlined />} onClick={handleReset}>
-          Reset
+          重置
         </Button>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => navigate('/rfqs/create')}
         >
-          Create RFQ
+          创建询价
         </Button>
       </Space>
 
@@ -194,7 +194,7 @@ function RfqList() {
           total: pageState.total,
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '50'],
-          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+          showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
         }}
       />
     </div>

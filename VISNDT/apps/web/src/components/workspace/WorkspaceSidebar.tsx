@@ -4,11 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const NAV_ITEMS = [
-  { label: 'Dashboard', href: '/dashboard', icon: '📊' },
-  { label: 'My Demands', href: '/workspace/demands', icon: '📋' },
-  { label: 'RFQs', href: '/workspace/rfqs', icon: '📄' },
-  { label: 'Matches', href: '/workspace/matches', icon: '🔗' },
-  { label: 'Settings', href: '/workspace/settings', icon: '⚙️' },
+  { label: '仪表盘', href: '/dashboard', icon: '📊' },
+  { label: '我的需求', href: '/workspace/demands', icon: '📋' },
+  { label: '询价单', href: '/workspace/rfqs', icon: '📄' },
+  { label: '匹配结果', href: '/workspace/matches', icon: '🔗' },
+  { label: '设置', href: '/workspace/settings', icon: '⚙️' },
 ];
 
 interface WorkspaceSidebarProps {
@@ -46,7 +46,7 @@ export default function WorkspaceSidebar({ mobileOpen, onClose }: WorkspaceSideb
             className="block text-lg font-bold mb-6"
             onClick={onClose}
           >
-            Workspace
+            工作区
           </Link>
           <nav className="space-y-1">
             {NAV_ITEMS.map((item) => {

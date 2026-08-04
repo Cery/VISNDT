@@ -23,18 +23,18 @@ export default function WorkspaceHeader({ onMenuToggle }: WorkspaceHeaderProps) 
           </svg>
         </button>
         <h1 className="text-sm font-semibold text-slate-700">
-          {user?.organizationId ? 'Organization Workspace' : 'Personal Workspace'}
+          {user?.organizationId ? '组织工作区' : '个人工作区'}
         </h1>
       </div>
       <div className="flex items-center gap-4">
         <span className="text-sm text-slate-500 hidden sm:inline">
-          {user?.name || user?.email || 'User'}
+          {user?.name || user?.email || '用户'}
         </span>
         <button
           onClick={logout}
           className="text-sm text-slate-400 hover:text-slate-600 transition-colors"
         >
-          Logout
+          退出登录
         </button>
       </div>
     </header>

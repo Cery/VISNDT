@@ -24,10 +24,10 @@ interface QueryParams {
 }
 
 const STATUS_OPTIONS = [
-  { value: '', label: 'All Statuses' },
-  { value: 'ACTIVE', label: 'Active' },
-  { value: 'DRAFT', label: 'Draft' },
-  { value: 'INACTIVE', label: 'Inactive' },
+  { value: '', label: '全部状态' },
+  { value: 'ACTIVE', label: '已上架' },
+  { value: 'DRAFT', label: '草稿' },
+  { value: 'INACTIVE', label: '已下架' },
 ];
 
 const STATUS_COLOR_MAP: Record<string, string> = {
@@ -72,7 +72,7 @@ function ProductList() {
       });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load products';
+        err instanceof Error ? err.message : '加载产品失败';
       setPageState({ status: 'error', message });
     }
   }, [query]);
@@ -130,12 +130,12 @@ function ProductList() {
     return (
       <Alert
         type="error"
-        message="Failed to load products"
+        message="加载产品失败"
         description={pageState.message}
         showIcon
         action={
           <Button size="small" onClick={fetchProducts}>
-            Retry
+            重试
           </Button>
         }
       />
@@ -144,7 +144,7 @@ function ProductList() {
 
   const columns: ColumnsType<Product> = [
     {
-      title: 'Name',
+      title: '名称',
       dataIndex: 'name',
       key: 'name',
       sorter: true,
@@ -159,19 +159,19 @@ function ProductList() {
       ),
     },
     {
-      title: 'Model',
+      title: '型号',
       dataIndex: 'model',
       key: 'model',
       render: (model: string | undefined) => model || '-',
     },
     {
-      title: 'Category',
+      title: '分类',
       dataIndex: 'category',
       key: 'category',
       render: (category: Product['category']) => category?.name || '-',
     },
     {
-      title: 'Status',
+      title: '状态',
       dataIndex: 'status',
       key: 'status',
       width: 120,
@@ -180,7 +180,7 @@ function ProductList() {
       ),
     },
     {
-      title: 'Created At',
+      title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
       sorter: true,
@@ -193,7 +193,7 @@ function ProductList() {
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
   {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       width: 160,
       render: (_: unknown, record: Product) => (
@@ -202,13 +202,13 @@ function ProductList() {
             type="link"
             onClick={() => navigate(`/products/${record.id}`)}
           >
-            View
+            查看
           </Button>
           <Button
             type="link"
             onClick={() => navigate(`/products/${record.id}/edit`)}
           >
-            Edit
+            编辑
           </Button>
         </Space>
       ),
@@ -218,19 +218,19 @@ function ProductList() {
   return (
     <div>
       <Title level={4} style={{ marginBottom: 16 }}>
-        Products
+        产品管理
       </Title>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search
-          placeholder="Search by name, model, or description"
+          placeholder="按名称、型号或描述搜索"
           allowClear
           onSearch={handleSearch}
           style={{ width: 320 }}
           prefix={<SearchOutlined />}
         />
         <Select
-          placeholder="Filter by status"
+          placeholder="按状态筛选"
           allowClear
           value={query.status || undefined}
           onChange={handleStatusChange}
@@ -238,7 +238,7 @@ function ProductList() {
           style={{ width: 160 }}
         />
         <Button icon={<ReloadOutlined />} onClick={handleReset}>
-          Reset
+          重置
         </Button>
       </Space>
 
@@ -253,7 +253,7 @@ function ProductList() {
           total: pageState.total,
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '50'],
-          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+          showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
         }}
       />
     </div>

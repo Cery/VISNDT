@@ -21,27 +21,27 @@ import {
 const { Header, Sider, Content } = Layout;
 
 const menuItems = [
-  { key: '/home', icon: <DashboardOutlined />, label: 'Dashboard' },
-  { key: '/products', icon: <ShoppingOutlined />, label: 'Products' },
-  { key: '/demands', icon: <FileTextOutlined />, label: 'Demands' },
-  { key: '/rfqs', icon: <SnippetsOutlined />, label: 'RFQs' },
-  { key: '/offers', icon: <TagsOutlined />, label: 'Offers' },
-  { key: '/inquiries', icon: <MailOutlined />, label: 'Inquiries' },
-  { key: '/matching', icon: <NodeIndexOutlined />, label: 'Matching' },
-  { key: '/users', icon: <UserOutlined />, label: 'Users' },
-  { key: '/organizations', icon: <BankOutlined />, label: 'Organizations' },
+  { key: '/home', icon: <DashboardOutlined />, label: '仪表盘' },
+  { key: '/products', icon: <ShoppingOutlined />, label: '产品管理' },
+  { key: '/demands', icon: <FileTextOutlined />, label: '需求管理' },
+  { key: '/rfqs', icon: <SnippetsOutlined />, label: '询价管理' },
+  { key: '/offers', icon: <TagsOutlined />, label: '报价管理' },
+  { key: '/inquiries', icon: <MailOutlined />, label: '询价管理' },
+  { key: '/matching', icon: <NodeIndexOutlined />, label: '匹配管理' },
+  { key: '/users', icon: <UserOutlined />, label: '用户管理' },
+  { key: '/organizations', icon: <BankOutlined />, label: '组织管理' },
   {
     key: 'parameters',
     icon: <SettingOutlined />,
-    label: 'Parameters',
+    label: '参数管理',
     children: [
-      { key: '/parameter-groups', label: 'Parameter Groups' },
-      { key: '/parameter-definitions', label: 'Parameter Definitions' },
-      { key: '/product-categories', label: 'Categories' },
+      { key: '/parameter-groups', label: '参数组' },
+      { key: '/parameter-definitions', label: '参数定义' },
+      { key: '/product-categories', label: '分类管理' },
     ],
   },
-  { key: '/notifications', icon: <BellOutlined />, label: 'Notifications' },
-  { key: '/audit-logs', icon: <AuditOutlined />, label: 'Audit Log' },
+  { key: '/notifications', icon: <BellOutlined />, label: '通知管理' },
+  { key: '/audit-logs', icon: <AuditOutlined />, label: '审计日志' },
 ];
 
 function AdminLayout() {
@@ -100,7 +100,7 @@ function AdminLayout() {
             style={{ fontSize: 16, width: 48, height: 48 }}
           />
           <span style={{ marginLeft: 12, fontSize: 16, fontWeight: 600 }}>
-            VISNDT Admin
+            VISNDT 管理后台
           </span>
         </Header>
         <Content

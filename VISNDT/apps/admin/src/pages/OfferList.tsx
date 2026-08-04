@@ -40,7 +40,7 @@ function OfferList() {
       }
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load offers';
+        err instanceof Error ? err.message : '加载报价失败';
       setPageState({ status: 'error', message });
     }
   }, [page, pageSize]);
@@ -69,12 +69,12 @@ function OfferList() {
     return (
       <Alert
         type="error"
-        message="Failed to load offers"
+        message="加载报价失败"
         description={pageState.message}
         showIcon
         action={
           <Button size="small" onClick={fetchOffers}>
-            Retry
+            重试
           </Button>
         }
       />
@@ -85,12 +85,12 @@ function OfferList() {
     return (
       <div>
         <Title level={4} style={{ marginBottom: 16 }}>
-          Offer Management
+          报价管理
         </Title>
         <Alert
           type="info"
-          message="No offers"
-          description="No offers have been created yet."
+          message="暂无报价"
+          description="暂无报价创建。"
           showIcon
         />
       </div>
@@ -99,19 +99,19 @@ function OfferList() {
 
   const columns: ColumnsType<Offer> = [
     {
-      title: 'Product',
+      title: '产品',
       dataIndex: 'product',
       key: 'product',
       render: (product: Offer['product']) => product?.name || '-',
     },
     {
-      title: 'Supplier',
+      title: '供应商',
       dataIndex: 'organization',
       key: 'supplier',
       render: (org: Offer['organization']) => org?.name || '-',
     },
     {
-      title: 'Status',
+      title: '状态',
       dataIndex: 'status',
       key: 'status',
       width: 120,
@@ -120,13 +120,13 @@ function OfferList() {
       ),
     },
     {
-      title: 'Created At',
+      title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       width: 100,
       render: (_: unknown, record: Offer) => (
@@ -134,7 +134,7 @@ function OfferList() {
           type="link"
           onClick={() => navigate(`/offers/${record.id}`)}
         >
-          View
+          查看
         </Button>
       ),
     },
@@ -143,7 +143,7 @@ function OfferList() {
   return (
     <div>
       <Title level={4} style={{ marginBottom: 16 }}>
-        Offer Management
+        报价管理
       </Title>
 
       <Table<Offer>
@@ -157,7 +157,7 @@ function OfferList() {
           total: pageState.total,
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '50'],
-          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+          showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
         }}
       />
     </div>

@@ -20,11 +20,11 @@ function ParameterGroupCreate() {
     setPageState({ status: 'submitting' });
     try {
       await parameterGroupService.create(values);
-      message.success('Parameter group created successfully');
+      message.success('参数组创建成功');
       navigate('/parameter-groups');
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to create parameter group';
+        err instanceof Error ? err.message : '创建参数组失败';
       setPageState({ status: 'error', message: errorMessage });
       message.error(errorMessage);
     }
@@ -33,7 +33,7 @@ function ParameterGroupCreate() {
   return (
     <div style={{ maxWidth: 600 }}>
       <Title level={4} style={{ marginBottom: 24 }}>
-        Create Parameter Group
+        创建参数组
       </Title>
 
       <Card>
@@ -44,27 +44,27 @@ function ParameterGroupCreate() {
           initialValues={{ name: '', code: '', description: '' }}
         >
           <Form.Item
-            label="Name"
+            label="名称"
             name="name"
-            rules={[{ required: true, message: 'Please enter a name' }]}
+            rules={[{ required: true, message: '请输入名称' }]}
           >
-            <Input placeholder="e.g. Dimensions" />
+            <Input placeholder="如：尺寸" />
           </Form.Item>
 
           <Form.Item
-            label="Code"
+            label="编码"
             name="code"
-            rules={[{ required: true, message: 'Please enter a code' }]}
+            rules={[{ required: true, message: '请输入编码' }]}
           >
-            <Input placeholder="e.g. dimensions" />
+            <Input placeholder="如：dimensions" />
           </Form.Item>
 
           <Form.Item
-            label="Description"
+            label="描述"
             name="description"
           >
             <Input.TextArea
-              placeholder="Optional description"
+              placeholder="可选描述"
               rows={3}
             />
           </Form.Item>
@@ -75,13 +75,13 @@ function ParameterGroupCreate() {
               htmlType="submit"
               loading={pageState.status === 'submitting'}
             >
-              Create Parameter Group
+              创建参数组
             </Button>
             <Button
               style={{ marginLeft: 8 }}
               onClick={() => navigate('/parameter-groups')}
             >
-              Cancel
+              取消
             </Button>
           </Form.Item>
         </Form>

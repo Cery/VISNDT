@@ -29,13 +29,13 @@ export default function Pagination({
   }
 
   return (
-    <nav className="flex items-center justify-center gap-1 mt-8" aria-label="Pagination">
+    <nav className="flex items-center justify-center gap-1 mt-8" aria-label="分页">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage <= 1}
         className="px-3 py-2 text-sm rounded-md border hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
-        Previous
+        上一页
       </button>
 
       {pages.map((page, idx) =>
@@ -63,7 +63,7 @@ export default function Pagination({
         disabled={currentPage >= totalPages}
         className="px-3 py-2 text-sm rounded-md border hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
-        Next
+        下一页
       </button>
     </nav>
   );

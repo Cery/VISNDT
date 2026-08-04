@@ -19,17 +19,17 @@ export default function FeaturedProductsSection() {
         <div className="flex items-end justify-between mb-10">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">
-              Featured Products
+              推荐产品
             </h2>
             <p className="text-slate-500">
-              Explore our selection of industrial inspection equipment
+              探索我们的工业检测设备精选
             </p>
           </div>
           <Link
             href="/products"
             className="hidden sm:inline-flex text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
           >
-            View All Products →
+            查看全部产品 →
           </Link>
         </div>
 
@@ -48,11 +48,11 @@ export default function FeaturedProductsSection() {
           </div>
         ) : isError ? (
           <div className="text-center py-12 text-slate-400">
-            <p>Unable to load products. Please try again later.</p>
+            <p>无法加载产品，请稍后重试。</p>
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-12 text-slate-400">
-            <p>No products available.</p>
+            <p>暂无产品</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -67,7 +67,7 @@ export default function FeaturedProductsSection() {
             href="/products"
             className="inline-flex text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
           >
-            View All Products →
+            查看全部产品 →
           </Link>
         </div>
       </div>

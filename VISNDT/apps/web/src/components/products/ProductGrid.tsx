@@ -26,7 +26,7 @@ export default function ProductGrid({ products, isLoading }: ProductGridProps) {
   }
 
   if (products.length === 0) {
-    return <EmptyState message="No products found" />;
+    return <EmptyState message="未找到产品" />;
   }
 
   return (

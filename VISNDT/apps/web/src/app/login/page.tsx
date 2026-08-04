@@ -29,12 +29,12 @@ export default function LoginPage() {
       if (err instanceof Error) {
         const msg = err.message;
         if (msg.includes('401') || msg.includes('Unauthorized')) {
-          setErrorMsg('Invalid email or password. Please try again.');
+          setErrorMsg('邮箱或密码错误，请重试。');
         } else {
           setErrorMsg(msg);
         }
       } else {
-        setErrorMsg('An unexpected error occurred. Please try again.');
+        setErrorMsg('发生未知错误，请重试。');
       }
     }
   };
@@ -42,8 +42,8 @@ export default function LoginPage() {
   return (
     <div className="container mx-auto px-4 py-16 max-w-md">
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-slate-900">Login</h1>
-        <p className="text-slate-500 mt-2">Sign in to your account</p>
+        <h1 className="text-2xl font-bold text-slate-900">登录</h1>
+        <p className="text-slate-500 mt-2">登录您的账户</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -60,7 +60,7 @@ export default function LoginPage() {
             htmlFor="login-email"
             className="block text-sm font-medium text-slate-700 mb-1"
           >
-            Email <span className="text-red-500">*</span>
+            邮箱 <span className="text-red-500">*</span>
           </label>
           <input
             id="login-email"
@@ -70,7 +70,7 @@ export default function LoginPage() {
             required
             disabled={status === 'submitting'}
             className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
-            placeholder="your@email.com"
+            placeholder="请输入邮箱"
           />
         </div>
 
@@ -80,7 +80,7 @@ export default function LoginPage() {
             htmlFor="login-password"
             className="block text-sm font-medium text-slate-700 mb-1"
           >
-            Password <span className="text-red-500">*</span>
+            密码 <span className="text-red-500">*</span>
           </label>
           <input
             id="login-password"
@@ -121,21 +121,21 @@ export default function LoginPage() {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                 />
               </svg>
-              Signing in...
+              登录中...
             </span>
           ) : (
-            'Sign In'
+            '登录'
           )}
         </button>
 
         {/* Register link */}
         <p className="text-center text-sm text-slate-500">
-          Don&apos;t have an account?{' '}
+          还没有账户？{' '}
           <Link
             href="/register"
             className="text-slate-900 font-medium hover:underline"
           >
-            Register
+            注册
           </Link>
         </p>
       </form>

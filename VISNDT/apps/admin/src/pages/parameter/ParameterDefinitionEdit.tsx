@@ -48,7 +48,7 @@ function ParameterDefinitionEdit() {
       setPageState({ status: 'ready', groups: groupsResult.data });
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to load parameter definition';
+        err instanceof Error ? err.message : '加载参数定义失败';
       setPageState({ status: 'error', message: errorMessage });
     }
   }, [id, form]);
@@ -72,11 +72,11 @@ function ParameterDefinitionEdit() {
         required: values.required ?? false,
       };
       await parameterDefinitionService.update(id, payload);
-      message.success('Parameter definition updated successfully');
+      message.success('参数定义更新成功');
       navigate('/parameter-definitions');
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to update parameter definition';
+        err instanceof Error ? err.message : '更新参数定义失败';
       setPageState((prev) =>
         prev.status === 'ready' ? { ...prev, status: 'ready' } as PageState : prev
       );
@@ -96,17 +96,17 @@ function ParameterDefinitionEdit() {
     return (
       <Alert
         type="error"
-        message="Failed to Load Parameter Definition"
+        message="加载参数定义失败"
         description={pageState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={loadData}>Retry</Button>
+            <Button onClick={loadData}>重试</Button>
             <Button
               onClick={() => navigate('/parameter-definitions')}
               icon={<ArrowLeftOutlined />}
             >
-              Back to List
+              返回列表
             </Button>
           </Space>
         }
@@ -120,7 +120,7 @@ function ParameterDefinitionEdit() {
   return (
     <div style={{ maxWidth: 600 }}>
       <Title level={4} style={{ marginBottom: 24 }}>
-        Edit Parameter Definition
+        编辑参数定义
       </Title>
 
       <Card>
@@ -130,27 +130,27 @@ function ParameterDefinitionEdit() {
           onFinish={handleSubmit}
         >
           <Form.Item
-            label="Name"
+            label="名称"
             name="name"
-            rules={[{ required: true, message: 'Please enter a name' }]}
+            rules={[{ required: true, message: '请输入名称' }]}
           >
-            <Input placeholder="e.g. Length" />
+            <Input placeholder="如：长度" />
           </Form.Item>
 
           <Form.Item
-            label="Code"
+            label="编码"
             name="code"
-            rules={[{ required: true, message: 'Please enter a code' }]}
+            rules={[{ required: true, message: '请输入编码' }]}
           >
-            <Input placeholder="e.g. length" />
+            <Input placeholder="如：length" />
           </Form.Item>
 
           <Form.Item
-            label="Data Type"
+            label="数据类型"
             name="dataType"
-            rules={[{ required: true, message: 'Please select a data type' }]}
+            rules={[{ required: true, message: '请选择数据类型' }]}
           >
-            <Select placeholder="Select data type">
+            <Select placeholder="请选择数据类型">
               {DATA_TYPE_OPTIONS.map((opt) => (
                 <Option key={opt.value} value={opt.value}>
                   {opt.label}
@@ -160,11 +160,11 @@ function ParameterDefinitionEdit() {
           </Form.Item>
 
           <Form.Item
-            label="Parameter Group"
+            label="参数组"
             name="parameterGroupId"
           >
             <Select
-              placeholder="Select a parameter group (optional)"
+              placeholder="请选择参数组（可选）"
               allowClear
             >
               {groups.map((g: ParameterGroup) => (
@@ -176,14 +176,14 @@ function ParameterDefinitionEdit() {
           </Form.Item>
 
           <Form.Item
-            label="Unit"
+            label="单位"
             name="unit"
           >
-            <Input placeholder="e.g. mm, kg, °C" />
+            <Input placeholder="如：mm、kg、°C" />
           </Form.Item>
 
           <Form.Item
-            label="Required"
+            label="必填"
             name="required"
             valuePropName="checked"
           >
@@ -196,13 +196,13 @@ function ParameterDefinitionEdit() {
               htmlType="submit"
               loading={pageState.status === 'submitting'}
             >
-              Update Parameter Definition
+              更新参数定义
             </Button>
             <Button
               style={{ marginLeft: 8 }}
               onClick={() => navigate('/parameter-definitions')}
             >
-              Cancel
+              取消
             </Button>
           </Form.Item>
         </Form>

@@ -73,7 +73,7 @@ export default function MatchDetailPage() {
       setPageState({ status: 'success', data });
     } catch (err) {
       const msg =
-        err instanceof Error ? err.message : 'Failed to load match detail';
+        err instanceof Error ? err.message : '加载匹配详情失败';
       setPageState({ status: 'error', message: msg });
     }
   }, [demandId, matchId]);
@@ -85,17 +85,17 @@ export default function MatchDetailPage() {
   const handleReviewMatch = () => {
     if (!demandId || !matchId) return;
     Modal.confirm({
-      title: 'Review this match?',
-      content: 'This will mark the match as reviewed.',
-      okText: 'Review',
+      title: '审核此匹配？',
+      content: '这将标记匹配为已审核。',
+      okText: '审核',
       onOk: async () => {
         try {
           setReviewing(true);
           await matchService.review(demandId, matchId);
-          message.success('Match reviewed');
+          message.success('匹配已审核');
           fetchMatch();
         } catch (err) {
-          const msg = err instanceof Error ? err.message : 'Failed to review match';
+          const msg = err instanceof Error ? err.message : '审核匹配失败';
           message.error(msg);
         } finally {
           setReviewing(false);
@@ -106,9 +106,9 @@ export default function MatchDetailPage() {
 
   const handleAcceptReject = (status: 'ACCEPTED' | 'REJECTED') => {
     if (!demandId || !matchId) return;
-    const label = status === 'ACCEPTED' ? 'Accept' : 'Reject';
+    const label = status === 'ACCEPTED' ? '接受' : '拒绝';
     Modal.confirm({
-      title: `${label} this match?`,
+      title: `${label}此匹配？`,
       okText: label,
       okButtonProps: { danger: status === 'REJECTED' },
       onOk: async () => {
@@ -118,7 +118,7 @@ export default function MatchDetailPage() {
           message.success(`Match ${status.toLowerCase()}`);
           fetchMatch();
         } catch (err) {
-          const msg = err instanceof Error ? err.message : 'Failed to update match';
+          const msg = err instanceof Error ? err.message : '匹配更新失败';
           message.error(msg);
         } finally {
           setReviewing(false);
@@ -139,19 +139,19 @@ export default function MatchDetailPage() {
     return (
       <Alert
         type="error"
-        message="Failed to load match detail"
+        message="加载匹配详情失败"
         description={pageState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={fetchMatch}>Retry</Button>
+            <Button onClick={fetchMatch}>重试</Button>
             <Button
               onClick={() =>
                 navigate(demandId ? `/demands/${demandId}` : '/demands')
               }
               icon={<ArrowLeftOutlined />}
             >
-              Back to Demand
+              返回需求
             </Button>
           </Space>
         }
@@ -168,13 +168,13 @@ export default function MatchDetailPage() {
 
   const paramColumns = [
     {
-      title: 'Parameter',
+      title: '参数',
       dataIndex: ['parameterDefinition', 'name'],
       key: 'name',
       width: 150,
     },
     {
-      title: 'Demand Value',
+      title: '需求值',
       key: 'demandValue',
       width: 150,
       render: (_: unknown, record: { parameterDefinition?: { id: string; name: string; code: string; unit?: string }; value?: string; valueMin?: number; valueMax?: number }) => {
@@ -188,7 +188,7 @@ export default function MatchDetailPage() {
       },
     },
     {
-      title: 'Unit',
+      title: '单位',
       dataIndex: ['parameterDefinition', 'unit'],
       key: 'unit',
       width: 80,
@@ -199,14 +199,14 @@ export default function MatchDetailPage() {
   // Build explanation factors table columns
   const factorColumns = [
     {
-      title: 'Factor',
+      title: '匹配因子',
       dataIndex: 'name',
       key: 'name',
       render: (name: string | undefined, record: ExplanationFactor) =>
         name || record.code || '-',
     },
     {
-      title: 'Matched',
+      title: '已匹配',
       dataIndex: 'matched',
       key: 'matched',
       width: 80,
@@ -221,14 +221,14 @@ export default function MatchDetailPage() {
       render: (v: number | undefined) => (v !== undefined ? v : '-'),
     },
     {
-      title: 'Score',
+      title: '得分',
       dataIndex: 'score',
       key: 'score',
       width: 80,
       render: (v: number | undefined) => (v !== undefined ? v : '-'),
     },
     {
-      title: 'Type',
+      title: '类型',
       dataIndex: 'type',
       key: 'type',
       width: 80,
@@ -248,24 +248,24 @@ export default function MatchDetailPage() {
             navigate(demandId ? `/demands/${demandId}` : '/demands')
           }
         >
-          Back to Demand
+          返回需求
         </Button>
       </Space>
 
-      <Title level={3}>Match Detail</Title>
+      <Title level={3}>匹配详情</Title>
 
       {/* Card 1: Match Summary */}
-      <Card title="Match Summary" style={{ marginBottom: 16 }}>
+      <Card title="匹配摘要" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="Product">
+          <Descriptions.Item label="产品">
             {match.product?.name || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Status">
+          <Descriptions.Item label="状态">
             <Tag color={STATUS_COLOR[match.matchStatus] || 'default'}>
               {match.matchStatus}
             </Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Match Score">
+          <Descriptions.Item label="匹配度">
             <Text
               strong
               style={{ color: SCORE_COLOR(match.matchScore), fontSize: 18 }}
@@ -273,28 +273,28 @@ export default function MatchDetailPage() {
               {match.matchScore}%
             </Text>
           </Descriptions.Item>
-          <Descriptions.Item label="Category">
+          <Descriptions.Item label="分类">
             {match.product?.category?.name || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Offer">
+          <Descriptions.Item label="报价">
             {match.offer
               ? `$${match.offer.price ?? 'N/A'}`
               : '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Matched At">
+          <Descriptions.Item label="匹配时间">
             {formatDate(match.matchedAt)}
           </Descriptions.Item>
-          <Descriptions.Item label="Reviewed At">
+          <Descriptions.Item label="审核时间">
             {formatDate(match.reviewedAt)}
           </Descriptions.Item>
-          <Descriptions.Item label="Created At">
+          <Descriptions.Item label="创建时间">
             {formatDate(match.createdAt)}
           </Descriptions.Item>
         </Descriptions>
       </Card>
 
       {/* Card 2: Demand Parameters */}
-      <Card title="Demand Parameters" style={{ marginBottom: 16 }}>
+      <Card title="需求参数" style={{ marginBottom: 16 }}>
         {demandParams.length > 0 ? (
           <Table
             dataSource={demandParams}
@@ -304,13 +304,13 @@ export default function MatchDetailPage() {
             size="small"
           />
         ) : (
-          <Empty description="No parameters" />
+          <Empty description="暂无参数" />
         )}
       </Card>
 
       {/* Card 3: Match Details — structured explanation or raw JSON */}
       {matchDetails && (
-        <Card title="Match Details" style={{ marginBottom: 16 }}>
+        <Card title="匹配详情" style={{ marginBottom: 16 }}>
           {explanation ? (
             <>
               {/* Match Score */}
@@ -321,7 +321,7 @@ export default function MatchDetailPage() {
                   size="small"
                   style={{ marginBottom: 16 }}
                 >
-                  <Descriptions.Item label="Match Score">
+                  <Descriptions.Item label="匹配度">
                     <Text
                       strong
                       style={{
@@ -354,7 +354,7 @@ export default function MatchDetailPage() {
                 items={[
                   {
                     key: 'json',
-                    label: 'Show Raw JSON',
+                    label: '显示原始 JSON',
                     children: (
                       <pre
                         style={{
@@ -378,7 +378,7 @@ export default function MatchDetailPage() {
               items={[
                 {
                   key: 'json',
-                  label: 'Raw Match Details',
+                  label: '原始匹配数据',
                   children: (
                     <pre
                       style={{
@@ -402,14 +402,14 @@ export default function MatchDetailPage() {
 
       {/* Card 4: Lifecycle Actions */}
       {(match.matchStatus === 'PENDING' || match.matchStatus === 'REVIEWED') && (
-        <Card title="Lifecycle Actions" style={{ marginBottom: 16 }}>
+        <Card title="生命周期操作" style={{ marginBottom: 16 }}>
           {match.matchStatus === 'PENDING' && (
             <Button
               type="primary"
               loading={reviewing}
               onClick={handleReviewMatch}
             >
-              Review
+              审核
             </Button>
           )}
 
@@ -421,14 +421,14 @@ export default function MatchDetailPage() {
                 loading={reviewing}
                 onClick={() => handleAcceptReject('ACCEPTED')}
               >
-                Accept
+                接受
               </Button>
               <Button
                 danger
                 loading={reviewing}
                 onClick={() => handleAcceptReject('REJECTED')}
               >
-                Reject
+                拒绝
               </Button>
             </Space>
           )}
@@ -441,7 +441,7 @@ export default function MatchDetailPage() {
           navigate(demandId ? `/demands/${demandId}` : '/demands')
         }
       >
-        Back to Demand
+        返回需求
       </Button>
     </div>
   );

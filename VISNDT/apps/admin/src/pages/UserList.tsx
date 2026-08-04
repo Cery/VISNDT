@@ -21,10 +21,10 @@ interface QueryParams {
 }
 
 const STATUS_OPTIONS = [
-  { value: '', label: 'All Statuses' },
-  { value: 'ACTIVE', label: 'Active' },
-  { value: 'INACTIVE', label: 'Inactive' },
-  { value: 'SUSPENDED', label: 'Suspended' },
+  { value: '', label: '全部状态' },
+  { value: 'ACTIVE', label: '活跃' },
+  { value: 'INACTIVE', label: '未激活' },
+  { value: 'SUSPENDED', label: '已停用' },
 ];
 
 const STATUS_COLOR_MAP: Record<string, string> = {
@@ -59,7 +59,7 @@ function UserList() {
       });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load users';
+        err instanceof Error ? err.message : '加载用户失败';
       setPageState({ status: 'error', message });
     }
   }, [query]);
@@ -125,12 +125,12 @@ function UserList() {
     return (
       <Alert
         type="error"
-        message="Failed to load users"
+        message="加载用户失败"
         description={pageState.message}
         showIcon
         action={
           <Button size="small" onClick={fetchUsers}>
-            Retry
+            重试
           </Button>
         }
       />
@@ -139,7 +139,7 @@ function UserList() {
 
   const columns: ColumnsType<User> = [
     {
-      title: 'Email',
+      title: '邮箱',
       dataIndex: 'email',
       key: 'email',
       render: (email: string) => (
@@ -147,19 +147,19 @@ function UserList() {
       ),
     },
     {
-      title: 'Name',
+      title: '姓名',
       dataIndex: 'name',
       key: 'name',
       render: (name: string | undefined) => name || '-',
     },
     {
-      title: 'Organization ID',
+      title: '组织ID',
       dataIndex: 'organizationId',
       key: 'organizationId',
       render: (id: string | undefined) => id || '-',
     },
     {
-      title: 'Status',
+      title: '状态',
       dataIndex: 'status',
       key: 'status',
       width: 120,
@@ -168,13 +168,13 @@ function UserList() {
       ),
     },
     {
-      title: 'Created',
+      title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Action',
+      title: '操作',
       key: 'action',
       width: 140,
       render: (_: unknown, record: User) => (
@@ -184,14 +184,14 @@ function UserList() {
             icon={<EyeOutlined />}
             onClick={() => navigate(`/users/${record.id}`)}
           >
-            View
+            查看
           </Button>
           <Button
             type="text"
             icon={<EditOutlined />}
             onClick={() => navigate(`/users/${record.id}/edit`)}
           >
-            Edit
+            编辑
           </Button>
         </Space>
       ),
@@ -201,7 +201,7 @@ function UserList() {
   return (
     <div>
       <Title level={4} style={{ marginBottom: 16 }}>
-        User Management
+        用户管理
       </Title>
 
       <Space style={{ marginBottom: 16 }} wrap>
@@ -210,17 +210,17 @@ function UserList() {
           icon={<PlusOutlined />}
           onClick={() => navigate('/users/create')}
         >
-          Create User
+          创建用户
         </Button>
         <Input.Search
-          placeholder="Search by email or name"
+          placeholder="按邮箱或姓名搜索"
           allowClear
           onSearch={handleSearch}
           style={{ width: 320 }}
           prefix={<SearchOutlined />}
         />
         <Select
-          placeholder="Filter by status"
+          placeholder="按状态筛选"
           allowClear
           value={query.status || undefined}
           onChange={handleStatusChange}
@@ -228,7 +228,7 @@ function UserList() {
           style={{ width: 160 }}
         />
         <Button icon={<ReloadOutlined />} onClick={handleReset}>
-          Reset
+          重置
         </Button>
       </Space>
 
@@ -243,7 +243,7 @@ function UserList() {
           total: pageState.total,
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '50'],
-          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+          showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
         }}
       />
     </div>

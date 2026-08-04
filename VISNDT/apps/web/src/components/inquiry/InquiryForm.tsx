@@ -69,7 +69,7 @@ export default function InquiryForm({
       setErrorMsg(
         err instanceof Error
           ? err.message
-          : 'Unable to submit inquiry. Please try again.',
+          : '提交询价失败，请重试。',
       );
     }
   };
@@ -93,15 +93,15 @@ export default function InquiryForm({
             />
           </svg>
           <h3 className="font-semibold text-green-800">
-            Thank you. Your inquiry has been submitted.
+            感谢您的询价，已成功提交。
           </h3>
         </div>
         <p className="text-sm text-green-700">
-          Our team will contact you shortly at{' '}
+          我们的团队将尽快通过{' '}
           <span className="font-medium">
             {result?.inquiry.visitorEmail || formData.email}
           </span>
-          {' '}regarding {productName}.
+          {' '}关于 {productName}.
         </p>
         <button
           onClick={() => {
@@ -110,7 +110,7 @@ export default function InquiryForm({
           }}
           className="mt-4 text-sm text-green-700 hover:text-green-800 underline"
         >
-          Submit another inquiry
+          提交另一个询价
         </button>
       </div>
     );
@@ -120,11 +120,10 @@ export default function InquiryForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <h3 className="font-semibold text-sm text-slate-900">
-        Send Inquiry
+        发送询价
       </h3>
       <p className="text-xs text-slate-500">
-        Interested in {productName}? Fill out the form below and we will get
-        back to you.
+        对 {productName} 感兴趣？填写以下表单，我们将尽快回复。
       </p>
 
       {/* Error Banner */}
@@ -140,7 +139,7 @@ export default function InquiryForm({
           htmlFor="inq-name"
           className="block text-sm font-medium text-slate-700 mb-1"
         >
-          Name <span className="text-red-500">*</span>
+          姓名 <span className="text-red-500">*</span>
         </label>
         <input
           id="inq-name"
@@ -152,7 +151,7 @@ export default function InquiryForm({
           maxLength={100}
           disabled={status === 'submitting'}
           className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
-          placeholder="Your name"
+          placeholder="您的姓名"
         />
       </div>
 
@@ -162,7 +161,7 @@ export default function InquiryForm({
           htmlFor="inq-email"
           className="block text-sm font-medium text-slate-700 mb-1"
         >
-          Email <span className="text-red-500">*</span>
+          邮箱 <span className="text-red-500">*</span>
         </label>
         <input
           id="inq-email"
@@ -173,7 +172,7 @@ export default function InquiryForm({
           required
           disabled={status === 'submitting'}
           className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
-          placeholder="your@email.com"
+          placeholder="请输入邮箱"
         />
       </div>
 
@@ -183,7 +182,7 @@ export default function InquiryForm({
           htmlFor="inq-phone"
           className="block text-sm font-medium text-slate-700 mb-1"
         >
-          Phone <span className="text-slate-400 text-xs">(optional)</span>
+          电话 <span className="text-slate-400 text-xs">（选填）</span>
         </label>
         <input
           id="inq-phone"
@@ -204,7 +203,7 @@ export default function InquiryForm({
           htmlFor="inq-message"
           className="block text-sm font-medium text-slate-700 mb-1"
         >
-          Message <span className="text-red-500">*</span>
+          留言 <span className="text-red-500">*</span>
         </label>
         <textarea
           id="inq-message"
@@ -216,7 +215,7 @@ export default function InquiryForm({
           rows={4}
           disabled={status === 'submitting'}
           className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400 transition-colors resize-y"
-          placeholder="I am interested in this product. Please provide more details."
+          placeholder="我对该产品感兴趣，请提供更多详情。"
         />
       </div>
 
@@ -247,10 +246,10 @@ export default function InquiryForm({
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
               />
             </svg>
-            Submitting...
+            提交中...
           </span>
         ) : (
-          'Submit Inquiry'
+          '提交询价'
         )}
       </button>
     </form>

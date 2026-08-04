@@ -36,7 +36,7 @@ function RfqCreate() {
       setPageState({ status: 'success', demands: result.data });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load demands';
+        err instanceof Error ? err.message : '加载需求列表失败';
       setPageState({ status: 'error', message });
     }
   }, []);
@@ -50,11 +50,11 @@ function RfqCreate() {
       const values = await form.validateFields();
       setSubmitting(true);
       const rfq = await rfqService.create({ demandId: values.demandId });
-      message.success('RFQ created successfully');
+      message.success('询价单创建成功');
       navigate(`/rfqs/${rfq.id}`);
     } catch (err) {
       if (err instanceof Error) {
-        message.error(err.message || 'Failed to create RFQ');
+        message.error(err.message || '创建询价单失败');
       }
     } finally {
       setSubmitting(false);
@@ -73,14 +73,14 @@ function RfqCreate() {
     return (
       <Alert
         type="error"
-        message="Failed to load demands"
+        message="加载需求列表失败"
         description={pageState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={fetchDemands}>Retry</Button>
+            <Button onClick={fetchDemands}>重试</Button>
             <Button onClick={() => navigate('/rfqs')} icon={<ArrowLeftOutlined />}>
-              Back to List
+              返回列表
             </Button>
           </Space>
         }
@@ -92,21 +92,21 @@ function RfqCreate() {
     <div>
       <Space style={{ marginBottom: 16 }}>
         <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/rfqs')}>
-          Back to List
+          返回列表
         </Button>
       </Space>
 
-      <Title level={3}>Create RFQ</Title>
+      <Title level={3}>创建询价单</Title>
 
       <Card style={{ maxWidth: 600 }}>
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <Form.Item
-            label="Select Demand"
+            label="选择需求"
             name="demandId"
-            rules={[{ required: true, message: 'Please select a demand' }]}
+            rules={[{ required: true, message: '请选择一个需求' }]}
           >
             <Select
-              placeholder="Select a demand to create RFQ"
+              placeholder="选择需求以创建询价单"
               showSearch
               optionFilterProp="label"
               options={pageState.demands.map((d) => ({
@@ -123,9 +123,9 @@ function RfqCreate() {
                 htmlType="submit"
                 loading={submitting}
               >
-                Create RFQ
+                创建询价单
               </Button>
-              <Button onClick={() => navigate('/rfqs')}>Cancel</Button>
+              <Button onClick={() => navigate('/rfqs')}>取消</Button>
             </Space>
           </Form.Item>
         </Form>

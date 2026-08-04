@@ -50,7 +50,7 @@ function FileAssetOrphanList() {
       }
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to load orphan files';
+        err instanceof Error ? err.message : '加载孤立文件失败';
       setPageState({ status: 'error', message: errorMessage });
     }
   }, []);
@@ -61,29 +61,27 @@ function FileAssetOrphanList() {
 
   const handleCleanup = useCallback(() => {
     if (selectedRowKeys.length === 0) {
-      message.warning('Please select at least one orphan file to clean up');
+      message.warning('请至少选择一个孤立文件进行清理');
       return;
     }
 
     confirm({
-      title: 'Clean Up Orphan Files',
+      title: '清理孤立文件',
       icon: <ExclamationCircleOutlined />,
       content: (
         <div>
           <p>
-            You are about to delete{' '}
-            <strong>{selectedRowKeys.length}</strong> orphan file
-            {selectedRowKeys.length > 1 ? 's' : ''}.
+            您即将删除{' '}
+            <strong>{selectedRowKeys.length}</strong> 个孤立文件。
           </p>
           <p style={{ color: '#ff4d4f' }}>
-            This action will permanently delete the files from the database and
-            storage. This cannot be undone.
+            此操作将永久从数据库和存储中删除文件，且不可撤销。
           </p>
         </div>
       ),
-      okText: 'Yes, Delete',
+      okText: '确认删除',
       okType: 'danger',
-      cancelText: 'Cancel',
+      cancelText: '取消',
       onOk: async () => {
         setCleaningUp(true);
         try {
@@ -93,18 +91,18 @@ function FileAssetOrphanList() {
 
           if (result.failed.length > 0) {
             message.warning(
-              `Deleted ${result.deleted} orphan file(s). ${result.failed.length} file(s) failed to delete.`,
+              `已删除 ${result.deleted} 个孤立文件，${result.failed.length} 个文件删除失败。`,
             );
           } else {
             message.success(
-              `Successfully deleted ${result.deleted} orphan file(s).`,
+              `成功删除 ${result.deleted} 个孤立文件。`,
             );
           }
 
           await fetchOrphans();
         } catch (err) {
           const errorMessage =
-            err instanceof Error ? err.message : 'Failed to clean up orphan files';
+            err instanceof Error ? err.message : '清理孤立文件失败';
           message.error(errorMessage);
         } finally {
           setCleaningUp(false);
@@ -120,7 +118,7 @@ function FileAssetOrphanList() {
 
   const columns: ColumnsType<FileAsset> = [
     {
-      title: 'File',
+      title: '文件',
       dataIndex: 'fileName',
       key: 'fileName',
       width: 260,
@@ -132,7 +130,7 @@ function FileAssetOrphanList() {
       ),
     },
     {
-      title: 'Type',
+      title: '类型',
       dataIndex: 'fileType',
       key: 'fileType',
       width: 110,
@@ -148,7 +146,7 @@ function FileAssetOrphanList() {
       ellipsis: true,
     },
     {
-      title: 'Size',
+      title: '大小',
       dataIndex: 'fileSize',
       key: 'fileSize',
       width: 100,
@@ -167,7 +165,7 @@ function FileAssetOrphanList() {
       ),
     },
     {
-      title: 'Created',
+      title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 170,
@@ -187,12 +185,12 @@ function FileAssetOrphanList() {
     return (
       <Alert
         type="error"
-        message="Failed to Load Orphan Files"
+        message="加载孤立文件失败"
         description={pageState.message}
         showIcon
         action={
           <Button onClick={fetchOrphans} type="primary">
-            Retry
+            重试
           </Button>
         }
       />
@@ -203,15 +201,15 @@ function FileAssetOrphanList() {
     return (
       <div>
         <Title level={4} style={{ marginBottom: 24 }}>
-          Orphan Files
+          孤立文件
         </Title>
         <Alert
           type="success"
-          message="No Orphan Files"
-          description="All FileAssets are properly linked to ProductMedia records. No cleanup needed."
+          message="无孤立文件"
+          description="所有文件资产已正确关联到产品媒体记录，无需清理。"
           showIcon
           action={
-            <Button onClick={fetchOrphans}>Refresh</Button>
+            <Button onClick={fetchOrphans}>刷新</Button>
           }
         />
       </div>
@@ -229,10 +227,10 @@ function FileAssetOrphanList() {
         }}
       >
         <Title level={4} style={{ margin: 0 }}>
-          Orphan Files
+          孤立文件
         </Title>
         <Space>
-          <Button onClick={fetchOrphans}>Refresh</Button>
+          <Button onClick={fetchOrphans}>刷新</Button>
           <Button
             type="primary"
             danger
@@ -241,7 +239,7 @@ function FileAssetOrphanList() {
             loading={cleaningUp}
             disabled={selectedRowKeys.length === 0}
           >
-            Cleanup Selected ({selectedRowKeys.length})
+            清理选中 ({selectedRowKeys.length})
           </Button>
         </Space>
       </div>
@@ -254,7 +252,7 @@ function FileAssetOrphanList() {
         pagination={{
           pageSize: 20,
           showSizeChanger: true,
-          showTotal: (total) => `Total ${total} orphan file(s)`,
+          showTotal: (total) => `共 ${total} 个孤立文件`,
         }}
         scroll={{ x: 1200 }}
       />

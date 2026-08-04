@@ -23,7 +23,7 @@ export default function ProductFilter({
     <div className="space-y-6">
       {/* Category Filter */}
       <div>
-        <h3 className="font-semibold text-sm mb-3">Category</h3>
+        <h3 className="font-semibold text-sm mb-3">分类</h3>
         <div className="space-y-1">
           <button
             onClick={() => onCategoryChange(undefined)}
@@ -33,7 +33,7 @@ export default function ProductFilter({
                 : 'text-muted-foreground hover:bg-muted'
             }`}
           >
-            All Categories
+            全部分类
           </button>
           {categories.map((cat) => (
             <button
@@ -53,7 +53,7 @@ export default function ProductFilter({
 
       {/* Sort Options */}
       <div>
-        <h3 className="font-semibold text-sm mb-3">Sort By</h3>
+        <h3 className="font-semibold text-sm mb-3">排序方式</h3>
         <select
           value={`${sortBy}:${sortOrder}`}
           onChange={(e) => {
@@ -62,11 +62,11 @@ export default function ProductFilter({
           }}
           className="w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20"
         >
-          <option value="createdAt:desc">Newest First</option>
-          <option value="createdAt:asc">Oldest First</option>
-          <option value="name:asc">Name (A-Z)</option>
-          <option value="name:desc">Name (Z-A)</option>
-          <option value="updatedAt:desc">Recently Updated</option>
+          <option value="createdAt:desc">最新优先</option>
+          <option value="createdAt:asc">最早优先</option>
+          <option value="name:asc">名称 (A-Z)</option>
+          <option value="name:desc">名称 (Z-A)</option>
+          <option value="updatedAt:desc">最近更新</option>
         </select>
       </div>
     </div>

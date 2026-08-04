@@ -57,39 +57,39 @@ function WorkspaceContent() {
             <div>
               <h2 className="text-xl font-bold text-slate-900">
                 {user?.organizationId
-                  ? 'Organization Workspace'
-                  : 'Personal Workspace'}
+                  ? '组织工作区'
+                  : '个人工作区'}
               </h2>
               <p className="text-slate-500 text-sm mt-1">
-                Manage your demands, RFQs, and matches in one place.
+                一站式管理您的需求、询价和匹配。
               </p>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <StatCard
-                label="My Demands"
+                label="我的需求"
                 value={isLoading ? '...' : demands.length}
-                description="Active demand listings"
+                description="活跃需求列表"
                 icon="📋"
               />
               <StatCard
-                label="RFQs Received"
+                label="收到的询价"
                 value={isLoading ? '...' : rfqs.length}
-                description="Incoming RFQs"
+                description="收到的询价单"
                 icon="📄"
               />
               <StatCard
-                label="Organization"
-                value={user?.organizationId ? 'Active' : 'Pending'}
+                label="组织"
+                value={user?.organizationId ? '已激活' : '待处理'}
                 icon="🏢"
               />
             </div>
 
-            {/* Recent Demands */}
+            {/* 最近需求 */}
             <section>
               <h3 className="font-semibold text-slate-900 mb-3">
-                Recent Demands
+                最近需求
               </h3>
               {isLoading ? (
                 <div className="space-y-3">
@@ -115,18 +115,18 @@ function WorkspaceContent() {
                 </div>
               ) : (
                 <WorkspaceEmpty
-                  title="No demands yet"
-                  message="You have not created any demand listings yet."
-                  actionLabel="Browse Products"
+                  title="暂无需求"
+                  message="您还没有创建任何需求。"
+                  actionLabel="浏览产品"
                   actionHref="/products"
                 />
               )}
             </section>
 
-            {/* Recent RFQs */}
+            {/* 最近询价 */}
             <section>
               <h3 className="font-semibold text-slate-900 mb-3">
-                Recent RFQs
+                最近询价
               </h3>
               {isLoading ? (
                 <div className="space-y-3">
@@ -151,8 +151,8 @@ function WorkspaceContent() {
                 </div>
               ) : (
                 <WorkspaceEmpty
-                  title="No RFQs yet"
-                  message="No RFQs have been received for your organization."
+                  title="暂无询价"
+                  message="您的组织尚未收到任何询价。"
                 />
               )}
             </section>

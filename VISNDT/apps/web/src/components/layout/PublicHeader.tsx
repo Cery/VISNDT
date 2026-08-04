@@ -5,13 +5,13 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const NAV_ITEMS = [
-  { href: '/', label: 'Home' },
-  { href: '/products', label: 'Products' },
-  { href: '/categories', label: 'Categories' },
-  { href: '/solutions', label: 'Solutions' },
-  { href: '/knowledge', label: 'Knowledge' },
-  { href: '/business', label: 'Business' },
-  { href: '/about', label: 'About' },
+  { href: '/', label: '首页' },
+  { href: '/products', label: '产品' },
+  { href: '/categories', label: '分类' },
+  { href: '/solutions', label: '解决方案' },
+  { href: '/knowledge', label: '知识中心' },
+  { href: '/business', label: '商务合作' },
+  { href: '/about', label: '关于我们' },
 ];
 
 export default function PublicHeader() {
@@ -52,13 +52,13 @@ export default function PublicHeader() {
             href="/login"
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            Login
+            登录
           </Link>
           <Link
             href="/register"
             className="text-sm bg-primary text-primary-foreground px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
           >
-            Register
+            注册
           </Link>
         </div>
 
@@ -66,7 +66,7 @@ export default function PublicHeader() {
         <button
           onClick={() => setMobileOpen((prev) => !prev)}
           className="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
-          aria-label="Toggle menu"
+          aria-label="切换菜单"
           aria-expanded={mobileOpen}
         >
           {mobileOpen ? (
@@ -108,14 +108,14 @@ export default function PublicHeader() {
                 onClick={() => setMobileOpen(false)}
                 className="flex-1 text-center text-sm text-muted-foreground hover:text-foreground py-2 rounded-md border transition-colors"
               >
-                Login
+                登录
               </Link>
               <Link
                 href="/register"
                 onClick={() => setMobileOpen(false)}
                 className="flex-1 text-center text-sm bg-primary text-primary-foreground px-4 py-2 rounded-md hover:opacity-90 transition-opacity"
               >
-                Register
+                注册
               </Link>
             </div>
           </nav>

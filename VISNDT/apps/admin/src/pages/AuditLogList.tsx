@@ -16,7 +16,7 @@ const ACTION_COLOR: Record<string, string> = {
 };
 
 const ACTION_OPTIONS: { label: string; value: string }[] = [
-  { label: 'All', value: '' },
+  { label: '全部', value: '' },
   { label: 'CREATE', value: 'CREATE' },
   { label: 'UPDATE', value: 'UPDATE' },
   { label: 'DELETE', value: 'DELETE' },
@@ -59,7 +59,7 @@ function AuditLogList() {
       }
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load audit logs';
+        err instanceof Error ? err.message : '加载审计日志失败';
       setPageState({ status: 'error', message });
     }
   }, [page, pageSize, actionFilter, entityTypeFilter]);
@@ -93,12 +93,12 @@ function AuditLogList() {
     return (
       <Alert
         type="error"
-        message="Failed to load audit logs"
+        message="加载审计日志失败"
         description={pageState.message}
         showIcon
         action={
           <Button size="small" onClick={fetchAuditLogs}>
-            Retry
+            重试
           </Button>
         }
       />
@@ -107,14 +107,14 @@ function AuditLogList() {
 
   const columns: ColumnsType<AuditLog> = [
     {
-      title: 'Time',
+      title: '时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 180,
       render: (date: string) => new Date(date).toLocaleString(),
     },
     {
-      title: 'Action',
+      title: '操作类型',
       dataIndex: 'action',
       key: 'action',
       width: 140,
@@ -123,14 +123,14 @@ function AuditLogList() {
       ),
     },
     {
-      title: 'Entity Type',
+      title: '实体类型',
       dataIndex: 'entityType',
       key: 'entityType',
       width: 140,
       render: (type: string) => <Tag>{type}</Tag>,
     },
     {
-      title: 'Entity ID',
+      title: '实体编号',
       dataIndex: 'entityId',
       key: 'entityId',
       width: 120,
@@ -140,7 +140,7 @@ function AuditLogList() {
       ),
     },
     {
-      title: 'Operator',
+      title: '操作者',
       dataIndex: 'operator',
       key: 'operator',
       width: 180,
@@ -148,7 +148,7 @@ function AuditLogList() {
         operator ? operator.name || operator.email : '-',
     },
     {
-      title: 'Old Value',
+      title: '旧值',
       dataIndex: 'oldValue',
       key: 'oldValue',
       width: 200,
@@ -163,7 +163,7 @@ function AuditLogList() {
         ),
     },
     {
-      title: 'New Value',
+      title: '新值',
       dataIndex: 'newValue',
       key: 'newValue',
       width: 200,
@@ -182,12 +182,12 @@ function AuditLogList() {
   return (
     <div>
       <Title level={4} style={{ marginBottom: 16 }}>
-        Audit Log
+        审计日志
       </Title>
 
       <Card size="small" style={{ marginBottom: 16 }}>
         <Space wrap>
-          <span>Action:</span>
+          <span>操作类型:</span>
           <Select
             value={actionFilter}
             onChange={(v) => {
@@ -197,9 +197,9 @@ function AuditLogList() {
             options={ACTION_OPTIONS}
             style={{ width: 160 }}
           />
-          <span>Entity Type:</span>
+          <span>实体类型:</span>
           <Input
-            placeholder="e.g. DEMAND, OFFER"
+            placeholder="如 DEMAND, OFFER"
             value={entityTypeFilter}
             onChange={(e) => {
               setEntityTypeFilter(e.target.value);
@@ -210,7 +210,7 @@ function AuditLogList() {
             allowClear
           />
           <Button icon={<ReloadOutlined />} onClick={handleRefresh}>
-            Refresh
+            刷新
           </Button>
         </Space>
       </Card>
@@ -218,8 +218,8 @@ function AuditLogList() {
       {pageState.status === 'empty' ? (
         <Alert
           type="info"
-          message="No audit logs"
-          description="No audit log entries found."
+          message="暂无审计日志"
+          description="未找到审计日志记录。"
           showIcon
         />
       ) : (
@@ -234,7 +234,7 @@ function AuditLogList() {
             total: pageState.total,
             showSizeChanger: true,
             pageSizeOptions: ['10', '20', '50'],
-            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+            showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
           }}
           scroll={{ x: 1200 }}
         />

@@ -45,7 +45,7 @@ function ProductCategoryList() {
       }
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load categories';
+        err instanceof Error ? err.message : '加载分类失败';
       setPageState({ status: 'error', message });
     }
   }, [query]);
@@ -77,12 +77,12 @@ function ProductCategoryList() {
     return (
       <Alert
         type="error"
-        message="Failed to load categories"
+        message="加载分类失败"
         description={pageState.message}
         showIcon
         action={
           <Button size="small" onClick={fetchData}>
-            Retry
+            重试
           </Button>
         }
       />
@@ -91,7 +91,7 @@ function ProductCategoryList() {
 
   const columns: ColumnsType<ProductCategory> = [
     {
-      title: 'Name',
+      title: '名称',
       dataIndex: 'name',
       key: 'name',
       render: (name: string) => (
@@ -99,19 +99,19 @@ function ProductCategoryList() {
       ),
     },
     {
-      title: 'Slug',
+      title: '标识',
       dataIndex: 'slug',
       key: 'slug',
       render: (slug: string) => <code>{slug}</code>,
     },
     {
-      title: 'Parent',
+      title: '父级',
       dataIndex: 'parentId',
       key: 'parentId',
       render: (parentId: string | undefined) => parentId || '-',
     },
     {
-      title: 'Children',
+      title: '子级',
       dataIndex: 'children',
       key: 'children',
       width: 100,
@@ -119,14 +119,14 @@ function ProductCategoryList() {
         children ? children.length : 0,
     },
     {
-      title: 'Created At',
+      title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 160,
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       width: 80,
       render: (_: unknown, record: ProductCategory) => (
@@ -134,7 +134,7 @@ function ProductCategoryList() {
           type="link"
           onClick={() => navigate(`/product-categories/${record.id}/edit`)}
         >
-          Edit
+          编辑
         </Button>
       ),
     },
@@ -151,22 +151,22 @@ function ProductCategoryList() {
         }}
       >
         <Title level={4} style={{ margin: 0 }}>
-          Categories
+          分类管理
         </Title>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => navigate('/product-categories/create')}
         >
-          Create Category
+          创建分类
         </Button>
       </div>
 
       {pageState.status === 'empty' ? (
         <Alert
           type="info"
-          message="No Categories"
-          description="No categories have been created yet. Click 'Create Category' to add one."
+          message="暂无分类"
+          description="暂无分类数据，请点击「创建分类」添加。"
           showIcon
         />
       ) : (
@@ -181,7 +181,7 @@ function ProductCategoryList() {
             total: pageState.total,
             showSizeChanger: true,
             pageSizeOptions: ['10', '20', '50'],
-            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+            showTotal: (total, range) => `${range[0]}-${range[1]} / 共 ${total} 条`,
           }}
         />
       )}

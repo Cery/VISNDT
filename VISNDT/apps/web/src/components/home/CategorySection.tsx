@@ -17,10 +17,10 @@ export default function CategorySection() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">
-            Product Categories
+            产品分类
           </h2>
           <p className="text-slate-500 max-w-xl mx-auto">
-            Browse industrial inspection equipment by standardized product categories
+            按标准化产品分类浏览工业检测设备
           </p>
         </div>
 
@@ -39,11 +39,11 @@ export default function CategorySection() {
           </div>
         ) : isError ? (
           <div className="text-center py-12 text-slate-400">
-            <p>Unable to load categories. Please try again later.</p>
+            <p>无法加载分类，请稍后重试。</p>
           </div>
         ) : categories.length === 0 ? (
           <div className="text-center py-12 text-slate-400">
-            <p>No categories available.</p>
+            <p>暂无分类</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

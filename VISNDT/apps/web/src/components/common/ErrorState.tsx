@@ -3,7 +3,7 @@ interface ErrorStateProps {
   onRetry?: () => void;
 }
 
-export default function ErrorState({ message = 'Something went wrong', onRetry }: ErrorStateProps) {
+export default function ErrorState({ message = '出了点问题', onRetry }: ErrorStateProps) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[200px] gap-4">
       <p className="text-destructive text-sm">{message}</p>
@@ -12,7 +12,7 @@ export default function ErrorState({ message = 'Something went wrong', onRetry }
           onClick={onRetry}
           className="text-sm text-primary hover:underline"
         >
-          Retry
+          重试
         </button>
       )}
     </div>

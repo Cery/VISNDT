@@ -7,7 +7,7 @@ interface ProductParametersProps {
 export default function ProductParameters({ parameters }: ProductParametersProps) {
   if (parameters.length === 0) {
     return (
-      <p className="text-sm text-muted-foreground">No technical parameters available.</p>
+      <p className="text-sm text-muted-foreground">暂无技术参数。</p>
     );
   }
 
@@ -17,10 +17,10 @@ export default function ProductParameters({ parameters }: ProductParametersProps
         <thead>
           <tr className="border-b">
             <th className="text-left py-2 px-3 font-semibold text-muted-foreground w-1/3">
-              Parameter
+              参数
             </th>
             <th className="text-left py-2 px-3 font-semibold text-muted-foreground">
-              Value
+              值
             </th>
           </tr>
         </thead>

@@ -50,7 +50,7 @@ export default function NotificationDetailPage() {
       setPageState({ status: 'success', data });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load notification';
+        err instanceof Error ? err.message : '加载通知失败';
       setPageState({ status: 'error', message });
     }
   }, [id]);
@@ -83,17 +83,17 @@ export default function NotificationDetailPage() {
     return (
       <Alert
         type="error"
-        message="Failed to load notification"
+        message="加载通知失败"
         description={pageState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={fetchNotification}>Retry</Button>
+            <Button onClick={fetchNotification}>重试</Button>
             <Button
               onClick={() => navigate('/notifications')}
               icon={<ArrowLeftOutlined />}
             >
-              Back to List
+              返回列表
             </Button>
           </Space>
         }
@@ -110,40 +110,40 @@ export default function NotificationDetailPage() {
           icon={<ArrowLeftOutlined />}
           onClick={() => navigate('/notifications')}
         >
-          Back to List
+          返回列表
         </Button>
       </Space>
 
-      <Title level={3}>Notification Detail</Title>
+      <Title level={3}>通知详情</Title>
 
-      <Card title="Basic Information" style={{ marginBottom: 16 }}>
+      <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
           <Descriptions.Item label="ID">{notification.id}</Descriptions.Item>
-          <Descriptions.Item label="Type">
+          <Descriptions.Item label="类型">
             <Tag color={TYPE_COLOR[notification.type] || 'default'}>
               {notification.type}
             </Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Status">
+          <Descriptions.Item label="状态">
             <Tag color={STATUS_COLOR[notification.status] || 'default'}>
               {notification.status}
             </Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Created At">
+          <Descriptions.Item label="创建时间">
             {formatDate(notification.createdAt)}
           </Descriptions.Item>
-          <Descriptions.Item label="Updated At">
+          <Descriptions.Item label="更新时间">
             {formatDate(notification.updatedAt)}
           </Descriptions.Item>
         </Descriptions>
       </Card>
 
-      <Card title="Content" style={{ marginBottom: 16 }}>
+      <Card title="内容" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={1}>
-          <Descriptions.Item label="Title">
+          <Descriptions.Item label="标题">
             <span style={{ fontWeight: 500 }}>{notification.title}</span>
           </Descriptions.Item>
-          <Descriptions.Item label="Message">
+          <Descriptions.Item label="消息">
             <p style={{ whiteSpace: 'pre-wrap', margin: 0 }}>
               {notification.message}
             </p>
@@ -151,12 +151,12 @@ export default function NotificationDetailPage() {
         </Descriptions>
       </Card>
 
-      <Card title="Reference">
+      <Card title="引用" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="Reference Type">
+          <Descriptions.Item label="引用类型">
             {notification.referenceType || 'N/A'}
           </Descriptions.Item>
-          <Descriptions.Item label="Reference ID">
+          <Descriptions.Item label="引用ID">
             {notification.referenceId || 'N/A'}
           </Descriptions.Item>
         </Descriptions>

@@ -22,13 +22,13 @@ interface QueryParams {
 }
 
 const STATUS_OPTIONS = [
-  { value: '', label: 'All Statuses' },
-  { value: 'DRAFT', label: 'Draft' },
-  { value: 'PUBLISHED', label: 'Published' },
-  { value: 'SUBMITTED', label: 'Submitted' },
-  { value: 'PROCESSING', label: 'Processing' },
-  { value: 'CLOSED', label: 'Closed' },
-  { value: 'CANCELLED', label: 'Cancelled' },
+  { value: '', label: '全部状态' },
+  { value: 'DRAFT', label: '草稿' },
+  { value: 'PUBLISHED', label: '已发布' },
+  { value: 'SUBMITTED', label: '已提交' },
+  { value: 'PROCESSING', label: '处理中' },
+  { value: 'CLOSED', label: '已关闭' },
+  { value: 'CANCELLED', label: '已取消' },
 ];
 
 const STATUS_COLOR_MAP: Record<string, string> = {
@@ -73,7 +73,7 @@ function DemandList() {
       });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load demands';
+        err instanceof Error ? err.message : '加载需求失败';
       setPageState({ status: 'error', message });
     }
   }, [query]);
@@ -135,12 +135,12 @@ function DemandList() {
     return (
       <Alert
         type="error"
-        message="Failed to load demands"
+        message="加载需求失败"
         description={pageState.message}
         showIcon
         action={
           <Button size="small" onClick={fetchDemands}>
-            Retry
+            重试
           </Button>
         }
       />
@@ -149,7 +149,7 @@ function DemandList() {
 
   const columns: ColumnsType<Demand> = [
     {
-      title: 'Title',
+      title: '标题',
       dataIndex: 'title',
       key: 'title',
       render: (title: string) => (
@@ -157,19 +157,19 @@ function DemandList() {
       ),
     },
     {
-      title: 'Organization',
+      title: '组织',
       dataIndex: 'organization',
       key: 'organization',
       render: (org: Demand['organization']) => org?.name || '-',
     },
     {
-      title: 'Category',
+      title: '分类',
       dataIndex: 'category',
       key: 'category',
       render: (cat: Demand['category']) => cat?.name || '-',
     },
     {
-      title: 'Status',
+      title: '状态',
       dataIndex: 'status',
       key: 'status',
       width: 120,
@@ -178,7 +178,7 @@ function DemandList() {
       ),
     },
     {
-      title: 'Published',
+      title: '发布时间',
       dataIndex: 'publishedAt',
       key: 'publishedAt',
       sorter: true,
@@ -186,7 +186,7 @@ function DemandList() {
         date ? new Date(date).toLocaleDateString() : '-',
     },
     {
-      title: 'Created',
+      title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
       sorter: true,
@@ -197,19 +197,19 @@ function DemandList() {
   return (
     <div>
       <Title level={4} style={{ marginBottom: 16 }}>
-        Demand Management
+        需求管理
       </Title>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search
-          placeholder="Search by title or description"
+          placeholder="按标题或描述搜索"
           allowClear
           onSearch={handleSearch}
           style={{ width: 320 }}
           prefix={<SearchOutlined />}
         />
         <Select
-          placeholder="Filter by status"
+          placeholder="按状态筛选"
           allowClear
           value={query.status || undefined}
           onChange={handleStatusChange}
@@ -217,7 +217,7 @@ function DemandList() {
           style={{ width: 160 }}
         />
         <Button icon={<ReloadOutlined />} onClick={handleReset}>
-          Reset
+          重置
         </Button>
       </Space>
 
@@ -232,7 +232,7 @@ function DemandList() {
           total: pageState.total,
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '50'],
-          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+          showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
         }}
       />
     </div>

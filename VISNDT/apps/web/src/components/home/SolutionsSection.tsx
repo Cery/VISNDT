@@ -2,8 +2,8 @@
 const SOLUTIONS = [
   {
     id: 'sol-1',
-    title: 'Aerospace Inspection',
-    description: 'High-precision borescope inspection for aircraft engines, turbine blades, and structural components.',
+    title: '航空航天检测',
+    description: '用于飞机发动机、涡轮叶片和结构部件的高精度内窥镜检测。',
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -12,8 +12,8 @@ const SOLUTIONS = [
   },
   {
     id: 'sol-2',
-    title: 'Automotive Inspection',
-    description: 'Engine cylinder, fuel injector, and exhaust system inspection using flexible video endoscopes.',
+    title: '汽车检测',
+    description: '使用柔性视频内窥镜进行发动机气缸、喷油器和排气系统的检测。',
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zm10 0a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -23,8 +23,8 @@ const SOLUTIONS = [
   },
   {
     id: 'sol-3',
-    title: 'Pipeline Inspection',
-    description: 'Robotic crawler systems for drainage, sewer, and industrial pipeline internal inspection.',
+    title: '管道检测',
+    description: '用于排水、污水和工业管道内部检测的机器人爬行器系统。',
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -33,8 +33,8 @@ const SOLUTIONS = [
   },
   {
     id: 'sol-4',
-    title: 'Manufacturing Quality Control',
-    description: 'Non-destructive testing for weld inspection, casting defect detection, and surface quality evaluation.',
+    title: '制造质量控制',
+    description: '用于焊缝检测、铸件缺陷检测和表面质量评估的无损检测。',
     icon: (
       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -49,10 +49,10 @@ export default function SolutionsSection() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">
-            Industrial Application Solutions
+            工业应用解决方案
           </h2>
           <p className="text-slate-500 max-w-xl mx-auto">
-            Professional inspection solutions tailored for diverse industrial scenarios
+            为不同工业场景量身定制的专业检测解决方案
           </p>
         </div>
 

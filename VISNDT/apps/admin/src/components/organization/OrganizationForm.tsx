@@ -11,9 +11,9 @@ interface OrganizationFormProps {
 }
 
 const STATUS_OPTIONS = [
-  { value: 'ACTIVE', label: 'Active' },
-  { value: 'INACTIVE', label: 'Inactive' },
-  { value: 'SUSPENDED', label: 'Suspended' },
+  { value: 'ACTIVE', label: '激活' },
+  { value: 'INACTIVE', label: '未激活' },
+  { value: 'SUSPENDED', label: '已停用' },
 ];
 
 export default function OrganizationForm({
@@ -31,8 +31,8 @@ export default function OrganizationForm({
       await onSubmit(values);
       message.success(
         mode === 'create'
-          ? 'Organization created successfully'
-          : 'Organization updated successfully',
+          ? '组织创建成功'
+          : '组织更新成功',
       );
       if (mode === 'create') {
         navigate('/organizations');
@@ -41,7 +41,7 @@ export default function OrganizationForm({
       }
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to save organization';
+        err instanceof Error ? err.message : '保存组织失败';
       message.error(errorMessage);
     } finally {
       setSubmitting(false);
@@ -49,15 +49,15 @@ export default function OrganizationForm({
   };
 
   const title =
-    mode === 'create' ? 'Create Organization' : 'Edit Organization';
+    mode === 'create' ? '创建组织' : '编辑组织';
   const submitLabel =
-    mode === 'create' ? 'Create Organization' : 'Update Organization';
+    mode === 'create' ? '创建组织' : '更新组织';
 
   return (
     <div>
       <Space style={{ marginBottom: 16 }}>
         <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>
-          Back
+          返回
         </Button>
       </Space>
       <h2>{title}</h2>
@@ -69,25 +69,25 @@ export default function OrganizationForm({
         style={{ maxWidth: 600 }}
       >
         <Form.Item
-          label="Name"
+          label="名称"
           name="name"
-          rules={[{ required: true, message: 'Please enter organization name' }]}
+          rules={[{ required: true, message: '请输入组织名称' }]}
         >
-          <Input placeholder="Enter organization name" />
+          <Input placeholder="请输入组织名称" />
         </Form.Item>
 
         <Form.Item
-          label="Type"
+          label="类型"
           name="type"
-          rules={[{ required: true, message: 'Please enter organization type' }]}
+          rules={[{ required: true, message: '请输入组织类型' }]}
         >
-          <Input placeholder="Enter organization type (e.g. supplier, buyer)" />
+          <Input placeholder="请输入组织类型（如：供应商、买方）" />
         </Form.Item>
 
         {mode === 'edit' && (
-          <Form.Item label="Status" name="status">
+          <Form.Item label="状态" name="status">
             <Select
-              placeholder="Select status"
+              placeholder="请选择状态"
               allowClear
               options={STATUS_OPTIONS}
             />
@@ -99,7 +99,7 @@ export default function OrganizationForm({
             <Button type="primary" htmlType="submit" loading={submitting}>
               {submitLabel}
             </Button>
-            <Button onClick={() => navigate(-1)}>Cancel</Button>
+            <Button onClick={() => navigate(-1)}>取消</Button>
           </Space>
         </Form.Item>
       </Form>

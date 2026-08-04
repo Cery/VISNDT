@@ -45,7 +45,7 @@ function ParameterGroupList() {
       }
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Failed to load parameter groups';
+        err instanceof Error ? err.message : '加载参数组失败';
       setPageState({ status: 'error', message });
     }
   }, [query]);
@@ -77,12 +77,12 @@ function ParameterGroupList() {
     return (
       <Alert
         type="error"
-        message="Failed to load parameter groups"
+        message="加载参数组失败"
         description={pageState.message}
         showIcon
         action={
           <Button size="small" onClick={fetchData}>
-            Retry
+            重试
           </Button>
         }
       />
@@ -91,7 +91,7 @@ function ParameterGroupList() {
 
   const columns: ColumnsType<ParameterGroup> = [
     {
-      title: 'Name',
+      title: '名称',
       dataIndex: 'name',
       key: 'name',
       render: (name: string) => (
@@ -99,26 +99,26 @@ function ParameterGroupList() {
       ),
     },
     {
-      title: 'Code',
+      title: '编码',
       dataIndex: 'code',
       key: 'code',
       render: (code: string) => <code>{code}</code>,
     },
     {
-      title: 'Description',
+      title: '描述',
       dataIndex: 'description',
       key: 'description',
       render: (desc: string | undefined) => desc || '-',
     },
     {
-      title: 'Created At',
+      title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 160,
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       width: 120,
       render: (_: unknown, record: ParameterGroup) => (
@@ -126,7 +126,7 @@ function ParameterGroupList() {
           type="link"
           onClick={() => navigate(`/parameter-groups/${record.id}/edit`)}
         >
-          Edit
+          编辑
         </Button>
       ),
     },
@@ -143,22 +143,22 @@ function ParameterGroupList() {
         }}
       >
         <Title level={4} style={{ margin: 0 }}>
-          Parameter Groups
+          参数组管理
         </Title>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => navigate('/parameter-groups/create')}
         >
-          Create Group
+          创建分组
         </Button>
       </div>
 
       {pageState.status === 'empty' ? (
         <Alert
           type="info"
-          message="No Parameter Groups"
-          description="No parameter groups have been created yet. Click 'Create Group' to add one."
+          message="暂无参数组"
+          description="暂无参数组数据，请点击「创建分组」添加。"
           showIcon
         />
       ) : (
@@ -173,7 +173,7 @@ function ParameterGroupList() {
             total: pageState.total,
             showSizeChanger: true,
             pageSizeOptions: ['10', '20', '50'],
-            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total}`,
+            showTotal: (total, range) => `${range[0]}-${range[1]} / 共 ${total} 条`,
           }}
         />
       )}

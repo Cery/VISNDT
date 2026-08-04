@@ -10,7 +10,7 @@ interface SearchBarProps {
 
 export default function SearchBar({
   onSearch,
-  placeholder = 'Search products...',
+  placeholder = '搜索产品...',
   initialValue = '',
 }: SearchBarProps) {
   const [value, setValue] = useState(initialValue);
@@ -33,7 +33,7 @@ export default function SearchBar({
         type="submit"
         className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm hover:opacity-90 transition-opacity"
       >
-        Search
+        搜索
       </button>
     </form>
   );

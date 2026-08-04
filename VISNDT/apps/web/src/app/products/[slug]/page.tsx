@@ -25,11 +25,11 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
         <Link href="/" className="hover:text-foreground transition-colors">
-          Home
+          首页
         </Link>
         <span>/</span>
         <Link href="/products" className="hover:text-foreground transition-colors">
-          Products
+          产品列表
         </Link>
         {product.category && (
           <>
@@ -55,7 +55,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
           <div>
             <h1 className="text-2xl font-bold text-slate-900">{product.name}</h1>
             {product.model && (
-              <p className="text-slate-500 mt-1">Model: {product.model}</p>
+              <p className="text-slate-500 mt-1">型号：{product.model}</p>
             )}
             {product.category && (
               <span className="inline-block mt-2 text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">
@@ -66,7 +66,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
           {product.description && (
             <div>
-              <h2 className="font-semibold text-sm text-slate-700 mb-2">Description</h2>
+              <h2 className="font-semibold text-sm text-slate-700 mb-2">产品描述</h2>
               <p className="text-sm text-slate-500 whitespace-pre-wrap leading-relaxed">
                 {product.description}
               </p>
@@ -89,7 +89,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
       {/* Technical Parameters */}
       <section className="mb-12">
-        <h2 className="text-xl font-bold text-slate-900 mb-4">Technical Parameters</h2>
+        <h2 className="text-xl font-bold text-slate-900 mb-4">技术参数</h2>
         <div className="rounded-lg border border-slate-200 p-4">
           <ProductParameters parameters={product.parameterValues} />
         </div>
@@ -98,7 +98,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       {/* Product Media Documents */}
       {product.media.filter((m) => m.mediaType !== 'IMAGE').length > 0 && (
         <section>
-          <h2 className="text-xl font-bold text-slate-900 mb-4">Documents & Certificates</h2>
+          <h2 className="text-xl font-bold text-slate-900 mb-4">文档与证书</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {product.media
               .filter((m) => m.mediaType !== 'IMAGE')
@@ -109,12 +109,12 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                 >
                   <div className="w-10 h-10 bg-slate-100 rounded flex items-center justify-center flex-shrink-0">
                     <span className="text-xs text-slate-400">
-                      {doc.mediaType === 'CERTIFICATE' ? 'Cert' : 'Doc'}
+                      {doc.mediaType === 'CERTIFICATE' ? '证书' : '文档'}
                     </span>
                   </div>
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-slate-700 truncate">
-                      {doc.title || 'Document'}
+                      {doc.title || '文档'}
                     </p>
                     {doc.description && (
                       <p className="text-xs text-slate-400 truncate">

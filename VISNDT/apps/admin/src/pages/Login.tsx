@@ -25,7 +25,7 @@ function Login() {
       const state = location.state as LocationState | null;
       navigate(state?.from ?? '/home', { replace: true });
     } catch {
-      setError('Invalid email or password. Please try again.');
+      setError('邮箱或密码错误，请重试。');
     } finally {
       setLoading(false);
     }
@@ -48,9 +48,9 @@ function Login() {
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           <div style={{ textAlign: 'center' }}>
             <Title level={3} style={{ marginBottom: 4 }}>
-              VISNDT Admin
+              VISNDT 管理后台
             </Title>
-            <Text type="secondary">Sign in to your account</Text>
+            <Text type="secondary">登录您的账户</Text>
           </div>
 
           {error && (
@@ -73,13 +73,13 @@ function Login() {
             <Form.Item
               name="email"
               rules={[
-                { required: true, message: 'Please enter your email' },
-                { type: 'email', message: 'Please enter a valid email' },
+                { required: true, message: '请输入邮箱' },
+                { type: 'email', message: '请输入有效的邮箱' },
               ]}
             >
               <Input
                 prefix={<MailOutlined />}
-                placeholder="Email"
+                placeholder="邮箱"
                 autoFocus
               />
             </Form.Item>
@@ -87,12 +87,12 @@ function Login() {
             <Form.Item
               name="password"
               rules={[
-                { required: true, message: 'Please enter your password' },
+                { required: true, message: '请输入密码' },
               ]}
             >
               <Input.Password
                 prefix={<LockOutlined />}
-                placeholder="Password"
+                placeholder="密码"
               />
             </Form.Item>
 
@@ -103,7 +103,7 @@ function Login() {
                 loading={loading}
                 block
               >
-                Sign In
+                登录
               </Button>
             </Form.Item>
           </Form>

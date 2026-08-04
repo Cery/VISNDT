@@ -23,7 +23,7 @@ export default function UserEdit() {
       const data = await userService.getById(id);
       setPageState({ status: 'ready', data });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load user';
+      const message = err instanceof Error ? err.message : '加载用户失败';
       setPageState({ status: 'error', message });
     }
   }, [id]);
@@ -54,14 +54,14 @@ export default function UserEdit() {
     return (
       <Alert
         type="error"
-        message="Failed to Load User"
+        message="加载用户失败"
         description={pageState.message}
         showIcon
         action={
           <Space>
-            <Button onClick={loadUser}>Retry</Button>
+            <Button onClick={loadUser}>重试</Button>
             <Button onClick={() => navigate('/users')} icon={<ArrowLeftOutlined />}>
-              Back to List
+              返回列表
             </Button>
           </Space>
         }

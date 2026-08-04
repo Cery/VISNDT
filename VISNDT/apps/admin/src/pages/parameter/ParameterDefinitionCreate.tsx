@@ -38,7 +38,7 @@ function ParameterDefinitionCreate() {
       } catch (err) {
         if (!cancelled) {
           const errorMessage =
-            err instanceof Error ? err.message : 'Failed to load parameter groups';
+            err instanceof Error ? err.message : '加载参数组失败';
           setPageState({ status: 'error', message: errorMessage });
         }
       }
@@ -61,11 +61,11 @@ function ParameterDefinitionCreate() {
         required: values.required ?? false,
       };
       await parameterDefinitionService.create(payload);
-      message.success('Parameter definition created successfully');
+      message.success('参数定义创建成功');
       navigate('/parameter-definitions');
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : 'Failed to create parameter definition';
+        err instanceof Error ? err.message : '创建参数定义失败';
       setPageState((prev) =>
         prev.status === 'ready' ? { ...prev, status: 'ready' } as PageState : prev
       );
@@ -85,12 +85,12 @@ function ParameterDefinitionCreate() {
     return (
       <Alert
         type="error"
-        message="Failed to load form data"
+        message="加载表单数据失败"
         description={pageState.message}
         showIcon
         action={
           <Button onClick={() => navigate('/parameter-definitions')}>
-            Back to List
+            返回列表
           </Button>
         }
       />
@@ -103,7 +103,7 @@ function ParameterDefinitionCreate() {
   return (
     <div style={{ maxWidth: 600 }}>
       <Title level={4} style={{ marginBottom: 24 }}>
-        Create Parameter Definition
+        创建参数定义
       </Title>
 
       <Card>
@@ -119,27 +119,27 @@ function ParameterDefinitionCreate() {
           }}
         >
           <Form.Item
-            label="Name"
+            label="名称"
             name="name"
-            rules={[{ required: true, message: 'Please enter a name' }]}
+            rules={[{ required: true, message: '请输入名称' }]}
           >
-            <Input placeholder="e.g. Length" />
+            <Input placeholder="如：长度" />
           </Form.Item>
 
           <Form.Item
-            label="Code"
+            label="编码"
             name="code"
-            rules={[{ required: true, message: 'Please enter a code' }]}
+            rules={[{ required: true, message: '请输入编码' }]}
           >
-            <Input placeholder="e.g. length" />
+            <Input placeholder="如：length" />
           </Form.Item>
 
           <Form.Item
-            label="Data Type"
+            label="数据类型"
             name="dataType"
-            rules={[{ required: true, message: 'Please select a data type' }]}
+            rules={[{ required: true, message: '请选择数据类型' }]}
           >
-            <Select placeholder="Select data type">
+            <Select placeholder="请选择数据类型">
               {DATA_TYPE_OPTIONS.map((opt) => (
                 <Option key={opt.value} value={opt.value}>
                   {opt.label}
@@ -149,11 +149,11 @@ function ParameterDefinitionCreate() {
           </Form.Item>
 
           <Form.Item
-            label="Parameter Group"
+            label="参数组"
             name="parameterGroupId"
           >
             <Select
-              placeholder="Select a parameter group (optional)"
+              placeholder="请选择参数组（可选）"
               allowClear
             >
               {groups.map((g: ParameterGroup) => (
@@ -165,14 +165,14 @@ function ParameterDefinitionCreate() {
           </Form.Item>
 
           <Form.Item
-            label="Unit"
+            label="单位"
             name="unit"
           >
-            <Input placeholder="e.g. mm, kg, °C" />
+            <Input placeholder="如：mm、kg、°C" />
           </Form.Item>
 
           <Form.Item
-            label="Required"
+            label="必填"
             name="required"
             valuePropName="checked"
           >
@@ -185,13 +185,13 @@ function ParameterDefinitionCreate() {
               htmlType="submit"
               loading={pageState.status === 'submitting'}
             >
-              Create Parameter Definition
+              创建参数定义
             </Button>
             <Button
               style={{ marginLeft: 8 }}
               onClick={() => navigate('/parameter-definitions')}
             >
-              Cancel
+              取消
             </Button>
           </Form.Item>
         </Form>

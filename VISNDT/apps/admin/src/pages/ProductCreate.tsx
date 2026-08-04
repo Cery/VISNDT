@@ -12,5 +12,5 @@ export default function ProductCreate() {
     });
   };
 
-  return <ProductForm onSubmit={handleSubmit} submitLabel="Create Product" title="Create Product" />;
+  return <ProductForm onSubmit={handleSubmit} submitLabel="创建产品" title="创建产品" />;
 }
