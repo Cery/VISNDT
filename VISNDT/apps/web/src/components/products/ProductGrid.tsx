@@ -14,7 +14,7 @@ export default function ProductGrid({ products, isLoading }: ProductGridProps) {
         {Array.from({ length: 8 }).map((_, i) => (
           <div
             key={i}
-            className="rounded-lg border bg-white p-4 animate-pulse"
+            className="rounded-xl border border-slate-200/80 shadow-industrial-sm bg-white p-4 animate-pulse"
           >
             <div className="aspect-video bg-muted rounded-md mb-3" />
             <div className="h-4 bg-muted rounded w-3/4 mb-2" />

@@ -34,7 +34,7 @@ const FOOTER_SECTIONS = [
     links: [],
     custom: (
       <div className="space-y-2 text-sm text-muted-foreground">
-        <p>Email: contact@visndt.com</p>
+        <p>邮箱：contact@visndt.com</p>
         <p>VISNDT平台团队</p>
       </div>
     ),
@@ -43,12 +43,22 @@ const FOOTER_SECTIONS = [
 
 export default function PublicFooter() {
   return (
-    <footer className="border-t bg-muted/30 mt-auto">
-      <div className="container mx-auto px-4 py-10">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8">
+    <footer className="bg-industrial-dark mt-auto">
+      <div className="max-w-[1200px] mx-auto px-6 py-10">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8">
+          {/* Brand Area */}
+          <div className="col-span-2 sm:col-span-3 lg:col-span-1">
+            <Link href="/" className="inline-block text-xl font-extrabold text-white mb-2">
+              VISNDT
+            </Link>
+            <p className="text-sm text-slate-400 leading-relaxed">
+              工业检测设备信息平台
+            </p>
+          </div>
+
           {FOOTER_SECTIONS.map((section) => (
             <div key={section.title}>
-              <h3 className="font-semibold text-sm mb-3 text-foreground">
+              <h3 className="font-semibold text-sm mb-3 text-white">
                 {section.title}
               </h3>
               {section.custom ? (
@@ -59,7 +69,7 @@ export default function PublicFooter() {
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        className="text-sm text-slate-400 hover:text-white transition-colors"
                       >
                         {link.label}
                       </Link>
@@ -73,8 +83,8 @@ export default function PublicFooter() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t">
-        <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-muted-foreground">
+      <div className="border-t border-white/10">
+        <div className="max-w-[1200px] mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-slate-400">
           <p>&copy; {new Date().getFullYear()} VISNDT. 版权所有</p>
           <p>工业检测设备信息平台</p>
         </div>

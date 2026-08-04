@@ -1,91 +1,95 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'About VISNDT',
-  description: 'About VISNDT - Industrial Inspection Equipment Information Platform',
+  title: '关于VISNDT',
+  description: '关于VISNDT — 工业检测设备信息平台',
 };
 
 export default function AboutPage() {
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-8">About VISNDT</h1>
+    <div>
+      {/* Hero */}
+      <section className="bg-industrial-dark text-white py-20 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-pattern bg-grid-md opacity-30" />
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-industrial-cyan/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
+            关于 <span className="text-industrial-cyan">VISNDT</span>
+          </h1>
+          <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+            专业的工业检测设备信息平台 — 连接买家与优质检测设备制造商。
+          </p>
+        </div>
+      </section>
 
-      <div className="prose prose-sm max-w-none space-y-8">
+      {/* Content */}
+      <section className="max-w-[1200px] mx-auto px-6 py-20">
+        <div className="prose prose-sm max-w-none space-y-8">
         <section>
-          <h2 className="text-xl font-semibold mb-3">Our Mission</h2>
+          <h2 className="text-xl font-semibold mb-3">我们的使命</h2>
           <p className="text-muted-foreground leading-relaxed">
-            VISNDT is a professional industrial inspection equipment information
-            platform dedicated to connecting buyers with high-quality inspection
-            equipment manufacturers. We provide comprehensive product information,
-            detailed technical specifications, and efficient inquiry channels to help
-            you find the right equipment for your needs.
+            VISNDT是一个专业的工业检测设备信息平台，致力于连接买家与优质检测设备制造商。
+            我们提供全面的产品信息、详细的技术规格和高效的询价渠道，帮助您找到合适的设备。
           </p>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-3">What We Offer</h2>
+          <h2 className="text-xl font-semibold mb-3">我们提供什么</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="rounded-lg border p-4">
-              <h3 className="font-semibold text-sm mb-2">Product Discovery</h3>
+            <div className="rounded-xl border border-slate-200/80 shadow-industrial-sm p-6 hover:shadow-industrial-md transition-all">
+              <h3 className="font-semibold text-sm mb-2">产品发现</h3>
               <p className="text-sm text-muted-foreground">
-                Browse a comprehensive catalog of industrial inspection equipment
-                with detailed technical parameters and specifications.
+                浏览全面的工业检测设备目录，包含详细的技术参数和规格说明。
               </p>
             </div>
-            <div className="rounded-lg border p-4">
-              <h3 className="font-semibold text-sm mb-2">Category Navigation</h3>
+            <div className="rounded-xl border border-slate-200/80 shadow-industrial-sm p-6 hover:shadow-industrial-md transition-all">
+              <h3 className="font-semibold text-sm mb-2">分类导航</h3>
               <p className="text-sm text-muted-foreground">
-                Navigate products by industry-standard categories to quickly find
-                equipment relevant to your field.
+                按行业标准分类浏览产品，快速找到与您领域相关的设备。
               </p>
             </div>
-            <div className="rounded-lg border p-4">
-              <h3 className="font-semibold text-sm mb-2">Direct Inquiry</h3>
+            <div className="rounded-xl border border-slate-200/80 shadow-industrial-sm p-6 hover:shadow-industrial-md transition-all">
+              <h3 className="font-semibold text-sm mb-2">直接询价</h3>
               <p className="text-sm text-muted-foreground">
-                Submit inquiries directly to manufacturers through our platform for
-                pricing, availability, and technical consultation.
+                通过我们的平台直接向制造商提交询价，获取价格、库存和技术咨询。
               </p>
             </div>
-            <div className="rounded-lg border p-4">
-              <h3 className="font-semibold text-sm mb-2">Manufacturer Info</h3>
+            <div className="rounded-xl border border-slate-200/80 shadow-industrial-sm p-6 hover:shadow-industrial-md transition-all">
+              <h3 className="font-semibold text-sm mb-2">制造商信息</h3>
               <p className="text-sm text-muted-foreground">
-                Access manufacturer information including enterprise qualifications
-                and product source details for informed decision-making.
+                查看制造商信息，包括企业资质和产品来源详情，帮助您做出明智决策。
               </p>
             </div>
           </div>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-3">Industries Served</h2>
+          <h2 className="text-xl font-semibold mb-3">服务行业</h2>
           <p className="text-muted-foreground leading-relaxed">
-            Our platform serves a wide range of industries including aerospace,
-            automotive, energy, manufacturing, construction, and research
-            institutions. Whether you need ultrasonic testing equipment, radiographic
-            inspection systems, or visual inspection tools, VISNDT helps you find
-            the right solution.
+            我们的平台服务于广泛的行业领域，包括航空航天、汽车、能源、制造、建筑和研究机构。
+            无论您需要超声检测设备、射线检测系统还是视觉检测工具，VISNDT都能帮助您找到合适的解决方案。
           </p>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold mb-3">Contact Us</h2>
+          <h2 className="text-xl font-semibold mb-3">联系我们</h2>
           <div className="space-y-2 text-sm text-muted-foreground">
             <p>
-              <strong className="text-foreground">Email:</strong>{' '}
+              <strong className="text-foreground">邮箱：</strong>{' '}
               contact@visndt.com
             </p>
             <p>
-              <strong className="text-foreground">Address:</strong>{' '}
-              VISNDT Platform Team
+              <strong className="text-foreground">地址：</strong>{' '}
+              VISNDT平台团队
             </p>
             <p className="mt-3">
-              For product inquiries, please use the inquiry form on the respective
-              product detail page. For general questions, feel free to reach out via
-              email.
+              如需产品咨询，请使用相应产品详情页的询价表单。如有一般性问题，欢迎通过邮件联系我们。
             </p>
           </div>
         </section>
       </div>
+      </section>
     </div>
   );
 }

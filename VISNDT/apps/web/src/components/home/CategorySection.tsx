@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { getCategories } from '@/lib/api/categories';
+import { translateCategoryName } from '@/lib/translate';
 
 export default function CategorySection() {
   const { data, isLoading, isError } = useQuery({
@@ -13,25 +14,28 @@ export default function CategorySection() {
   const categories = data?.data ?? [];
 
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">
+    <section className="py-20 bg-white">
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="text-center mb-14 animate-slide-up">
+          <p className="text-sm font-semibold text-primary tracking-widest uppercase mb-3">
             产品分类
+          </p>
+          <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-4">
+            按标准化分类浏览
           </h2>
-          <p className="text-slate-500 max-w-xl mx-auto">
-            按标准化产品分类浏览工业检测设备
+          <p className="text-muted-foreground max-w-xl mx-auto text-base">
+            涵盖工业内窥镜、测量系统、检测相机等专业设备分类
           </p>
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
-                className="rounded-lg border border-slate-200 p-6 animate-pulse"
+                className="rounded-xl border border-slate-200/80 p-6 animate-pulse"
               >
-                <div className="w-12 h-12 bg-slate-100 rounded-lg mb-4" />
+                <div className="w-12 h-12 bg-slate-100 rounded-xl mb-4" />
                 <div className="h-5 bg-slate-100 rounded w-3/4 mb-2" />
                 <div className="h-4 bg-slate-100 rounded w-full" />
               </div>
@@ -46,16 +50,16 @@ export default function CategorySection() {
             <p>暂无分类</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {categories.map((cat) => (
               <Link
                 key={cat.id}
                 href={`/products?categoryId=${cat.id}`}
-                className="group rounded-lg border border-slate-200 p-6 hover:border-slate-400 hover:shadow-md transition-all"
+                className="group rounded-xl border border-slate-200/80 p-6 shadow-industrial-sm hover:shadow-industrial-md hover:-translate-y-1 transition-all duration-300 bg-white"
               >
-                <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-slate-200 transition-colors">
+                <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-industrial-cyan/10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                   <svg
-                    className="w-6 h-6 text-slate-600"
+                    className="w-6 h-6 text-primary"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -69,10 +73,10 @@ export default function CategorySection() {
                   </svg>
                 </div>
 
-                <h3 className="font-semibold text-slate-900 mb-2 group-hover:text-slate-700 transition-colors">
-                  {cat.name}
+                <h3 className="font-semibold text-foreground mb-1.5 group-hover:text-primary transition-colors">
+                  {translateCategoryName(cat.name)}
                 </h3>
-                <p className="text-sm text-slate-500 line-clamp-2">
+                <p className="text-sm text-muted-foreground line-clamp-2">
                   {cat.slug}
                 </p>
               </Link>

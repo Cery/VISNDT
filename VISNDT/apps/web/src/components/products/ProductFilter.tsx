@@ -1,6 +1,7 @@
 'use client';
 
 import type { ProductCategory } from '@/types/category';
+import { translateCategoryName } from '@/lib/translate';
 
 interface ProductFilterProps {
   categories: ProductCategory[];
@@ -27,9 +28,9 @@ export default function ProductFilter({
         <div className="space-y-1">
           <button
             onClick={() => onCategoryChange(undefined)}
-            className={`block w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors ${
+            className={`block w-full text-left px-3 py-1.5 text-sm rounded-lg transition-colors ${
               !selectedCategoryId
-                ? 'bg-primary/10 text-primary font-medium'
+                ? 'bg-primary/5 text-primary border-l-2 border-primary font-medium'
                 : 'text-muted-foreground hover:bg-muted'
             }`}
           >
@@ -39,13 +40,13 @@ export default function ProductFilter({
             <button
               key={cat.id}
               onClick={() => onCategoryChange(cat.id)}
-              className={`block w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors ${
+              className={`block w-full text-left px-3 py-1.5 text-sm rounded-lg transition-colors ${
                 selectedCategoryId === cat.id
-                  ? 'bg-primary/10 text-primary font-medium'
+                  ? 'bg-primary/5 text-primary border-l-2 border-primary font-medium'
                   : 'text-muted-foreground hover:bg-muted'
               }`}
             >
-              {cat.name}
+              {translateCategoryName(cat.name)}
             </button>
           ))}
         </div>
@@ -60,7 +61,7 @@ export default function ProductFilter({
             const [field, order] = e.target.value.split(':');
             onSortChange(field, order);
           }}
-          className="w-full px-3 py-1.5 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary/20"
+          className="w-full px-3 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30"
         >
           <option value="createdAt:desc">最新优先</option>
           <option value="createdAt:asc">最早优先</option>

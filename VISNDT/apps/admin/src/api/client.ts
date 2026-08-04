@@ -9,12 +9,30 @@ export const apiClient = axios.create({
   },
 });
 
-// Request interceptor: inject Authorization header
+/**
+ * Read CSRF token from cookie (set by GET /auth/csrf).
+ * The csrf_token cookie is httpOnly: false so JS can read it.
+ */
+function getCsrfToken(): string | null {
+  const match = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+// Request interceptor: inject Authorization header + CSRF token
 apiClient.interceptors.request.use((config) => {
   const { accessToken } = authStore.getState();
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
+
+  // Inject CSRF token for state-changing requests
+  if (config.method && ['post', 'put', 'patch', 'delete'].includes(config.method.toLowerCase())) {
+    const csrfToken = getCsrfToken();
+    if (csrfToken) {
+      config.headers['X-CSRF-Token'] = csrfToken;
+    }
+  }
+
   return config;
 });
 

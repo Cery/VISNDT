@@ -27,11 +27,11 @@ export default function SearchBar({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
-        className="flex-1 px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+        className="flex-1 px-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
       />
       <button
         type="submit"
-        className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm hover:opacity-90 transition-opacity"
+        className="px-4 py-2 bg-gradient-to-r from-primary to-industrial-cyan text-white rounded-md text-sm hover:opacity-90 transition-opacity"
       >
         搜索
       </button>

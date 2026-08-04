@@ -40,6 +40,35 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        industrial: {
+          cyan: "hsl(var(--industrial-cyan))",
+          "cyan-foreground": "hsl(var(--industrial-cyan-foreground))",
+          amber: "hsl(var(--industrial-amber))",
+          "amber-foreground": "hsl(var(--industrial-amber-foreground))",
+          slate: "hsl(var(--industrial-slate))",
+          "slate-foreground": "hsl(var(--industrial-slate-foreground))",
+          dark: "hsl(var(--industrial-dark))",
+          "dark-foreground": "hsl(var(--industrial-dark-foreground))",
+        },
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
+      boxShadow: {
+        'industrial-sm': 'var(--shadow-industrial-sm)',
+        'industrial-md': 'var(--shadow-industrial-md)',
+        'industrial-lg': 'var(--shadow-industrial-lg)',
+      },
+      backgroundImage: {
+        'grid-pattern': 'linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)',
+        'dot-pattern': 'radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px)',
+      },
+      backgroundSize: {
+        'grid-sm': '40px 40px',
+        'grid-md': '60px 60px',
+        'dot-sm': '16px 16px',
+        'dot-md': '20px 20px',
       },
       borderRadius: {
         lg: "var(--radius)",

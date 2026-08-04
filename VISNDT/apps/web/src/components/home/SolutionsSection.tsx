@@ -45,10 +45,10 @@ const SOLUTIONS = [
 
 export default function SolutionsSection() {
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">
+    <section className="py-20 bg-white">
+      <div className="max-w-[1200px] mx-auto px-6">
+        <div className="text-center mb-12 animate-slide-up">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-3">
             工业应用解决方案
           </h2>
           <p className="text-slate-500 max-w-xl mx-auto">
@@ -60,9 +60,9 @@ export default function SolutionsSection() {
           {SOLUTIONS.map((sol) => (
             <div
               key={sol.id}
-              className="flex gap-4 rounded-lg border border-slate-200 p-6 hover:border-slate-400 transition-colors"
-            >
-              <div className="flex-shrink-0 w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-600">
+              className="flex gap-4 rounded-xl border border-slate-200/80 border-l-2 border-l-primary p-6 shadow-industrial-sm hover:shadow-industrial-md hover:-translate-y-1 transition-all duration-300"
+              >
+                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-primary/10 to-industrial-cyan/10 rounded-xl flex items-center justify-center text-slate-600">
                 {sol.icon}
               </div>
               <div>

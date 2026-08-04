@@ -49,8 +49,10 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-16 max-w-md">
-      <div className="text-center mb-8">
+    <div className="min-h-screen bg-industrial-slate flex items-center justify-center py-12">
+      <div className="w-full max-w-md mx-auto bg-white rounded-xl border border-slate-200/80 shadow-industrial-lg p-8 relative">
+        <div className="h-1 bg-gradient-to-r from-primary to-industrial-cyan rounded-t-xl absolute top-0 left-0 right-0" />
+        <div className="text-center mb-8">
         <h1 className="text-2xl font-bold text-slate-900">注册</h1>
         <p className="text-slate-500 mt-2">创建您的账户</p>
       </div>
@@ -77,7 +79,7 @@ export default function RegisterPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             disabled={status === 'submitting'}
-            className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
             placeholder="您的姓名"
           />
         </div>
@@ -97,7 +99,7 @@ export default function RegisterPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
             disabled={status === 'submitting'}
-            className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
             placeholder="请输入邮箱"
           />
         </div>
@@ -118,7 +120,7 @@ export default function RegisterPage() {
             required
             minLength={8}
             disabled={status === 'submitting'}
-            className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
             placeholder="至少8个字符"
           />
         </div>
@@ -138,7 +140,7 @@ export default function RegisterPage() {
             value={inviteToken}
             onChange={(e) => setInviteToken(e.target.value)}
             disabled={status === 'submitting'}
-            className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
             placeholder="如有邀请码请填写"
           />
         </div>
@@ -147,7 +149,7 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={status === 'submitting'}
-          className="w-full py-2.5 bg-slate-900 text-white rounded-md text-sm font-medium hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full py-2.5 bg-gradient-to-r from-primary to-industrial-cyan text-white rounded-lg text-sm font-semibold shadow-industrial-sm hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
           {status === 'submitting' ? (
             <span className="flex items-center justify-center gap-2">
@@ -188,6 +190,7 @@ export default function RegisterPage() {
           </Link>
         </p>
       </form>
+      </div>
     </div>
   );
 }

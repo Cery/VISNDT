@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Product } from '@/types/product';
+import { translateCategoryName } from '@/lib/translate';
 
 interface ProductCardProps {
   product: Product;
@@ -9,10 +10,10 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <Link
       href={`/products/${product.id}`}
-      className="group block rounded-lg border bg-white p-4 hover:shadow-md transition-shadow"
+      className="group block rounded-xl border border-slate-200/80 shadow-industrial-sm hover:shadow-industrial-lg hover:-translate-y-1 transition-all duration-300 bg-white p-4"
     >
       {/* Placeholder image */}
-      <div className="aspect-video bg-muted rounded-md mb-3 flex items-center justify-center">
+      <div className="aspect-video bg-gradient-to-br from-slate-100 to-industrial-slate rounded-md mb-3 flex items-center justify-center">
         <span className="text-muted-foreground text-sm">暂无图片</span>
       </div>
 
@@ -22,12 +23,12 @@ export default function ProductCard({ product }: ProductCardProps) {
         </h3>
 
         {product.model && (
-          <p className="text-xs text-muted-foreground">型号：{product.model}</p>
+          <p className="font-mono text-xs text-muted-foreground">型号：{product.model}</p>
         )}
 
         {product.category && (
-          <span className="inline-block text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
-            {product.category.name}
+          <span className="inline-block bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
+            {translateCategoryName(product.category.name)}
           </span>
         )}
 

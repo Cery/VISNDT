@@ -5,6 +5,7 @@ import ManufacturerInfo from '@/components/products/ManufacturerInfo';
 import InquirySection from '@/components/inquiry/InquirySection';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { translateCategoryName } from '@/lib/translate';
 
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -38,7 +39,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               href={`/products?categoryId=${product.category.id}`}
               className="hover:text-foreground transition-colors"
             >
-              {product.category.name}
+              {translateCategoryName(product.category.name)}
             </Link>
           </>
         )}
@@ -59,7 +60,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             )}
             {product.category && (
               <span className="inline-block mt-2 text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">
-                {product.category.name}
+                {translateCategoryName(product.category.name)}
               </span>
             )}
           </div>

@@ -14,11 +14,11 @@ export default function FeaturedProductsSection() {
   const products = data?.data ?? [];
 
   return (
-    <section className="py-16 bg-slate-50">
-      <div className="container mx-auto px-4">
+    <section className="py-20 bg-industrial-slate">
+      <div className="max-w-[1200px] mx-auto px-6">
         <div className="flex items-end justify-between mb-10">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">
+          <div className="animate-slide-up">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-3">
               推荐产品
             </h2>
             <p className="text-slate-500">
@@ -27,7 +27,7 @@ export default function FeaturedProductsSection() {
           </div>
           <Link
             href="/products"
-            className="hidden sm:inline-flex text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+            className="hidden sm:inline-flex text-sm font-medium text-primary hover:text-primary/80 transition-colors"
           >
             查看全部产品 →
           </Link>
@@ -38,9 +38,9 @@ export default function FeaturedProductsSection() {
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
-                className="rounded-lg border border-slate-200 bg-white p-4 animate-pulse"
+                className="rounded-xl border border-slate-200/80 bg-white p-4 shadow-industrial-sm animate-pulse"
               >
-                <div className="aspect-video bg-slate-100 rounded-md mb-4" />
+                <div className="aspect-video bg-slate-100 rounded-lg mb-4" />
                 <div className="h-4 bg-slate-100 rounded w-3/4 mb-2" />
                 <div className="h-3 bg-slate-100 rounded w-1/2" />
               </div>
@@ -65,7 +65,7 @@ export default function FeaturedProductsSection() {
         <div className="mt-8 text-center sm:hidden">
           <Link
             href="/products"
-            className="inline-flex text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors"
+            className="inline-flex text-sm font-medium text-primary hover:text-primary/80 transition-colors"
           >
             查看全部产品 →
           </Link>

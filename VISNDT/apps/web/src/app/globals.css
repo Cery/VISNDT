@@ -24,6 +24,24 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
+
+    /* === 工业平台辅助色 === */
+    --industrial-cyan: 190 85% 45%;
+    --industrial-cyan-foreground: 0 0% 100%;
+
+    --industrial-amber: 32 95% 50%;
+    --industrial-amber-foreground: 0 0% 100%;
+
+    --industrial-slate: 220 14% 96%;
+    --industrial-slate-foreground: 220 10% 20%;
+
+    --industrial-dark: 220 25% 8%;
+    --industrial-dark-foreground: 210 20% 98%;
+
+    /* === 增强阴影 === */
+    --shadow-industrial-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-industrial-md: 0 4px 12px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
+    --shadow-industrial-lg: 0 8px 24px rgba(0,0,0,0.08), 0 4px 8px rgba(0,0,0,0.04);
   }
 
   .dark {
@@ -56,4 +74,23 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }

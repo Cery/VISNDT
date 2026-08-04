@@ -1,20 +1,21 @@
 import Link from 'next/link';
 import type { Product } from '@/types/product';
+import { translateCategoryName } from '@/lib/translate';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const categoryName = product.category?.name ?? '';
+  const categoryName = translateCategoryName(product.category?.name ?? '');
 
   return (
     <Link
       href={`/products/${product.id}`}
-      className="group block rounded-lg border border-slate-200 bg-white p-4 hover:border-slate-400 hover:shadow-md transition-all"
+      className="group block rounded-xl border border-slate-200/80 shadow-industrial-sm hover:shadow-industrial-lg hover:-translate-y-1 transition-all duration-300 bg-white p-4"
     >
       {/* Image placeholder */}
-      <div className="aspect-video bg-slate-100 rounded-md mb-4 flex items-center justify-center">
+      <div className="aspect-video bg-gradient-to-br from-slate-100 to-industrial-slate rounded-md mb-4 flex items-center justify-center">
         <svg
           className="w-10 h-10 text-slate-300"
           fill="none"
@@ -36,11 +37,11 @@ export default function ProductCard({ product }: ProductCardProps) {
         </h3>
 
         {product.model && (
-          <p className="text-xs text-slate-400">Model: {product.model}</p>
+          <p className="font-mono text-xs text-slate-400">Model: {product.model}</p>
         )}
 
         {categoryName && (
-          <span className="inline-block text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">
+          <span className="inline-block bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
             {categoryName}
           </span>
         )}
