@@ -21,6 +21,8 @@ export interface UserListResponse {
 export interface SearchUserParams {
   page?: number;
   pageSize?: number;
+  keyword?: string;
+  status?: string;
 }
 
 export interface UserFormData {

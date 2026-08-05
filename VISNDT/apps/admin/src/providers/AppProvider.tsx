@@ -1,7 +1,7 @@
 import { ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import { useEffect, type ReactNode } from 'react';
-import axios from 'axios';
+import { apiClient, setCsrfToken } from '../api/client';
 
 interface AppProviderProps {
   children: ReactNode;
@@ -9,11 +9,14 @@ interface AppProviderProps {
 
 /**
  * Fetch CSRF token on app initialization.
- * The token is set as a cookie (httpOnly: false) and read by the API client.
+ * Stores the token in memory for the API client interceptor.
  */
 async function initCsrfToken() {
   try {
-    await axios.get('/api/v1/auth/csrf');
+    const res = await apiClient.get('/auth/csrf') as any;
+    if (res?.data?.csrfToken) {
+      setCsrfToken(res.data.csrfToken);
+    }
   } catch {
     // Ignore failures — CSRF token will be fetched on next login
   }

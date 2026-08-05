@@ -10,10 +10,20 @@ export const apiClient = axios.create({
 });
 
 /**
- * Read CSRF token from cookie (set by GET /auth/csrf).
- * The csrf_token cookie is httpOnly: false so JS can read it.
+ * In-memory CSRF token — fetched once on app init and reused.
+ * Cookie-based fallback is less reliable through Vite proxy.
  */
+let _csrfToken: string | null = null;
+
+export function setCsrfToken(token: string | null) {
+  _csrfToken = token;
+}
+
 function getCsrfToken(): string | null {
+  // Primary: in-memory token set by initCsrfToken()
+  if (_csrfToken) return _csrfToken;
+
+  // Fallback: try reading the cookie (set by GET /auth/csrf)
   const match = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
   return match ? decodeURIComponent(match[1]) : null;
 }

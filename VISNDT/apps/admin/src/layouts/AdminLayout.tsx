@@ -24,7 +24,7 @@ const menuItems = [
   { key: '/home', icon: <DashboardOutlined />, label: '仪表盘' },
   { key: '/products', icon: <ShoppingOutlined />, label: '产品管理' },
   { key: '/demands', icon: <FileTextOutlined />, label: '需求管理' },
-  { key: '/rfqs', icon: <SnippetsOutlined />, label: '询价管理' },
+  { key: '/rfqs', icon: <SnippetsOutlined />, label: 'RFQ管理' },
   { key: '/offers', icon: <TagsOutlined />, label: '报价管理' },
   { key: '/inquiries', icon: <MailOutlined />, label: '询价管理' },
   { key: '/matching', icon: <NodeIndexOutlined />, label: '匹配管理' },

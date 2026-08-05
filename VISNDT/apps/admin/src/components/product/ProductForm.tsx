@@ -56,7 +56,7 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
     setSubmitting(true);
     try {
       await onSubmit(values);
-      message.success(submitLabel === 'Create Product' ? '产品创建成功' : '产品更新成功');
+      message.success(submitLabel === '创建产品' ? '产品创建成功' : '产品更新成功');
       navigate('/products');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '保存产品失败';

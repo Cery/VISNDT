@@ -22,28 +22,28 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="max-w-[1200px] mx-auto px-6 py-8">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-        <Link href="/" className="hover:text-foreground transition-colors">
+        <Link href="/" className="hover:text-primary transition-colors">
           首页
         </Link>
-        <span>/</span>
-        <Link href="/products" className="hover:text-foreground transition-colors">
+        <span className="text-slate-300">/</span>
+        <Link href="/products" className="hover:text-primary transition-colors">
           产品列表
         </Link>
         {product.category && (
           <>
-            <span>/</span>
+            <span className="text-slate-300">/</span>
             <Link
               href={`/products?categoryId=${product.category.id}`}
-              className="hover:text-foreground transition-colors"
+              className="hover:text-primary transition-colors"
             >
               {translateCategoryName(product.category.name)}
             </Link>
           </>
         )}
-        <span>/</span>
+        <span className="text-slate-300">/</span>
         <span className="text-foreground truncate max-w-[200px]">{product.name}</span>
       </nav>
 
@@ -54,12 +54,12 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         {/* Product Info */}
         <div className="space-y-6">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">{product.name}</h1>
+            <h1 className="text-3xl font-extrabold text-foreground">{product.name}</h1>
             {product.model && (
-              <p className="text-slate-500 mt-1">型号：{product.model}</p>
+              <p className="text-slate-500 mt-1 font-mono text-sm">型号：{product.model}</p>
             )}
             {product.category && (
-              <span className="inline-block mt-2 text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">
+              <span className="inline-block mt-3 text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full font-medium">
                 {translateCategoryName(product.category.name)}
               </span>
             )}
@@ -90,8 +90,8 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
       {/* Technical Parameters */}
       <section className="mb-12">
-        <h2 className="text-xl font-bold text-slate-900 mb-4">技术参数</h2>
-        <div className="rounded-lg border border-slate-200 p-4">
+        <h2 className="text-2xl font-extrabold text-foreground mb-6">技术参数</h2>
+        <div className="rounded-xl border border-slate-200/80 shadow-industrial-sm bg-white p-6">
           <ProductParameters parameters={product.parameterValues} />
         </div>
       </section>
@@ -99,17 +99,17 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       {/* Product Media Documents */}
       {product.media.filter((m) => m.mediaType !== 'IMAGE').length > 0 && (
         <section>
-          <h2 className="text-xl font-bold text-slate-900 mb-4">文档与证书</h2>
+          <h2 className="text-2xl font-extrabold text-foreground mb-6">文档与证书</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {product.media
               .filter((m) => m.mediaType !== 'IMAGE')
               .map((doc) => (
                 <div
                   key={doc.id}
-                  className="rounded-lg border border-slate-200 p-4 flex items-center gap-3"
+                  className="rounded-xl border border-slate-200/80 shadow-industrial-sm hover:shadow-industrial-md hover:-translate-y-1 transition-all duration-300 bg-white p-4 flex items-center gap-3"
                 >
-                  <div className="w-10 h-10 bg-slate-100 rounded flex items-center justify-center flex-shrink-0">
-                    <span className="text-xs text-slate-400">
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-xs text-primary font-medium">
                       {doc.mediaType === 'CERTIFICATE' ? '证书' : '文档'}
                     </span>
                   </div>

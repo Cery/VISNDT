@@ -60,10 +60,10 @@ export default function ProductsPage() {
   const categories = categoriesData?.data ?? [];
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="max-w-[1200px] mx-auto px-6 py-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold">产品</h1>
-        <p className="text-muted-foreground text-sm mt-1">
+        <h1 className="text-3xl font-extrabold text-foreground">产品</h1>
+        <p className="text-muted-foreground mt-1">
           浏览工业检测设备
         </p>
       </div>

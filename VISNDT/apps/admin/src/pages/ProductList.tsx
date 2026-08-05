@@ -222,6 +222,12 @@ function ProductList() {
       </Title>
 
       <Space style={{ marginBottom: 16 }} wrap>
+        <Button
+          type="primary"
+          onClick={() => navigate('/products/create')}
+        >
+          创建产品
+        </Button>
         <Input.Search
           placeholder="按名称、型号或描述搜索"
           allowClear

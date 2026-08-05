@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Input, Select, Space, Spin, Alert, Button, Tag, Typography } from 'antd';
 import { SearchOutlined, ReloadOutlined, EyeOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
@@ -49,6 +49,8 @@ function UserList() {
       const params: SearchUserParams = {
         page: query.page,
         pageSize: query.pageSize,
+        keyword: query.keyword.trim() || undefined,
+        status: query.status || undefined,
       };
 
       const result = await userService.getList(params);
@@ -67,23 +69,6 @@ function UserList() {
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
-
-  const filteredData = useMemo(() => {
-    if (pageState.status !== 'success') return [];
-    let list = pageState.data;
-    if (query.keyword.trim()) {
-      const kw = query.keyword.trim().toLowerCase();
-      list = list.filter(
-        (u) =>
-          u.email.toLowerCase().includes(kw) ||
-          (u.name && u.name.toLowerCase().includes(kw)),
-      );
-    }
-    if (query.status) {
-      list = list.filter((u) => u.status === query.status);
-    }
-    return list;
-  }, [pageState, query.keyword, query.status]);
 
   const handleSearch = useCallback((value: string) => {
     setQuery((prev) => ({ ...prev, keyword: value, page: 1 }));
@@ -234,7 +219,7 @@ function UserList() {
 
       <Table<User>
         columns={columns}
-        dataSource={filteredData}
+        dataSource={pageState.data}
         rowKey="id"
         onChange={handleTableChange}
         pagination={{

@@ -36,7 +36,7 @@ export class UsersService {
   }
 
   async findAll(pagination: PaginationDto) {
-    const { page = 1, pageSize = 20 } = pagination;
+    const { page = 1, pageSize = 20, keyword, status } = pagination as any;
     const skip = (page - 1) * pageSize;
 
     const userSelect = {
@@ -49,14 +49,26 @@ export class UsersService {
       updatedAt: true,
     };
 
+    const where: any = {};
+    if (keyword) {
+      where.OR = [
+        { email: { contains: keyword, mode: 'insensitive' } },
+        { name: { contains: keyword, mode: 'insensitive' } },
+      ];
+    }
+    if (status) {
+      where.status = status;
+    }
+
     const [data, total] = await Promise.all([
       this.prisma.user.findMany({
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
         select: userSelect,
+        where,
       }),
-      this.prisma.user.count(),
+      this.prisma.user.count({ where }),
     ]);
 
     return {
