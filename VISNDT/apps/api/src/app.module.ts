@@ -24,6 +24,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { InquiriesModule } from './inquiries/inquiries.module';
 import { StorageModule } from './storage/storage.module';
 import { FileAssetModule } from './file-asset/file-asset.module';
+import { AuditLogModule } from './audit-log/audit-log.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { FileAssetModule } from './file-asset/file-asset.module';
     InquiriesModule,
     StorageModule,
     FileAssetModule,
+    AuditLogModule,
   ],
   providers: [
     {

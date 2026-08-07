@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import AuthGuard from '@/auth/AuthGuard';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
 import MatchList from '@/components/match/MatchList';
 import { getAllMatches } from '@/services/match.service';
+import { updateMatchStatus, rematchDemand } from '@/lib/api/demands';
 import type { MatchItem } from '@/services/match.service';
 
 function MatchesContent() {
@@ -18,6 +19,7 @@ function MatchesContent() {
   const [page, setPage] = useState(1);
   const pageSize = 20;
   const [searchQuery, setSearchQuery] = useState('');
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const load = useCallback(async () => {
     setIsLoading(true);
@@ -36,6 +38,15 @@ function MatchesContent() {
     load();
   }, [load]);
 
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setSearchQuery(value);
+      setPage(1);
+    }, 300);
+  };
+
   // Client-side filtering and pagination
   const filtered = searchQuery
     ? matches.filter((m) =>
@@ -45,6 +56,29 @@ function MatchesContent() {
 
   const totalPages = Math.ceil(filtered.length / pageSize);
   const pagedData = filtered.slice((page - 1) * pageSize, page * pageSize);
+
+  const handleStatusUpdate = async (matchId: string, newStatus: string) => {
+    const match = matches.find((m) => m.id === matchId);
+    if (!match) return;
+    try {
+      await updateMatchStatus(match.demandId, matchId, newStatus);
+      setMatches((prev) =>
+        prev.map((m) => (m.id === matchId ? { ...m, status: newStatus } : m)),
+      );
+    } catch {
+      setError('Failed to update match status. Please try again.');
+    }
+  };
+
+  const handleRematch = async (demandId: string) => {
+    try {
+      await rematchDemand(demandId);
+      // Reload matches after rematch
+      await load();
+    } catch {
+      setError('Failed to rematch. Please try again.');
+    }
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -60,16 +94,12 @@ function MatchesContent() {
               </p>
             </div>
 
-            {/* Search */}
+            {/* Search with debounce */}
             <div>
               <input
                 type="text"
                 placeholder="搜索需求标题..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setPage(1);
-                }}
+                onChange={handleSearchChange}
                 className="w-full max-w-xs px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-400"
               />
             </div>
@@ -86,7 +116,12 @@ function MatchesContent() {
               </div>
             ) : (
               <>
-                <MatchList matches={pagedData} isLoading={isLoading} />
+                <MatchList
+                  matches={pagedData}
+                  isLoading={isLoading}
+                  onStatusUpdate={handleStatusUpdate}
+                  onRematch={handleRematch}
+                />
                 {totalPages > 1 && (
                   <div className="flex items-center justify-center gap-2 mt-6">
                     <button

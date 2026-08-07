@@ -249,6 +249,18 @@ function OfferList() {
       render: (org: Offer['organization']) => org?.name || '-',
     },
     {
+      title: '报价金额',
+      dataIndex: 'price',
+      key: 'price',
+      width: 140,
+      render: (price: number | undefined | null, record: Offer) => {
+        if (price == null) return '-';
+        const currency = record.currency || 'CNY';
+        const symbol = currency === 'CNY' ? '¥' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : currency;
+        return `${symbol}${Number(price).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      },
+    },
+    {
       title: '状态',
       dataIndex: 'status',
       key: 'status',

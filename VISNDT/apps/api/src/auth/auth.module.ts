@@ -11,6 +11,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { CsrfModule } from '../common/security/csrf/csrf.module';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CsrfModule } from '../common/security/csrf/csrf.module';
       }),
     }),
     CsrfModule,
+    PrismaModule,
   ],
   controllers: [AuthController, InvitationController],
   providers: [AuthService, RefreshTokenService, InvitationService, JwtStrategy, JwtAuthGuard, RolesGuard],

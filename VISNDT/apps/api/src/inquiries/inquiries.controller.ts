@@ -1,4 +1,5 @@
 import { Controller, Post, Get, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { InquiriesService } from './inquiries.service';
 import { CreateInquiryDto } from './dto/create-inquiry.dto';
@@ -14,6 +15,7 @@ export class InquiriesController {
   constructor(private readonly service: InquiriesService) {}
 
   @Post()
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @ApiOperation({ summary: 'Create product inquiry' })
   async create(@Body() dto: CreateInquiryDto) {
     return ApiResponse.ok(await this.service.create(dto), 'Inquiry submitted');

@@ -1,9 +1,9 @@
 /**
  * Inquiry Service Layer
  *
- * Encapsulates POST /inquiries API call for page-level consumption.
+ * Encapsulates inquiry API calls for page-level consumption.
  */
-import { createInquiry as postInquiry } from '@/lib/api/inquiries';
+import { createInquiry as postInquiry, getMyInquiries as fetchMyInquiries } from '@/lib/api/inquiries';
 import type { CreateInquiryDto, InquiryResponse } from '@/types/inquiry';
 
 /**
@@ -14,4 +14,15 @@ export async function createInquiry(
   dto: CreateInquiryDto,
 ): Promise<InquiryResponse> {
   return postInquiry(dto);
+}
+
+/**
+ * Get my organization inquiries (paginated).
+ * GET /inquiries/mine (JWT)
+ */
+export async function getMyInquiries(
+  page = 1,
+  pageSize = 20,
+): Promise<{ data: any[]; total: number }> {
+  return fetchMyInquiries(page, pageSize);
 }

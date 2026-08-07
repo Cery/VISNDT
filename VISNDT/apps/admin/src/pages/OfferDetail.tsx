@@ -185,6 +185,11 @@ export default function OfferDetailPage() {
             </Tag>
           </Descriptions.Item>
           <Descriptions.Item label="标题">{offer.title}</Descriptions.Item>
+          <Descriptions.Item label="报价金额">
+            {offer.price != null
+              ? `${offer.currency === 'CNY' ? '¥' : offer.currency === 'USD' ? '$' : offer.currency === 'EUR' ? '€' : offer.currency || '¥'}${Number(offer.price).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+              : '-'}
+          </Descriptions.Item>
           <Descriptions.Item label="创建时间">
             {formatDate(offer.createdAt)}
           </Descriptions.Item>

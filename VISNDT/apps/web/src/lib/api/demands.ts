@@ -140,3 +140,36 @@ export async function getDemandMatches(
   );
   return res.data;
 }
+
+/**
+ * Update match status.
+ * PATCH /demands/:id/matches/:matchId (JWT)
+ */
+export async function updateMatchStatus(
+  demandId: string,
+  matchId: string,
+  status: string,
+): Promise<unknown> {
+  const res = await apiClient<ApiResponse<unknown>>(
+    `/demands/${demandId}/matches/${matchId}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    },
+  );
+  return res.data;
+}
+
+/**
+ * Re-match a demand.
+ * POST /demands/:id/rematch (JWT)
+ */
+export async function rematchDemand(
+  demandId: string,
+): Promise<unknown> {
+  const res = await apiClient<ApiResponse<unknown>>(
+    `/demands/${demandId}/rematch`,
+    { method: 'POST' },
+  );
+  return res.data;
+}

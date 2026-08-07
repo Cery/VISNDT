@@ -6,6 +6,8 @@ export interface Offer {
   productId: string;
   title: string;
   description?: string;
+  price?: number;
+  currency?: string;
   status: OfferStatus;
   createdAt: string;
   updatedAt: string;

@@ -5,25 +5,30 @@ import AuthGuard from '@/auth/AuthGuard';
 import { useAuth } from '@/auth/AuthProvider';
 import StatCard from '@/components/workspace/StatCard';
 import { getDemands } from '@/services/demand.service';
-import { getRfqs } from '@/services/rfq.service';
+import { getMyInquiries } from '@/services/inquiry.service';
+import { getUnreadCount } from '@/lib/api/notifications';
 import Link from 'next/link';
 
 function DashboardContent() {
   const { user } = useAuth();
-  const [stats, setStats] = useState({ demands: 0, rfqs: 0 });
+  const [stats, setStats] = useState({ demands: 0, inquiries: 0, unreadNotifications: 0 });
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadStats() {
       try {
-        const [demandsRes, rfqsRes] = await Promise.allSettled([
+        const [demandsRes, inquiriesRes, unreadRes] = await Promise.allSettled([
           getDemands(1, 1),
-          getRfqs(),
+          getMyInquiries(1, 1),
+          getUnreadCount(),
         ]);
         setStats({
           demands:
             demandsRes.status === 'fulfilled' ? demandsRes.value.total : 0,
-          rfqs: rfqsRes.status === 'fulfilled' ? rfqsRes.value.total : 0,
+          inquiries:
+            inquiriesRes.status === 'fulfilled' ? inquiriesRes.value.total : 0,
+          unreadNotifications:
+            unreadRes.status === 'fulfilled' ? unreadRes.value : 0,
         });
       } catch {
         // Stats are optional — show 0 on error
@@ -49,7 +54,7 @@ function DashboardContent() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard
           label="我的需求"
           value={isLoading ? '...' : stats.demands}
@@ -58,9 +63,15 @@ function DashboardContent() {
         />
         <StatCard
           label="收到的询价"
-          value={isLoading ? '...' : stats.rfqs}
-          description="收到的请求"
+          value={isLoading ? '...' : stats.inquiries}
+          description="收到的询价请求"
           icon="📄"
+        />
+        <StatCard
+          label="未读通知"
+          value={isLoading ? '...' : stats.unreadNotifications}
+          description={stats.unreadNotifications > 0 ? '有待处理通知' : '全部已读'}
+          icon="🔔"
         />
         <StatCard
           label="组织"

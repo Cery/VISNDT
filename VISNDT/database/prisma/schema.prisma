@@ -429,6 +429,8 @@ model Offer {
   productId      String      @map("product_id") @db.Uuid
   title          String
   description    String?
+  price          Decimal?    @map("price") @db.Decimal(12, 2)
+  currency       String?     @default("CNY") @map("currency")
   status         OfferStatus @default(DRAFT)
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -656,6 +658,7 @@ model AuditLog {
   operatorId String      @map("operator_id") @db.Uuid
   oldValue   Json?       @map("old_value") @db.JsonB
   newValue   Json?       @map("new_value") @db.JsonB
+  ipAddress  String?     @map("ip_address")
 
   createdAt DateTime @default(now()) @map("created_at")
 
