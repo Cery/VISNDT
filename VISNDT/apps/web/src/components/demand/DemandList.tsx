@@ -68,6 +68,16 @@ export default function DemandList({ demands, isLoading }: DemandListProps) {
                 {demand.category.name}
               </span>
             )}
+            {demand.budgetRange && (
+              <span className="bg-slate-100 px-2 py-0.5 rounded-full">
+                {demand.budgetRange}
+              </span>
+            )}
+            {demand.quantity != null && (
+              <span>
+                Qty: {demand.quantity}{demand.quantityUnit ? ` ${demand.quantityUnit}` : ''}
+              </span>
+            )}
             <span>{new Date(demand.createdAt).toLocaleDateString()}</span>
           </div>
         </Link>

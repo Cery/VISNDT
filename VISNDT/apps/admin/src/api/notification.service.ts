@@ -53,4 +53,9 @@ export const notificationService = {
 
     return response.data;
   },
+
+  async batchDelete(ids: string[]): Promise<{ count: number }> {
+    const response = (await apiClient.post('/notifications/batch-delete', { ids })) as unknown as ApiResponseWrapper<{ count: number }>;
+    return response.data;
+  },
 };

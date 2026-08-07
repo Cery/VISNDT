@@ -734,6 +734,51 @@ export class DemandsService {
     return updated;
   }
 
+  async remove(id: string) {
+    const demand = await this.prisma.demand.findUnique({
+      where: { id },
+      include: { 
+        _count: { 
+          select: { matches: true, parameters: true } 
+        },
+        rfq: true,
+      },
+    });
+    if (!demand) throw new NotFoundException(`Demand ${id} not found`);
+
+    if (demand._count.matches > 0 || demand.rfq) {
+      const reasons: string[] = [];
+      if (demand._count.matches > 0) reasons.push(`${demand._count.matches} match(es)`);
+      if (demand.rfq) reasons.push(`1 RFQ`);
+      throw new BadRequestException(
+        `Cannot delete demand with existing dependencies: ${reasons.join(', ')}. Remove dependencies first.`,
+      );
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.demandParameter.deleteMany({ where: { demandId: id } }),
+      this.prisma.demand.delete({ where: { id } }),
+    ]);
+
+    return { id };
+  }
+
+  async batchDelete(ids: string[]) {
+    const results = await Promise.allSettled(ids.map((id) => this.remove(id)));
+    return results.map((r, i) => ({
+      id: ids[i],
+      success: r.status === 'fulfilled',
+      ...(r.status === 'fulfilled' ? { data: r.value } : { error: r.reason?.message }),
+    }));
+  }
+
+  async batchStatus(ids: string[], status: string) {
+    return this.prisma.demand.updateMany({
+      where: { id: { in: ids } },
+      data: { status: status as DemandStatus },
+    });
+  }
+
   // ==========================================
   // Contact Protection
   // ==========================================

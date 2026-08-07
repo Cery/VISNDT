@@ -8,6 +8,8 @@ export interface RfqItem {
   status: string;
   demandId?: string | null;
   organizationId: string;
+  publishedAt?: string | null;
+  closedAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -31,9 +33,13 @@ export interface RfqResponseItem {
  * Get RFQs for current supplier organization.
  * GET /rfqs/mine (JWT)
  */
-export async function getMyRfqs(): Promise<PaginatedResponse<RfqItem>> {
+export async function getMyRfqs(
+  page = 1,
+  pageSize = 20,
+): Promise<PaginatedResponse<RfqItem>> {
   const res = await apiClient<ApiResponse<PaginatedResponse<RfqItem>>>(
     '/rfqs/mine',
+    { params: { page, pageSize } },
   );
   return res.data;
 }
@@ -62,6 +68,56 @@ export async function createRfq(params: CreateRfqParams): Promise<RfqItem> {
     method: 'POST',
     body: JSON.stringify(params),
   });
+  return res.data;
+}
+
+/**
+ * Update an RFQ.
+ * PATCH /rfqs/:id (JWT)
+ */
+export async function updateRfq(
+  id: string,
+  params: Partial<CreateRfqParams>,
+): Promise<RfqDetailItem> {
+  const res = await apiClient<ApiResponse<RfqDetailItem>>(`/rfqs/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(params),
+  });
+  return res.data;
+}
+
+/**
+ * Delete an RFQ.
+ * DELETE /rfqs/:id (JWT)
+ */
+export async function deleteRfq(id: string): Promise<{ id: string }> {
+  const res = await apiClient<ApiResponse<{ id: string }>>(`/rfqs/${id}`, {
+    method: 'DELETE',
+  });
+  return res.data;
+}
+
+/**
+ * Publish an RFQ (DRAFT → OPEN).
+ * POST /rfqs/:id/publish (JWT)
+ */
+export async function publishRfq(id: string): Promise<RfqDetailItem> {
+  const res = await apiClient<ApiResponse<RfqDetailItem>>(
+    `/rfqs/${id}/publish`,
+    { method: 'POST' },
+  );
+  return res.data;
+}
+
+/**
+ * Close an RFQ.
+ * POST /rfqs/:id/close (JWT)
+ */
+export async function closeRfq(id: string): Promise<RfqDetailItem> {
+  const res = await apiClient<ApiResponse<RfqDetailItem>>(
+    `/rfqs/${id}/close`,
+    { method: 'POST' },
+  );
   return res.data;
 }
 

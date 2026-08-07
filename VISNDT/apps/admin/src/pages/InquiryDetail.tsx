@@ -26,10 +26,10 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 const STATUS_OPTIONS: { label: string; value: InquiryStatus }[] = [
-  { label: 'NEW', value: 'NEW' },
-  { label: 'PROCESSING', value: 'PROCESSING' },
-  { label: 'REPLIED', value: 'REPLIED' },
-  { label: 'CLOSED', value: 'CLOSED' },
+  { label: '新建', value: 'NEW' },
+  { label: '处理中', value: 'PROCESSING' },
+  { label: '已回复', value: 'REPLIED' },
+  { label: '已关闭', value: 'CLOSED' },
 ];
 
 type PageState =

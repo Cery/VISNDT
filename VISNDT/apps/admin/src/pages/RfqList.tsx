@@ -1,16 +1,18 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Table, Select, Space, Spin, Alert, Button, Tag, Typography } from 'antd';
+import { Table, Select, Space, Spin, Alert, Button, Tag, Typography, Input, message, Modal } from 'antd';
 import { ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import { rfqService } from '../api';
 import type { Rfq } from '../types';
+import BatchOperations from '../components/BatchOperations';
 
 const { Title } = Typography;
 
 type PageState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
+  | { status: 'empty' }
   | { status: 'success'; data: Rfq[]; total: number };
 
 const STATUS_OPTIONS = [
@@ -22,6 +24,12 @@ const STATUS_OPTIONS = [
   { value: 'CANCELLED', label: '已取消' },
 ];
 
+const BATCH_STATUS_OPTIONS = [
+  { label: '草稿', value: 'DRAFT' },
+  { label: '开放', value: 'OPEN' },
+  { label: '已关闭', value: 'CLOSED' },
+];
+
 const STATUS_COLOR_MAP: Record<string, string> = {
   DRAFT: 'orange',
   OPEN: 'blue',
@@ -30,57 +38,137 @@ const STATUS_COLOR_MAP: Record<string, string> = {
   CANCELLED: 'red',
 };
 
+const RFQ_STATUS_LABEL_MAP: Record<string, string> = {
+  DRAFT: '草稿',
+  OPEN: '开放',
+  RESPONDING: '响应中',
+  CLOSED: '已关闭',
+  CANCELLED: '已取消',
+};
+
+interface QueryParams {
+  page: number;
+  pageSize: number;
+  keyword: string;
+  status: string;
+}
+
 function RfqList() {
   const navigate = useNavigate();
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
-  const [statusFilter, setStatusFilter] = useState<string>('');
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [batchLoading, setBatchLoading] = useState(false);
+  const [query, setQuery] = useState<QueryParams>({
+    page: 1,
+    pageSize: 20,
+    keyword: '',
+    status: '',
+  });
 
   const fetchRfqs = useCallback(async () => {
     setPageState({ status: 'loading' });
     try {
-      const result = await rfqService.getList(page, pageSize);
-      let filteredData = result.data;
-      if (statusFilter) {
-        filteredData = result.data.filter(
-          (rfq) => rfq.status === statusFilter,
-        );
+      const result = await rfqService.getList(
+        query.page,
+        query.pageSize,
+        query.keyword || undefined,
+        query.status || undefined,
+      );
+      if (result.data.length === 0) {
+        setPageState({ status: 'empty' });
+      } else {
+        setPageState({
+          status: 'success',
+          data: result.data,
+          total: result.total,
+        });
       }
-      setPageState({
-        status: 'success',
-        data: filteredData,
-        total: statusFilter ? filteredData.length : result.total,
-      });
     } catch (err) {
       const message =
         err instanceof Error ? err.message : '加载询价失败';
       setPageState({ status: 'error', message });
     }
-  }, [page, pageSize, statusFilter]);
+  }, [query]);
 
   useEffect(() => {
     fetchRfqs();
   }, [fetchRfqs]);
 
+  const handleSearch = useCallback((value: string) => {
+    setQuery((prev) => ({ ...prev, keyword: value, page: 1 }));
+  }, []);
+
   const handleStatusChange = useCallback((value: string) => {
-    setStatusFilter(value);
-    setPage(1);
+    setQuery((prev) => ({ ...prev, status: value, page: 1 }));
   }, []);
 
   const handleReset = useCallback(() => {
-    setStatusFilter('');
-    setPage(1);
-    setPageSize(20);
+    setQuery({ page: 1, pageSize: 20, keyword: '', status: '' });
   }, []);
 
   const handleTableChange = useCallback(
     (pagination: TablePaginationConfig) => {
-      setPage(pagination.current || 1);
-      setPageSize(pagination.pageSize || 20);
+      setQuery((prev) => ({
+        ...prev,
+        page: pagination.current || 1,
+        pageSize: pagination.pageSize || 20,
+      }));
     },
     [],
   );
+
+  const handleDelete = useCallback((id: string) => {
+    Modal.confirm({
+      title: '确认删除',
+      content: '确定要删除此询价吗？此操作不可撤销。',
+      okText: '确认删除',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          await rfqService.remove(id);
+          message.success('询价已删除');
+          fetchRfqs();
+        } catch (err) {
+          message.error(err instanceof Error ? err.message : '删除失败');
+        }
+      },
+    });
+  }, [fetchRfqs]);
+
+  const handleBatchDelete = useCallback(async (ids: string[]) => {
+    setBatchLoading(true);
+    const hideLoading = message.loading('正在删除...');
+    try {
+      await rfqService.batchDelete(ids);
+      hideLoading();
+      message.success(`成功删除 ${ids.length} 个询价`);
+      setSelectedRowKeys([]);
+      fetchRfqs();
+    } catch (err) {
+      hideLoading();
+      message.error(err instanceof Error ? err.message : '批量删除失败');
+    } finally {
+      setBatchLoading(false);
+    }
+  }, [fetchRfqs]);
+
+  const handleBatchStatus = useCallback(async (ids: string[], status: string) => {
+    setBatchLoading(true);
+    const hideLoading = message.loading('正在更新状态...');
+    try {
+      await rfqService.batchStatus(ids, status);
+      hideLoading();
+      message.success(`成功更新 ${ids.length} 个询价状态`);
+      setSelectedRowKeys([]);
+      fetchRfqs();
+    } catch (err) {
+      hideLoading();
+      message.error(err instanceof Error ? err.message : '批量更新状态失败');
+    } finally {
+      setBatchLoading(false);
+    }
+  }, [fetchRfqs]);
 
   if (pageState.status === 'loading') {
     return (
@@ -120,7 +208,7 @@ function RfqList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <Tag color={STATUS_COLOR_MAP[status] || 'default'}>{status}</Tag>
+        <Tag color={STATUS_COLOR_MAP[status] || 'default'}>{RFQ_STATUS_LABEL_MAP[status] || status}</Tag>
       ),
     },
     {
@@ -136,6 +224,20 @@ function RfqList() {
       render: (user: Rfq['createdByUser']) => user?.name || user?.email || '-',
     },
     {
+      title: '发布时间',
+      dataIndex: 'publishedAt',
+      key: 'publishedAt',
+      render: (date: string | undefined) =>
+        date ? new Date(date).toLocaleDateString() : '-',
+    },
+    {
+      title: '关闭时间',
+      dataIndex: 'closedAt',
+      key: 'closedAt',
+      render: (date: string | undefined) =>
+        date ? new Date(date).toLocaleDateString() : '-',
+    },
+    {
       title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
@@ -146,12 +248,21 @@ function RfqList() {
       key: 'actions',
       width: 100,
       render: (_: unknown, record: Rfq) => (
-        <Button
-          type="link"
-          onClick={() => navigate(`/rfqs/${record.id}`)}
-        >
-          查看
-        </Button>
+        <Space>
+          <Button
+            type="link"
+            onClick={() => navigate(`/rfqs/${record.id}`)}
+          >
+            查看
+          </Button>
+          <Button
+            type="link"
+            danger
+            onClick={() => handleDelete(record.id)}
+          >
+            删除
+          </Button>
+        </Space>
       ),
     },
   ];
@@ -163,10 +274,16 @@ function RfqList() {
       </Title>
 
       <Space style={{ marginBottom: 16 }} wrap>
+        <Input.Search
+          placeholder="搜索需求标题..."
+          allowClear
+          onSearch={handleSearch}
+          style={{ width: 240 }}
+        />
         <Select
           placeholder="按状态筛选"
           allowClear
-          value={statusFilter || undefined}
+          value={query.status || undefined}
           onChange={handleStatusChange}
           options={STATUS_OPTIONS}
           style={{ width: 160 }}
@@ -183,20 +300,40 @@ function RfqList() {
         </Button>
       </Space>
 
-      <Table<Rfq>
-        columns={columns}
-        dataSource={pageState.data}
-        rowKey="id"
-        onChange={handleTableChange}
-        pagination={{
-          current: page,
-          pageSize,
-          total: pageState.total,
-          showSizeChanger: true,
-          pageSizeOptions: ['10', '20', '50'],
-          showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
-        }}
+      <BatchOperations
+        selectedRowKeys={selectedRowKeys}
+        onBatchDelete={handleBatchDelete}
+        onBatchStatus={handleBatchStatus}
+        statusOptions={BATCH_STATUS_OPTIONS}
+        loading={batchLoading}
       />
+
+      {pageState.status === 'empty' ? (
+        <Alert
+          type="info"
+          message="暂无询价"
+          showIcon
+        />
+      ) : (
+        <Table<Rfq>
+          columns={columns}
+          dataSource={pageState.data}
+          rowKey="id"
+          rowSelection={{
+            selectedRowKeys,
+            onChange: (keys) => setSelectedRowKeys(keys),
+          }}
+          onChange={handleTableChange}
+          pagination={{
+            current: query.page,
+            pageSize: query.pageSize,
+            total: pageState.total,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '20', '50'],
+            showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
+          }}
+        />
+      )}
     </div>
   );
 }

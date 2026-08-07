@@ -44,6 +44,13 @@ const MEDIA_TYPE_COLOR_MAP: Record<MediaType, string> = {
   OTHER: 'default',
 };
 
+const MEDIA_TYPE_LABEL_MAP: Record<string, string> = {
+  IMAGE: '图片',
+  DOCUMENT: '文档',
+  CERTIFICATE: '证书',
+  OTHER: '其他',
+};
+
 function ProductMediaList() {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
@@ -218,7 +225,7 @@ function ProductMediaList() {
       width: 120,
       render: (mediaType: MediaType) => (
         <Tag color={MEDIA_TYPE_COLOR_MAP[mediaType] || 'default'}>
-          {mediaType}
+          {MEDIA_TYPE_LABEL_MAP[mediaType] || mediaType}
         </Tag>
       ),
     },

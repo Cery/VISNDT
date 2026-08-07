@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { RFQStatus, NotificationType, WorkflowAction, WorkflowEntityType } from '@prisma/client';
+import { RFQStatus, Prisma, NotificationType, WorkflowAction, WorkflowEntityType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRfqDto } from './dto/create-rfq.dto';
 import { UpdateRfqDto } from './dto/update-rfq.dto';
-import { PaginationDto } from '../common/dto/pagination.dto';
+import { SearchParamsDto } from '../common/dto/search-params.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { WorkflowEventsService } from '../workflow-events/workflow-events.service';
 
@@ -23,24 +23,36 @@ export class RfqsService {
     private readonly workflowEventsService: WorkflowEventsService,
   ) {}
 
-  async findAll(pagination: PaginationDto) {
-    const { page = 1, pageSize = 20 } = pagination;
+  async findAll(params: SearchParamsDto) {
+    const { page = 1, pageSize = 20, keyword, status } = params;
     const skip = (page - 1) * pageSize;
+
+    const where: Prisma.RFQWhereInput = {};
+    if (keyword) {
+      where.demand = {
+        title: { contains: keyword },
+      };
+    }
+    if (status) {
+      where.status = status as RFQStatus;
+    }
 
     const [data, total] = await Promise.all([
       this.prisma.rFQ.findMany({
+        where,
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
         include: { demand: true, createdByUser: true },
       }),
-      this.prisma.rFQ.count(),
+      this.prisma.rFQ.count({ where }),
     ]);
 
     return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
   }
 
-  async findMine(organizationId: string) {
+  async findMine(organizationId: string, page = 1, pageSize = 20) {
+    const skip = (page - 1) * pageSize;
     const [data, total] = await Promise.all([
       this.prisma.rFQ.findMany({
         where: {
@@ -48,6 +60,8 @@ export class RfqsService {
             organizationId,
           },
         },
+        skip,
+        take: pageSize,
         orderBy: { createdAt: 'desc' },
         include: { demand: true, createdByUser: true },
       }),
@@ -60,7 +74,7 @@ export class RfqsService {
       }),
     ]);
 
-    return { data, total };
+    return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
   }
 
   async findOne(id: string) {
@@ -157,6 +171,43 @@ export class RfqsService {
     }
 
     return updated;
+  }
+
+  async remove(id: string) {
+    const rfq = await this.prisma.rFQ.findUnique({
+      where: { id },
+      include: { 
+        _count: { 
+          select: { responses: true } 
+        } 
+      },
+    });
+    if (!rfq) throw new NotFoundException(`RFQ ${id} not found`);
+
+    if (rfq._count.responses > 0) {
+      throw new BadRequestException(
+        `Cannot delete RFQ with ${rfq._count.responses} response(s). Remove responses first.`,
+      );
+    }
+
+    await this.prisma.rFQ.delete({ where: { id } });
+    return { id };
+  }
+
+  async batchDelete(ids: string[]) {
+    const results = await Promise.allSettled(ids.map((id) => this.remove(id)));
+    return results.map((r, i) => ({
+      id: ids[i],
+      success: r.status === 'fulfilled',
+      ...(r.status === 'fulfilled' ? { data: r.value } : { error: r.reason?.message }),
+    }));
+  }
+
+  async batchStatus(ids: string[], status: string) {
+    return this.prisma.rFQ.updateMany({
+      where: { id: { in: ids } },
+      data: { status: status as RFQStatus },
+    });
   }
 
   /**

@@ -58,9 +58,9 @@ export default function OfferDetailPage() {
   const handleSubmit = () => {
     if (!id) return;
     Modal.confirm({
-      title: 'Submit Offer',
-      content: 'Submit this offer?',
-      okText: 'Submit',
+      title: '提交报价',
+      content: '确认提交此报价？',
+      okText: '提交',
       onOk: async () => {
         try {
           await offerService.submit(id);
@@ -245,7 +245,7 @@ export default function OfferDetailPage() {
               {offer.organization.name}
             </Descriptions.Item>
             <Descriptions.Item label="类型">
-              <Tag>{offer.organization.type || 'N/A'}</Tag>
+              <Tag>{offer.organization.type || '未知'}</Tag>
             </Descriptions.Item>
           </Descriptions>
         </Card>

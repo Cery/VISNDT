@@ -77,6 +77,12 @@ const STATUS_COLOR: Record<string, string> = {
   INACTIVE: 'red',
 };
 
+const STATUS_LABEL_MAP: Record<string, string> = {
+  ACTIVE: '已上架',
+  DRAFT: '草稿',
+  INACTIVE: '已下架',
+};
+
 const PARAM_COLUMNS = [
   {
     title: '参数名称',
@@ -189,7 +195,7 @@ export default function ProductDetailPage() {
             {product.category?.name || '-'}
           </Descriptions.Item>
           <Descriptions.Item label="状态">
-            <Tag color={STATUS_COLOR[product.status] || 'default'}>{product.status}</Tag>
+            <Tag color={STATUS_COLOR[product.status] || 'default'}>{STATUS_LABEL_MAP[product.status] || product.status}</Tag>
           </Descriptions.Item>
           <Descriptions.Item label="创建时间">
             {new Date(product.createdAt).toLocaleString()}

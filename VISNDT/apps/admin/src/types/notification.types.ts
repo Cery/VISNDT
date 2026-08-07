@@ -26,6 +26,7 @@ export interface NotificationListResponse {
 export interface NotificationQueryParams {
   page?: number;
   pageSize?: number;
+  keyword?: string;
   status?: NotificationStatus;
   type?: NotificationType;
 }

@@ -14,7 +14,7 @@ interface ApiResponseWrapper<T> {
 }
 
 export const parameterGroupService = {
-  async list(params?: { page?: number; pageSize?: number }): Promise<ParameterGroupListResponse> {
+  async getList(params?: { page?: number; pageSize?: number; keyword?: string }): Promise<ParameterGroupListResponse> {
     const response = (await apiClient.get('/parameter-groups', {
       params,
     })) as unknown as ApiResponseWrapper<ParameterGroupListResponse>;
@@ -41,6 +41,18 @@ export const parameterGroupService = {
       `/parameter-groups/${id}`,
       data,
     )) as unknown as ApiResponseWrapper<ParameterGroup>;
+    return response.data;
+  },
+
+  async remove(id: string): Promise<{ id: string }> {
+    const response = (await apiClient.delete(
+      `/parameter-groups/${id}`,
+    )) as unknown as ApiResponseWrapper<{ id: string }>;
+    return response.data;
+  },
+
+  async batchDelete(ids: string[]): Promise<{ count: number }> {
+    const response = (await apiClient.post('/parameter-groups/batch-delete', { ids })) as unknown as ApiResponseWrapper<{ count: number }>;
     return response.data;
   },
 };

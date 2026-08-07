@@ -1,6 +1,12 @@
 import { apiClient } from './client';
 import type { UploadResponse, FileAsset, OrphanListResponse, CleanupOrphansResponse } from '../types/file-asset.types';
 
+interface ApiResponseWrapper<T> {
+  data: T;
+  message?: string;
+  statusCode?: number;
+}
+
 const FILES_BASE = '/files';
 
 export const fileAssetService = {
@@ -65,6 +71,11 @@ export const fileAssetService = {
       `${FILES_BASE}/orphans/cleanup`,
       { ids },
     )) as unknown as CleanupOrphansResponse;
+    return response.data;
+  },
+
+  async batchDelete(ids: string[]): Promise<{ count: number }> {
+    const response = (await apiClient.post(`${FILES_BASE}/batch-delete`, { ids })) as unknown as ApiResponseWrapper<{ count: number }>;
     return response.data;
   },
 };

@@ -125,23 +125,23 @@ export default function RegisterPage() {
           />
         </div>
 
-        {/* Invite Token (optional) */}
+        {/* Invite Token */}
         <div>
           <label
             htmlFor="reg-invite"
             className="block text-sm font-medium text-slate-700 mb-1"
           >
-            邀请码{' '}
-            <span className="text-slate-400 text-xs">（选填）</span>
+            邀请码 <span className="text-red-500">*</span>
           </label>
           <input
             id="reg-invite"
             type="text"
             value={inviteToken}
             onChange={(e) => setInviteToken(e.target.value)}
+            required
             disabled={status === 'submitting'}
             className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
-            placeholder="如有邀请码请填写"
+            placeholder="请输入管理员提供的邀请码"
           />
         </div>
 

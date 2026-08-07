@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InquiryStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { BatchDeleteDto } from '../common/dto/batch-delete.dto';
+import { BatchStatusDto } from '../common/dto/batch-status.dto';
 
 const VALID_STATUSES: InquiryStatus[] = [
   'NEW',
@@ -13,10 +15,20 @@ const VALID_STATUSES: InquiryStatus[] = [
 export class AdminInquiryService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async list(page: number, pageSize: number) {
+  async list(page: number, pageSize: number, keyword?: string, status?: string) {
     const skip = (page - 1) * pageSize;
 
     const where: Prisma.InquiryWhereInput = {};
+    if (keyword) {
+      where.OR = [
+        { contactName: { contains: keyword } },
+        { contactEmail: { contains: keyword } },
+        { message: { contains: keyword } },
+      ];
+    }
+    if (status) {
+      where.status = status as InquiryStatus;
+    }
 
     const [data, total] = await Promise.all([
       this.prisma.inquiry.findMany({
@@ -86,6 +98,39 @@ export class AdminInquiryService {
     });
 
     return this.mapInquiry(updated);
+  }
+
+  async remove(id: string) {
+    const inquiry = await this.prisma.inquiry.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+    if (!inquiry) {
+      throw new NotFoundException(`Inquiry ${id} not found`);
+    }
+
+    await this.prisma.inquiry.delete({ where: { id } });
+    return { id };
+  }
+
+  async batchDelete(dto: BatchDeleteDto) {
+    const { ids } = dto;
+    await this.prisma.inquiry.deleteMany({ where: { id: { in: ids } } });
+    return { deletedIds: ids };
+  }
+
+  async batchStatus(dto: BatchStatusDto) {
+    const { ids, status } = dto;
+    if (!VALID_STATUSES.includes(status as InquiryStatus)) {
+      throw new BadRequestException(
+        `Invalid status "${status}". Allowed: ${VALID_STATUSES.join(', ')}`,
+      );
+    }
+    await this.prisma.inquiry.updateMany({
+      where: { id: { in: ids } },
+      data: { status: status as InquiryStatus },
+    });
+    return { updatedIds: ids, status };
   }
 
   private mapInquiry(i: any) {

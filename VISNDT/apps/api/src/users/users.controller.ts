@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PaginationDto } from '../common/dto/pagination.dto';
+import { BatchDeleteDto } from '../common/dto/batch-delete.dto';
+import { BatchStatusDto } from '../common/dto/batch-status.dto';
 import { ApiResponse } from '../common/dto/api-response.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -25,6 +27,27 @@ export class UsersController {
   async findAll(@Query() pagination: PaginationDto) {
     const result = await this.usersService.findAll(pagination);
     return ApiResponse.ok(result);
+  }
+
+  @Post('batch-delete')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Batch delete users (ADMIN only)' })
+  async batchDelete(
+    @Body() dto: BatchDeleteDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.usersService.batchDelete(dto.ids, user), 'Batch delete completed');
+  }
+
+  @Patch('batch-status')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Batch update user status (ADMIN only)' })
+  async batchStatus(@Body() dto: BatchStatusDto) {
+    return ApiResponse.ok(await this.usersService.batchStatus(dto.ids, dto.status), 'Batch status updated');
   }
 
   @Get(':id')
@@ -62,5 +85,18 @@ export class UsersController {
   ) {
     const result = await this.usersService.update(id, dto, user);
     return ApiResponse.ok(result, 'User updated');
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete user (ADMIN only). Cascades: memberships, notifications, refresh tokens. Cannot delete self.' })
+  @ApiParam({ name: 'id', description: 'User UUID' })
+  async remove(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.usersService.remove(id, user), 'User deleted');
   }
 }

@@ -1,9 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Table, Spin, Alert, Button, Tag, Typography } from 'antd';
+import { Table, Spin, Alert, Button, Tag, Typography, Select, Input, Space, message, Modal } from 'antd';
+import { ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import { offerService } from '../api';
 import type { Offer } from '../types';
+import BatchOperations from '../components/BatchOperations';
 
 const { Title } = Typography;
 
@@ -23,16 +25,59 @@ const STATUS_COLOR: Record<string, string> = {
   INACTIVE: 'default',
 };
 
+const STATUS_LABEL_MAP: Record<string, string> = {
+  DRAFT: '草稿',
+  SUBMITTED: '已提交',
+  ACCEPTED: '已接受',
+  REJECTED: '已拒绝',
+  WITHDRAWN: '已撤回',
+  ACTIVE: '活跃',
+  INACTIVE: '不活跃',
+};
+
+const STATUS_OPTIONS = [
+  { value: '', label: '全部状态' },
+  { value: 'DRAFT', label: '草稿' },
+  { value: 'SUBMITTED', label: '已提交' },
+  { value: 'ACCEPTED', label: '已接受' },
+  { value: 'REJECTED', label: '已拒绝' },
+  { value: 'WITHDRAWN', label: '已撤回' },
+];
+
+const BATCH_STATUS_OPTIONS = [
+  { label: '草稿', value: 'DRAFT' },
+  { label: '上架', value: 'ACTIVE' },
+  { label: '下架', value: 'INACTIVE' },
+];
+
+interface QueryParams {
+  page: number;
+  pageSize: number;
+  keyword: string;
+  status: string;
+}
+
 function OfferList() {
   const navigate = useNavigate();
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [batchLoading, setBatchLoading] = useState(false);
+  const [query, setQuery] = useState<QueryParams>({
+    page: 1,
+    pageSize: 20,
+    keyword: '',
+    status: '',
+  });
 
   const fetchOffers = useCallback(async () => {
     setPageState({ status: 'loading' });
     try {
-      const result = await offerService.getList(page, pageSize);
+      const result = await offerService.getList(
+        query.page,
+        query.pageSize,
+        query.keyword || undefined,
+        query.status || undefined,
+      );
       if (result.data.length === 0) {
         setPageState({ status: 'empty' });
       } else {
@@ -43,7 +88,7 @@ function OfferList() {
         err instanceof Error ? err.message : '加载报价失败';
       setPageState({ status: 'error', message });
     }
-  }, [page, pageSize]);
+  }, [query]);
 
   useEffect(() => {
     fetchOffers();
@@ -51,11 +96,79 @@ function OfferList() {
 
   const handleTableChange = useCallback(
     (pagination: TablePaginationConfig) => {
-      setPage(pagination.current || 1);
-      setPageSize(pagination.pageSize || 20);
+      setQuery((prev) => ({
+        ...prev,
+        page: pagination.current || 1,
+        pageSize: pagination.pageSize || 20,
+      }));
     },
     [],
   );
+
+  const handleSearch = useCallback((value: string) => {
+    setQuery((prev) => ({ ...prev, keyword: value, page: 1 }));
+  }, []);
+
+  const handleStatusChange = useCallback((value: string) => {
+    setQuery((prev) => ({ ...prev, status: value, page: 1 }));
+  }, []);
+
+  const handleReset = useCallback(() => {
+    setQuery({ page: 1, pageSize: 20, keyword: '', status: '' });
+  }, []);
+
+  const handleDelete = useCallback((id: string) => {
+    Modal.confirm({
+      title: '确认删除',
+      content: '确定要删除此报价吗？此操作不可撤销。',
+      okText: '确认删除',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          await offerService.remove(id);
+          message.success('报价已删除');
+          fetchOffers();
+        } catch (err) {
+          message.error(err instanceof Error ? err.message : '删除失败');
+        }
+      },
+    });
+  }, [fetchOffers]);
+
+  const handleBatchDelete = useCallback(async (ids: string[]) => {
+    setBatchLoading(true);
+    const hideLoading = message.loading('正在删除...');
+    try {
+      await offerService.batchDelete(ids);
+      hideLoading();
+      message.success(`成功删除 ${ids.length} 个报价`);
+      setSelectedRowKeys([]);
+      fetchOffers();
+    } catch (err) {
+      hideLoading();
+      message.error(err instanceof Error ? err.message : '批量删除失败');
+    } finally {
+      setBatchLoading(false);
+    }
+  }, [fetchOffers]);
+
+  const handleBatchStatus = useCallback(async (ids: string[], status: string) => {
+    setBatchLoading(true);
+    const hideLoading = message.loading('正在更新状态...');
+    try {
+      await offerService.batchStatus(ids, status);
+      hideLoading();
+      message.success(`成功更新 ${ids.length} 个报价状态`);
+      setSelectedRowKeys([]);
+      fetchOffers();
+    } catch (err) {
+      hideLoading();
+      message.error(err instanceof Error ? err.message : '批量更新状态失败');
+    } finally {
+      setBatchLoading(false);
+    }
+  }, [fetchOffers]);
 
   if (pageState.status === 'loading') {
     return (
@@ -87,6 +200,25 @@ function OfferList() {
         <Title level={4} style={{ marginBottom: 16 }}>
           报价管理
         </Title>
+        <Space style={{ marginBottom: 16 }} wrap>
+          <Input.Search
+            placeholder="搜索产品/描述..."
+            allowClear
+            onSearch={handleSearch}
+            style={{ width: 240 }}
+          />
+          <Select
+            placeholder="按状态筛选"
+            allowClear
+            value={query.status || undefined}
+            onChange={handleStatusChange}
+            options={STATUS_OPTIONS}
+            style={{ width: 160 }}
+          />
+          <Button icon={<ReloadOutlined />} onClick={handleReset}>
+            重置
+          </Button>
+        </Space>
         <Alert
           type="info"
           message="暂无报价"
@@ -98,6 +230,12 @@ function OfferList() {
   }
 
   const columns: ColumnsType<Offer> = [
+    {
+      title: '标题',
+      dataIndex: 'title',
+      key: 'title',
+      render: (title: string | undefined) => title || '-',
+    },
     {
       title: '产品',
       dataIndex: 'product',
@@ -116,7 +254,7 @@ function OfferList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <Tag color={STATUS_COLOR[status] || 'default'}>{status}</Tag>
+        <Tag color={STATUS_COLOR[status] || 'default'}>{STATUS_LABEL_MAP[status] || status}</Tag>
       ),
     },
     {
@@ -130,12 +268,21 @@ function OfferList() {
       key: 'actions',
       width: 100,
       render: (_: unknown, record: Offer) => (
-        <Button
-          type="link"
-          onClick={() => navigate(`/offers/${record.id}`)}
-        >
-          查看
-        </Button>
+        <Space>
+          <Button
+            type="link"
+            onClick={() => navigate(`/offers/${record.id}`)}
+          >
+            查看
+          </Button>
+          <Button
+            type="link"
+            danger
+            onClick={() => handleDelete(record.id)}
+          >
+            删除
+          </Button>
+        </Space>
       ),
     },
   ];
@@ -146,18 +293,50 @@ function OfferList() {
         报价管理
       </Title>
 
+      <Space style={{ marginBottom: 16 }} wrap>
+        <Input.Search
+          placeholder="搜索产品/描述..."
+          allowClear
+          onSearch={handleSearch}
+          style={{ width: 240 }}
+        />
+        <Select
+          placeholder="按状态筛选"
+          allowClear
+          value={query.status || undefined}
+          onChange={handleStatusChange}
+          options={STATUS_OPTIONS}
+          style={{ width: 160 }}
+        />
+        <Button icon={<ReloadOutlined />} onClick={handleReset}>
+          重置
+        </Button>
+      </Space>
+
+      <BatchOperations
+        selectedRowKeys={selectedRowKeys}
+        onBatchDelete={handleBatchDelete}
+        onBatchStatus={handleBatchStatus}
+        statusOptions={BATCH_STATUS_OPTIONS}
+        loading={batchLoading}
+      />
+
       <Table<Offer>
         columns={columns}
         dataSource={pageState.data}
         rowKey="id"
+        rowSelection={{
+          selectedRowKeys,
+          onChange: (keys) => setSelectedRowKeys(keys),
+        }}
         onChange={handleTableChange}
         pagination={{
-          current: page,
-          pageSize,
+          current: query.page,
+          pageSize: query.pageSize,
           total: pageState.total,
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '50'],
-          showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
+          showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条 / 共 ${total} 条`,
         }}
       />
     </div>

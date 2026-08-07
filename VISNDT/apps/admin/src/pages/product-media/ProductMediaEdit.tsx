@@ -33,10 +33,10 @@ const { Dragger } = Upload;
 const { Option } = Select;
 
 const MEDIA_TYPE_OPTIONS: { value: MediaType; label: string }[] = [
-  { value: 'IMAGE', label: 'IMAGE' },
-  { value: 'DOCUMENT', label: 'DOCUMENT' },
-  { value: 'CERTIFICATE', label: 'CERTIFICATE' },
-  { value: 'OTHER', label: 'OTHER' },
+  { value: 'IMAGE', label: '图片' },
+  { value: 'DOCUMENT', label: '文档' },
+  { value: 'CERTIFICATE', label: '证书' },
+  { value: 'OTHER', label: '其他' },
 ];
 
 type PageState =

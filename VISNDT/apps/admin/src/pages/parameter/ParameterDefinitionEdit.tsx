@@ -11,10 +11,10 @@ const { Title } = Typography;
 const { Option } = Select;
 
 const DATA_TYPE_OPTIONS: { value: ParameterDataType; label: string }[] = [
-  { value: 'STRING', label: 'STRING' },
-  { value: 'NUMBER', label: 'NUMBER' },
-  { value: 'BOOLEAN', label: 'BOOLEAN' },
-  { value: 'ENUM', label: 'ENUM' },
+  { value: 'STRING', label: '字符串' },
+  { value: 'NUMBER', label: '数字' },
+  { value: 'BOOLEAN', label: '布尔' },
+  { value: 'ENUM', label: '枚举' },
 ];
 
 type PageState =
@@ -35,7 +35,7 @@ function ParameterDefinitionEdit() {
     try {
       const [definition, groupsResult] = await Promise.all([
         parameterDefinitionService.getById(id),
-        parameterGroupService.list({ page: 1, pageSize: 100 }),
+        parameterGroupService.getList({ page: 1, pageSize: 100 }),
       ]);
       form.setFieldsValue({
         name: definition.name,

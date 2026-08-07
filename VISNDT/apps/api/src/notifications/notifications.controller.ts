@@ -1,8 +1,9 @@
-import { Controller, Get, Patch, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Query, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
 import { QueryNotificationsDto } from './dto/query-notifications.dto';
 import { ApiResponse } from '../common/dto/api-response.dto';
+import { BatchDeleteDto } from '../common/dto/batch-delete.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthRequest } from '../auth/interfaces/auth-request.interface';
@@ -29,6 +30,13 @@ export class NotificationsController {
   async getUnreadCount(@CurrentUser() user: AuthRequest['user']) {
     const result = await this.notificationsService.getUnreadCount(user);
     return ApiResponse.ok(result);
+  }
+
+  @Post('batch-delete')
+  @ApiOperation({ summary: 'Batch delete notifications' })
+  async batchDelete(@Body() dto: BatchDeleteDto) {
+    const result = await this.notificationsService.batchDelete(dto.ids);
+    return ApiResponse.ok(result, 'Notifications deleted');
   }
 
   @Patch('read-all')

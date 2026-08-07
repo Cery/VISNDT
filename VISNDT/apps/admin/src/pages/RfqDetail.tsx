@@ -39,6 +39,14 @@ const STATUS_COLOR: Record<string, string> = {
   CANCELLED: 'red',
 };
 
+const RFQ_STATUS_LABEL_MAP: Record<string, string> = {
+  DRAFT: '草稿',
+  OPEN: '开放',
+  RESPONDING: '响应中',
+  CLOSED: '已关闭',
+  CANCELLED: '已取消',
+};
+
 const RESPONSE_STATUS_COLOR: Record<string, string> = {
   SUBMITTED: 'blue',
   VIEWED: 'cyan',
@@ -96,7 +104,7 @@ export default function RfqDetailPage() {
     try {
       setUpdating(true);
       await rfqService.update(id, { status: newStatus as Rfq['status'] });
-      message.success(`询价单状态已更新为 ${newStatus}`);
+      message.success(`询价单状态已更新为 ${RFQ_STATUS_LABEL_MAP[newStatus] || newStatus}`);
       fetchRfq();
     } catch (err) {
       const msg = err instanceof Error ? err.message : '更新状态失败';
@@ -242,7 +250,7 @@ export default function RfqDetailPage() {
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
           <Descriptions.Item label="ID">{rfq.id}</Descriptions.Item>
           <Descriptions.Item label="状态">
-            <Tag color={STATUS_COLOR[rfq.status] || 'default'}>{rfq.status}</Tag>
+            <Tag color={STATUS_COLOR[rfq.status] || 'default'}>{RFQ_STATUS_LABEL_MAP[rfq.status] || rfq.status}</Tag>
           </Descriptions.Item>
           <Descriptions.Item label="需求">
             {rfq.demand?.title || '-'}
@@ -270,7 +278,7 @@ export default function RfqDetailPage() {
               onChange={handleStatusChange}
               options={allowedTransitions.map((s) => ({
                 value: s,
-                label: s,
+                label: RFQ_STATUS_LABEL_MAP[s] || s,
               }))}
               style={{ minWidth: 160 }}
             />
@@ -307,7 +315,7 @@ export default function RfqDetailPage() {
             description={responseState.message}
             action={
               <Button size="small" onClick={fetchResponses}>
-                Retry
+                重试
               </Button>
             }
           />

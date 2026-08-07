@@ -14,7 +14,7 @@ interface ApiResponseWrapper<T> {
 }
 
 export const categoryService = {
-  async list(params?: { page?: number; pageSize?: number }): Promise<ProductCategoryListResponse> {
+  async getList(params?: { page?: number; pageSize?: number; keyword?: string }): Promise<ProductCategoryListResponse> {
     const response = (await apiClient.get('/product-categories', {
       params,
     })) as unknown as ApiResponseWrapper<ProductCategoryListResponse>;
@@ -41,6 +41,18 @@ export const categoryService = {
       `/product-categories/${id}`,
       data,
     )) as unknown as ApiResponseWrapper<ProductCategory>;
+    return response.data;
+  },
+
+  async remove(id: string): Promise<{ id: string }> {
+    const response = (await apiClient.delete(
+      `/product-categories/${id}`,
+    )) as unknown as ApiResponseWrapper<{ id: string }>;
+    return response.data;
+  },
+
+  async batchDelete(ids: string[]): Promise<{ count: number }> {
+    const response = (await apiClient.post('/product-categories/batch-delete', { ids })) as unknown as ApiResponseWrapper<{ count: number }>;
     return response.data;
   },
 };

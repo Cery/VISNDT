@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { ParameterDefinitionsService } from './parameter-definitions.service';
 import { CreateParameterDefinitionDto } from './dto/create-parameter-definition.dto';
 import { UpdateParameterDefinitionDto } from './dto/update-parameter-definition.dto';
-import { PaginationDto } from '../common/dto/pagination.dto';
+import { SearchParamsDto } from '../common/dto/search-params.dto';
 import { ApiResponse } from '../common/dto/api-response.dto';
+import { BatchDeleteDto } from '../common/dto/batch-delete.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -17,8 +18,8 @@ export class ParameterDefinitionsController {
 
   @Get()
   @ApiOperation({ summary: 'List all parameter definitions (public)' })
-  async findAll(@Query() pagination: PaginationDto) {
-    return ApiResponse.ok(await this.service.findAll(pagination));
+  async findAll(@Query() params: SearchParamsDto) {
+    return ApiResponse.ok(await this.service.findAll(params));
   }
 
   @Get(':id')
@@ -45,5 +46,24 @@ export class ParameterDefinitionsController {
   @ApiParam({ name: 'id', description: 'Parameter Definition UUID' })
   async update(@Param('id') id: string, @Body() dto: UpdateParameterDefinitionDto) {
     return ApiResponse.ok(await this.service.update(id, dto), 'ParameterDefinition updated');
+  }
+
+  @Post('batch-delete')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Batch delete parameter definitions (ADMIN only). Skips definitions that have product associations.' })
+  async batchDelete(@Body() dto: BatchDeleteDto) {
+    return ApiResponse.ok(await this.service.batchDelete(dto), 'ParameterDefinitions batch deleted');
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete parameter definition (ADMIN only). Blocks if associated with products.' })
+  @ApiParam({ name: 'id', description: 'Parameter Definition UUID' })
+  async remove(@Param('id') id: string) {
+    return ApiResponse.ok(await this.service.remove(id), 'ParameterDefinition deleted');
   }
 }

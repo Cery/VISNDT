@@ -7,6 +7,14 @@ import type { AuditLog, AuditAction } from '../types';
 
 const { Title } = Typography;
 
+const ACTION_LABEL_MAP: Record<string, string> = {
+  CREATE: '创建',
+  UPDATE: '更新',
+  DELETE: '删除',
+  STATUS_CHANGE: '状态变更',
+  LOGIN: '登录',
+};
+
 const ACTION_COLOR: Record<string, string> = {
   CREATE: 'green',
   UPDATE: 'blue',
@@ -119,7 +127,7 @@ function AuditLogList() {
       key: 'action',
       width: 140,
       render: (action: AuditAction) => (
-        <Tag color={ACTION_COLOR[action] || 'default'}>{action}</Tag>
+        <Tag color={ACTION_COLOR[action] || 'default'}>{ACTION_LABEL_MAP[action] || action}</Tag>
       ),
     },
     {

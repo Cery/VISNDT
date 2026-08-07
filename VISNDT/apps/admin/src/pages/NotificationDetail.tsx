@@ -154,10 +154,10 @@ export default function NotificationDetailPage() {
       <Card title="引用" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
           <Descriptions.Item label="引用类型">
-            {notification.referenceType || 'N/A'}
+            {notification.referenceType || '无'}
           </Descriptions.Item>
           <Descriptions.Item label="引用ID">
-            {notification.referenceId || 'N/A'}
+            {notification.referenceId || '无'}
           </Descriptions.Item>
         </Descriptions>
       </Card>

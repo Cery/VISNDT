@@ -278,7 +278,7 @@ export default function MatchDetailPage() {
           </Descriptions.Item>
           <Descriptions.Item label="报价">
             {match.offer
-              ? `$${match.offer.price ?? 'N/A'}`
+              ? `$${match.offer.price ?? '-'}`
               : '-'}
           </Descriptions.Item>
           <Descriptions.Item label="匹配时间">

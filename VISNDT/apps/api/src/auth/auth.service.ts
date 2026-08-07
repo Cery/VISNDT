@@ -1,5 +1,6 @@
 import {
   Injectable,
+  BadRequestException,
   ConflictException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -24,7 +25,7 @@ export class AuthService {
   async register(dto: RegisterDto) {
     // Validate invitation token
     if (!dto.inviteToken) {
-      throw new UnauthorizedException('Invitation token is required');
+      throw new BadRequestException('注册需要邀请码，请联系管理员获取。');
     }
 
     const invitation = await this.invitationService.validateInvitation(dto.inviteToken);

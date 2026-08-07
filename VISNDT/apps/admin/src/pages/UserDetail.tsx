@@ -27,6 +27,12 @@ const STATUS_COLOR: Record<string, string> = {
   SUSPENDED: 'red',
 };
 
+const STATUS_LABEL_MAP: Record<string, string> = {
+  ACTIVE: '活跃',
+  INACTIVE: '未激活',
+  SUSPENDED: '已停用',
+};
+
 const formatDate = (date: string | undefined) =>
   date ? new Date(date).toLocaleString() : '-';
 
@@ -97,7 +103,7 @@ export default function UserDetailPage() {
           <Descriptions.Item label="姓名">{user.name || '-'}</Descriptions.Item>
           <Descriptions.Item label="状态">
             <Tag color={STATUS_COLOR[user.status] || 'default'}>
-              {user.status}
+              {STATUS_LABEL_MAP[user.status] || user.status}
             </Tag>
           </Descriptions.Item>
         </Descriptions>

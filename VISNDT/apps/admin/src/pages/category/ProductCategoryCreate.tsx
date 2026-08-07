@@ -22,7 +22,7 @@ function ProductCategoryCreate() {
     let cancelled = false;
     const loadCategories = async () => {
       try {
-        const result = await categoryService.list({ page: 1, pageSize: 100 });
+        const result = await categoryService.getList({ page: 1, pageSize: 100 });
         if (!cancelled) {
           setPageState({ status: 'ready', categories: result.data });
         }

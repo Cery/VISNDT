@@ -138,8 +138,8 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
           <Select
             options={[
               { value: 'DRAFT', label: '草稿' },
-              { value: 'ACTIVE', label: '激活' },
-              { value: 'INACTIVE', label: '未激活' },
+              { value: 'ACTIVE', label: '已上架' },
+              { value: 'INACTIVE', label: '已下架' },
             ]}
           />
         </Form.Item>

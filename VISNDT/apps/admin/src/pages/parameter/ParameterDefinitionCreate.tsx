@@ -16,10 +16,10 @@ type PageState =
   | { status: 'submitting' };
 
 const DATA_TYPE_OPTIONS: { value: ParameterDataType; label: string }[] = [
-  { value: 'STRING', label: 'STRING' },
-  { value: 'NUMBER', label: 'NUMBER' },
-  { value: 'BOOLEAN', label: 'BOOLEAN' },
-  { value: 'ENUM', label: 'ENUM' },
+  { value: 'STRING', label: '字符串' },
+  { value: 'NUMBER', label: '数字' },
+  { value: 'BOOLEAN', label: '布尔' },
+  { value: 'ENUM', label: '枚举' },
 ];
 
 function ParameterDefinitionCreate() {
@@ -31,7 +31,7 @@ function ParameterDefinitionCreate() {
     let cancelled = false;
     const loadGroups = async () => {
       try {
-        const result = await parameterGroupService.list({ page: 1, pageSize: 100 });
+        const result = await parameterGroupService.getList({ page: 1, pageSize: 100 });
         if (!cancelled) {
           setPageState({ status: 'ready', groups: result.data });
         }

@@ -26,7 +26,7 @@ function ProductCategoryEdit() {
     try {
       const [category, listResult] = await Promise.all([
         categoryService.getById(id),
-        categoryService.list({ page: 1, pageSize: 100 }),
+        categoryService.getList({ page: 1, pageSize: 100 }),
       ]);
       form.setFieldsValue({
         name: category.name,

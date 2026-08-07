@@ -30,6 +30,13 @@ const STATUS_COLOR: Record<string, string> = {
   REJECTED: 'red',
 };
 
+const RESPONSE_STATUS_LABEL_MAP: Record<string, string> = {
+  SUBMITTED: '已提交',
+  VIEWED: '已查看',
+  ACCEPTED: '已接受',
+  REJECTED: '已拒绝',
+};
+
 const RESPONSE_TRANSITIONS: Record<string, string[]> = {
   SUBMITTED: ['VIEWED'],
   VIEWED: ['ACCEPTED', 'REJECTED'],
@@ -65,7 +72,7 @@ export default function RfqResponseDetailPage() {
     try {
       setUpdating(true);
       await rfqResponseService.update(id, { status: newStatus });
-      message.success(`响应状态已更新为 ${newStatus}`);
+      message.success(`响应状态已更新为 ${RESPONSE_STATUS_LABEL_MAP[newStatus] || newStatus}`);
       fetchResponse();
     } catch (err) {
       const msg = err instanceof Error ? err.message : '更新状态失败';
@@ -123,7 +130,7 @@ export default function RfqResponseDetailPage() {
           <Descriptions.Item label="ID">{response.id}</Descriptions.Item>
           <Descriptions.Item label="状态">
             <Tag color={STATUS_COLOR[response.status] || 'default'}>
-              {response.status}
+              {RESPONSE_STATUS_LABEL_MAP[response.status] || response.status}
             </Tag>
           </Descriptions.Item>
           <Descriptions.Item label="组织">
@@ -160,7 +167,7 @@ export default function RfqResponseDetailPage() {
               onChange={handleStatusChange}
               options={allowedTransitions.map((s) => ({
                 value: s,
-                label: s,
+                label: RESPONSE_STATUS_LABEL_MAP[s] || s,
               }))}
               style={{ minWidth: 160 }}
             />

@@ -1,25 +1,36 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateParameterDefinitionDto } from './dto/create-parameter-definition.dto';
 import { UpdateParameterDefinitionDto } from './dto/update-parameter-definition.dto';
-import { PaginationDto } from '../common/dto/pagination.dto';
+import { SearchParamsDto } from '../common/dto/search-params.dto';
+import { BatchDeleteDto } from '../common/dto/batch-delete.dto';
 
 @Injectable()
 export class ParameterDefinitionsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(pagination: PaginationDto) {
-    const { page = 1, pageSize = 20 } = pagination;
+  async findAll(params: SearchParamsDto) {
+    const { page = 1, pageSize = 20, keyword } = params;
     const skip = (page - 1) * pageSize;
+
+    const where: Prisma.ParameterDefinitionWhereInput = {};
+    if (keyword) {
+      where.OR = [
+        { name: { contains: keyword } },
+        { code: { contains: keyword } },
+      ];
+    }
 
     const [data, total] = await Promise.all([
       this.prisma.parameterDefinition.findMany({
+        where,
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
         include: { group: true },
       }),
-      this.prisma.parameterDefinition.count(),
+      this.prisma.parameterDefinition.count({ where }),
     ]);
 
     return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
@@ -41,5 +52,47 @@ export class ParameterDefinitionsService {
   async update(id: string, dto: UpdateParameterDefinitionDto) {
     await this.findOne(id);
     return this.prisma.parameterDefinition.update({ where: { id }, data: dto as any });
+  }
+
+  async remove(id: string) {
+    const def = await this.prisma.parameterDefinition.findUnique({
+      where: { id },
+      include: { 
+        _count: { 
+          select: { productValues: true, productAssociations: true } 
+        } 
+      },
+    });
+    if (!def) throw new NotFoundException(`ParameterDefinition ${id} not found`);
+
+    if (def._count.productValues > 0 || def._count.productAssociations > 0) {
+      throw new BadRequestException(
+        `Cannot delete parameter definition with ${def._count.productValues} product value(s) and ${def._count.productAssociations} product association(s). Remove associations first.`,
+      );
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.parameterOption.deleteMany({ where: { parameterDefinitionId: id } }),
+      this.prisma.parameterDefinition.delete({ where: { id } }),
+    ]);
+
+    return { id };
+  }
+
+  async batchDelete(dto: BatchDeleteDto) {
+    const { ids } = dto;
+    const results = await Promise.allSettled(
+      ids.map((id) => this.remove(id)),
+    );
+    const succeeded: string[] = [];
+    const failed: { id: string; reason: string }[] = [];
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        succeeded.push(ids[index]);
+      } else {
+        failed.push({ id: ids[index], reason: result.reason.message });
+      }
+    });
+    return { succeeded, failed };
   }
 }

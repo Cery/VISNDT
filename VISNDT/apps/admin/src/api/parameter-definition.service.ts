@@ -14,7 +14,7 @@ interface ApiResponseWrapper<T> {
 }
 
 export const parameterDefinitionService = {
-  async list(params?: { page?: number; pageSize?: number }): Promise<ParameterDefinitionListResponse> {
+  async getList(params?: { page?: number; pageSize?: number; keyword?: string }): Promise<ParameterDefinitionListResponse> {
     const response = (await apiClient.get('/parameter-definitions', {
       params,
     })) as unknown as ApiResponseWrapper<ParameterDefinitionListResponse>;
@@ -41,6 +41,18 @@ export const parameterDefinitionService = {
       `/parameter-definitions/${id}`,
       data,
     )) as unknown as ApiResponseWrapper<ParameterDefinition>;
+    return response.data;
+  },
+
+  async remove(id: string): Promise<{ id: string }> {
+    const response = (await apiClient.delete(
+      `/parameter-definitions/${id}`,
+    )) as unknown as ApiResponseWrapper<{ id: string }>;
+    return response.data;
+  },
+
+  async batchDelete(ids: string[]): Promise<{ count: number }> {
+    const response = (await apiClient.post('/parameter-definitions/batch-delete', { ids })) as unknown as ApiResponseWrapper<{ count: number }>;
     return response.data;
   },
 };

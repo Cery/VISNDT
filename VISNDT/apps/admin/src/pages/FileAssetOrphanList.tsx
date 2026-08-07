@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   Table,
   Spin,
@@ -9,13 +9,16 @@ import {
   Modal,
   message,
   Space,
+  Select,
+  Input,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import type { TableRowSelection } from 'antd/es/table/interface';
-import { ExclamationCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
 import { fileAssetService } from '../api';
 import type { FileAsset } from '../types';
 import { getFileTypeIcon, formatFileSize } from '../utils/file-utils';
+import BatchOperations from '../components/BatchOperations';
 
 const { Title } = Typography;
 const { confirm } = Modal;
@@ -36,7 +39,34 @@ type PageState =
 function FileAssetOrphanList() {
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [cleaningUp, setCleaningUp] = useState(false);
+  const [batchLoading, setBatchLoading] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [filterFileType, setFilterFileType] = useState<string>('');
+
+  const filteredOrphans = useMemo(() => {
+    if (pageState.status !== 'success') return [];
+    let list = pageState.data;
+    if (searchText) {
+      const lower = searchText.toLowerCase();
+      list = list.filter(
+        (f) =>
+          f.fileName.toLowerCase().includes(lower) ||
+          (f.mimeType && f.mimeType.toLowerCase().includes(lower)),
+      );
+    }
+    if (filterFileType) {
+      list = list.filter((f) => f.fileType === filterFileType);
+    }
+    return list;
+  }, [pageState, searchText, filterFileType]);
+
+  const FILE_TYPE_OPTIONS = [
+    { value: '', label: '全部类型' },
+    { value: 'IMAGE', label: '图片' },
+    { value: 'DOCUMENT', label: '文档' },
+    { value: 'CERTIFICATE', label: '证书' },
+    { value: 'OTHER', label: '其他' },
+  ];
 
   const fetchOrphans = useCallback(async () => {
     setPageState({ status: 'loading' });
@@ -59,20 +89,14 @@ function FileAssetOrphanList() {
     fetchOrphans();
   }, [fetchOrphans]);
 
-  const handleCleanup = useCallback(() => {
-    if (selectedRowKeys.length === 0) {
-      message.warning('请至少选择一个孤立文件进行清理');
-      return;
-    }
-
+  const handleBatchDelete = useCallback(async (ids: string[]) => {
     confirm({
       title: '清理孤立文件',
       icon: <ExclamationCircleOutlined />,
       content: (
         <div>
           <p>
-            您即将删除{' '}
-            <strong>{selectedRowKeys.length}</strong> 个孤立文件。
+            您即将删除 <strong>{ids.length}</strong> 个孤立文件。
           </p>
           <p style={{ color: '#ff4d4f' }}>
             此操作将永久从数据库和存储中删除文件，且不可撤销。
@@ -83,11 +107,9 @@ function FileAssetOrphanList() {
       okType: 'danger',
       cancelText: '取消',
       onOk: async () => {
-        setCleaningUp(true);
+        setBatchLoading(true);
         try {
-          const result = await fileAssetService.cleanupOrphans(
-            selectedRowKeys as string[],
-          );
+          const result = await fileAssetService.cleanupOrphans(ids);
 
           if (result.failed.length > 0) {
             message.warning(
@@ -105,11 +127,11 @@ function FileAssetOrphanList() {
             err instanceof Error ? err.message : '清理孤立文件失败';
           message.error(errorMessage);
         } finally {
-          setCleaningUp(false);
+          setBatchLoading(false);
         }
       },
     });
-  }, [selectedRowKeys, fetchOrphans]);
+  }, [fetchOrphans]);
 
   const rowSelection: TableRowSelection<FileAsset> = {
     selectedRowKeys,
@@ -153,7 +175,7 @@ function FileAssetOrphanList() {
       render: (size: number) => formatFileSize(size),
     },
     {
-      title: 'Storage Key',
+      title: '存储路径',
       dataIndex: 'storageKey',
       key: 'storageKey',
       width: 280,
@@ -230,24 +252,42 @@ function FileAssetOrphanList() {
           孤立文件
         </Title>
         <Space>
-          <Button onClick={fetchOrphans}>刷新</Button>
-          <Button
-            type="primary"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={handleCleanup}
-            loading={cleaningUp}
-            disabled={selectedRowKeys.length === 0}
-          >
-            清理选中 ({selectedRowKeys.length})
+          <Input.Search
+            placeholder="搜索文件名..."
+            allowClear
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            onSearch={(value) => setSearchText(value)}
+            style={{ width: 200 }}
+            prefix={<SearchOutlined />}
+          />
+          <Select
+            placeholder="文件类型"
+            allowClear
+            value={filterFileType || undefined}
+            onChange={(value) => setFilterFileType(value || '')}
+            options={FILE_TYPE_OPTIONS}
+            style={{ width: 140 }}
+          />
+          <Button icon={<ReloadOutlined />} onClick={() => { setSearchText(''); setFilterFileType(''); fetchOrphans(); }}>
+            重置
           </Button>
+          <Button onClick={fetchOrphans}>刷新</Button>
         </Space>
       </div>
+
+      <BatchOperations
+        selectedRowKeys={selectedRowKeys}
+        onBatchDelete={handleBatchDelete}
+        loading={batchLoading}
+        deleteTitle="清理孤立文件"
+        deleteDescription="此操作将永久从数据库和存储中删除文件，且不可撤销。"
+      />
 
       <Table<FileAsset>
         rowKey="id"
         columns={columns}
-        dataSource={pageState.data}
+        dataSource={filteredOrphans}
         rowSelection={rowSelection}
         pagination={{
           pageSize: 20,
@@ -255,6 +295,7 @@ function FileAssetOrphanList() {
           showTotal: (total) => `共 ${total} 个孤立文件`,
         }}
         scroll={{ x: 1200 }}
+        locale={{ emptyText: searchText || filterFileType ? '未找到匹配的孤立文件' : '暂无数据' }}
       />
     </div>
   );

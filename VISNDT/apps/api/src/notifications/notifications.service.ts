@@ -230,4 +230,11 @@ export class NotificationsService {
       take: members.length,
     });
   }
+
+  async batchDelete(ids: string[]) {
+    const result = await this.prisma.notification.deleteMany({
+      where: { id: { in: ids } },
+    });
+    return { deletedCount: result.count };
+  }
 }

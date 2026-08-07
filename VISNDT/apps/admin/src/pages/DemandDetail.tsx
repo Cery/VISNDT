@@ -34,6 +34,15 @@ const STATUS_COLOR: Record<string, string> = {
   CANCELLED: 'red',
 };
 
+const STATUS_LABEL_MAP: Record<string, string> = {
+  DRAFT: '草稿',
+  PUBLISHED: '已发布',
+  SUBMITTED: '已提交',
+  PROCESSING: '处理中',
+  CLOSED: '已关闭',
+  CANCELLED: '已取消',
+};
+
 const MATCH_STATUS_COLOR: Record<string, string> = {
   PENDING: 'orange',
   MATCHED: 'blue',
@@ -248,7 +257,7 @@ export default function DemandDetailPage() {
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
           <Descriptions.Item label="标题">{demand.title}</Descriptions.Item>
           <Descriptions.Item label="状态">
-            <Tag color={STATUS_COLOR[demand.status] || 'default'}>{demand.status}</Tag>
+            <Tag color={STATUS_COLOR[demand.status] || 'default'}>{STATUS_LABEL_MAP[demand.status] || demand.status}</Tag>
           </Descriptions.Item>
           <Descriptions.Item label="分类">
             {demand.category?.name || '-'}

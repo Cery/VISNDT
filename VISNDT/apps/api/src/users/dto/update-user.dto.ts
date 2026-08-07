@@ -8,6 +8,11 @@ export class UpdateUserDto {
   @IsEmail()
   email?: string;
 
+  @ApiPropertyOptional({ description: 'User display name' })
+  @IsOptional()
+  @IsString()
+  name?: string;
+
   @ApiPropertyOptional({ description: 'Password hash', minLength: 6 })
   @IsOptional()
   @IsString()

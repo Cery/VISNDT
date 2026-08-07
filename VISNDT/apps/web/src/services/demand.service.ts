@@ -1,7 +1,7 @@
 /**
  * Demand Service Layer
  */
-import { getMyDemands, getDemand as fetchDemand, getDemandMatches } from '@/lib/api/demands';
+import { getMyDemands, getDemand as fetchDemand, getDemandMatches, deleteDemand as apiDeleteDemand, publishDemand as apiPublishDemand, closeDemand as apiCloseDemand } from '@/lib/api/demands';
 import type { PaginatedResponse } from '@/types/api';
 import type { DemandItem, DemandDetailItem } from '@/lib/api/demands';
 
@@ -14,6 +14,18 @@ export async function getDemands(
 
 export async function getDemand(id: string): Promise<DemandDetailItem> {
   return fetchDemand(id);
+}
+
+export async function deleteDemand(id: string): Promise<{ id: string }> {
+  return apiDeleteDemand(id);
+}
+
+export async function publishDemand(id: string): Promise<DemandDetailItem> {
+  return apiPublishDemand(id);
+}
+
+export async function closeDemand(id: string): Promise<DemandDetailItem> {
+  return apiCloseDemand(id);
 }
 
 export { getDemandMatches };

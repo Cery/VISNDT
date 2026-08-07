@@ -6,7 +6,7 @@ import AuthGuard from '@/auth/AuthGuard';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
 import DemandDetail from '@/components/demand/DemandDetail';
-import { getDemand, getDemandMatches } from '@/services/demand.service';
+import { getDemand, getDemandMatches, deleteDemand, publishDemand, closeDemand } from '@/services/demand.service';
 import type { DemandDetailItem } from '@/lib/api/demands';
 
 function DemandDetailContent({ id }: { id: string }) {
@@ -18,33 +18,76 @@ function DemandDetailContent({ id }: { id: string }) {
   const [matchesCount, setMatchesCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [actionLoading, setActionLoading] = useState('');
+
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    setError('');
+    try {
+      const [demandRes, matchesRes] = await Promise.allSettled([
+        getDemand(id),
+        getDemandMatches(id, 1, 1),
+      ]);
+
+      if (demandRes.status === 'fulfilled') {
+        setDemand(demandRes.value);
+      } else {
+        setError('Failed to load demand. It may not exist or you may not have access.');
+        return;
+      }
+
+      if (matchesRes.status === 'fulfilled') {
+        setMatchesCount(matchesRes.value.total || 0);
+      }
+    } catch {
+      setError('An unexpected error occurred.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [id]);
 
   useEffect(() => {
-    async function load() {
-      try {
-        const [demandRes, matchesRes] = await Promise.allSettled([
-          getDemand(id),
-          getDemandMatches(id, 1, 1),
-        ]);
-
-        if (demandRes.status === 'fulfilled') {
-          setDemand(demandRes.value);
-        } else {
-          setError('Failed to load demand. It may not exist or you may not have access.');
-          return;
-        }
-
-        if (matchesRes.status === 'fulfilled') {
-          setMatchesCount(matchesRes.value.total || 0);
-        }
-      } catch {
-        setError('An unexpected error occurred.');
-      } finally {
-        setIsLoading(false);
-      }
-    }
     load();
+  }, [load]);
+
+  const handleDelete = useCallback(async () => {
+    if (!window.confirm('Are you sure you want to delete this demand?')) return;
+    setActionLoading('delete');
+    try {
+      await deleteDemand(id);
+      router.push('/workspace/demands');
+    } catch {
+      setError('Failed to delete demand.');
+      setActionLoading('');
+    }
+  }, [id, router]);
+
+  const handlePublish = useCallback(async () => {
+    setActionLoading('publish');
+    try {
+      const updated = await publishDemand(id);
+      setDemand(updated);
+    } catch {
+      setError('Failed to publish demand.');
+    } finally {
+      setActionLoading('');
+    }
   }, [id]);
+
+  const handleClose = useCallback(async () => {
+    setActionLoading('close');
+    try {
+      const updated = await closeDemand(id);
+      setDemand(updated);
+    } catch {
+      setError('Failed to close demand.');
+    } finally {
+      setActionLoading('');
+    }
+  }, [id]);
+
+  const canPublish = demand?.status === 'DRAFT';
+  const canClose = demand?.status === 'PUBLISHED' || demand?.status === 'PROCESSING';
 
   return (
     <div className="flex min-h-screen">
@@ -72,7 +115,45 @@ function DemandDetailContent({ id }: { id: string }) {
                 {error}
               </div>
             ) : demand ? (
-              <DemandDetail demand={demand} matchesCount={matchesCount} />
+              <>
+                {/* Action buttons */}
+                {!isLoading && demand && (
+                  <div className="flex items-center gap-2 mb-6">
+                    <button
+                      onClick={() => router.push(`/workspace/demands/${id}/edit`)}
+                      className="px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors"
+                    >
+                      Edit
+                    </button>
+                    {canPublish && (
+                      <button
+                        onClick={handlePublish}
+                        disabled={actionLoading === 'publish'}
+                        className="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 transition-colors"
+                      >
+                        {actionLoading === 'publish' ? 'Publishing...' : 'Publish'}
+                      </button>
+                    )}
+                    {canClose && (
+                      <button
+                        onClick={handleClose}
+                        disabled={actionLoading === 'close'}
+                        className="px-3 py-1.5 text-xs font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700 disabled:opacity-50 transition-colors"
+                      >
+                        {actionLoading === 'close' ? 'Closing...' : 'Close'}
+                      </button>
+                    )}
+                    <button
+                      onClick={handleDelete}
+                      disabled={actionLoading === 'delete'}
+                      className="px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 border border-red-300 rounded-md hover:bg-red-100 disabled:opacity-50 transition-colors"
+                    >
+                      {actionLoading === 'delete' ? 'Deleting...' : 'Delete'}
+                    </button>
+                  </div>
+                )}
+                <DemandDetail demand={demand} matchesCount={matchesCount} />
+              </>
             ) : null}
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -125,5 +125,39 @@ export class UsersService {
     }
 
     return this.prisma.user.update({ where: { id }, data: dto });
+  }
+
+  async remove(id: string, requestUser: RequestUser) {
+    if (requestUser.id === id) {
+      throw new BadRequestException('Cannot delete your own account.');
+    }
+
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new NotFoundException(`User ${id} not found`);
+
+    await this.prisma.$transaction([
+      this.prisma.organizationMember.deleteMany({ where: { userId: id } }),
+      this.prisma.notification.deleteMany({ where: { userId: id } }),
+      this.prisma.refreshToken.deleteMany({ where: { userId: id } }),
+      this.prisma.user.delete({ where: { id } }),
+    ]);
+
+    return { id };
+  }
+
+  async batchDelete(ids: string[], requestUser: RequestUser): Promise<{ count: number }> {
+    const results = await Promise.allSettled(
+      ids.map((id) => this.remove(id, requestUser)),
+    );
+    const succeeded = results.filter(r => r.status === 'fulfilled').length;
+    return { count: succeeded };
+  }
+
+  async batchStatus(ids: string[], status: string): Promise<{ count: number }> {
+    const result = await this.prisma.user.updateMany({
+      where: { id: { in: ids } },
+      data: { status: status as any },
+    });
+    return { count: result.count };
   }
 }

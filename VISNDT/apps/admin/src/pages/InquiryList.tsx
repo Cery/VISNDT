@@ -1,9 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Table, Spin, Alert, Button, Tag, Typography } from 'antd';
+import { Table, Spin, Alert, Button, Tag, Typography, Select, Input, Space, message, Modal } from 'antd';
+import { ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import { inquiryService } from '../api';
 import type { Inquiry } from '../types';
+import BatchOperations from '../components/BatchOperations';
 
 const { Title } = Typography;
 
@@ -14,22 +16,62 @@ const STATUS_COLOR: Record<string, string> = {
   CLOSED: 'default',
 };
 
+const INQUIRY_STATUS_LABEL_MAP: Record<string, string> = {
+  NEW: '新建',
+  PROCESSING: '处理中',
+  REPLIED: '已回复',
+  CLOSED: '已关闭',
+};
+
+const STATUS_OPTIONS = [
+  { value: '', label: '全部状态' },
+  { value: 'NEW', label: '新建' },
+  { value: 'PROCESSING', label: '处理中' },
+  { value: 'REPLIED', label: '已回复' },
+  { value: 'CLOSED', label: '已关闭' },
+];
+
+const BATCH_STATUS_OPTIONS = [
+  { label: '新建', value: 'NEW' },
+  { label: '处理中', value: 'PROCESSING' },
+  { label: '已回复', value: 'REPLIED' },
+  { label: '已关闭', value: 'CLOSED' },
+];
+
 type PageState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
   | { status: 'empty' }
   | { status: 'success'; data: Inquiry[]; total: number };
 
+interface QueryParams {
+  page: number;
+  pageSize: number;
+  keyword: string;
+  status: string;
+}
+
 function InquiryList() {
   const navigate = useNavigate();
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [batchLoading, setBatchLoading] = useState(false);
+  const [query, setQuery] = useState<QueryParams>({
+    page: 1,
+    pageSize: 20,
+    keyword: '',
+    status: '',
+  });
 
   const fetchInquiries = useCallback(async () => {
     setPageState({ status: 'loading' });
     try {
-      const result = await inquiryService.getList(page, pageSize);
+      const result = await inquiryService.getList(
+        query.page,
+        query.pageSize,
+        query.keyword || undefined,
+        query.status || undefined,
+      );
       if (result.data.length === 0) {
         setPageState({ status: 'empty' });
       } else {
@@ -44,7 +86,7 @@ function InquiryList() {
         err instanceof Error ? err.message : '加载询价失败';
       setPageState({ status: 'error', message });
     }
-  }, [page, pageSize]);
+  }, [query]);
 
   useEffect(() => {
     fetchInquiries();
@@ -52,11 +94,79 @@ function InquiryList() {
 
   const handleTableChange = useCallback(
     (pagination: TablePaginationConfig) => {
-      setPage(pagination.current || 1);
-      setPageSize(pagination.pageSize || 20);
+      setQuery((prev) => ({
+        ...prev,
+        page: pagination.current || 1,
+        pageSize: pagination.pageSize || 20,
+      }));
     },
     [],
   );
+
+  const handleSearch = useCallback((value: string) => {
+    setQuery((prev) => ({ ...prev, keyword: value, page: 1 }));
+  }, []);
+
+  const handleStatusChange = useCallback((value: string) => {
+    setQuery((prev) => ({ ...prev, status: value, page: 1 }));
+  }, []);
+
+  const handleReset = useCallback(() => {
+    setQuery({ page: 1, pageSize: 20, keyword: '', status: '' });
+  }, []);
+
+  const handleDelete = useCallback((id: string) => {
+    Modal.confirm({
+      title: '确认删除',
+      content: '确定要删除此询价吗？此操作不可撤销。',
+      okText: '确认删除',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          await inquiryService.remove(id);
+          message.success('询价已删除');
+          fetchInquiries();
+        } catch (err) {
+          message.error(err instanceof Error ? err.message : '删除失败');
+        }
+      },
+    });
+  }, [fetchInquiries]);
+
+  const handleBatchDelete = useCallback(async (ids: string[]) => {
+    setBatchLoading(true);
+    const hideLoading = message.loading('正在删除...');
+    try {
+      await inquiryService.batchDelete(ids);
+      hideLoading();
+      message.success(`成功删除 ${ids.length} 个询价`);
+      setSelectedRowKeys([]);
+      fetchInquiries();
+    } catch (err) {
+      hideLoading();
+      message.error(err instanceof Error ? err.message : '批量删除失败');
+    } finally {
+      setBatchLoading(false);
+    }
+  }, [fetchInquiries]);
+
+  const handleBatchStatus = useCallback(async (ids: string[], status: string) => {
+    setBatchLoading(true);
+    const hideLoading = message.loading('正在更新状态...');
+    try {
+      await inquiryService.batchStatus(ids, status);
+      hideLoading();
+      message.success(`成功更新 ${ids.length} 个询价状态`);
+      setSelectedRowKeys([]);
+      fetchInquiries();
+    } catch (err) {
+      hideLoading();
+      message.error(err instanceof Error ? err.message : '批量更新状态失败');
+    } finally {
+      setBatchLoading(false);
+    }
+  }, [fetchInquiries]);
 
   if (pageState.status === 'loading') {
     return (
@@ -88,6 +198,25 @@ function InquiryList() {
         <Title level={4} style={{ marginBottom: 16 }}>
           询价管理
         </Title>
+        <Space style={{ marginBottom: 16 }} wrap>
+          <Input.Search
+            placeholder="搜索联系人/邮箱..."
+            allowClear
+            onSearch={handleSearch}
+            style={{ width: 240 }}
+          />
+          <Select
+            placeholder="按状态筛选"
+            allowClear
+            value={query.status || undefined}
+            onChange={handleStatusChange}
+            options={STATUS_OPTIONS}
+            style={{ width: 160 }}
+          />
+          <Button icon={<ReloadOutlined />} onClick={handleReset}>
+            重置
+          </Button>
+        </Space>
         <Alert
           type="info"
           message="暂无询价"
@@ -129,7 +258,7 @@ function InquiryList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <Tag color={STATUS_COLOR[status] || 'default'}>{status}</Tag>
+        <Tag color={STATUS_COLOR[status] || 'default'}>{INQUIRY_STATUS_LABEL_MAP[status] || status}</Tag>
       ),
     },
     {
@@ -143,12 +272,21 @@ function InquiryList() {
       key: 'actions',
       width: 100,
       render: (_: unknown, record: Inquiry) => (
-        <Button
-          type="link"
-          onClick={() => navigate(`/inquiries/${record.id}`)}
-        >
-          查看
-        </Button>
+        <Space>
+          <Button
+            type="link"
+            onClick={() => navigate(`/inquiries/${record.id}`)}
+          >
+            查看
+          </Button>
+          <Button
+            type="link"
+            danger
+            onClick={() => handleDelete(record.id)}
+          >
+            删除
+          </Button>
+        </Space>
       ),
     },
   ];
@@ -159,18 +297,50 @@ function InquiryList() {
         询价管理
       </Title>
 
+      <Space style={{ marginBottom: 16 }} wrap>
+        <Input.Search
+          placeholder="搜索联系人/邮箱..."
+          allowClear
+          onSearch={handleSearch}
+          style={{ width: 240 }}
+        />
+        <Select
+          placeholder="按状态筛选"
+          allowClear
+          value={query.status || undefined}
+          onChange={handleStatusChange}
+          options={STATUS_OPTIONS}
+          style={{ width: 160 }}
+        />
+        <Button icon={<ReloadOutlined />} onClick={handleReset}>
+          重置
+        </Button>
+      </Space>
+
+      <BatchOperations
+        selectedRowKeys={selectedRowKeys}
+        onBatchDelete={handleBatchDelete}
+        onBatchStatus={handleBatchStatus}
+        statusOptions={BATCH_STATUS_OPTIONS}
+        loading={batchLoading}
+      />
+
       <Table<Inquiry>
         columns={columns}
         dataSource={pageState.data}
         rowKey="id"
+        rowSelection={{
+          selectedRowKeys,
+          onChange: (keys) => setSelectedRowKeys(keys),
+        }}
         onChange={handleTableChange}
         pagination={{
-          current: page,
-          pageSize,
+          current: query.page,
+          pageSize: query.pageSize,
           total: pageState.total,
           showSizeChanger: true,
           pageSizeOptions: ['10', '20', '50'],
-          showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
+          showTotal: (total, range) => `第 ${range[0]}-${range[1]} 条 / 共 ${total} 条`,
         }}
       />
     </div>

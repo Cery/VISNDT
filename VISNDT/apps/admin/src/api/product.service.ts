@@ -52,4 +52,21 @@ export const productService = {
     )) as unknown as ApiResponseWrapper<Product>;
     return response.data;
   },
+
+  async remove(id: string): Promise<{ id: string }> {
+    const response = (await apiClient.delete(
+      `/products/${id}`,
+    )) as unknown as ApiResponseWrapper<{ id: string }>;
+    return response.data;
+  },
+
+  async batchDelete(ids: string[]): Promise<{ count: number }> {
+    const response = (await apiClient.post('/products/batch-delete', { ids })) as unknown as ApiResponseWrapper<{ count: number }>;
+    return response.data;
+  },
+
+  async batchStatus(ids: string[], status: string): Promise<{ count: number }> {
+    const response = (await apiClient.patch('/products/batch-status', { ids, status })) as unknown as ApiResponseWrapper<{ count: number }>;
+    return response.data;
+  },
 };

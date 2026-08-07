@@ -131,4 +131,48 @@ export class ProductsService {
     await this.findOne(id);
     return this.prisma.product.update({ where: { id }, data: dto });
   }
+
+  async remove(id: string) {
+    const product = await this.prisma.product.findUnique({
+      where: { id },
+      include: { offers: true, demandMatches: true },
+    });
+    if (!product) throw new NotFoundException(`Product ${id} not found`);
+
+    if (product.offers.length > 0) {
+      throw new BadRequestException(
+        'Cannot delete product with existing offers. Remove offers first.',
+      );
+    }
+    if (product.demandMatches.length > 0) {
+      throw new BadRequestException(
+        'Cannot delete product with existing demand matches. Remove matches first.',
+      );
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.productMedia.deleteMany({ where: { productId: id } }),
+      this.prisma.productParameterValue.deleteMany({ where: { productId: id } }),
+      this.prisma.productParameterDefinition.deleteMany({ where: { productId: id } }),
+      this.prisma.product.delete({ where: { id } }),
+    ]);
+
+    return { id };
+  }
+
+  async batchDelete(ids: string[]): Promise<{ count: number }> {
+    const results = await Promise.allSettled(
+      ids.map((id) => this.remove(id)),
+    );
+    const succeeded = results.filter(r => r.status === 'fulfilled').length;
+    return { count: succeeded };
+  }
+
+  async batchStatus(ids: string[], status: string): Promise<{ count: number }> {
+    const result = await this.prisma.product.updateMany({
+      where: { id: { in: ids } },
+      data: { status },
+    });
+    return { count: result.count };
+  }
 }

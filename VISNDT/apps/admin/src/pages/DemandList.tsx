@@ -1,10 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Table, Input, Select, Space, Spin, Alert, Button, Tag, Typography } from 'antd';
+import { Table, Input, Select, Space, Spin, Alert, Button, Tag, Typography, message, Modal } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { SorterResult } from 'antd/es/table/interface';
+import { useNavigate } from 'react-router-dom';
 import { demandService } from '../api';
 import type { Demand, SearchDemandParams } from '../types';
+import BatchOperations from '../components/BatchOperations';
 
 const { Title } = Typography;
 
@@ -31,6 +33,12 @@ const STATUS_OPTIONS = [
   { value: 'CANCELLED', label: '已取消' },
 ];
 
+const BATCH_STATUS_OPTIONS = [
+  { label: '草稿', value: 'DRAFT' },
+  { label: '已发布', value: 'PUBLISHED' },
+  { label: '已关闭', value: 'CLOSED' },
+];
+
 const STATUS_COLOR_MAP: Record<string, string> = {
   DRAFT: 'orange',
   PUBLISHED: 'green',
@@ -40,8 +48,20 @@ const STATUS_COLOR_MAP: Record<string, string> = {
   CANCELLED: 'red',
 };
 
+const STATUS_LABEL_MAP: Record<string, string> = {
+  DRAFT: '草稿',
+  PUBLISHED: '已发布',
+  SUBMITTED: '已提交',
+  PROCESSING: '处理中',
+  CLOSED: '已关闭',
+  CANCELLED: '已取消',
+};
+
 function DemandList() {
+  const navigate = useNavigate();
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [batchLoading, setBatchLoading] = useState(false);
   const [query, setQuery] = useState<QueryParams>({
     keyword: '',
     status: '',
@@ -123,6 +143,59 @@ function DemandList() {
     [],
   );
 
+  const handleDelete = useCallback((id: string) => {
+    Modal.confirm({
+      title: '确认删除',
+      content: '确定要删除此需求吗？此操作不可撤销。',
+      okText: '确认删除',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          await demandService.remove(id);
+          message.success('需求已删除');
+          fetchDemands();
+        } catch (err) {
+          message.error(err instanceof Error ? err.message : '删除失败');
+        }
+      },
+    });
+  }, [fetchDemands]);
+
+  const handleBatchDelete = useCallback(async (ids: string[]) => {
+    setBatchLoading(true);
+    const hideLoading = message.loading('正在删除...');
+    try {
+      await demandService.batchDelete(ids);
+      hideLoading();
+      message.success(`成功删除 ${ids.length} 个需求`);
+      setSelectedRowKeys([]);
+      fetchDemands();
+    } catch (err) {
+      hideLoading();
+      message.error(err instanceof Error ? err.message : '批量删除失败');
+    } finally {
+      setBatchLoading(false);
+    }
+  }, [fetchDemands]);
+
+  const handleBatchStatus = useCallback(async (ids: string[], status: string) => {
+    setBatchLoading(true);
+    const hideLoading = message.loading('正在更新状态...');
+    try {
+      await demandService.batchStatus(ids, status);
+      hideLoading();
+      message.success(`成功更新 ${ids.length} 个需求状态`);
+      setSelectedRowKeys([]);
+      fetchDemands();
+    } catch (err) {
+      hideLoading();
+      message.error(err instanceof Error ? err.message : '批量更新状态失败');
+    } finally {
+      setBatchLoading(false);
+    }
+  }, [fetchDemands]);
+
   if (pageState.status === 'loading') {
     return (
       <div style={{ textAlign: 'center', padding: '120px 0' }}>
@@ -169,12 +242,24 @@ function DemandList() {
       render: (cat: Demand['category']) => cat?.name || '-',
     },
     {
+      title: '预算范围',
+      dataIndex: 'budgetRange',
+      key: 'budgetRange',
+      render: (range: string | undefined) => range || '-',
+    },
+    {
+      title: '数量',
+      dataIndex: 'quantity',
+      key: 'quantity',
+      render: (quantity: number | undefined) => (quantity != null ? quantity : '-'),
+    },
+    {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <Tag color={STATUS_COLOR_MAP[status] || 'default'}>{status}</Tag>
+        <Tag color={STATUS_COLOR_MAP[status] || 'default'}>{STATUS_LABEL_MAP[status] || status}</Tag>
       ),
     },
     {
@@ -191,6 +276,28 @@ function DemandList() {
       key: 'createdAt',
       sorter: true,
       render: (date: string) => new Date(date).toLocaleDateString(),
+    },
+    {
+      title: '操作',
+      key: 'actions',
+      width: 160,
+      render: (_: unknown, record: Demand) => (
+        <Space>
+          <Button
+            type="link"
+            onClick={() => navigate(`/demands/${record.id}`)}
+          >
+            查看
+          </Button>
+          <Button
+            type="link"
+            danger
+            onClick={() => handleDelete(record.id)}
+          >
+            删除
+          </Button>
+        </Space>
+      ),
     },
   ];
 
@@ -221,10 +328,22 @@ function DemandList() {
         </Button>
       </Space>
 
+      <BatchOperations
+        selectedRowKeys={selectedRowKeys}
+        onBatchDelete={handleBatchDelete}
+        onBatchStatus={handleBatchStatus}
+        statusOptions={BATCH_STATUS_OPTIONS}
+        loading={batchLoading}
+      />
+
       <Table<Demand>
         columns={columns}
         dataSource={pageState.data}
         rowKey="id"
+        rowSelection={{
+          selectedRowKeys,
+          onChange: (keys) => setSelectedRowKeys(keys),
+        }}
         onChange={handleTableChange}
         pagination={{
           current: query.page,

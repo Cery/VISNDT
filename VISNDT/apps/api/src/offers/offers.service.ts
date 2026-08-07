@@ -3,10 +3,11 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
-import { PaginationDto } from '../common/dto/pagination.dto';
+import { SearchParamsDto } from '../common/dto/search-params.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { WorkflowEventsService } from '../workflow-events/workflow-events.service';
 import { NotificationType, OfferStatus, WorkflowAction, WorkflowEntityType } from '@prisma/client';
@@ -19,18 +20,30 @@ export class OffersService {
     private readonly workflowEventsService: WorkflowEventsService,
   ) {}
 
-  async findAll(pagination: PaginationDto) {
-    const { page = 1, pageSize = 20 } = pagination;
+  async findAll(params: SearchParamsDto) {
+    const { page = 1, pageSize = 20, keyword, status } = params;
     const skip = (page - 1) * pageSize;
+
+    const where: Prisma.OfferWhereInput = {};
+    if (keyword) {
+      where.OR = [
+        { title: { contains: keyword } },
+        { description: { contains: keyword } },
+      ];
+    }
+    if (status) {
+      where.status = status as OfferStatus;
+    }
 
     const [data, total] = await Promise.all([
       this.prisma.offer.findMany({
+        where,
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
         include: { organization: true, product: true },
       }),
-      this.prisma.offer.count(),
+      this.prisma.offer.count({ where }),
     ]);
 
     return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
@@ -229,6 +242,45 @@ export class OffersService {
     await this.createWorkflowEvent(id, offer.status, WorkflowAction.WITHDRAWN, user);
 
     return updated;
+  }
+
+  async remove(id: string) {
+    const offer = await this.prisma.offer.findUnique({
+      where: { id },
+      include: { 
+        _count: { 
+          select: { demandMatches: true } 
+        } 
+      },
+    });
+    if (!offer) throw new NotFoundException(`Offer ${id} not found`);
+
+    if (offer._count.demandMatches > 0) {
+      const reasons: string[] = [];
+      if (offer._count.demandMatches > 0) reasons.push(`${offer._count.demandMatches} demand match(es)`);
+      throw new BadRequestException(
+        `Cannot delete offer with existing dependencies: ${reasons.join(', ')}. Remove dependencies first.`,
+      );
+    }
+
+    await this.prisma.offer.delete({ where: { id } });
+    return { id };
+  }
+
+  async batchDelete(ids: string[]) {
+    const results = await Promise.allSettled(ids.map((id) => this.remove(id)));
+    return results.map((r, i) => ({
+      id: ids[i],
+      success: r.status === 'fulfilled',
+      ...(r.status === 'fulfilled' ? { data: r.value } : { error: r.reason?.message }),
+    }));
+  }
+
+  async batchStatus(ids: string[], status: string) {
+    return this.prisma.offer.updateMany({
+      where: { id: { in: ids } },
+      data: { status: status as OfferStatus },
+    });
   }
 
   /**

@@ -6,6 +6,9 @@ export interface DemandItem {
   title: string;
   description?: string | null;
   status: string;
+  budgetRange?: string | null;
+  quantity?: number | null;
+  quantityUnit?: string | null;
   category?: { id: string; name: string; slug: string } | null;
   organizationId: string;
   createdAt: string;
@@ -69,6 +72,56 @@ export async function createDemand(params: CreateDemandParams): Promise<DemandIt
     method: 'POST',
     body: JSON.stringify(params),
   });
+  return res.data;
+}
+
+/**
+ * Update a demand.
+ * PATCH /demands/:id (JWT)
+ */
+export async function updateDemand(
+  id: string,
+  params: Partial<CreateDemandParams>,
+): Promise<DemandDetailItem> {
+  const res = await apiClient<ApiResponse<DemandDetailItem>>(`/demands/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(params),
+  });
+  return res.data;
+}
+
+/**
+ * Delete a demand.
+ * DELETE /demands/:id (JWT)
+ */
+export async function deleteDemand(id: string): Promise<{ id: string }> {
+  const res = await apiClient<ApiResponse<{ id: string }>>(`/demands/${id}`, {
+    method: 'DELETE',
+  });
+  return res.data;
+}
+
+/**
+ * Publish a demand (DRAFT → PUBLISHED).
+ * POST /demands/:id/publish (JWT)
+ */
+export async function publishDemand(id: string): Promise<DemandDetailItem> {
+  const res = await apiClient<ApiResponse<DemandDetailItem>>(
+    `/demands/${id}/publish`,
+    { method: 'POST' },
+  );
+  return res.data;
+}
+
+/**
+ * Close a demand (PUBLISHED/PROCESSING → CLOSED).
+ * POST /demands/:id/close (JWT)
+ */
+export async function closeDemand(id: string): Promise<DemandDetailItem> {
+  const res = await apiClient<ApiResponse<DemandDetailItem>>(
+    `/demands/${id}/close`,
+    { method: 'POST' },
+  );
   return res.data;
 }
 

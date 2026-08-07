@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -11,7 +9,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - visndt_postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U visndt"]
       interval: 5s
@@ -31,8 +29,10 @@ services:
       - "9000:9000"
       - "9001:9001"
     volumes:
-      - minio_data:/data
+      - visndt_minio_data:/data
 
 volumes:
-  postgres_data:
-  minio_data:
+  visndt_postgres_data:
+    external: true
+  visndt_minio_data:
+    external: true

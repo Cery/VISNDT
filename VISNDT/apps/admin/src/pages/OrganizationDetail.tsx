@@ -30,6 +30,17 @@ const STATUS_COLOR: Record<string, string> = {
   SUSPENDED: 'red',
 };
 
+const ROLE_LABEL_MAP: Record<string, string> = {
+  ADMIN: '管理员',
+  MEMBER: '成员',
+};
+
+const STATUS_LABEL_MAP: Record<string, string> = {
+  ACTIVE: '活跃',
+  INACTIVE: '未激活',
+  SUSPENDED: '已停用',
+};
+
 const MEMBER_COLUMNS: ColumnsType<OrganizationMember> = [
   {
     title: '用户ID',
@@ -43,7 +54,7 @@ const MEMBER_COLUMNS: ColumnsType<OrganizationMember> = [
     key: 'role',
     width: 120,
     render: (role: string) => (
-      <Tag color={role === 'ADMIN' ? 'blue' : 'default'}>{role}</Tag>
+      <Tag color={role === 'ADMIN' ? 'blue' : 'default'}>{ROLE_LABEL_MAP[role] || role}</Tag>
     ),
   },
   {
@@ -133,7 +144,7 @@ export default function OrganizationDetailPage() {
           <Descriptions.Item label="类型">{org.type || '-'}</Descriptions.Item>
           <Descriptions.Item label="状态">
             <Tag color={STATUS_COLOR[org.status] || 'default'}>
-              {org.status}
+              {STATUS_LABEL_MAP[org.status] || org.status}
             </Tag>
           </Descriptions.Item>
         </Descriptions>

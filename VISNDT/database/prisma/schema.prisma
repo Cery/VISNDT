@@ -253,7 +253,7 @@ model OrganizationMember {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   organization Organization @relation(fields: [organizationId], references: [id])
-  user         User         @relation(fields: [userId], references: [id])
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([organizationId, userId])
   @@index([userId])
@@ -321,7 +321,7 @@ model ProductMedia {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  product   Product    @relation(fields: [productId], references: [id])
+  product   Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
   fileAsset FileAsset? @relation(fields: [fileAssetId], references: [id])
 
   @@index([productId])
@@ -377,7 +377,7 @@ model ParameterOption {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  parameterDefinition ParameterDefinition @relation(fields: [parameterDefinitionId], references: [id])
+  parameterDefinition ParameterDefinition @relation(fields: [parameterDefinitionId], references: [id], onDelete: Cascade)
 
   @@index([parameterDefinitionId])
   @@map("parameter_option")
@@ -393,7 +393,7 @@ model ProductParameterValue {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  product             Product             @relation(fields: [productId], references: [id])
+  product             Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
   parameterDefinition ParameterDefinition @relation(fields: [parameterDefinitionId], references: [id])
 
   @@unique([productId, parameterDefinitionId])
@@ -411,7 +411,7 @@ model ProductParameterDefinition {
 
   createdAt DateTime @default(now()) @map("created_at")
 
-  product             Product             @relation(fields: [productId], references: [id])
+  product             Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
   parameterDefinition ParameterDefinition @relation(fields: [parameterDefinitionId], references: [id])
 
   @@unique([productId, parameterDefinitionId])
@@ -614,7 +614,7 @@ model Notification {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, status])
   @@index([type])

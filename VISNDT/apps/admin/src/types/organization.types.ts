@@ -36,4 +36,6 @@ export interface OrganizationListResponse {
 export interface SearchOrganizationParams {
   page?: number;
   pageSize?: number;
+  keyword?: string;
+  status?: string;
 }

@@ -242,4 +242,12 @@ export class FileAssetService {
     );
     return { deleted, failed };
   }
+
+  async batchDelete(ids: string[]) {
+    const result = await this.prisma.fileAsset.deleteMany({
+      where: { id: { in: ids } },
+    });
+    this.logger.log(`Batch deleted ${result.count} FileAssets`);
+    return { deletedCount: result.count };
+  }
 }

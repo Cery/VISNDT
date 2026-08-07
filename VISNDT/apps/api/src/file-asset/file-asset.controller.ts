@@ -23,6 +23,7 @@ import { Role } from '../auth/enums/role.enum';
 import { ApiResponse } from '../common/dto/api-response.dto';
 import { AuthRequest } from '../auth/interfaces/auth-request.interface';
 import { CleanupOrphansDto } from './dto/cleanup-orphans.dto';
+import { BatchDeleteDto } from '../common/dto/batch-delete.dto';
 
 @ApiTags('Files')
 @Controller('files')
@@ -90,6 +91,16 @@ export class FileAssetController {
       `attachment; filename="${encodeURIComponent(fileName)}"`,
     );
     return res.redirect(HttpStatus.FOUND, url);
+  }
+
+  @Post('batch-delete')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Batch delete files (ADMIN only)' })
+  async batchDelete(@Body() dto: BatchDeleteDto) {
+    const result = await this.service.batchDelete(dto.ids);
+    return ApiResponse.ok(result, 'Files deleted');
   }
 
   /**

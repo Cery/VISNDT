@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Button, Spin, Alert, Typography } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Table, Button, Spin, Alert, Typography, Input, Space, message, Modal } from 'antd';
+import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { categoryService } from '../../api/category.service';
 import type { ProductCategory } from '../../types/category.types';
+import BatchOperations from '../../components/BatchOperations';
 
 const { Title } = Typography;
 
@@ -17,22 +18,27 @@ type PageState =
 interface QueryParams {
   page: number;
   pageSize: number;
+  keyword: string;
 }
 
 function ProductCategoryList() {
   const navigate = useNavigate();
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [batchLoading, setBatchLoading] = useState(false);
   const [query, setQuery] = useState<QueryParams>({
     page: 1,
     pageSize: 20,
+    keyword: '',
   });
 
   const fetchData = useCallback(async () => {
     setPageState({ status: 'loading' });
     try {
-      const result = await categoryService.list({
+      const result = await categoryService.getList({
         page: query.page,
         pageSize: query.pageSize,
+        keyword: query.keyword || undefined,
       });
       if (result.data.length === 0) {
         setPageState({ status: 'empty' });
@@ -64,6 +70,50 @@ function ProductCategoryList() {
     },
     [],
   );
+
+  const handleSearch = useCallback((value: string) => {
+    setQuery((prev) => ({ ...prev, keyword: value, page: 1 }));
+  }, []);
+
+  const handleReset = useCallback(() => {
+    setQuery({ page: 1, pageSize: 20, keyword: '' });
+  }, []);
+
+  const handleDelete = useCallback((id: string) => {
+    Modal.confirm({
+      title: '确认删除',
+      content: '确定要删除此分类吗？此操作不可撤销。',
+      okText: '确认删除',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          await categoryService.remove(id);
+          message.success('分类已删除');
+          fetchData();
+        } catch (err) {
+          message.error(err instanceof Error ? err.message : '删除失败');
+        }
+      },
+    });
+  }, [fetchData]);
+
+  const handleBatchDelete = useCallback(async (ids: string[]) => {
+    setBatchLoading(true);
+    const hideLoading = message.loading('正在删除...');
+    try {
+      await categoryService.batchDelete(ids);
+      hideLoading();
+      message.success(`成功删除 ${ids.length} 个分类`);
+      setSelectedRowKeys([]);
+      fetchData();
+    } catch (err) {
+      hideLoading();
+      message.error(err instanceof Error ? err.message : '批量删除失败');
+    } finally {
+      setBatchLoading(false);
+    }
+  }, [fetchData]);
 
   if (pageState.status === 'loading') {
     return (
@@ -108,7 +158,10 @@ function ProductCategoryList() {
       title: '父级',
       dataIndex: 'parentId',
       key: 'parentId',
-      render: (parentId: string | undefined) => parentId || '-',
+      render: (parentId: string | undefined, _: unknown) => {
+        const categoryMap = new Map(pageState.status === 'success' ? pageState.data.map(c => [c.id, c.name]) : []);
+        return parentId ? (categoryMap.get(parentId) || parentId) : '-';
+      },
     },
     {
       title: '子级',
@@ -130,12 +183,21 @@ function ProductCategoryList() {
       key: 'actions',
       width: 80,
       render: (_: unknown, record: ProductCategory) => (
-        <Button
-          type="link"
-          onClick={() => navigate(`/product-categories/${record.id}/edit`)}
-        >
-          编辑
-        </Button>
+        <Space>
+          <Button
+            type="link"
+            onClick={() => navigate(`/product-categories/${record.id}/edit`)}
+          >
+            编辑
+          </Button>
+          <Button
+            type="link"
+            danger
+            onClick={() => handleDelete(record.id)}
+          >
+            删除
+          </Button>
+        </Space>
       ),
     },
   ];
@@ -163,17 +225,53 @@ function ProductCategoryList() {
       </div>
 
       {pageState.status === 'empty' ? (
-        <Alert
-          type="info"
-          message="暂无分类"
-          description="暂无分类数据，请点击「创建分类」添加。"
-          showIcon
-        />
+        <>
+          <Space style={{ marginBottom: 16 }} wrap>
+            <Input.Search
+              placeholder="搜索名称/标识..."
+              allowClear
+              onSearch={handleSearch}
+              style={{ width: 240 }}
+            />
+            <Button icon={<ReloadOutlined />} onClick={handleReset}>
+              重置
+            </Button>
+          </Space>
+          <Alert
+            type="info"
+            message="暂无分类"
+            description="暂无分类数据，请点击「创建分类」添加。"
+            showIcon
+          />
+        </>
       ) : (
-        <Table<ProductCategory>
+        <>
+          <Space style={{ marginBottom: 16 }} wrap>
+            <Input.Search
+              placeholder="搜索名称/标识..."
+              allowClear
+              onSearch={handleSearch}
+              style={{ width: 240 }}
+            />
+            <Button icon={<ReloadOutlined />} onClick={handleReset}>
+              重置
+            </Button>
+          </Space>
+
+          <BatchOperations
+            selectedRowKeys={selectedRowKeys}
+            onBatchDelete={handleBatchDelete}
+            loading={batchLoading}
+          />
+
+          <Table<ProductCategory>
           columns={columns}
           dataSource={pageState.data}
           rowKey="id"
+          rowSelection={{
+            selectedRowKeys,
+            onChange: (keys) => setSelectedRowKeys(keys),
+          }}
           onChange={handleTableChange}
           pagination={{
             current: query.page,
@@ -184,6 +282,7 @@ function ProductCategoryList() {
             showTotal: (total, range) => `${range[0]}-${range[1]} / 共 ${total} 条`,
           }}
         />
+      </>
       )}
     </div>
   );

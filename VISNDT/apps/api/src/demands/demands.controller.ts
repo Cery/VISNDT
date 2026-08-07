@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
-import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiPropertyOptional, ApiBody } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 import { DemandsService } from './demands.service';
 import { CreateDemandDto } from './dto/create-demand.dto';
@@ -12,7 +12,12 @@ import { QueryMatchDto } from './dto/query-match.dto';
 import { UpdateMatchStatusDto } from './dto/update-match-status.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { ApiResponse } from '../common/dto/api-response.dto';
+import { BatchDeleteDto } from '../common/dto/batch-delete.dto';
+import { BatchStatusDto } from '../common/dto/batch-status.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '../auth/enums/role.enum';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthRequest } from '../auth/interfaces/auth-request.interface';
 
@@ -92,6 +97,16 @@ export class DemandsController {
       await this.service.update(id, dto, user),
       'Demand updated',
     );
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete demand (ADMIN only). Blocks if has active matches.' })
+  @ApiParam({ name: 'id', description: 'Demand UUID' })
+  async remove(@Param('id') id: string) {
+    return ApiResponse.ok(await this.service.remove(id), 'Demand deleted');
   }
 
   // ==========================================
@@ -261,5 +276,25 @@ export class DemandsController {
       await this.service.updateMatchStatus(id, matchId, dto, user),
       'Match status updated',
     );
+  }
+
+  @Post('batch-delete')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Batch delete demands (ADMIN only)' })
+  @ApiBody({ type: BatchDeleteDto })
+  async batchDelete(@Body() dto: BatchDeleteDto) {
+    return ApiResponse.ok(await this.service.batchDelete(dto.ids), 'Batch delete completed');
+  }
+
+  @Patch('batch-status')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Batch update demand status (ADMIN only)' })
+  @ApiBody({ type: BatchStatusDto })
+  async batchStatus(@Body() dto: BatchStatusDto) {
+    return ApiResponse.ok(await this.service.batchStatus(dto.ids, dto.status), 'Batch status updated');
   }
 }

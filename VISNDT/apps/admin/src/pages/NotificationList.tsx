@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Select, Space, Spin, Alert, Button, Tag, Typography } from 'antd';
-import { ReloadOutlined, EyeOutlined } from '@ant-design/icons';
+import { Table, Select, Space, Spin, Alert, Button, Tag, Typography, message, Input } from 'antd';
+import { ReloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { notificationService } from '../api';
 import type { Notification, NotificationQueryParams } from '../types';
+import BatchOperations from '../components/BatchOperations';
 
 const { Title } = Typography;
 
@@ -14,6 +15,7 @@ type PageState =
   | { status: 'success'; data: Notification[]; total: number };
 
 interface QueryParams {
+  keyword: string;
   status: string;
   type: string;
   page: number;
@@ -46,10 +48,18 @@ const STATUS_COLOR_MAP: Record<string, string> = {
   READ: 'default',
 };
 
+const STATUS_LABEL_MAP: Record<string, string> = {
+  UNREAD: '未读',
+  READ: '已读',
+};
+
 function NotificationList() {
   const navigate = useNavigate();
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [batchLoading, setBatchLoading] = useState(false);
   const [query, setQuery] = useState<QueryParams>({
+    keyword: '',
     status: '',
     type: '',
     page: 1,
@@ -63,6 +73,9 @@ function NotificationList() {
         page: query.page,
         pageSize: query.pageSize,
       };
+      if (query.keyword) {
+        params.keyword = query.keyword;
+      }
       if (query.status) {
         params.status = query.status as NotificationQueryParams['status'];
       }
@@ -87,6 +100,10 @@ function NotificationList() {
     fetchNotifications();
   }, [fetchNotifications]);
 
+  const handleSearch = useCallback((value: string) => {
+    setQuery((prev) => ({ ...prev, keyword: value, page: 1 }));
+  }, []);
+
   const handleStatusChange = useCallback((value: string) => {
     setQuery((prev) => ({ ...prev, status: value, page: 1 }));
   }, []);
@@ -97,6 +114,7 @@ function NotificationList() {
 
   const handleReset = useCallback(() => {
     setQuery({
+      keyword: '',
       status: '',
       type: '',
       page: 1,
@@ -115,6 +133,40 @@ function NotificationList() {
     [],
   );
 
+  const handleBatchDelete = useCallback(async (ids: string[]) => {
+    setBatchLoading(true);
+    const hideLoading = message.loading('正在删除...');
+    try {
+      await notificationService.batchDelete(ids);
+      hideLoading();
+      message.success(`成功删除 ${ids.length} 条通知`);
+      setSelectedRowKeys([]);
+      fetchNotifications();
+    } catch (err) {
+      hideLoading();
+      message.error(err instanceof Error ? err.message : '批量删除失败');
+    } finally {
+      setBatchLoading(false);
+    }
+  }, [fetchNotifications]);
+
+  const handleBatchMarkRead = useCallback(async () => {
+    setBatchLoading(true);
+    const hideLoading = message.loading('正在标记已读...');
+    try {
+      await notificationService.markAllRead();
+      hideLoading();
+      message.success('已全部标记为已读');
+      setSelectedRowKeys([]);
+      fetchNotifications();
+    } catch (err) {
+      hideLoading();
+      message.error(err instanceof Error ? err.message : '标记已读失败');
+    } finally {
+      setBatchLoading(false);
+    }
+  }, [fetchNotifications]);
+
   if (pageState.status === 'loading') {
     return (
       <div style={{ textAlign: 'center', padding: '120px 0' }}>
@@ -132,7 +184,7 @@ function NotificationList() {
         showIcon
         action={
           <Button size="small" onClick={fetchNotifications}>
-            Retry
+            重试
           </Button>
         }
       />
@@ -163,7 +215,7 @@ function NotificationList() {
       key: 'status',
       width: 100,
       render: (status: string) => (
-        <Tag color={STATUS_COLOR_MAP[status] || 'default'}>{status}</Tag>
+        <Tag color={STATUS_COLOR_MAP[status] || 'default'}>{STATUS_LABEL_MAP[status] || status}</Tag>
       ),
     },
     {
@@ -202,6 +254,13 @@ function NotificationList() {
       </Title>
 
       <Space style={{ marginBottom: 16 }} wrap>
+        <Input.Search
+          placeholder="搜索通知标题..."
+          allowClear
+          onSearch={handleSearch}
+          style={{ width: 240 }}
+          prefix={<SearchOutlined />}
+        />
         <Select
           placeholder="按状态筛选"
           allowClear
@@ -223,10 +282,26 @@ function NotificationList() {
         </Button>
       </Space>
 
+      <Space style={{ marginBottom: 16 }}>
+        <Button onClick={handleBatchMarkRead} loading={batchLoading}>
+          标记全部已读
+        </Button>
+      </Space>
+
+      <BatchOperations
+        selectedRowKeys={selectedRowKeys}
+        onBatchDelete={handleBatchDelete}
+        loading={batchLoading}
+      />
+
       <Table<Notification>
         columns={columns}
         dataSource={pageState.data}
         rowKey="id"
+        rowSelection={{
+          selectedRowKeys,
+          onChange: (keys) => setSelectedRowKeys(keys),
+        }}
         onChange={handleTableChange}
         pagination={{
           current: query.page,
