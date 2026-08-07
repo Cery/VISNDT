@@ -48,19 +48,19 @@ function DemandsContent() {
       <div className="flex-1 flex flex-col min-w-0">
         <WorkspaceHeader onMenuToggle={toggleSidebar} />
         <div className="flex-1 bg-slate-50 p-6">
-          <div className="max-w-5xl mx-auto space-y-6">
+          <div className="max-w-[1200px] mx-auto space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">My Demands</h2>
+                <h2 className="text-xl font-bold text-slate-900">我的需求</h2>
                 <p className="text-slate-500 text-sm mt-1">
-                  View and manage your demand listings.
+                  查看和管理您的需求列表。
                 </p>
               </div>
               <button
                 onClick={() => router.push('/workspace/demands/create')}
                 className="px-4 py-2 text-sm font-medium text-white bg-slate-900 rounded-md hover:bg-slate-800 transition-colors"
               >
-                + Create Demand
+                + 创建需求
               </button>
             </div>
 
@@ -68,7 +68,7 @@ function DemandsContent() {
             <div>
               <input
                 type="text"
-                placeholder="Search demands..."
+                placeholder="搜索需求..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => {

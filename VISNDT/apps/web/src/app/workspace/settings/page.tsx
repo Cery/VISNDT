@@ -28,7 +28,7 @@ function SettingsContent() {
   const handleSaveName = useCallback(async () => {
     if (!user?.id) return;
     if (!nameValue.trim()) {
-      setNameError('Name cannot be empty.');
+      setNameError('姓名不能为空。');
       return;
     }
     setSavingName(true);
@@ -37,9 +37,9 @@ function SettingsContent() {
     try {
       await updateUserProfile(user.id, { name: nameValue.trim() });
       setEditName(false);
-      setSuccessMsg('Name updated successfully.');
+      setSuccessMsg('姓名已更新成功。');
     } catch {
-      setNameError('Failed to update name. Please try again.');
+      setNameError('更新姓名失败，请重试。');
     } finally {
       setSavingName(false);
     }
@@ -48,7 +48,7 @@ function SettingsContent() {
   const handleSavePassword = useCallback(async () => {
     if (!user?.id) return;
     if (passwordValue.length < 6) {
-      setPasswordError('Password must be at least 6 characters.');
+      setPasswordError('密码长度至少为 6 个字符。');
       return;
     }
     setSavingPassword(true);
@@ -58,9 +58,9 @@ function SettingsContent() {
       await updateUserProfile(user.id, { passwordHash: passwordValue });
       setEditPassword(false);
       setPasswordValue('');
-      setSuccessMsg('Password changed successfully.');
+      setSuccessMsg('密码已更改成功。');
     } catch {
-      setPasswordError('Failed to change password. Please try again.');
+      setPasswordError('更改密码失败，请重试。');
     } finally {
       setSavingPassword(false);
     }
@@ -72,13 +72,13 @@ function SettingsContent() {
       <div className="flex-1 flex flex-col min-w-0">
         <WorkspaceHeader onMenuToggle={toggleSidebar} />
         <div className="flex-1 bg-slate-50 p-6">
-          <div className="max-w-2xl mx-auto space-y-6">
+          <div className="max-w-[1200px] mx-auto space-y-6">
             <div>
               <h2 className="text-xl font-bold text-slate-900">
-                Account Settings
+                账户设置
               </h2>
               <p className="text-slate-500 text-sm mt-1">
-                Manage your account information.
+                管理您的账户信息。
               </p>
             </div>
 
@@ -93,7 +93,7 @@ function SettingsContent() {
             <div className="rounded-lg border border-slate-200 bg-white divide-y divide-slate-100">
               {/* Email */}
               <div className="flex items-center justify-between px-5 py-3.5">
-                <span className="text-sm text-slate-500">Email</span>
+                <span className="text-sm text-slate-500">邮箱</span>
                 <span className="text-sm font-medium text-slate-900">
                   {user?.email || '—'}
                 </span>
@@ -101,7 +101,7 @@ function SettingsContent() {
 
               {/* Name */}
               <div className="flex items-center justify-between px-5 py-3.5">
-                <span className="text-sm text-slate-500">Name</span>
+                <span className="text-sm text-slate-500">姓名</span>
                 {editName ? (
                   <div className="flex items-center gap-2">
                     <input
@@ -116,13 +116,13 @@ function SettingsContent() {
                       disabled={savingName}
                       className="px-3 py-1 text-xs font-medium text-white bg-slate-900 rounded-md hover:bg-slate-800 disabled:opacity-50 transition-colors"
                     >
-                      {savingName ? 'Saving...' : 'Save'}
+                      {savingName ? '保存中...' : '保存'}
                     </button>
                     <button
                       onClick={() => { setEditName(false); setNameValue(user?.name || ''); setNameError(''); }}
                       className="px-3 py-1 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors"
                     >
-                      Cancel
+                      取消
                     </button>
                   </div>
                 ) : (
@@ -134,7 +134,7 @@ function SettingsContent() {
                       onClick={() => { setEditName(true); setNameValue(user?.name || ''); }}
                       className="text-xs text-slate-500 hover:text-slate-700 underline"
                     >
-                      Edit
+                      编辑
                     </button>
                   </div>
                 )}
@@ -145,17 +145,17 @@ function SettingsContent() {
 
               {/* Organization */}
               <div className="flex items-center justify-between px-5 py-3.5">
-                <span className="text-sm text-slate-500">Organization</span>
+                <span className="text-sm text-slate-500">组织</span>
                 <span className="text-sm font-medium text-slate-900">
                   {user?.organizationId
-                    ? `Active (${user.organizationId.slice(0, 8)}…)`
-                    : 'Not joined'}
+                    ? `已激活 (${user.organizationId.slice(0, 8)}…)`
+                    : '未加入'}
                 </span>
               </div>
 
               {/* User ID */}
               <div className="flex items-center justify-between px-5 py-3.5">
-                <span className="text-sm text-slate-500">User ID</span>
+                <span className="text-sm text-slate-500">用户 ID</span>
                 <span className="text-xs font-mono text-slate-400">
                   {user?.id ? user.id.slice(0, 8) + '…' : '—'}
                 </span>
@@ -166,9 +166,9 @@ function SettingsContent() {
             <div className="rounded-lg border border-slate-200 bg-white p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-semibold text-slate-900">Password</h3>
+                  <h3 className="text-sm font-semibold text-slate-900">密码</h3>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Change your account password.
+                    修改您的账户密码。
                   </p>
                 </div>
                 {!editPassword && (
@@ -176,7 +176,7 @@ function SettingsContent() {
                     onClick={() => setEditPassword(true)}
                     className="text-xs text-slate-500 hover:text-slate-700 underline"
                   >
-                    Change
+                    修改
                   </button>
                 )}
               </div>
@@ -184,7 +184,7 @@ function SettingsContent() {
                 <div className="mt-4 space-y-3">
                   <input
                     type="password"
-                    placeholder="New password (min. 6 characters)"
+                    placeholder="新密码（至少 6 个字符）"
                     value={passwordValue}
                     onChange={(e) => setPasswordValue(e.target.value)}
                     className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-400"
@@ -199,13 +199,13 @@ function SettingsContent() {
                       disabled={savingPassword}
                       className="px-4 py-2 text-xs font-medium text-white bg-slate-900 rounded-md hover:bg-slate-800 disabled:opacity-50 transition-colors"
                     >
-                      {savingPassword ? 'Changing...' : 'Change Password'}
+                      {savingPassword ? '更改中...' : '更改密码'}
                     </button>
                     <button
                       onClick={() => { setEditPassword(false); setPasswordValue(''); setPasswordError(''); }}
                       className="px-4 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors"
                     >
-                      Cancel
+                      取消
                     </button>
                   </div>
                 </div>
@@ -231,7 +231,7 @@ function SettingsContent() {
                     d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
                   />
                 </svg>
-                Logout
+                退出登录
               </button>
             </div>
           </div>

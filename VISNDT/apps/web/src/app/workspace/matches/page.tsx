@@ -52,11 +52,11 @@ function MatchesContent() {
       <div className="flex-1 flex flex-col min-w-0">
         <WorkspaceHeader onMenuToggle={toggleSidebar} />
         <div className="flex-1 bg-slate-50 p-6">
-          <div className="max-w-5xl mx-auto space-y-6">
+          <div className="max-w-[1200px] mx-auto space-y-6">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">Matches</h2>
+              <h2 className="text-xl font-bold text-slate-900">匹配结果</h2>
               <p className="text-slate-500 text-sm mt-1">
-                Review product matches for your demands.
+                查看需求与产品的匹配结果。
               </p>
             </div>
 
@@ -64,7 +64,7 @@ function MatchesContent() {
             <div>
               <input
                 type="text"
-                placeholder="Search by demand title..."
+                placeholder="搜索需求标题..."
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);

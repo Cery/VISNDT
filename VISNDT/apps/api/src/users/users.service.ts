@@ -109,6 +109,12 @@ export class UsersService {
   async update(id: string, dto: UpdateUserDto, requestUser: RequestUser) {
     await this.findOne(id, requestUser);
 
+    // Hash password if provided
+    let updateData = { ...dto };
+    if (updateData.passwordHash) {
+      updateData.passwordHash = await bcrypt.hash(updateData.passwordHash, 10);
+    }
+
     // Non-admin users cannot change status or organizationId
     if (requestUser.id === id) {
       const member = await this.prisma.organizationMember.findFirst({
@@ -116,7 +122,7 @@ export class UsersService {
       });
       if (!member) {
         // Self-update: remove admin-only fields
-        const { status, organizationId, ...allowedFields } = dto;
+        const { status, organizationId, ...allowedFields } = updateData;
         return this.prisma.user.update({
           where: { id },
           data: allowedFields,
@@ -124,7 +130,7 @@ export class UsersService {
       }
     }
 
-    return this.prisma.user.update({ where: { id }, data: dto });
+    return this.prisma.user.update({ where: { id }, data: updateData });
   }
 
   async remove(id: string, requestUser: RequestUser) {

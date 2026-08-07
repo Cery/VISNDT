@@ -48,19 +48,19 @@ function RfqsContent() {
       <div className="flex-1 flex flex-col min-w-0">
         <WorkspaceHeader onMenuToggle={toggleSidebar} />
         <div className="flex-1 bg-slate-50 p-6">
-          <div className="max-w-5xl mx-auto space-y-6">
+          <div className="max-w-[1200px] mx-auto space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-slate-900">RFQs</h2>
+                <h2 className="text-xl font-bold text-slate-900">询价单</h2>
                 <p className="text-slate-500 text-sm mt-1">
-                  View and respond to Requests for Quotation.
+                  查看和回复询价请求。
                 </p>
               </div>
               <button
                 onClick={() => router.push('/workspace/rfqs/create')}
                 className="px-4 py-2 text-sm font-medium text-white bg-slate-900 rounded-md hover:bg-slate-800 transition-colors"
               >
-                + Create RFQ
+                + 创建询价
               </button>
             </div>
 
@@ -68,7 +68,7 @@ function RfqsContent() {
             <div>
               <input
                 type="text"
-                placeholder="Search RFQs..."
+                placeholder="搜索询价..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => {

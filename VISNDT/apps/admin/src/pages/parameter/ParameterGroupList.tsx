@@ -102,9 +102,18 @@ function ParameterGroupList() {
     setBatchLoading(true);
     const hideLoading = message.loading('正在删除...');
     try {
-      await parameterGroupService.batchDelete(ids);
+      const result = await parameterGroupService.batchDelete(ids);
       hideLoading();
-      message.success(`成功删除 ${ids.length} 个参数组`);
+      const succeeded = result.succeeded?.length ?? 0;
+      const failed = result.failed ?? [];
+      if (succeeded > 0) {
+        message.success(`成功删除 ${succeeded} 个参数组`);
+      }
+      if (failed.length > 0) {
+        failed.forEach((f) => {
+          message.error(`删除失败: ${f.reason}`);
+        });
+      }
       setSelectedRowKeys([]);
       fetchData();
     } catch (err) {

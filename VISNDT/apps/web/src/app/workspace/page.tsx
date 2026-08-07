@@ -52,7 +52,7 @@ function WorkspaceContent() {
       <div className="flex-1 flex flex-col min-w-0">
         <WorkspaceHeader onMenuToggle={toggleSidebar} />
         <div className="flex-1 bg-slate-50 p-6">
-          <div className="max-w-5xl mx-auto space-y-8">
+          <div className="max-w-[1200px] mx-auto space-y-8">
             {/* Welcome */}
             <div>
               <h2 className="text-xl font-bold text-slate-900">

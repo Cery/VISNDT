@@ -60,9 +60,11 @@ export class ParameterGroupsService {
     });
     if (!group) throw new NotFoundException(`ParameterGroup ${id} not found`);
     if (group._count.definitions > 0) {
-      throw new BadRequestException(
-        `Cannot delete parameter group with ${group._count.definitions} definition(s). Remove definitions first.`,
-      );
+      throw new BadRequestException({
+        code: 'GROUP_HAS_DEFINITIONS',
+        message: `无法删除该参数组：参数组下存在 ${group._count.definitions} 个参数定义，请先移除所有参数定义后再删除。`,
+        details: { definitionCount: group._count.definitions },
+      });
     }
 
     await this.prisma.parameterGroup.delete({ where: { id } });

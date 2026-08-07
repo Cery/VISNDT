@@ -106,7 +106,18 @@ export async function apiClient<T = unknown>(
         credentials: 'include',
       });
       if (!retryResponse.ok) {
-        throw new ApiError(retryResponse.status, `Request failed with status ${retryResponse.status}`);
+        let errorMessage = `Request failed with status ${retryResponse.status}`;
+        try {
+          const errorBody = await retryResponse.json();
+          if (errorBody?.message) {
+            errorMessage = errorBody.message;
+          } else if (errorBody?.data?.message) {
+            errorMessage = errorBody.data.message;
+          }
+        } catch {
+          // ignore parse error
+        }
+        throw new ApiError(retryResponse.status, errorMessage);
       }
       const data = await retryResponse.json();
       return data as T;
@@ -116,7 +127,18 @@ export async function apiClient<T = unknown>(
   }
 
   if (!response.ok) {
-    throw new ApiError(response.status, `Request failed with status ${response.status}`);
+    let errorMessage = `Request failed with status ${response.status}`;
+    try {
+      const errorBody = await response.json();
+      if (errorBody?.message) {
+        errorMessage = errorBody.message;
+      } else if (errorBody?.data?.message) {
+        errorMessage = errorBody.data.message;
+      }
+    } catch {
+      // ignore parse error, use default message
+    }
+    throw new ApiError(response.status, errorMessage);
   }
 
   const data = await response.json();

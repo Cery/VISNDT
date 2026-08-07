@@ -35,7 +35,7 @@ function DashboardContent() {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="max-w-[1200px] mx-auto px-6 py-8">
       {/* Welcome */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-slate-900">

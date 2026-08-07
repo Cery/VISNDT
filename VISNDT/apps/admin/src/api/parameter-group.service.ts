@@ -51,8 +51,8 @@ export const parameterGroupService = {
     return response.data;
   },
 
-  async batchDelete(ids: string[]): Promise<{ count: number }> {
-    const response = (await apiClient.post('/parameter-groups/batch-delete', { ids })) as unknown as ApiResponseWrapper<{ count: number }>;
+  async batchDelete(ids: string[]): Promise<{ succeeded: { id: string }[]; failed: { id: string; reason: string }[] }> {
+    const response = (await apiClient.post('/parameter-groups/batch-delete', { ids })) as unknown as ApiResponseWrapper<{ succeeded: { id: string }[]; failed: { id: string; reason: string }[] }>;
     return response.data;
   },
 };

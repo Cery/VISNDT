@@ -102,9 +102,18 @@ function ProductCategoryList() {
     setBatchLoading(true);
     const hideLoading = message.loading('正在删除...');
     try {
-      await categoryService.batchDelete(ids);
+      const result = await categoryService.batchDelete(ids);
       hideLoading();
-      message.success(`成功删除 ${ids.length} 个分类`);
+      const succeeded = result.succeeded?.length ?? 0;
+      const failed = result.failed ?? [];
+      if (succeeded > 0) {
+        message.success(`成功删除 ${succeeded} 个分类`);
+      }
+      if (failed.length > 0) {
+        failed.forEach((f) => {
+          message.error(`删除失败: ${f.reason}`);
+        });
+      }
       setSelectedRowKeys([]);
       fetchData();
     } catch (err) {
