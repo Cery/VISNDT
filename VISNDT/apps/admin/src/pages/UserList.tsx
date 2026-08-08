@@ -206,10 +206,10 @@ function UserList() {
       render: (name: string | undefined) => name || '-',
     },
     {
-      title: '组织ID',
-      dataIndex: 'organizationId',
-      key: 'organizationId',
-      render: (id: string | undefined) => id || '-',
+      title: '组织',
+      dataIndex: 'organization',
+      key: 'organization',
+      render: (org: User['organization']) => org?.name || '-',
     },
     {
       title: '状态',
@@ -260,9 +260,12 @@ function UserList() {
 
   return (
     <div>
-      <Title level={4} style={{ marginBottom: 16 }}>
+      <Title level={4} style={{ marginBottom: 4 }}>
         用户管理
       </Title>
+      <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16, fontSize: 13 }}>
+        管理平台用户账户，用户可关联组织并分配角色
+      </Typography.Text>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Button

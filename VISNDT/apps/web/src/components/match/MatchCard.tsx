@@ -36,11 +36,11 @@ export default function MatchCard({ match, onStatusUpdate, onRematch }: MatchCar
         <div className="min-w-0 flex-1">
           <Link href={`/workspace/demands/${match.demandId}`} className="hover:underline">
             <h3 className="font-medium text-sm text-slate-900 line-clamp-2">
-              {match.demandTitle || 'Untitled Demand'}
+              {match.demandTitle || '未命名需求'}
             </h3>
           </Link>
           <p className="text-xs text-slate-400 mt-0.5">
-            Demand #{match.demandId.slice(0, 8)}
+            需求 #{match.demandId.slice(0, 8)}
           </p>
         </div>
         <MatchStatusBadge status={match.status} />

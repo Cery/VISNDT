@@ -1,9 +1,9 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Button, Spin, Alert, Typography, Input, Space, message, Modal } from 'antd';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
-import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
-import { categoryService } from '../../api/category.service';
+import type { ColumnsType } from 'antd/es/table';
+import { categoryService, extractErrorMessage } from '../../api';
 import type { ProductCategory } from '../../types/category.types';
 import BatchOperations from '../../components/BatchOperations';
 
@@ -15,68 +15,85 @@ type PageState =
   | { status: 'empty' }
   | { status: 'success'; data: ProductCategory[]; total: number };
 
-interface QueryParams {
-  page: number;
-  pageSize: number;
-  keyword: string;
-}
-
 function ProductCategoryList() {
   const navigate = useNavigate();
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [batchLoading, setBatchLoading] = useState(false);
-  const [query, setQuery] = useState<QueryParams>({
-    page: 1,
-    pageSize: 20,
-    keyword: '',
-  });
+  const [searchKeyword, setSearchKeyword] = useState('');
 
   const fetchData = useCallback(async () => {
     setPageState({ status: 'loading' });
     try {
-      const result = await categoryService.getList({
-        page: query.page,
-        pageSize: query.pageSize,
-        keyword: query.keyword || undefined,
-      });
+      // 获取所有分类数据（不分页），树形需要完整数据
+      const result = await categoryService.getList({ pageSize: 100 });
       if (result.data.length === 0) {
         setPageState({ status: 'empty' });
       } else {
-        setPageState({
-          status: 'success',
-          data: result.data,
-          total: result.total,
-        });
+        // 构建树形数据：顶层节点（parentId == null）作为根节点，children 自动展开
+        const topLevel = result.data.filter((c) => !c.parentId);
+        if (topLevel.length === 0) {
+          // 如果没有顶层节点，则全部作为根节点
+          setPageState({
+            status: 'success',
+            data: result.data,
+            total: result.data.length,
+          });
+        } else {
+          setPageState({
+            status: 'success',
+            data: topLevel,
+            total: result.data.length,
+          });
+        }
       }
     } catch (err) {
       const message =
         err instanceof Error ? err.message : '加载分类失败';
       setPageState({ status: 'error', message });
     }
-  }, [query]);
+  }, []);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-  const handleTableChange = useCallback(
-    (pagination: TablePaginationConfig) => {
-      setQuery((prev) => ({
-        ...prev,
-        page: pagination.current || 1,
-        pageSize: pagination.pageSize || 20,
-      }));
-    },
-    [],
-  );
+  // 客户端搜索过滤：按名称和标识匹配，递归保留匹配节点及其父路径
+  const filteredData = useMemo(() => {
+    if (pageState.status !== 'success') return [];
+    if (!searchKeyword) return pageState.data;
+
+    const keyword = searchKeyword.toLowerCase();
+
+    const filterTree = (nodes: ProductCategory[]): ProductCategory[] => {
+      return nodes.reduce<ProductCategory[]>((acc, node) => {
+        const matches =
+          node.name.toLowerCase().includes(keyword) ||
+          node.slug.toLowerCase().includes(keyword);
+        const filteredChildren = node.children
+          ? filterTree(node.children)
+          : [];
+
+        if (matches || filteredChildren.length > 0) {
+          acc.push({
+            ...node,
+            children:
+              filteredChildren.length > 0 ? filteredChildren : node.children,
+          });
+        }
+        return acc;
+      }, []);
+    };
+
+    return filterTree(pageState.data);
+  }, [searchKeyword, pageState]);
 
   const handleSearch = useCallback((value: string) => {
-    setQuery((prev) => ({ ...prev, keyword: value, page: 1 }));
+    setSearchKeyword(value);
   }, []);
 
   const handleReset = useCallback(() => {
-    setQuery({ page: 1, pageSize: 20, keyword: '' });
+    setSearchKeyword('');
   }, []);
 
   const handleDelete = useCallback((id: string) => {
@@ -92,7 +109,7 @@ function ProductCategoryList() {
           message.success('分类已删除');
           fetchData();
         } catch (err) {
-          message.error(err instanceof Error ? err.message : '删除失败');
+          message.error(extractErrorMessage(err, '删除失败'));
         }
       },
     });
@@ -164,15 +181,6 @@ function ProductCategoryList() {
       render: (slug: string) => <code>{slug}</code>,
     },
     {
-      title: '父级',
-      dataIndex: 'parentId',
-      key: 'parentId',
-      render: (parentId: string | undefined, _: unknown) => {
-        const categoryMap = new Map(pageState.status === 'success' ? pageState.data.map(c => [c.id, c.name]) : []);
-        return parentId ? (categoryMap.get(parentId) || parentId) : '-';
-      },
-    },
-    {
       title: '子级',
       dataIndex: 'children',
       key: 'children',
@@ -221,9 +229,14 @@ function ProductCategoryList() {
           marginBottom: 16,
         }}
       >
-        <Title level={4} style={{ margin: 0 }}>
-          分类管理
-        </Title>
+        <div>
+          <Title level={4} style={{ margin: 0 }}>
+            分类管理
+          </Title>
+          <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+            管理产品分类层级结构，分类用于组织产品目录
+          </Typography.Text>
+        </div>
         <Button
           type="primary"
           icon={<PlusOutlined />}
@@ -274,24 +287,16 @@ function ProductCategoryList() {
           />
 
           <Table<ProductCategory>
-          columns={columns}
-          dataSource={pageState.data}
-          rowKey="id"
-          rowSelection={{
-            selectedRowKeys,
-            onChange: (keys) => setSelectedRowKeys(keys),
-          }}
-          onChange={handleTableChange}
-          pagination={{
-            current: query.page,
-            pageSize: query.pageSize,
-            total: pageState.total,
-            showSizeChanger: true,
-            pageSizeOptions: ['10', '20', '50'],
-            showTotal: (total, range) => `${range[0]}-${range[1]} / 共 ${total} 条`,
-          }}
-        />
-      </>
+            columns={columns}
+            dataSource={filteredData}
+            rowKey="id"
+            rowSelection={{
+              selectedRowKeys,
+              onChange: (keys) => setSelectedRowKeys(keys),
+            }}
+            pagination={false}
+          />
+        </>
       )}
     </div>
   );

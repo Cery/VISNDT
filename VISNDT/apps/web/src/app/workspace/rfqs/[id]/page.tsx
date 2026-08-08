@@ -33,7 +33,7 @@ function RfqDetailContent({ id }: { id: string }) {
       if (rfqRes.status === 'fulfilled') {
         setRfq(rfqRes.value);
       } else {
-        setError('Failed to load RFQ. It may not exist or you may not have access.');
+        setError('加载询价失败，可能不存在或无权访问。');
         return;
       }
 
@@ -42,7 +42,7 @@ function RfqDetailContent({ id }: { id: string }) {
         setResponses(all.filter((r) => r.rfqId === id));
       }
     } catch {
-      setError('An unexpected error occurred.');
+      setError('发生意外错误。');
     } finally {
       setIsLoading(false);
     }
@@ -53,13 +53,13 @@ function RfqDetailContent({ id }: { id: string }) {
   }, [load]);
 
   const handleDelete = useCallback(async () => {
-    if (!window.confirm('Are you sure you want to delete this RFQ?')) return;
+    if (!window.confirm('确定要删除此询价单吗？此操作不可撤销。')) return;
     setActionLoading('delete');
     try {
       await deleteRfq(id);
       router.push('/workspace/rfqs');
     } catch {
-      setError('Failed to delete RFQ.');
+      setError('删除询价失败。');
       setActionLoading('');
     }
   }, [id, router]);
@@ -70,7 +70,7 @@ function RfqDetailContent({ id }: { id: string }) {
       const updated = await publishRfq(id);
       setRfq(updated);
     } catch {
-      setError('Failed to publish RFQ.');
+      setError('发布询价失败。');
     } finally {
       setActionLoading('');
     }
@@ -82,7 +82,7 @@ function RfqDetailContent({ id }: { id: string }) {
       const updated = await closeRfq(id);
       setRfq(updated);
     } catch {
-      setError('Failed to close RFQ.');
+      setError('关闭询价失败。');
     } finally {
       setActionLoading('');
     }
@@ -97,13 +97,13 @@ function RfqDetailContent({ id }: { id: string }) {
       <div className="flex-1 flex flex-col min-w-0">
         <WorkspaceHeader onMenuToggle={toggleSidebar} />
         <div className="flex-1 bg-slate-50 p-6">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-[1200px] mx-auto">
             {/* Back button */}
             <button
               onClick={() => router.push('/workspace/rfqs')}
               className="text-sm text-slate-500 hover:text-slate-700 mb-6 flex items-center gap-1 transition-colors"
             >
-              ← Back to RFQs
+              ← 返回询价列表
             </button>
 
             {isLoading ? (
@@ -125,7 +125,7 @@ function RfqDetailContent({ id }: { id: string }) {
                       onClick={() => router.push(`/workspace/rfqs/${id}/edit`)}
                       className="px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors"
                     >
-                      Edit
+                      编辑
                     </button>
                     {canPublish && (
                       <button
@@ -133,7 +133,7 @@ function RfqDetailContent({ id }: { id: string }) {
                         disabled={actionLoading === 'publish'}
                         className="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 transition-colors"
                       >
-                        {actionLoading === 'publish' ? 'Publishing...' : 'Publish'}
+                        {actionLoading === 'publish' ? '发布中...' : '发布'}
                       </button>
                     )}
                     {canClose && (
@@ -142,7 +142,7 @@ function RfqDetailContent({ id }: { id: string }) {
                         disabled={actionLoading === 'close'}
                         className="px-3 py-1.5 text-xs font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700 disabled:opacity-50 transition-colors"
                       >
-                        {actionLoading === 'close' ? 'Closing...' : 'Close'}
+                        {actionLoading === 'close' ? '关闭中...' : '关闭'}
                       </button>
                     )}
                     <button
@@ -150,14 +150,14 @@ function RfqDetailContent({ id }: { id: string }) {
                       disabled={actionLoading === 'delete'}
                       className="px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 border border-red-300 rounded-md hover:bg-red-100 disabled:opacity-50 transition-colors"
                     >
-                      {actionLoading === 'delete' ? 'Deleting...' : 'Delete'}
+                      {actionLoading === 'delete' ? '删除中...' : '删除'}
                     </button>
                   </div>
                 )}
                 <RFQDetail rfq={rfq} responseCount={responses.length} />
                 <div className="mt-8">
                   <h2 className="text-sm font-semibold text-slate-700 mb-3">
-                    Response Details
+                    响应详情
                   </h2>
                   <RFQResponseList responses={responses} />
                 </div>

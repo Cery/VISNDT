@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Table, Button, Spin, Alert, Tag, Typography, Input, Space, message, Modal } from 'antd';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
+import type { SorterResult } from 'antd/es/table/interface';
 import { parameterDefinitionService } from '../../api/parameter-definition.service';
 import type { ParameterDefinition } from '../../types/parameter-definition.types';
 import BatchOperations from '../../components/BatchOperations';
@@ -19,6 +20,8 @@ interface QueryParams {
   page: number;
   pageSize: number;
   keyword: string;
+  sortBy: string;
+  sortOrder: string;
 }
 
 const DATA_TYPE_COLOR_MAP: Record<string, string> = {
@@ -44,6 +47,8 @@ function ParameterDefinitionList() {
     page: 1,
     pageSize: 20,
     keyword: '',
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
   });
 
   const fetchData = useCallback(async () => {
@@ -75,11 +80,18 @@ function ParameterDefinitionList() {
   }, [fetchData]);
 
   const handleTableChange = useCallback(
-    (pagination: TablePaginationConfig) => {
+    (
+      pagination: TablePaginationConfig,
+      _filters: Record<string, unknown>,
+      sorter: SorterResult<ParameterDefinition> | SorterResult<ParameterDefinition>[],
+    ) => {
+      const singleSorter = Array.isArray(sorter) ? sorter[0] : sorter;
       setQuery((prev) => ({
         ...prev,
         page: pagination.current || 1,
         pageSize: pagination.pageSize || 20,
+        sortBy: (singleSorter.field as string) || prev.sortBy,
+        sortOrder: singleSorter.order === 'ascend' ? 'asc' : 'desc',
       }));
     },
     [],
@@ -90,7 +102,7 @@ function ParameterDefinitionList() {
   }, []);
 
   const handleReset = useCallback(() => {
-    setQuery({ page: 1, pageSize: 20, keyword: '' });
+    setQuery({ page: 1, pageSize: 20, keyword: '', sortBy: 'createdAt', sortOrder: 'desc' });
   }, []);
 
   const handleDelete = useCallback((id: string) => {
@@ -167,8 +179,10 @@ function ParameterDefinitionList() {
       title: '名称',
       dataIndex: 'name',
       key: 'name',
-      render: (name: string) => (
-        <span style={{ fontWeight: 500 }}>{name}</span>
+      render: (name: string, record: ParameterDefinition) => (
+        <Button type="link" style={{ padding: 0, fontWeight: 500 }} onClick={() => navigate(`/parameter-definitions/${record.id}`)}>
+          {name}
+        </Button>
       ),
     },
     {
@@ -206,6 +220,13 @@ function ParameterDefinitionList() {
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 160,
+      sorter: true,
+      sortOrder:
+        query.sortBy === 'createdAt'
+          ? query.sortOrder === 'asc'
+            ? 'ascend'
+            : 'descend'
+          : undefined,
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
@@ -242,9 +263,14 @@ function ParameterDefinitionList() {
           marginBottom: 16,
         }}
       >
-        <Title level={4} style={{ margin: 0 }}>
-          参数定义管理
-        </Title>
+        <div>
+          <Title level={4} style={{ margin: 0 }}>
+            参数定义管理
+          </Title>
+          <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+            管理产品参数定义，定义参数名称、数据类型和所属分组
+          </Typography.Text>
+        </div>
         <Button
           type="primary"
           icon={<PlusOutlined />}

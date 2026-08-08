@@ -10,6 +10,12 @@ interface OrganizationFormProps {
   onSubmit: (data: OrganizationFormData) => Promise<void>;
 }
 
+const TYPE_OPTIONS = [
+  { value: 'BUYER', label: '采购方' },
+  { value: 'SUPPLIER', label: '供应商' },
+  { value: 'ADMIN', label: '管理员' },
+];
+
 const STATUS_OPTIONS = [
   { value: 'ACTIVE', label: '激活' },
   { value: 'INACTIVE', label: '未激活' },
@@ -79,9 +85,12 @@ export default function OrganizationForm({
         <Form.Item
           label="类型"
           name="type"
-          rules={[{ required: true, message: '请输入组织类型' }]}
+          rules={[{ required: true, message: '请选择组织类型' }]}
         >
-          <Input placeholder="请输入组织类型（如：供应商、买方）" />
+          <Select
+            placeholder="请选择组织类型"
+            options={TYPE_OPTIONS}
+          />
         </Form.Item>
 
         {mode === 'edit' && (

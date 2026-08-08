@@ -55,6 +55,7 @@ export class OrganizationsService {
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
+        _count: { select: { members: true } },
       }),
       this.prisma.organization.count({ where }),
     ]);
@@ -71,7 +72,7 @@ export class OrganizationsService {
   async findOne(id: string, requestUser: RequestUser) {
     const org = await this.prisma.organization.findUnique({
       where: { id },
-      include: { members: true },
+      include: { members: { include: { user: { select: { id: true, email: true, name: true } } } } },
     });
     if (!org) throw new NotFoundException(`Organization ${id} not found`);
 

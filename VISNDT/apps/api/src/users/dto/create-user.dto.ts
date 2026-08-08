@@ -6,13 +6,23 @@ export class CreateUserDto {
   @IsEmail()
   email: string;
 
-  @ApiProperty({ description: 'Password hash', minLength: 6, example: 'hashed_password' })
+  @ApiProperty({ description: 'Password', minLength: 6, example: 'password123' })
   @IsString()
   @MinLength(6)
   passwordHash: string;
+
+  @ApiPropertyOptional({ description: 'User display name', example: '张三' })
+  @IsOptional()
+  @IsString()
+  name?: string;
 
   @ApiPropertyOptional({ description: 'Organization ID to join', example: 'uuid' })
   @IsOptional()
   @IsString()
   organizationId?: string;
+
+  @ApiPropertyOptional({ description: 'Role in organization', example: 'MEMBER' })
+  @IsOptional()
+  @IsString()
+  role?: string;
 }

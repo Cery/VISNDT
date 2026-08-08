@@ -249,6 +249,13 @@ function OfferList() {
       render: (org: Offer['organization']) => org?.name || '-',
     },
     {
+      title: '业务员',
+      dataIndex: 'createdByUser',
+      key: 'createdByUser',
+      width: 120,
+      render: (user: Offer['createdByUser']) => user?.name || user?.email || '-',
+    },
+    {
       title: '报价金额',
       dataIndex: 'price',
       key: 'price',
@@ -301,9 +308,12 @@ function OfferList() {
 
   return (
     <div>
-      <Title level={4} style={{ marginBottom: 16 }}>
+      <Title level={4} style={{ marginBottom: 4 }}>
         报价管理
       </Title>
+      <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16, fontSize: 13 }}>
+        管理供应商提交的报价，报价关联具体产品和供应商组织
+      </Typography.Text>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search

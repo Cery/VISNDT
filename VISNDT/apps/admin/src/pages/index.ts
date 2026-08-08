@@ -1,4 +1,5 @@
 export { default as DemandDetail } from './DemandDetail';
+export { default as DemandEdit } from './DemandEdit';
 export { default as DemandList } from './DemandList';
 export { default as FileAssetOrphanList } from './FileAssetOrphanList';
 export { default as Home } from './Home';
@@ -31,9 +32,11 @@ export { default as InquiryList } from './InquiryList';
 export { default as InquiryDetail } from './InquiryDetail';
 export { default as ParameterGroupList } from './parameter/ParameterGroupList';
 export { default as ParameterGroupCreate } from './parameter/ParameterGroupCreate';
+export { default as ParameterGroupDetail } from './parameter/ParameterGroupDetail';
 export { default as ParameterGroupEdit } from './parameter/ParameterGroupEdit';
 export { default as ParameterDefinitionList } from './parameter/ParameterDefinitionList';
 export { default as ParameterDefinitionCreate } from './parameter/ParameterDefinitionCreate';
+export { default as ParameterDefinitionDetail } from './parameter/ParameterDefinitionDetail';
 export { default as ParameterDefinitionEdit } from './parameter/ParameterDefinitionEdit';
 export { default as ProductCategoryList } from './category/ProductCategoryList';
 export { default as ProductCategoryCreate } from './category/ProductCategoryCreate';

@@ -30,7 +30,7 @@ function DemandsContent() {
       setDemands(res.data || []);
       setTotal(res.total || 0);
     } catch {
-      setError('Unable to load demands. Please try again.');
+      setError('加载需求失败，请重试。');
     } finally {
       setIsLoading(false);
     }
@@ -88,7 +88,7 @@ function DemandsContent() {
                   onClick={load}
                   className="mt-3 text-sm font-medium text-red-700 underline hover:text-red-800"
                 >
-                  Try again
+                  重试
                 </button>
               </div>
             ) : (
@@ -102,7 +102,7 @@ function DemandsContent() {
                       disabled={page <= 1}
                       className="px-3 py-1 text-sm border border-slate-300 rounded-md disabled:opacity-50 hover:bg-slate-50"
                     >
-                      Previous
+                      上一页
                     </button>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                       <button
@@ -122,7 +122,7 @@ function DemandsContent() {
                       disabled={page >= totalPages}
                       className="px-3 py-1 text-sm border border-slate-300 rounded-md disabled:opacity-50 hover:bg-slate-50"
                     >
-                      Next
+                      下一页
                     </button>
                   </div>
                 )}

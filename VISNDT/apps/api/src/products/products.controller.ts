@@ -11,6 +11,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @ApiTags('Products')
 @Controller('products')
@@ -53,8 +54,8 @@ export class ProductsController {
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new product (ADMIN only)' })
-  async create(@Body() dto: CreateProductDto) {
-    return ApiResponse.ok(await this.service.create(dto), 'Product created');
+  async create(@Body() dto: CreateProductDto, @CurrentUser() user: { id: string }) {
+    return ApiResponse.ok(await this.service.create(dto, user.id), 'Product created');
   }
 
   @Patch(':id')
@@ -71,9 +72,10 @@ export class ProductsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Delete product (ADMIN only). Cascades: media, parameter values, parameter associations. Blocks if has offers or demand matches.' })
+  @ApiOperation({ summary: 'Delete product (ADMIN only). Cascades: media, parameter values, parameter associations. Blocks if has offers or demand matches. Use ?force=true to force cascade delete.' })
   @ApiParam({ name: 'id', description: 'Product UUID' })
-  async remove(@Param('id') id: string) {
-    return ApiResponse.ok(await this.service.remove(id), 'Product deleted');
+  async remove(@Param('id') id: string, @Query('force') force?: string) {
+    const forceBool = force === 'true';
+    return ApiResponse.ok(await this.service.remove(id, forceBool), 'Product deleted');
   }
 }

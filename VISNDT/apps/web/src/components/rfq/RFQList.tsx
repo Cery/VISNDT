@@ -57,12 +57,12 @@ export default function RFQList({ rfqs, isLoading }: RFQListProps) {
             <RFQStatusBadge status={rfq.status} />
           </div>
           <div className="flex items-center gap-3 mt-3 text-xs text-slate-400">
-            <span>Created: {new Date(rfq.createdAt).toLocaleDateString()}</span>
+            <span>创建时间: {new Date(rfq.createdAt).toLocaleDateString()}</span>
             {rfq.publishedAt && (
-              <span>Published: {new Date(rfq.publishedAt).toLocaleDateString()}</span>
+              <span>发布时间: {new Date(rfq.publishedAt).toLocaleDateString()}</span>
             )}
             {rfq.closedAt && (
-              <span>Closed: {new Date(rfq.closedAt).toLocaleDateString()}</span>
+              <span>关闭时间: {new Date(rfq.closedAt).toLocaleDateString()}</span>
             )}
           </div>
         </Link>

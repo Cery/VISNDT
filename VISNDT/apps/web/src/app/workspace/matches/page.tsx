@@ -28,7 +28,7 @@ function MatchesContent() {
       const data = await getAllMatches();
       setMatches(data);
     } catch {
-      setError('Unable to load matches. Please try again.');
+      setError('加载匹配结果失败，请重试。');
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +66,7 @@ function MatchesContent() {
         prev.map((m) => (m.id === matchId ? { ...m, status: newStatus } : m)),
       );
     } catch {
-      setError('Failed to update match status. Please try again.');
+      setError('更新匹配状态失败，请重试。');
     }
   };
 
@@ -76,7 +76,7 @@ function MatchesContent() {
       // Reload matches after rematch
       await load();
     } catch {
-      setError('Failed to rematch. Please try again.');
+      setError('重新匹配失败，请重试。');
     }
   };
 
@@ -111,7 +111,7 @@ function MatchesContent() {
                   onClick={load}
                   className="mt-3 text-sm font-medium text-red-700 underline hover:text-red-800"
                 >
-                  Try again
+                  重试
                 </button>
               </div>
             ) : (
@@ -129,7 +129,7 @@ function MatchesContent() {
                       disabled={page <= 1}
                       className="px-3 py-1 text-sm border border-slate-300 rounded-md disabled:opacity-50 hover:bg-slate-50"
                     >
-                      Previous
+                      上一页
                     </button>
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                       <button
@@ -149,7 +149,7 @@ function MatchesContent() {
                       disabled={page >= totalPages}
                       className="px-3 py-1 text-sm border border-slate-300 rounded-md disabled:opacity-50 hover:bg-slate-50"
                     >
-                      Next
+                      下一页
                     </button>
                   </div>
                 )}

@@ -40,7 +40,7 @@ export class ProductCategoriesService {
       where: { id },
       include: { children: true, products: true },
     });
-    if (!cat) throw new NotFoundException(`ProductCategory ${id} not found`);
+    if (!cat) throw new NotFoundException(`产品分类 ${id} 未找到`);
     return cat;
   }
 

@@ -65,7 +65,10 @@ export class UsersService {
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
-        select: userSelect,
+        select: {
+          ...userSelect,
+          organization: { select: { id: true, name: true } },
+        },
         where,
       }),
       this.prisma.user.count({ where }),
@@ -101,9 +104,24 @@ export class UsersService {
 
   async create(dto: CreateUserDto) {
     const passwordHash = await bcrypt.hash(dto.passwordHash, 10);
-    return this.prisma.user.create({
-      data: { ...dto, passwordHash },
+    const { role, ...userData } = dto;
+
+    const user = await this.prisma.user.create({
+      data: { ...userData, passwordHash },
     });
+
+    // If organizationId and role are provided, also create OrganizationMember record
+    if (dto.organizationId && dto.role) {
+      await this.prisma.organizationMember.create({
+        data: {
+          userId: user.id,
+          organizationId: dto.organizationId,
+          role: dto.role,
+        },
+      });
+    }
+
+    return user;
   }
 
   async update(id: string, dto: UpdateUserDto, requestUser: RequestUser) {

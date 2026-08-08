@@ -31,9 +31,9 @@ export default function MatchCard({
       <div className="flex items-start justify-between gap-2 mb-2">
         <div>
           <h3 className="font-medium text-sm text-slate-900">
-            Match #{id.slice(0, 8)}
+            匹配 #{id.slice(0, 8)}
           </h3>
-          <p className="text-xs text-slate-400 mt-0.5">Demand: {demandId.slice(0, 8)}</p>
+          <p className="text-xs text-slate-400 mt-0.5">需求: {demandId.slice(0, 8)}</p>
         </div>
         <span
           className={`flex-shrink-0 text-xs px-2 py-0.5 rounded-full ${
@@ -45,7 +45,7 @@ export default function MatchCard({
       </div>
       <div className="flex items-center justify-between text-xs text-slate-400">
         {score !== null && score !== undefined && (
-          <span>Score: {(score * 100).toFixed(0)}%</span>
+          <span>匹配度: {(score * 100).toFixed(0)}%</span>
         )}
         <span>{new Date(createdAt).toLocaleDateString()}</span>
       </div>

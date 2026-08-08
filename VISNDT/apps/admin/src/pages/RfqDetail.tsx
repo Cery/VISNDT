@@ -244,7 +244,7 @@ export default function RfqDetailPage() {
         </Button>
       </Space>
 
-      <Title level={3}>询价单详情</Title>
+      <Title level={3}>RFQ详情</Title>
 
       <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>

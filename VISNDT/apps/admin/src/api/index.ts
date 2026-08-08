@@ -1,4 +1,4 @@
-export { apiClient } from './client';
+export { apiClient, extractErrorMessage } from './client';
 export { categoriesService } from './categories.service';
 export { dashboardService } from './dashboard.service';
 export { demandService } from './demand.service';
@@ -17,3 +17,4 @@ export { categoryService } from './category.service';
 export { productMediaService } from './product-media.service';
 export { fileAssetService } from './file-asset.service';
 export { auditLogService } from './audit-log.service';
+export { productParameterService } from './product-parameter.service';

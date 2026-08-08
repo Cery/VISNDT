@@ -15,7 +15,7 @@ import {
   message,
 } from 'antd';
 import { ArrowLeftOutlined, ReloadOutlined } from '@ant-design/icons';
-import { demandService, matchService } from '../api';
+import { demandService, rfqService } from '../api';
 import type { Demand, DemandParameter, DemandMatch } from '../types';
 
 const { Title } = Typography;
@@ -39,6 +39,22 @@ const STATUS_LABEL_MAP: Record<string, string> = {
   PUBLISHED: '已发布',
   SUBMITTED: '已提交',
   PROCESSING: '处理中',
+  CLOSED: '已关闭',
+  CANCELLED: '已取消',
+};
+
+const RFQ_STATUS_COLOR: Record<string, string> = {
+  DRAFT: 'orange',
+  OPEN: 'green',
+  RESPONDING: 'blue',
+  CLOSED: 'default',
+  CANCELLED: 'red',
+};
+
+const RFQ_STATUS_LABEL_MAP: Record<string, string> = {
+  DRAFT: '草稿',
+  OPEN: '开放',
+  RESPONDING: '响应中',
   CLOSED: '已关闭',
   CANCELLED: '已取消',
 };
@@ -95,9 +111,8 @@ export default function DemandDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
-  const [matches, setMatches] = useState<DemandMatch[]>([]);
-  const [matchesLoading, setMatchesLoading] = useState(false);
   const [rematching, setRematching] = useState(false);
+  const [generatingRfq, setGeneratingRfq] = useState(false);
 
   const fetchDemand = useCallback(async () => {
     if (!id) return;
@@ -111,37 +126,49 @@ export default function DemandDetailPage() {
     }
   }, [id]);
 
-  const fetchMatches = useCallback(async () => {
-    if (!id) return;
-    setMatchesLoading(true);
-    try {
-      const result = await matchService.getDemandMatches(id, 1, 50);
-      setMatches(result.data);
-    } catch {
-      setMatches([]);
-    } finally {
-      setMatchesLoading(false);
-    }
-  }, [id]);
-
   useEffect(() => {
     fetchDemand();
-    fetchMatches();
-  }, [fetchDemand, fetchMatches]);
+  }, [fetchDemand]);
 
   const handleRematch = async () => {
     if (!id) return;
     try {
       setRematching(true);
+      const { matchService } = await import('../api');
       await matchService.rematch(id);
       message.success('重新匹配成功');
-      fetchMatches();
+      fetchDemand();
     } catch (err) {
       const msg = err instanceof Error ? err.message : '重新匹配失败';
       message.error(msg);
     } finally {
       setRematching(false);
     }
+  };
+
+  const handleGenerateRfq = async () => {
+    if (!id) return;
+    try {
+      setGeneratingRfq(true);
+      await rfqService.create({ demandId: id });
+      message.success('RFQ已创建成功');
+      fetchDemand();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '创建RFQ失败';
+      message.error(msg);
+    } finally {
+      setGeneratingRfq(false);
+    }
+  };
+
+  const showGenerateRfqConfirm = () => {
+    Modal.confirm({
+      title: '确认生成RFQ',
+      content: '将基于此需求创建RFQ（报价请求），是否继续？',
+      okText: '确认生成',
+      cancelText: '取消',
+      onOk: handleGenerateRfq,
+    });
   };
 
   const showRematchConfirm = () => {
@@ -184,6 +211,7 @@ export default function DemandDetailPage() {
 
   const demand = pageState.data;
   const parameters = demand.parameters;
+  const matches = demand.matches;
 
   const formatQuantity = () => {
     if (demand.quantity === undefined || demand.quantity === null) return '-';
@@ -194,11 +222,29 @@ export default function DemandDetailPage() {
   const formatDate = (date: string | undefined) =>
     date ? new Date(date).toLocaleString() : '-';
 
+  const formatContactDisplay = () => {
+    if (!demand.contactName && !demand.contactEmail && !demand.contactPhone) return '未设置';
+    const parts: string[] = [];
+    if (demand.contactName) parts.push(demand.contactName);
+    if (demand.contactEmail) parts.push(demand.contactEmail);
+    if (demand.contactPhone) parts.push(demand.contactPhone);
+    return parts.join(' / ');
+  };
+
   const matchColumns = [
     {
       title: '产品',
       dataIndex: ['product', 'name'],
       key: 'product',
+      render: (name: string, record: DemandMatch) => (
+        <Button
+          type="link"
+          style={{ padding: 0 }}
+          onClick={() => navigate(`/products/${record.productId}`)}
+        >
+          {name || '-'}
+        </Button>
+      ),
     },
     {
       title: '匹配度',
@@ -229,16 +275,26 @@ export default function DemandDetailPage() {
     {
       title: '操作',
       key: 'actions',
-      width: 100,
+      width: 160,
       render: (_: unknown, record: DemandMatch) => (
-        <Button
-          type="link"
-          onClick={() =>
-            navigate(`/demands/${id}/matches/${record.id}`)
-          }
-        >
-          查看
-        </Button>
+        <Space>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => navigate(`/products/${record.productId}`)}
+          >
+            查看产品
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() =>
+              navigate(`/demands/${id}/matches/${record.id}`)
+            }
+          >
+            匹配详情
+          </Button>
+        </Space>
       ),
     },
   ];
@@ -265,12 +321,21 @@ export default function DemandDetailPage() {
           <Descriptions.Item label="组织">
             {demand.organization?.name || '-'}
           </Descriptions.Item>
+          <Descriptions.Item label="创建者">
+            {demand.createdByUser?.name || demand.createdByUser?.email || '-'}
+          </Descriptions.Item>
+          <Descriptions.Item label="联系方式">
+            {formatContactDisplay()}
+          </Descriptions.Item>
           <Descriptions.Item label="预算范围">
             {demand.budgetRange || '-'}
           </Descriptions.Item>
           <Descriptions.Item label="数量">{formatQuantity()}</Descriptions.Item>
           <Descriptions.Item label="预计交付">
             {formatDate(demand.expectedDeliveryDate)}
+          </Descriptions.Item>
+          <Descriptions.Item label="关闭原因">
+            {demand.closeReason || '-'}
           </Descriptions.Item>
         </Descriptions>
       </Card>
@@ -303,10 +368,18 @@ export default function DemandDetailPage() {
             <Button
               size="small"
               icon={<ReloadOutlined />}
-              onClick={fetchMatches}
-              loading={matchesLoading}
+              onClick={fetchDemand}
             >
               刷新
+            </Button>
+            <Button
+              size="small"
+              type="primary"
+              onClick={showGenerateRfqConfirm}
+              loading={generatingRfq}
+              disabled={!matches || matches.length === 0}
+            >
+              生成RFQ
             </Button>
             <Button
               size="small"
@@ -319,11 +392,7 @@ export default function DemandDetailPage() {
           </Space>
         }
       >
-        {matchesLoading ? (
-          <div style={{ textAlign: 'center', padding: 40 }}>
-            <Spin />
-          </div>
-        ) : matches.length > 0 ? (
+        {matches && matches.length > 0 ? (
           <Table
             dataSource={matches}
             columns={matchColumns}
@@ -333,6 +402,32 @@ export default function DemandDetailPage() {
           />
         ) : (
           <Empty description="暂无匹配" />
+        )}
+      </Card>
+
+      <Card title="关联RFQ" style={{ marginBottom: 16 }}>
+        {demand.rfq ? (
+          <Descriptions bordered column={{ xs: 1, sm: 2 }}>
+            <Descriptions.Item label="RFQ状态">
+              <Tag color={RFQ_STATUS_COLOR[demand.rfq.status] || 'default'}>
+                {RFQ_STATUS_LABEL_MAP[demand.rfq.status] || demand.rfq.status}
+              </Tag>
+            </Descriptions.Item>
+            <Descriptions.Item label="创建时间">
+              {formatDate(demand.rfq.createdAt)}
+            </Descriptions.Item>
+            <Descriptions.Item label="操作">
+              <Button
+                type="primary"
+                size="small"
+                onClick={() => navigate(`/rfqs/${demand.rfq!.id}`)}
+              >
+                查看RFQ详情
+              </Button>
+            </Descriptions.Item>
+          </Descriptions>
+        ) : (
+          <Empty description="暂无关联RFQ" />
         )}
       </Card>
 

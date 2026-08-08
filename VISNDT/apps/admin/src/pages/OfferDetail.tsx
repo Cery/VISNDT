@@ -196,6 +196,9 @@ export default function OfferDetailPage() {
           <Descriptions.Item label="更新时间">
             {formatDate(offer.updatedAt)}
           </Descriptions.Item>
+          <Descriptions.Item label="创建人">
+            {offer.createdByUser?.name || offer.createdByUser?.email || '-'}
+          </Descriptions.Item>
         </Descriptions>
       </Card>
 

@@ -1,3 +1,5 @@
+import type { DemandMatch } from './match.types';
+
 export type DemandStatus =
   | 'DRAFT'
   | 'PUBLISHED'
@@ -40,9 +42,20 @@ export interface Demand {
   createdAt: string;
   updatedAt: string;
 
+  contactName?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  contactVisible?: boolean;
+
   organization?: {
     id: string;
     name: string;
+  };
+
+  createdByUser?: {
+    id: string;
+    email: string;
+    name?: string;
   };
 
   category?: {
@@ -52,6 +65,15 @@ export interface Demand {
   };
 
   parameters?: DemandParameter[];
+
+  matches?: DemandMatch[];
+
+  rfq?: {
+    id: string;
+    status: string;
+    createdAt: string;
+    demand?: { title: string };
+  } | null;
 }
 
 export interface DemandListResponse {

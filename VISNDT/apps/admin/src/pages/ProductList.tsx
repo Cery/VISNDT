@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Input, Select, Space, Spin, Alert, Button, Tag, Typography, message, Modal } from 'antd';
+import { Table, Input, Select, Space, Spin, Alert, Button, Tag, Typography, message, Modal, Checkbox } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { SorterResult } from 'antd/es/table/interface';
-import { productService } from '../api';
+import { productService, extractErrorMessage } from '../api';
 import type { Product, SearchProductParams } from '../types';
 import BatchOperations from '../components/BatchOperations';
 
@@ -134,19 +134,33 @@ function ProductList() {
   );
 
   const handleDelete = useCallback((id: string) => {
+    let forceDelete = false;
+    const content = (
+      <div>
+        <p>确定要删除此产品吗？此操作不可撤销。</p>
+        <Checkbox onChange={(e) => { forceDelete = e.target.checked; }}>
+          同时删除关联数据（报价、匹配记录等）
+        </Checkbox>
+      </div>
+    );
     Modal.confirm({
       title: '确认删除',
-      content: '确定要删除此产品吗？此操作不可撤销。',
+      content,
       okText: '确认删除',
       okType: 'danger',
       cancelText: '取消',
       onOk: async () => {
         try {
-          await productService.remove(id);
+          await productService.remove(id, forceDelete);
           message.success('产品已删除');
           fetchProducts();
         } catch (err) {
-          message.error(err instanceof Error ? err.message : '删除失败');
+          const errorMsg = extractErrorMessage(err, '删除失败');
+          Modal.error({
+            title: '删除失败',
+            content: errorMsg,
+            okText: '知道了',
+          });
         }
       },
     });
@@ -156,14 +170,23 @@ function ProductList() {
     setBatchLoading(true);
     const hideLoading = message.loading('正在删除...');
     try {
-      await productService.batchDelete(ids);
+      const result = await productService.batchDelete(ids);
       hideLoading();
-      message.success(`成功删除 ${ids.length} 个产品`);
+      if (result.count === ids.length) {
+        message.success(`成功删除 ${result.count} 个产品`);
+      } else {
+        message.warning(`成功删除 ${result.count} / ${ids.length} 个产品（部分因有关联数据无法删除）`);
+      }
       setSelectedRowKeys([]);
       fetchProducts();
     } catch (err) {
       hideLoading();
-      message.error(err instanceof Error ? err.message : '批量删除失败');
+      const errorMsg = extractErrorMessage(err, '批量删除失败');
+      Modal.error({
+        title: '批量删除失败',
+        content: errorMsg,
+        okText: '知道了',
+      });
     } finally {
       setBatchLoading(false);
     }
@@ -239,6 +262,20 @@ function ProductList() {
       render: (category: Product['category']) => category?.name || '-',
     },
     {
+      title: '组织',
+      key: 'organization',
+      width: 140,
+      render: (_: unknown, record: Product) =>
+        record.createdBy?.organization?.name || '-',
+    },
+    {
+      title: '创建者',
+      key: 'creator',
+      width: 120,
+      render: (_: unknown, record: Product) =>
+        record.createdBy?.name || record.createdBy?.email || '-',
+    },
+    {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
@@ -292,9 +329,12 @@ function ProductList() {
 
   return (
     <div>
-      <Title level={4} style={{ marginBottom: 16 }}>
+      <Title level={4} style={{ marginBottom: 4 }}>
         产品管理
       </Title>
+      <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16, fontSize: 13 }}>
+        管理平台产品目录，包括产品信息、分类、参数和媒体资源
+      </Typography.Text>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Button

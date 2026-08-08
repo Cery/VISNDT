@@ -58,7 +58,7 @@ export class DemandsService {
     const demand = await this.prisma.demand.findUnique({ where: { id } });
 
     if (!demand) {
-      throw new NotFoundException(`Demand ${id} not found`);
+      throw new NotFoundException(`需求 ${id} 未找到`);
     }
 
     const isCreator = demand.createdBy === user.id;
@@ -197,7 +197,7 @@ export class DemandsService {
         },
       },
     });
-    if (!demand) throw new NotFoundException(`Demand ${id} not found`);
+    if (!demand) throw new NotFoundException(`需求 ${id} 未找到`);
 
     return this.protectContactInfo(demand);
   }
@@ -254,7 +254,7 @@ export class DemandsService {
     });
 
     if (!demand) {
-      throw new NotFoundException(`Demand ${id} not found`);
+      throw new NotFoundException(`需求 ${id} 未找到`);
     }
 
     const isCreator = demand.createdBy === user.id;
@@ -302,7 +302,7 @@ export class DemandsService {
     const demand = await this.prisma.demand.findUnique({ where: { id } });
 
     if (!demand) {
-      throw new NotFoundException(`Demand ${id} not found`);
+      throw new NotFoundException(`需求 ${id} 未找到`);
     }
 
     const isCreator = demand.createdBy === user.id;
@@ -364,10 +364,13 @@ export class DemandsService {
       );
     }
 
-    const demand = await this.prisma.demand.findUnique({ where: { id } });
+    const demand = await this.prisma.demand.findUnique({
+      where: { id },
+      include: { rfq: { select: { id: true, status: true } } },
+    });
 
     if (!demand) {
-      throw new NotFoundException(`Demand ${id} not found`);
+      throw new NotFoundException(`需求 ${id} 未找到`);
     }
 
     const isCreator = demand.createdBy === user.id;
@@ -407,6 +410,31 @@ export class DemandsService {
           },
         },
       });
+
+      // Auto-close associated RFQ if it exists and is still open
+      if (demand.rfq && demand.rfq.status === 'OPEN') {
+        await tx.rFQ.update({
+          where: { id: demand.rfq.id },
+          data: {
+            status: 'CLOSED' as any,
+            closedAt: new Date(),
+          },
+        });
+
+        await tx.workflowEvent.create({
+          data: {
+            entityType: WorkflowEntityType.RFQ,
+            entityId: demand.rfq.id,
+            action: WorkflowAction.CLOSED,
+            operatorId: user.id,
+            metadata: {
+              previousStatus: 'OPEN',
+              newStatus: 'CLOSED',
+              reason: 'Associated demand was closed',
+            },
+          },
+        });
+      }
 
       return [updatedDemand];
     });
@@ -744,14 +772,14 @@ export class DemandsService {
         rfq: true,
       },
     });
-    if (!demand) throw new NotFoundException(`Demand ${id} not found`);
+    if (!demand) throw new NotFoundException(`需求 ${id} 未找到`);
 
     if (demand._count.matches > 0 || demand.rfq) {
       const reasons: string[] = [];
-      if (demand._count.matches > 0) reasons.push(`${demand._count.matches} match(es)`);
-      if (demand.rfq) reasons.push(`1 RFQ`);
+      if (demand._count.matches > 0) reasons.push(`${demand._count.matches}个匹配记录`);
+      if (demand.rfq) reasons.push(`1 个RFQ`);
       throw new BadRequestException(
-        `Cannot delete demand with existing dependencies: ${reasons.join(', ')}. Remove dependencies first.`,
+        `无法删除存在依赖项的需求：${reasons.join('、')}，请先移除依赖项。`,
       );
     }
 

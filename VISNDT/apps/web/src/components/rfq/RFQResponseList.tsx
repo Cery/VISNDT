@@ -1,11 +1,11 @@
 import type { RfqResponseItem } from '@/lib/api/rfqs';
 
 const STATUS_MAP: Record<string, string> = {
-  DRAFT: 'Draft',
-  SUBMITTED: 'Submitted',
-  REVIEWED: 'Reviewed',
-  ACCEPTED: 'Accepted',
-  REJECTED: 'Rejected',
+  DRAFT: '草稿',
+  SUBMITTED: '已提交',
+  REVIEWED: '已审核',
+  ACCEPTED: '已接受',
+  REJECTED: '已拒绝',
 };
 
 interface RFQResponseListProps {
@@ -30,7 +30,7 @@ export default function RFQResponseList({
   if (responses.length === 0) {
     return (
       <p className="text-sm text-slate-400 italic">
-        No responses received yet.
+        暂无响应。
       </p>
     );
   }
@@ -44,7 +44,7 @@ export default function RFQResponseList({
         >
           <div>
             <span className="text-sm font-medium text-slate-700">
-              Response #{resp.id.slice(0, 8)}
+              响应 #{resp.id.slice(0, 8)}
             </span>
             <span className="text-xs text-slate-400 ml-2">
               {new Date(resp.createdAt).toLocaleDateString()}

@@ -28,6 +28,7 @@ export const productService = {
     name: string;
     model?: string;
     description?: string;
+    status?: string;
   }): Promise<Product> {
     const response = (await apiClient.post(
       '/products',
@@ -53,9 +54,9 @@ export const productService = {
     return response.data;
   },
 
-  async remove(id: string): Promise<{ id: string }> {
+  async remove(id: string, force?: boolean): Promise<{ id: string }> {
     const response = (await apiClient.delete(
-      `/products/${id}`,
+      `/products/${id}${force ? '?force=true' : ''}`,
     )) as unknown as ApiResponseWrapper<{ id: string }>;
     return response.data;
   },

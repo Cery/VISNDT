@@ -6,6 +6,10 @@ export interface User {
   name?: string;
   status: UserStatus;
   organizationId?: string;
+  organization?: {
+    id: string;
+    name: string;
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -28,6 +32,8 @@ export interface SearchUserParams {
 export interface UserFormData {
   email: string;
   passwordHash: string;
+  name?: string;
   status?: UserStatus;
   organizationId?: string;
+  role?: string;
 }

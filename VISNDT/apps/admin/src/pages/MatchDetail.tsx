@@ -115,7 +115,7 @@ export default function MatchDetailPage() {
         try {
           setReviewing(true);
           await matchService.updateMatchStatus(demandId, matchId, { status });
-          message.success(`Match ${status.toLowerCase()}`);
+          message.success(status === 'ACCEPTED' ? '匹配已接受' : '匹配已拒绝');
           fetchMatch();
         } catch (err) {
           const msg = err instanceof Error ? err.message : '匹配更新失败';

@@ -47,7 +47,7 @@ function RfqCreateContent() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedDemandId) {
-      setError('Please select a demand');
+      setError('请选择一个需求');
       return;
     }
     setError('');
@@ -60,13 +60,13 @@ function RfqCreateContent() {
       <div className="flex-1 flex flex-col min-w-0">
         <WorkspaceHeader onMenuToggle={toggleSidebar} />
         <div className="flex-1 bg-slate-50 p-6">
-          <div className="max-w-2xl mx-auto space-y-6">
+          <div className="max-w-[1200px] mx-auto space-y-6">
             <div>
               <h2 className="text-xl font-bold text-slate-900">
-                Create RFQ
+                创建询价
               </h2>
               <p className="text-slate-500 text-sm mt-1">
-                Create a Request for Quotation from one of your demands.
+                从您的需求中创建询价单。
               </p>
             </div>
 
@@ -80,7 +80,7 @@ function RfqCreateContent() {
                   htmlFor="demandId"
                   className="block text-sm font-medium text-slate-700 mb-1"
                 >
-                  Select Demand <span className="text-red-500">*</span>
+                  选择需求 <span className="text-red-500">*</span>
                 </label>
 
                 {demandsLoading ? (
@@ -105,24 +105,24 @@ function RfqCreateContent() {
                       />
                     </svg>
                     <span className="text-sm text-slate-400">
-                      Loading demands...
+                      加载需求中...
                     </span>
                   </div>
                 ) : demandsError ? (
                   <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-                    Unable to load demands. Please try again later.
+                    加载需求失败，请稍后重试。
                   </div>
                 ) : demands.length === 0 ? (
                   <div className="rounded-md bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-700">
                     <p className="mb-2">
-                      No demands found. You need to create a demand first.
+                      没有找到需求。请先创建一个需求。
                     </p>
                     <button
                       type="button"
                       onClick={() => router.push('/workspace/demands/create')}
                       className="text-amber-800 underline hover:text-amber-900"
                     >
-                      Create a demand →
+                      创建需求 →
                     </button>
                   </div>
                 ) : (
@@ -137,7 +137,7 @@ function RfqCreateContent() {
                       error ? 'border-red-400' : 'border-slate-300'
                     }`}
                   >
-                    <option value="">-- Select a demand --</option>
+                    <option value="">-- 请选择需求 --</option>
                     {demands.map((d) => (
                       <option key={d.id} value={d.id}>
                         {d.title}
@@ -154,7 +154,7 @@ function RfqCreateContent() {
               {selectedDemandId && demands.length > 0 && (
                 <div className="rounded-md bg-slate-50 border border-slate-200 px-4 py-3">
                   <p className="text-xs text-slate-500 mb-1">
-                    Selected Demand
+                    已选需求
                   </p>
                   <p className="text-sm font-medium text-slate-900">
                     {demands.find((d) => d.id === selectedDemandId)?.title}
@@ -166,7 +166,7 @@ function RfqCreateContent() {
               {mutation.isError && (
                 <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
                   {(mutation.error as Error)?.message ||
-                    'Failed to create RFQ. Please try again.'}
+                    '创建询价失败，请重试。'}
                 </div>
               )}
 
@@ -198,10 +198,10 @@ function RfqCreateContent() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                         />
                       </svg>
-                      Creating...
+                      创建中...
                     </>
                   ) : (
-                    'Create RFQ'
+                    '创建询价'
                   )}
                 </button>
                 <button
@@ -209,7 +209,7 @@ function RfqCreateContent() {
                   onClick={() => router.push('/workspace/rfqs')}
                   className="rounded-md border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
                 >
-                  Cancel
+                  取消
                 </button>
               </div>
             </form>

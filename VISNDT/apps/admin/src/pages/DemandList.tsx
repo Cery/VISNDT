@@ -280,7 +280,7 @@ function DemandList() {
     {
       title: '操作',
       key: 'actions',
-      width: 160,
+      width: 200,
       render: (_: unknown, record: Demand) => (
         <Space>
           <Button
@@ -288,6 +288,12 @@ function DemandList() {
             onClick={() => navigate(`/demands/${record.id}`)}
           >
             查看
+          </Button>
+          <Button
+            type="link"
+            onClick={() => navigate(`/demands/${record.id}/edit`)}
+          >
+            编辑
           </Button>
           <Button
             type="link"
@@ -303,9 +309,12 @@ function DemandList() {
 
   return (
     <div>
-      <Title level={4} style={{ marginBottom: 16 }}>
+      <Title level={4} style={{ marginBottom: 4 }}>
         需求管理
       </Title>
+      <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16, fontSize: 13 }}>
+        管理采购方发布的产品需求，需求可生成RFQ向供应商询价
+      </Typography.Text>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search

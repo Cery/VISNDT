@@ -293,9 +293,12 @@ function InquiryList() {
 
   return (
     <div>
-      <Title level={4} style={{ marginBottom: 16 }}>
+      <Title level={4} style={{ marginBottom: 4 }}>
         询价管理
       </Title>
+      <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16, fontSize: 13 }}>
+        管理前台访客提交的产品询价记录，询价与RFQ是不同的业务概念
+      </Typography.Text>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search

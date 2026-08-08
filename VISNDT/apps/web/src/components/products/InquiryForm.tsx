@@ -65,7 +65,7 @@ export default function InquiryForm({
     } catch (err) {
       setStatus('error');
       setErrorMsg(
-        err instanceof Error ? err.message : 'Failed to submit inquiry. Please try again.',
+        err instanceof Error ? err.message : '提交询价失败，请重试。',
       );
     }
   };
@@ -73,16 +73,16 @@ export default function InquiryForm({
   if (status === 'success') {
     return (
       <div className="rounded-lg border border-green-200 bg-green-50 p-6">
-        <h3 className="font-semibold text-green-800 mb-2">Inquiry Submitted!</h3>
+        <h3 className="font-semibold text-green-800 mb-2">询价已提交！</h3>
         <p className="text-sm text-green-700">
-          Thank you for your interest in {productName}. Our team will contact you
-          shortly at {result?.inquiry.visitorEmail || formData.email}.
+          感谢您对 {productName} 的关注。我们的团队将尽快通过您提交的邮箱
+          {result?.inquiry.visitorEmail || formData.email} 与您联系。
         </p>
         <button
           onClick={() => setStatus('idle')}
           className="mt-4 text-sm text-primary hover:underline"
         >
-          Submit another inquiry
+          提交新的询价
         </button>
       </div>
     );
@@ -90,9 +90,9 @@ export default function InquiryForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h3 className="font-semibold text-sm">Send Inquiry</h3>
+      <h3 className="font-semibold text-sm">发送询价</h3>
       <p className="text-xs text-muted-foreground">
-        Interested in {productName}? Fill out the form below and we will get back to you.
+        对 {productName} 感兴趣？请填写以下表单，我们将尽快与您联系。
       </p>
 
       {status === 'error' && (
@@ -114,13 +114,13 @@ export default function InquiryForm({
           required
           maxLength={100}
           className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-          placeholder="Your name"
+          placeholder="您的姓名"
         />
       </div>
 
       <div>
         <label htmlFor="inq-email" className="block text-sm font-medium mb-1">
-          Email <span className="text-red-500">*</span>
+          邮箱 <span className="text-red-500">*</span>
         </label>
         <input
           id="inq-email"
@@ -130,13 +130,13 @@ export default function InquiryForm({
           onChange={handleChange}
           required
           className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-          placeholder="your@email.com"
+          placeholder="请输入邮箱"
         />
       </div>
 
       <div>
         <label htmlFor="inq-phone" className="block text-sm font-medium mb-1">
-          Phone
+          电话
         </label>
         <input
           id="inq-phone"
@@ -152,7 +152,7 @@ export default function InquiryForm({
 
       <div>
         <label htmlFor="inq-message" className="block text-sm font-medium mb-1">
-          Message <span className="text-red-500">*</span>
+          消息 <span className="text-red-500">*</span>
         </label>
         <textarea
           id="inq-message"
@@ -163,7 +163,7 @@ export default function InquiryForm({
           maxLength={2000}
           rows={4}
           className="w-full px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-y"
-          placeholder="I am interested in this product. Please provide more details."
+          placeholder="我对该产品感兴趣，请提供更多详细信息。"
         />
       </div>
 
@@ -172,7 +172,7 @@ export default function InquiryForm({
         disabled={status === 'submitting'}
         className="w-full py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
       >
-        {status === 'submitting' ? 'Submitting...' : 'Submit Inquiry'}
+        {status === 'submitting' ? '提交中...' : '提交询价'}
       </button>
     </form>
   );

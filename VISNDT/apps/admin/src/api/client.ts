@@ -10,6 +10,24 @@ export const apiClient = axios.create({
 });
 
 /**
+ * Extract the actual error message from an axios error response.
+ * The backend wraps messages in { success, data, message, timestamp }.
+ * Falls back to the generic error message if unavailable.
+ */
+export function extractErrorMessage(err: unknown, fallback = '操作失败'): string {
+  if (err && typeof err === 'object' && 'response' in err) {
+    const axiosErr = err as { response?: { data?: { message?: string } } };
+    if (axiosErr.response?.data?.message) {
+      return axiosErr.response.data.message;
+    }
+  }
+  if (err instanceof Error) {
+    return err.message;
+  }
+  return fallback;
+}
+
+/**
  * In-memory CSRF token — fetched once on app init and reused.
  * Cookie-based fallback is less reliable through Vite proxy.
  */

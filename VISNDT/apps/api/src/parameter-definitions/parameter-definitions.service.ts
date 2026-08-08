@@ -41,7 +41,7 @@ export class ParameterDefinitionsService {
       where: { id },
       include: { group: true, options: true },
     });
-    if (!def) throw new NotFoundException(`ParameterDefinition ${id} not found`);
+    if (!def) throw new NotFoundException(`参数定义 ${id} 未找到`);
     return def;
   }
 
@@ -63,11 +63,11 @@ export class ParameterDefinitionsService {
         } 
       },
     });
-    if (!def) throw new NotFoundException(`ParameterDefinition ${id} not found`);
+    if (!def) throw new NotFoundException(`参数定义 ${id} 未找到`);
 
     if (def._count.productValues > 0 || def._count.productAssociations > 0) {
       throw new BadRequestException(
-        `Cannot delete parameter definition with ${def._count.productValues} product value(s) and ${def._count.productAssociations} product association(s). Remove associations first.`,
+        `无法删除该参数定义：参数定义关联了 ${def._count.productValues} 个产品参数值和 ${def._count.productAssociations} 个产品关联，请先移除关联后再删除。`,
       );
     }
 

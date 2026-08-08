@@ -32,7 +32,7 @@ function DemandDetailContent({ id }: { id: string }) {
       if (demandRes.status === 'fulfilled') {
         setDemand(demandRes.value);
       } else {
-        setError('Failed to load demand. It may not exist or you may not have access.');
+        setError('加载需求失败，可能不存在或无权访问。');
         return;
       }
 
@@ -40,7 +40,7 @@ function DemandDetailContent({ id }: { id: string }) {
         setMatchesCount(matchesRes.value.total || 0);
       }
     } catch {
-      setError('An unexpected error occurred.');
+      setError('发生意外错误。');
     } finally {
       setIsLoading(false);
     }
@@ -51,13 +51,13 @@ function DemandDetailContent({ id }: { id: string }) {
   }, [load]);
 
   const handleDelete = useCallback(async () => {
-    if (!window.confirm('Are you sure you want to delete this demand?')) return;
+    if (!window.confirm('确定要删除此需求吗？此操作不可撤销。')) return;
     setActionLoading('delete');
     try {
       await deleteDemand(id);
       router.push('/workspace/demands');
     } catch {
-      setError('Failed to delete demand.');
+      setError('删除需求失败。');
       setActionLoading('');
     }
   }, [id, router]);
@@ -68,7 +68,7 @@ function DemandDetailContent({ id }: { id: string }) {
       const updated = await publishDemand(id);
       setDemand(updated);
     } catch {
-      setError('Failed to publish demand.');
+      setError('发布需求失败。');
     } finally {
       setActionLoading('');
     }
@@ -80,7 +80,7 @@ function DemandDetailContent({ id }: { id: string }) {
       const updated = await closeDemand(id);
       setDemand(updated);
     } catch {
-      setError('Failed to close demand.');
+      setError('关闭需求失败。');
     } finally {
       setActionLoading('');
     }
@@ -95,13 +95,13 @@ function DemandDetailContent({ id }: { id: string }) {
       <div className="flex-1 flex flex-col min-w-0">
         <WorkspaceHeader onMenuToggle={toggleSidebar} />
         <div className="flex-1 bg-slate-50 p-6">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-[1200px] mx-auto">
             {/* Back button */}
             <button
               onClick={() => router.push('/workspace/demands')}
               className="text-sm text-slate-500 hover:text-slate-700 mb-6 flex items-center gap-1 transition-colors"
             >
-              ← Back to Demands
+              ← 返回需求列表
             </button>
 
             {isLoading ? (
@@ -123,7 +123,7 @@ function DemandDetailContent({ id }: { id: string }) {
                       onClick={() => router.push(`/workspace/demands/${id}/edit`)}
                       className="px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors"
                     >
-                      Edit
+                      编辑
                     </button>
                     {canPublish && (
                       <button
@@ -131,7 +131,7 @@ function DemandDetailContent({ id }: { id: string }) {
                         disabled={actionLoading === 'publish'}
                         className="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50 transition-colors"
                       >
-                        {actionLoading === 'publish' ? 'Publishing...' : 'Publish'}
+                        {actionLoading === 'publish' ? '发布中...' : '发布'}
                       </button>
                     )}
                     {canClose && (
@@ -140,7 +140,7 @@ function DemandDetailContent({ id }: { id: string }) {
                         disabled={actionLoading === 'close'}
                         className="px-3 py-1.5 text-xs font-medium text-white bg-orange-600 rounded-md hover:bg-orange-700 disabled:opacity-50 transition-colors"
                       >
-                        {actionLoading === 'close' ? 'Closing...' : 'Close'}
+                        {actionLoading === 'close' ? '关闭中...' : '关闭'}
                       </button>
                     )}
                     <button
@@ -148,7 +148,7 @@ function DemandDetailContent({ id }: { id: string }) {
                       disabled={actionLoading === 'delete'}
                       className="px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 border border-red-300 rounded-md hover:bg-red-100 disabled:opacity-50 transition-colors"
                     >
-                      {actionLoading === 'delete' ? 'Deleting...' : 'Delete'}
+                      {actionLoading === 'delete' ? '删除中...' : '删除'}
                     </button>
                   </div>
                 )}

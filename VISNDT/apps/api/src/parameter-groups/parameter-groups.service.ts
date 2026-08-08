@@ -40,7 +40,7 @@ export class ParameterGroupsService {
       where: { id },
       include: { definitions: true },
     });
-    if (!group) throw new NotFoundException(`ParameterGroup ${id} not found`);
+    if (!group) throw new NotFoundException(`参数组 ${id} 未找到`);
     return group;
   }
 
@@ -58,7 +58,7 @@ export class ParameterGroupsService {
       where: { id },
       include: { _count: { select: { definitions: true } } },
     });
-    if (!group) throw new NotFoundException(`ParameterGroup ${id} not found`);
+    if (!group) throw new NotFoundException(`参数组 ${id} 未找到`);
     if (group._count.definitions > 0) {
       throw new BadRequestException({
         code: 'GROUP_HAS_DEFINITIONS',

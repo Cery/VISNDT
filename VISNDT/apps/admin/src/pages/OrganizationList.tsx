@@ -219,6 +219,12 @@ function OrganizationList() {
       ),
     },
     {
+      title: '成员数',
+      key: 'members',
+      width: 100,
+      render: (_: unknown, record: Organization) => record._count?.members || 0,
+    },
+    {
       title: '创建时间',
       dataIndex: 'createdAt',
       key: 'createdAt',
@@ -258,10 +264,15 @@ function OrganizationList() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <Title level={4} style={{ margin: 0 }}>
-          组织管理
-        </Title>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+        <div>
+          <Title level={4} style={{ margin: 0 }}>
+            组织管理
+          </Title>
+          <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+            管理平台组织（采购方/供应商），组织包含多个成员用户
+          </Typography.Text>
+        </div>
         <Button
           type="primary"
           icon={<PlusOutlined />}

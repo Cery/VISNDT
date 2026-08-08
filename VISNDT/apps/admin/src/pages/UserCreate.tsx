@@ -7,7 +7,9 @@ export default function UserCreate() {
     await userService.create({
       email: data.email,
       passwordHash: data.passwordHash,
+      name: data.name || undefined,
       organizationId: data.organizationId || undefined,
+      role: data.role || undefined,
     });
   };
 

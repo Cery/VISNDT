@@ -22,8 +22,8 @@ export default function DemandDetail({ demand, matchesCount }: DemandDetailProps
               {demand.category.name}
             </span>
           )}
-          <span>Created: {new Date(demand.createdAt).toLocaleDateString()}</span>
-          <span>Updated: {new Date(demand.updatedAt).toLocaleDateString()}</span>
+          <span>创建时间: {new Date(demand.createdAt).toLocaleDateString()}</span>
+          <span>更新时间: {new Date(demand.updatedAt).toLocaleDateString()}</span>
         </div>
       </div>
 
@@ -31,7 +31,7 @@ export default function DemandDetail({ demand, matchesCount }: DemandDetailProps
       {demand.description && (
         <section>
           <h2 className="text-sm font-semibold text-slate-700 mb-2">
-            Description
+            描述
           </h2>
           <p className="text-sm text-slate-500 whitespace-pre-wrap leading-relaxed">
             {demand.description}
@@ -42,7 +42,7 @@ export default function DemandDetail({ demand, matchesCount }: DemandDetailProps
       {/* Parameters */}
       <section>
         <h2 className="text-sm font-semibold text-slate-700 mb-3">
-          Technical Parameters
+          技术参数
         </h2>
         <DemandParameters
           parameters={demand.parameters || demand.parameterValues}
@@ -52,12 +52,12 @@ export default function DemandDetail({ demand, matchesCount }: DemandDetailProps
       {/* Match Count */}
       <section>
         <h2 className="text-sm font-semibold text-slate-700 mb-2">
-          Product Matches
+          产品匹配
         </h2>
         <div className="rounded-lg border border-slate-200 bg-white p-4">
           <p className="text-2xl font-bold text-slate-900">{matchesCount}</p>
           <p className="text-xs text-slate-400 mt-1">
-            Matching products found for this demand
+            此需求匹配到的产品
           </p>
         </div>
       </section>

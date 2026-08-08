@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Table, Button, Spin, Alert, Typography, Input, Space, message, Modal } from 'antd';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
+import type { SorterResult } from 'antd/es/table/interface';
 import { parameterGroupService } from '../../api/parameter-group.service';
 import type { ParameterGroup } from '../../types/parameter.types';
 import BatchOperations from '../../components/BatchOperations';
@@ -19,6 +20,8 @@ interface QueryParams {
   page: number;
   pageSize: number;
   keyword: string;
+  sortBy: string;
+  sortOrder: string;
 }
 
 function ParameterGroupList() {
@@ -30,6 +33,8 @@ function ParameterGroupList() {
     page: 1,
     pageSize: 20,
     keyword: '',
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
   });
 
   const fetchData = useCallback(async () => {
@@ -61,11 +66,18 @@ function ParameterGroupList() {
   }, [fetchData]);
 
   const handleTableChange = useCallback(
-    (pagination: TablePaginationConfig) => {
+    (
+      pagination: TablePaginationConfig,
+      _filters: Record<string, unknown>,
+      sorter: SorterResult<ParameterGroup> | SorterResult<ParameterGroup>[],
+    ) => {
+      const singleSorter = Array.isArray(sorter) ? sorter[0] : sorter;
       setQuery((prev) => ({
         ...prev,
         page: pagination.current || 1,
         pageSize: pagination.pageSize || 20,
+        sortBy: (singleSorter.field as string) || prev.sortBy,
+        sortOrder: singleSorter.order === 'ascend' ? 'asc' : 'desc',
       }));
     },
     [],
@@ -76,7 +88,7 @@ function ParameterGroupList() {
   }, []);
 
   const handleReset = useCallback(() => {
-    setQuery({ page: 1, pageSize: 20, keyword: '' });
+    setQuery({ page: 1, pageSize: 20, keyword: '', sortBy: 'createdAt', sortOrder: 'desc' });
   }, []);
 
   const handleDelete = useCallback((id: string) => {
@@ -153,8 +165,10 @@ function ParameterGroupList() {
       title: '名称',
       dataIndex: 'name',
       key: 'name',
-      render: (name: string) => (
-        <span style={{ fontWeight: 500 }}>{name}</span>
+      render: (name: string, record: ParameterGroup) => (
+        <Button type="link" style={{ padding: 0, fontWeight: 500 }} onClick={() => navigate(`/parameter-groups/${record.id}`)}>
+          {name}
+        </Button>
       ),
     },
     {
@@ -174,6 +188,13 @@ function ParameterGroupList() {
       dataIndex: 'createdAt',
       key: 'createdAt',
       width: 160,
+      sorter: true,
+      sortOrder:
+        query.sortBy === 'createdAt'
+          ? query.sortOrder === 'asc'
+            ? 'ascend'
+            : 'descend'
+          : undefined,
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
     {
@@ -210,9 +231,14 @@ function ParameterGroupList() {
           marginBottom: 16,
         }}
       >
-        <Title level={4} style={{ margin: 0 }}>
-          参数组管理
-        </Title>
+        <div>
+          <Title level={4} style={{ margin: 0 }}>
+            参数组管理
+          </Title>
+          <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+            管理产品参数分组，每个参数组包含多个参数定义
+          </Typography.Text>
+        </div>
         <Button
           type="primary"
           icon={<PlusOutlined />}

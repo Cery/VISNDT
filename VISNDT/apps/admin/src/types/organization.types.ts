@@ -7,6 +7,11 @@ export interface OrganizationMember {
   role: string;
   createdAt: string;
   updatedAt: string;
+  user?: {
+    id: string;
+    email: string;
+    name?: string | null;
+  };
 }
 
 export interface OrganizationFormData {
@@ -23,6 +28,7 @@ export interface Organization {
   createdAt: string;
   updatedAt: string;
   members?: OrganizationMember[];
+  _count?: { members: number };
 }
 
 export interface OrganizationListResponse {

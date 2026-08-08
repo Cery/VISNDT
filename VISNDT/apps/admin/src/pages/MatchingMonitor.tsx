@@ -1,13 +1,15 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Card, Statistic, Row, Col, Spin, Alert, Typography, Button } from 'antd';
+import { Card, Statistic, Row, Col, Spin, Alert, Typography, Button, Space } from 'antd';
 import {
   LinkOutlined,
   InfoCircleOutlined,
   PercentageOutlined,
   StopOutlined,
   SyncOutlined,
+  UnorderedListOutlined,
 } from '@ant-design/icons';
 import { matchService } from '../api';
+import { useNavigate } from 'react-router-dom';
 import type { MatchingStats } from '../types';
 
 const { Title, Paragraph } = Typography;
@@ -18,6 +20,7 @@ type PageState =
   | { status: 'success'; stats: MatchingStats };
 
 function MatchingMonitor() {
+  const navigate = useNavigate();
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
 
   const fetchStats = useCallback(async () => {
@@ -120,9 +123,24 @@ function MatchingMonitor() {
           <InfoCircleOutlined style={{ marginRight: 8, color: '#1890ff' }} />
           匹配引擎已与需求工作流集成。
         </Paragraph>
-        <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+        <Paragraph type="secondary" style={{ marginBottom: 12 }}>
           如需查看详细的匹配信息，请检查各个需求详情页面。每个需求页面会展示其匹配的产品、匹配度和匹配状态。
         </Paragraph>
+        <Space>
+          <Button
+            type="primary"
+            icon={<UnorderedListOutlined />}
+            onClick={() => navigate('/demands')}
+          >
+            查看需求列表
+          </Button>
+          <Button
+            icon={<LinkOutlined />}
+            onClick={() => navigate('/products')}
+          >
+            查看产品列表
+          </Button>
+        </Space>
       </Card>
     </div>
   );

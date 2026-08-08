@@ -41,7 +41,7 @@ export class OffersService {
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
-        include: { organization: true, product: true },
+        include: { organization: true, product: true, createdByUser: { select: { id: true, email: true, name: true } } },
       }),
       this.prisma.offer.count({ where }),
     ]);
@@ -52,7 +52,7 @@ export class OffersService {
   async findOne(id: string) {
     const offer = await this.prisma.offer.findUnique({
       where: { id },
-      include: { organization: true, product: true },
+      include: { organization: true, product: true, createdByUser: { select: { id: true, email: true, name: true } } },
     });
     if (!offer) throw new NotFoundException(`Offer ${id} not found`);
     return offer;
@@ -72,6 +72,7 @@ export class OffersService {
       data: {
         ...dto,
         organizationId: user.organizationId,
+        createdBy: user.id,
       },
     });
 

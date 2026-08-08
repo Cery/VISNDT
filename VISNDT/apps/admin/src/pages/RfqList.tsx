@@ -269,9 +269,12 @@ function RfqList() {
 
   return (
     <div>
-      <Title level={4} style={{ marginBottom: 16 }}>
-        询价管理
+      <Title level={4} style={{ marginBottom: 4 }}>
+        RFQ管理
       </Title>
+      <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16, fontSize: 13 }}>
+        管理报价请求（Request for Quotation），RFQ基于需求生成，用于向供应商征求报价
+      </Typography.Text>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search

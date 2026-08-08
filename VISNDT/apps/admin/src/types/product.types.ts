@@ -12,6 +12,15 @@ export interface Product {
     name: string;
     slug: string;
   };
+  createdBy?: {
+    id: string;
+    name?: string | null;
+    email: string;
+    organization?: {
+      id: string;
+      name: string;
+    } | null;
+  } | null;
 }
 
 export interface ProductListResponse {

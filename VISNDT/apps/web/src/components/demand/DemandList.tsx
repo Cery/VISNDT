@@ -75,7 +75,7 @@ export default function DemandList({ demands, isLoading }: DemandListProps) {
             )}
             {demand.quantity != null && (
               <span>
-                Qty: {demand.quantity}{demand.quantityUnit ? ` ${demand.quantityUnit}` : ''}
+                数量: {demand.quantity}{demand.quantityUnit ? ` ${demand.quantityUnit}` : ''}
               </span>
             )}
             <span>{new Date(demand.createdAt).toLocaleDateString()}</span>

@@ -43,10 +43,16 @@ const STATUS_LABEL_MAP: Record<string, string> = {
 
 const MEMBER_COLUMNS: ColumnsType<OrganizationMember> = [
   {
-    title: '用户ID',
-    dataIndex: 'userId',
-    key: 'userId',
-    ellipsis: true,
+    title: '姓名',
+    dataIndex: 'user',
+    key: 'user',
+    render: (user: OrganizationMember['user']) => user?.name || user?.email || '-',
+  },
+  {
+    title: '邮箱',
+    dataIndex: 'user',
+    key: 'email',
+    render: (user: OrganizationMember['user']) => user?.email || '-',
   },
   {
     title: '角色',

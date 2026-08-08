@@ -24,6 +24,12 @@ export interface Offer {
     model?: string;
     status?: string;
   };
+
+  createdByUser?: {
+    id: string;
+    email: string;
+    name?: string | null;
+  };
 }
 
 export interface OfferListResponse {

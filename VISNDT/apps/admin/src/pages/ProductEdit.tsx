@@ -41,6 +41,7 @@ export default function ProductEdit() {
       description: formData.description,
       status: formData.status,
     });
+    return { id };
   };
 
   if (pageState.status === 'loading') {
@@ -84,6 +85,7 @@ export default function ProductEdit() {
       onSubmit={handleSubmit}
       submitLabel="更新产品"
       title="编辑产品"
+      productId={id}
     />
   );
 }

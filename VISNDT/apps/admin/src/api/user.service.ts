@@ -28,7 +28,9 @@ export const userService = {
   async create(data: {
     email: string;
     passwordHash: string;
+    name?: string;
     organizationId?: string;
+    role?: string;
   }): Promise<User> {
     const response = (await apiClient.post('/users', data)) as unknown as ApiResponseWrapper<User>;
     return response.data;

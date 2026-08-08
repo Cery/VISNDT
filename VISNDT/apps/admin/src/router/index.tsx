@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { RequireAuth } from '../auth';
 import AdminLayout from '../layouts/AdminLayout';
-import { DemandDetail, DemandList, FileAssetOrphanList, Home, InquiryDetail, InquiryList, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ParameterDefinitionCreate, ParameterDefinitionEdit, ParameterDefinitionList, ParameterGroupCreate, ParameterGroupEdit, ParameterGroupList, ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList, ProductCreate, ProductDetail, ProductEdit, ProductList, ProductMediaCreate, ProductMediaEdit, ProductMediaList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, AuditLogList, UserCreate, UserDetail, UserEdit, UserList } from '../pages';
+import { DemandDetail, DemandEdit, DemandList, FileAssetOrphanList, Home, InquiryDetail, InquiryList, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ParameterDefinitionCreate, ParameterDefinitionDetail, ParameterDefinitionEdit, ParameterDefinitionList, ParameterGroupCreate, ParameterGroupDetail, ParameterGroupEdit, ParameterGroupList, ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList, ProductCreate, ProductDetail, ProductEdit, ProductList, ProductMediaCreate, ProductMediaEdit, ProductMediaList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, AuditLogList, UserCreate, UserDetail, UserEdit, UserList } from '../pages';
 
 const router = createBrowserRouter([
   {
@@ -27,6 +27,7 @@ const router = createBrowserRouter([
       { path: 'products/:productId/media/:id/edit', element: <ProductMediaEdit /> },
       { path: 'demands', element: <DemandList /> },
       { path: 'demands/:id', element: <DemandDetail /> },
+      { path: 'demands/:id/edit', element: <DemandEdit /> },
       { path: 'demands/:demandId/matches/:matchId', element: <MatchDetail /> },
       { path: 'matching', element: <MatchingMonitor /> },
       { path: 'users', element: <UserList /> },
@@ -49,9 +50,11 @@ const router = createBrowserRouter([
       { path: 'inquiries/:id', element: <InquiryDetail /> },
       { path: 'parameter-groups', element: <ParameterGroupList /> },
       { path: 'parameter-groups/create', element: <ParameterGroupCreate /> },
+      { path: 'parameter-groups/:id', element: <ParameterGroupDetail /> },
       { path: 'parameter-groups/:id/edit', element: <ParameterGroupEdit /> },
       { path: 'parameter-definitions', element: <ParameterDefinitionList /> },
       { path: 'parameter-definitions/create', element: <ParameterDefinitionCreate /> },
+      { path: 'parameter-definitions/:id', element: <ParameterDefinitionDetail /> },
       { path: 'parameter-definitions/:id/edit', element: <ParameterDefinitionEdit /> },
       { path: 'product-categories', element: <ProductCategoryList /> },
       { path: 'product-categories/create', element: <ProductCategoryCreate /> },
