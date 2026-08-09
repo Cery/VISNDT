@@ -3,6 +3,7 @@
 import { useEffect, useState, use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import AuthGuard from '@/auth/AuthGuard';
+import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
 import DemandDetail from '@/components/demand/DemandDetail';
@@ -171,7 +172,9 @@ export default function DemandDetailPage({
 
   return (
     <AuthGuard>
-      <DemandDetailContent id={id} />
+      <RoleGuard roles={['BUYER']}>
+        <DemandDetailContent id={id} />
+      </RoleGuard>
     </AuthGuard>
   );
 }

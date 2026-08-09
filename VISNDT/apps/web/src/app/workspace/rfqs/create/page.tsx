@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import AuthGuard from '@/auth/AuthGuard';
+import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
 import { getMyDemands } from '@/lib/api/demands';
@@ -12,7 +13,9 @@ import { createRfq } from '@/lib/api/rfqs';
 export default function RfqCreatePage() {
   return (
     <AuthGuard>
-      <RfqCreateContent />
+      <RoleGuard roles={['BUYER']}>
+        <RfqCreateContent />
+      </RoleGuard>
     </AuthGuard>
   );
 }

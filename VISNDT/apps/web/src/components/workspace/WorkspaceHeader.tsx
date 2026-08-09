@@ -8,6 +8,12 @@ interface WorkspaceHeaderProps {
 
 export default function WorkspaceHeader({ onMenuToggle }: WorkspaceHeaderProps) {
   const { user, logout } = useAuth();
+  const hasOrganizationWorkspace = Boolean(
+    user
+    && user.organization
+    && user.organizationMember
+    && user.workspaceRole,
+  );
 
   return (
     <header className="h-14 border-b border-slate-200 bg-white flex items-center justify-between px-4 md:px-6 flex-shrink-0">
@@ -23,7 +29,7 @@ export default function WorkspaceHeader({ onMenuToggle }: WorkspaceHeaderProps) 
           </svg>
         </button>
         <h1 className="text-sm font-semibold text-slate-700">
-          {user?.organizationId ? '组织工作区' : '个人工作区'}
+          {hasOrganizationWorkspace ? '组织工作区' : '个人工作区'}
         </h1>
       </div>
       <div className="flex items-center gap-4">

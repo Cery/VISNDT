@@ -3,16 +3,35 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/auth/AuthProvider';
 import { getUnreadCount } from '@/lib/api/notifications';
+import type { WorkspaceRole } from '@/services/auth.service';
 
-const NAV_ITEMS = [
-  { label: '仪表盘', href: '/dashboard', icon: '📊' },
-  { label: '我的需求', href: '/workspace/demands', icon: '📋' },
-  { label: '询价单', href: '/workspace/rfqs', icon: '📄' },
-  { label: '匹配结果', href: '/workspace/matches', icon: '🔗' },
-  { label: '通知中心', href: '/workspace/notifications', icon: '🔔' },
-  { label: '设置', href: '/workspace/settings', icon: '⚙️' },
-];
+type NavigableWorkspaceRole = Exclude<WorkspaceRole, null>;
+
+interface NavItem {
+  label: string;
+  href: string;
+  icon: string;
+}
+
+const NAV_CONFIG: Record<NavigableWorkspaceRole, NavItem[]> = {
+  BUYER: [
+    { label: '仪表盘', href: '/dashboard', icon: '📊' },
+    { label: '我的需求', href: '/workspace/demands', icon: '📋' },
+    { label: '询价单', href: '/workspace/rfqs', icon: '📄' },
+    { label: '匹配结果', href: '/workspace/matches', icon: '🔗' },
+    { label: '通知中心', href: '/workspace/notifications', icon: '🔔' },
+    { label: '设置', href: '/workspace/settings', icon: '⚙️' },
+  ],
+  SUPPLIER: [
+    { label: '供应商工作台', href: '/workspace/supplier', icon: '🏭' },
+    { label: 'RFQ响应', href: '/workspace/supplier/rfqs', icon: '📄' },
+    { label: '我的响应', href: '/workspace/supplier/responses', icon: '📨' },
+    { label: '通知中心', href: '/workspace/notifications', icon: '🔔' },
+    { label: '设置', href: '/workspace/settings', icon: '⚙️' },
+  ],
+};
 
 interface WorkspaceSidebarProps {
   mobileOpen?: boolean;
@@ -21,7 +40,10 @@ interface WorkspaceSidebarProps {
 
 export default function WorkspaceSidebar({ mobileOpen, onClose }: WorkspaceSidebarProps) {
   const pathname = usePathname();
+  const { user, isLoading } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
+  const workspaceRole = user ? user.workspaceRole : null;
+  const navItems = workspaceRole ? NAV_CONFIG[workspaceRole] : [];
 
   useEffect(() => {
     async function loadUnreadCount() {
@@ -35,10 +57,15 @@ export default function WorkspaceSidebar({ mobileOpen, onClose }: WorkspaceSideb
     loadUnreadCount();
   }, []);
 
-  const isActive = (href: string) => {
-    if (href === '/dashboard') return pathname === '/dashboard';
-    return pathname.startsWith(href);
-  };
+  const activeHref = navItems.reduce<string>((matchedHref, item) => {
+    const matches = pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+    if (!matches) {
+      return matchedHref;
+    }
+
+    return item.href.length > matchedHref.length ? item.href : matchedHref;
+  }, '');
 
   return (
     <>
@@ -65,8 +92,12 @@ export default function WorkspaceSidebar({ mobileOpen, onClose }: WorkspaceSideb
             工作区
           </Link>
           <nav className="space-y-1">
-            {NAV_ITEMS.map((item) => {
-              const active = isActive(item.href);
+            {isLoading && <p className="px-3 py-2 text-sm text-slate-400">加载中...</p>}
+            {!isLoading && !workspaceRole && (
+              <p className="px-3 py-2 text-sm text-slate-400">当前账号未映射到可用工作区</p>
+            )}
+            {!isLoading && workspaceRole && navItems.map((item) => {
+              const active = activeHref === item.href;
               const isNotification = item.href === '/workspace/notifications';
               return (
                 <Link

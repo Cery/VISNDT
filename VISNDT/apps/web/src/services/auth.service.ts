@@ -8,11 +8,26 @@ import { apiClient } from '@/lib/api-client';
 
 // --- Types ---
 
+export type WorkspaceRole = 'SUPPLIER' | 'BUYER' | null;
+
+export interface AuthOrganization {
+  id: string;
+  name: string;
+  type: string;
+}
+
+export interface AuthOrganizationMember {
+  role: string;
+}
+
 export interface AuthUser {
   id: string;
   email: string;
   name?: string | null;
   organizationId?: string | null;
+  organization: AuthOrganization | null;
+  organizationMember: AuthOrganizationMember | null;
+  workspaceRole: WorkspaceRole;
 }
 
 export interface AuthResponse {

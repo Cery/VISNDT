@@ -1,5 +1,17 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { RFQResponseStatus, NotificationType } from '@prisma/client';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ConflictException,
+} from '@nestjs/common';
+import {
+  RFQResponseStatus,
+  NotificationType,
+  RFQStatus,
+  OrganizationStatus,
+  UserStatus,
+  Prisma,
+} from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRfqResponseDto } from './dto/create-rfq-response.dto';
 import { UpdateRfqResponseDto } from './dto/update-rfq-response.dto';
@@ -47,17 +59,33 @@ export class RfqResponsesService {
     return response;
   }
 
-  async findMine(organizationId: string) {
+  async findMine(organizationId: string, page = 1, pageSize = 20) {
+    const skip = (page - 1) * pageSize;
     const [data, total] = await Promise.all([
       this.prisma.rFQResponse.findMany({
         where: { organizationId },
+        skip,
+        take: pageSize,
         orderBy: { createdAt: 'desc' },
-        include: { rfq: true, organization: true, offer: true },
+        include: {
+          rfq: {
+            include: {
+              demand: {
+                select: {
+                  id: true,
+                  title: true,
+                },
+              },
+            },
+          },
+          organization: true,
+          offer: true,
+        },
       }),
       this.prisma.rFQResponse.count({ where: { organizationId } }),
     ]);
 
-    return { data, total };
+    return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
   }
 
   async create(
@@ -70,22 +98,121 @@ export class RfqResponsesService {
         'User must belong to an organization to respond to an RFQ',
       );
     }
+    const organizationId = user.organizationId;
 
-    const response = await this.prisma.rFQResponse.create({
-      data: {
-        rfqId,
-        organizationId: user.organizationId,
-        offerId: dto.offerId,
-        message: dto.message,
+    const membership = await this.prisma.organizationMember.findUnique({
+      where: {
+        organizationId_userId: {
+          organizationId,
+          userId: user.id,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            status: true,
+          },
+        },
+        organization: {
+          select: {
+            status: true,
+          },
+        },
       },
     });
 
+    if (
+      !membership ||
+      membership.user.status !== UserStatus.ACTIVE ||
+      membership.organization.status !== OrganizationStatus.ACTIVE
+    ) {
+      throw new BadRequestException(
+        'Current user must be an active organization member to respond to an RFQ',
+      );
+    }
+
+    const [rfq, existingResponse, offer] = await Promise.all([
+      this.prisma.rFQ.findUnique({
+        where: { id: rfqId },
+        select: {
+          id: true,
+          status: true,
+          publishedAt: true,
+          createdBy: true,
+        },
+      }),
+      this.prisma.rFQResponse.findUnique({
+        where: {
+          rfqId_organizationId: {
+            rfqId,
+            organizationId,
+          },
+        },
+        select: { id: true },
+      }),
+      dto.offerId
+        ? this.prisma.offer.findUnique({
+            where: { id: dto.offerId },
+            select: {
+              id: true,
+              organizationId: true,
+            },
+          })
+        : Promise.resolve(null),
+    ]);
+
+    if (!rfq) {
+      throw new NotFoundException(`RFQ ${rfqId} not found`);
+    }
+
+    // In the current RFQ workflow, OPEN is the published state exposed to suppliers.
+    if (rfq.status !== RFQStatus.OPEN || !rfq.publishedAt) {
+      throw new BadRequestException(
+        'Only published RFQs can receive responses',
+      );
+    }
+
+    if (existingResponse) {
+      throw new ConflictException(
+        'Your organization has already submitted a response to this RFQ',
+      );
+    }
+
+    if (dto.offerId && !offer) {
+      throw new NotFoundException(`Offer ${dto.offerId} not found`);
+    }
+
+    if (offer && offer.organizationId !== organizationId) {
+      throw new BadRequestException(
+        'Offer must belong to the current user organization',
+      );
+    }
+
+    const response = await (async () => {
+      try {
+        return await this.prisma.rFQResponse.create({
+          data: {
+            rfqId,
+            organizationId,
+            offerId: dto.offerId,
+            message: dto.message,
+          },
+        });
+      } catch (error) {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === 'P2002'
+        ) {
+          throw new ConflictException(
+            'Your organization has already submitted a response to this RFQ',
+          );
+        }
+        throw error;
+      }
+    })();
+
     // E3: RFQ Response Submitted — notify the RFQ creator
     try {
-      const rfq = await this.prisma.rFQ.findUnique({
-        where: { id: rfqId },
-        select: { createdBy: true },
-      });
       if (rfq) {
         await this.notificationsService.create({
           userId: rfq.createdBy,

@@ -34,8 +34,11 @@ export class NotificationsController {
 
   @Post('batch-delete')
   @ApiOperation({ summary: 'Batch delete notifications' })
-  async batchDelete(@Body() dto: BatchDeleteDto) {
-    const result = await this.notificationsService.batchDelete(dto.ids);
+  async batchDelete(
+    @Body() dto: BatchDeleteDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    const result = await this.notificationsService.batchDelete(dto.ids, user);
     return ApiResponse.ok(result, 'Notifications deleted');
   }
 

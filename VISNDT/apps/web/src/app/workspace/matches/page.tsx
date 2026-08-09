@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import AuthGuard from '@/auth/AuthGuard';
+import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
 import MatchList from '@/components/match/MatchList';
@@ -165,7 +166,9 @@ function MatchesContent() {
 export default function MatchesPage() {
   return (
     <AuthGuard>
-      <MatchesContent />
+      <RoleGuard roles={['BUYER']}>
+        <MatchesContent />
+      </RoleGuard>
     </AuthGuard>
   );
 }

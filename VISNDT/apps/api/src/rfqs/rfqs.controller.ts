@@ -26,10 +26,18 @@ export class RfqsController {
     return ApiResponse.ok(await this.service.findAll(params));
   }
 
+  @Get('available')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List available RFQs for supplier to quote (OPEN / RESPONDING, paginated)' })
+  async findAvailable(@Query() params: SearchParamsDto) {
+    return ApiResponse.ok(await this.service.findAvailable(params));
+  }
+
   @Get('mine')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get RFQs for current supplier organization (paginated)' })
+  @ApiOperation({ summary: 'Get RFQs published by current buyer organization (paginated)' })
   async findMine(
     @CurrentUser() user: AuthRequest['user'],
     @Query() pagination: PaginationDto,

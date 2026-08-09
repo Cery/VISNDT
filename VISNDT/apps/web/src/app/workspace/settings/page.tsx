@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import AuthGuard from '@/auth/AuthGuard';
+import RoleGuard from '@/auth/RoleGuard';
 import { useAuth } from '@/auth/AuthProvider';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
@@ -12,6 +13,12 @@ function SettingsContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
+  const hasOrganizationWorkspace = Boolean(
+    user
+    && user.organization
+    && user.organizationMember
+    && user.workspaceRole,
+  );
 
   const [editName, setEditName] = useState(false);
   const [nameValue, setNameValue] = useState(user?.name || '');
@@ -147,8 +154,8 @@ function SettingsContent() {
               <div className="flex items-center justify-between px-5 py-3.5">
                 <span className="text-sm text-slate-500">组织</span>
                 <span className="text-sm font-medium text-slate-900">
-                  {user?.organizationId
-                    ? `已激活 (${user.organizationId.slice(0, 8)}…)`
+                  {hasOrganizationWorkspace && user?.organization
+                    ? `已激活 (${user.organization.id.slice(0, 8)}…)`
                     : '未加入'}
                 </span>
               </div>
@@ -244,7 +251,9 @@ function SettingsContent() {
 export default function SettingsPage() {
   return (
     <AuthGuard>
-      <SettingsContent />
+      <RoleGuard roles={['BUYER', 'SUPPLIER']}>
+        <SettingsContent />
+      </RoleGuard>
     </AuthGuard>
   );
 }

@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import AuthGuard from '@/auth/AuthGuard';
+import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
 import { createDemand } from '@/lib/api/demands';
@@ -11,7 +12,9 @@ import { createDemand } from '@/lib/api/demands';
 export default function DemandCreatePage() {
   return (
     <AuthGuard>
-      <DemandCreateContent />
+      <RoleGuard roles={['BUYER']}>
+        <DemandCreateContent />
+      </RoleGuard>
     </AuthGuard>
   );
 }

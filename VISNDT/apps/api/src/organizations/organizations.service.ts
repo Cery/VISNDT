@@ -55,7 +55,9 @@ export class OrganizationsService {
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
-        _count: { select: { members: true } },
+        include: {
+          _count: { select: { members: true } },
+        },
       }),
       this.prisma.organization.count({ where }),
     ]);

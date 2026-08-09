@@ -3,6 +3,7 @@
 import { useEffect, useState, use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import AuthGuard from '@/auth/AuthGuard';
+import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
 import RFQDetail from '@/components/rfq/RFQDetail';
@@ -179,7 +180,9 @@ export default function RfqDetailPage({
 
   return (
     <AuthGuard>
-      <RfqDetailContent id={id} />
+      <RoleGuard roles={['BUYER']}>
+        <RfqDetailContent id={id} />
+      </RoleGuard>
     </AuthGuard>
   );
 }

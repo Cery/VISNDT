@@ -231,9 +231,25 @@ export class NotificationsService {
     });
   }
 
-  async batchDelete(ids: string[]) {
+  async batchDelete(ids: string[], requestUser: RequestUser) {
+    const uniqueIds = [...new Set(ids)];
+    const notifications = await this.prisma.notification.findMany({
+      where: { id: { in: uniqueIds } },
+      include: { user: { select: { id: true, organizationId: true } } },
+    });
+
+    if (notifications.length !== uniqueIds.length) {
+      const foundIds = new Set(notifications.map((notification) => notification.id));
+      const missingId = uniqueIds.find((id) => !foundIds.has(id));
+      throw new NotFoundException(`Notification ${missingId} not found`);
+    }
+
+    for (const notification of notifications) {
+      await this.validateAccess(notification, requestUser);
+    }
+
     const result = await this.prisma.notification.deleteMany({
-      where: { id: { in: ids } },
+      where: { id: { in: uniqueIds } },
     });
     return { deletedCount: result.count };
   }

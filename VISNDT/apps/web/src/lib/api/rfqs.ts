@@ -1,6 +1,13 @@
 import { apiClient } from '../api-client';
 import type { ApiResponse, PaginatedResponse } from '@/types/api';
 
+export interface RfqDemandSummary {
+  id: string;
+  title: string;
+  description?: string | null;
+  organizationId: string;
+}
+
 export interface RfqItem {
   id: string;
   title: string;
@@ -12,11 +19,20 @@ export interface RfqItem {
   closedAt?: string | null;
   createdAt: string;
   updatedAt: string;
+  demand?: RfqDemandSummary | null;
+  createdByUser?: { id: string; name?: string | null; email: string } | null;
 }
 
-export interface RfqDetailItem extends RfqItem {
-  demand?: { id: string; title: string } | null;
-  createdByUser?: { id: string; name?: string | null; email: string } | null;
+export type RfqDetailItem = RfqItem;
+
+export interface AvailableRfqItem {
+  id: string;
+  status: string;
+  publishedAt?: string | null;
+  closedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  demand: RfqDemandSummary;
 }
 
 export interface RfqResponseItem {
@@ -25,12 +41,54 @@ export interface RfqResponseItem {
   organizationId: string;
   status: string;
   offerId?: string | null;
+  message?: string | null;
   createdAt: string;
   updatedAt: string;
+  rfq?: {
+    id: string;
+    status?: string;
+    demand?: {
+      id: string;
+      title: string;
+    } | null;
+  } | null;
+  organization?: {
+    id: string;
+    name?: string;
+  } | null;
+  offer?: {
+    id: string;
+    organizationId: string;
+    productId: string;
+    createdBy?: string | null;
+    title: string;
+    description?: string | null;
+    price?: string | number | null;
+    currency?: string | null;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+  } | null;
 }
 
 /**
- * Get RFQs for current supplier organization.
+ * List available RFQs for supplier to quote.
+ * GET /rfqs/available (JWT)
+ * Default statuses: OPEN + RESPONDING
+ */
+export async function getAvailableRfqs(
+  params: { page?: number; pageSize?: number; keyword?: string; status?: string } = {},
+): Promise<PaginatedResponse<AvailableRfqItem>> {
+  const { page = 1, pageSize = 20, keyword, status } = params;
+  const res = await apiClient<ApiResponse<PaginatedResponse<AvailableRfqItem>>>(
+    '/rfqs/available',
+    { params: { page, pageSize, ...(keyword ? { keyword } : {}), ...(status ? { status } : {}) } },
+  );
+  return res.data;
+}
+
+/**
+ * Get RFQs published by current buyer organization.
  * GET /rfqs/mine (JWT)
  */
 export async function getMyRfqs(
@@ -133,5 +191,25 @@ export async function getMyRfqResponses(
     '/rfq-responses/mine',
     { params: { page, pageSize } },
   );
+  return res.data;
+}
+
+export interface CreateRfqResponseParams {
+  offerId?: string;
+  message?: string;
+}
+
+/**
+ * Create a supplier response to an RFQ.
+ * POST /rfqs/:id/responses (JWT)
+ */
+export async function createRfqResponse(
+  rfqId: string,
+  params: CreateRfqResponseParams,
+): Promise<RfqResponseItem> {
+  const res = await apiClient<ApiResponse<RfqResponseItem>>(`/rfqs/${rfqId}/responses`, {
+    method: 'POST',
+    body: JSON.stringify(params),
+  });
   return res.data;
 }

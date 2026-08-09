@@ -77,6 +77,48 @@ export class RfqsService {
     return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
   }
 
+  async findAvailable(params: SearchParamsDto) {
+    const { page = 1, pageSize = 20, keyword, status } = params;
+    const skip = (page - 1) * pageSize;
+
+    const where: Prisma.RFQWhereInput = {
+      status: {
+        in: status
+          ? ([status] as RFQStatus[])
+          : [RFQStatus.OPEN, RFQStatus.RESPONDING],
+      },
+    };
+    if (keyword) {
+      where.demand = {
+        title: { contains: keyword },
+      };
+    } else if (!where.demand) {
+      where.demand = {};
+    }
+
+    const [data, total] = await Promise.all([
+      this.prisma.rFQ.findMany({
+        where,
+        skip,
+        take: pageSize,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          demand: {
+            select: {
+              id: true,
+              title: true,
+              description: true,
+              organizationId: true,
+            },
+          },
+        },
+      }),
+      this.prisma.rFQ.count({ where }),
+    ]);
+
+    return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
+  }
+
   async findOne(id: string) {
     const rfq = await this.prisma.rFQ.findUnique({
       where: { id },

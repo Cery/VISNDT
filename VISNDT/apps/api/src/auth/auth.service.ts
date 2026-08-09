@@ -13,6 +13,24 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 
+type WorkspaceRole = 'SUPPLIER' | 'BUYER' | null;
+
+interface AuthUserContext {
+  id: string;
+  email: string;
+  name: string | null;
+  organizationId: string | null;
+  organization: {
+    id: string;
+    name: string;
+    type: string;
+  } | null;
+  organizationMember: {
+    role: string;
+  } | null;
+  workspaceRole: WorkspaceRole;
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -75,16 +93,12 @@ export class AuthService {
     });
 
     const refreshToken = await this.refreshTokenService.createRefreshToken(user.id);
+    const authUser = await this.buildAuthUser(user.id);
 
     return {
       accessToken,
       refreshToken,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        organizationId: user.organizationId,
-      },
+      user: authUser!,
     };
   }
 
@@ -110,16 +124,12 @@ export class AuthService {
     });
 
     const refreshToken = await this.refreshTokenService.createRefreshToken(user.id);
+    const authUser = await this.buildAuthUser(user.id);
 
     return {
       accessToken,
       refreshToken,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        organizationId: user.organizationId,
-      },
+      user: authUser!,
     };
   }
 
@@ -143,16 +153,12 @@ export class AuthService {
     });
 
     const refreshToken = await this.refreshTokenService.createRefreshToken(user.id);
+    const authUser = await this.buildAuthUser(user.id);
 
     return {
       accessToken,
       refreshToken,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        organizationId: user.organizationId,
-      },
+      user: authUser!,
     };
   }
 
@@ -168,19 +174,91 @@ export class AuthService {
   async validateUser(payload: JwtPayload) {
     const user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
+      select: { id: true },
     });
+    if (!user) return null;
+
+    return this.buildAuthUser(payload.sub);
+  }
+
+  private generateToken(payload: JwtPayload): string {
+    return this.jwtService.sign(payload);
+  }
+
+  private async buildAuthUser(userId: string): Promise<AuthUserContext | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        organizationId: true,
+        organization: {
+          select: {
+            id: true,
+            name: true,
+            type: true,
+          },
+        },
+      },
+    });
+
     if (!user) {
       return null;
     }
+
+    const organizationMember = user.organizationId
+      ? await this.prisma.organizationMember.findUnique({
+          where: {
+            organizationId_userId: {
+              organizationId: user.organizationId,
+              userId: user.id,
+            },
+          },
+          select: {
+            role: true,
+          },
+        })
+      : null;
+
     return {
       id: user.id,
       email: user.email,
       name: user.name,
       organizationId: user.organizationId,
+      organization: user.organization
+        ? {
+            id: user.organization.id,
+            name: user.organization.name,
+            type: user.organization.type,
+          }
+        : null,
+      organizationMember: organizationMember
+        ? {
+            role: organizationMember.role,
+          }
+        : null,
+      workspaceRole: this.resolveWorkspaceRole(user.organization?.type ?? null),
     };
   }
 
-  private generateToken(payload: JwtPayload): string {
-    return this.jwtService.sign(payload);
+  private resolveWorkspaceRole(organizationType: string | null): WorkspaceRole {
+    if (!organizationType) {
+      return null;
+    }
+
+    if (
+      organizationType === 'SUPPLIER' ||
+      organizationType === 'MANUFACTURER' ||
+      organizationType === 'DISTRIBUTOR'
+    ) {
+      return 'SUPPLIER';
+    }
+
+    if (organizationType === 'BUYER') {
+      return 'BUYER';
+    }
+
+    return null;
   }
 }

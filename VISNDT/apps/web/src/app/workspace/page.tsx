@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import AuthGuard from '@/auth/AuthGuard';
+import RoleGuard from '@/auth/RoleGuard';
 import { useAuth } from '@/auth/AuthProvider';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
@@ -19,6 +20,12 @@ function WorkspaceContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
+  const hasOrganizationWorkspace = Boolean(
+    user
+    && user.organization
+    && user.organizationMember
+    && user.workspaceRole,
+  );
   const [demands, setDemands] = useState<DemandItem[]>([]);
   const [rfqs, setRfqs] = useState<RfqItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,7 +63,7 @@ function WorkspaceContent() {
             {/* Welcome */}
             <div>
               <h2 className="text-xl font-bold text-slate-900">
-                {user?.organizationId
+                {hasOrganizationWorkspace
                   ? '组织工作区'
                   : '个人工作区'}
               </h2>
@@ -81,7 +88,7 @@ function WorkspaceContent() {
               />
               <StatCard
                 label="组织"
-                value={user?.organizationId ? '已激活' : '待处理'}
+                value={hasOrganizationWorkspace ? '已激活' : '待处理'}
                 icon="🏢"
               />
             </div>
@@ -166,7 +173,9 @@ function WorkspaceContent() {
 export default function WorkspacePage() {
   return (
     <AuthGuard>
-      <WorkspaceContent />
+      <RoleGuard roles={['BUYER', 'SUPPLIER']}>
+        <WorkspaceContent />
+      </RoleGuard>
     </AuthGuard>
   );
 }

@@ -6,5 +6,14 @@ export interface AuthRequest extends Request {
     email: string;
     name?: string | null;
     organizationId?: string | null;
+    organization: {
+      id: string;
+      name: string;
+      type: string;
+    } | null;
+    organizationMember: {
+      role: string;
+    } | null;
+    workspaceRole: 'SUPPLIER' | 'BUYER' | null;
   };
 }

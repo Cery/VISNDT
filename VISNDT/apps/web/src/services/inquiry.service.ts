@@ -23,6 +23,6 @@ export async function createInquiry(
 export async function getMyInquiries(
   page = 1,
   pageSize = 20,
-): Promise<{ data: any[]; total: number }> {
+): ReturnType<typeof fetchMyInquiries> {
   return fetchMyInquiries(page, pageSize);
 }

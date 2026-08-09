@@ -37,12 +37,16 @@ export class RfqResponsesController {
   @Get('rfq-responses/mine')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get current organization RFQ responses' })
-  async findMine(@CurrentUser() user: AuthRequest['user']) {
+  @ApiOperation({ summary: 'Get current organization RFQ responses (paginated)' })
+  async findMine(
+    @CurrentUser() user: AuthRequest['user'],
+    @Query() pagination: PaginationDto,
+  ) {
     if (!user.organizationId) {
-      return ApiResponse.ok({ data: [], total: 0 });
+      return ApiResponse.ok({ data: [], total: 0, page: 1, pageSize: 20, totalPages: 0 });
     }
-    return ApiResponse.ok(await this.service.findMine(user.organizationId));
+    const { page = 1, pageSize = 20 } = pagination;
+    return ApiResponse.ok(await this.service.findMine(user.organizationId, page, pageSize));
   }
 
   @Get('rfq-responses/:id')

@@ -3,7 +3,7 @@
 import { type ReactNode } from 'react';
 import { useAuth } from './AuthProvider';
 
-type Role = 'BUYER' | 'SUPPLIER' | 'ADMIN';
+type Role = 'BUYER' | 'SUPPLIER';
 
 interface RoleGuardProps {
   children: ReactNode;
@@ -18,8 +18,12 @@ export default function RoleGuard({ children, roles, fallback }: RoleGuardProps)
     return <>{fallback}</>;
   }
 
-  // TODO: Implement role checking based on user.organizationId and organization.type
-  const hasRole = roles.includes('BUYER');
+  const workspaceRole = user.workspaceRole;
+  if (!workspaceRole) {
+    return <>{fallback ?? <p className="text-sm text-muted-foreground p-4">Workspace role not configured</p>}</>;
+  }
+
+  const hasRole = roles.includes(workspaceRole);
 
   if (!hasRole) {
     return <>{fallback ?? <p className="text-sm text-muted-foreground p-4">Access denied</p>}</>;
