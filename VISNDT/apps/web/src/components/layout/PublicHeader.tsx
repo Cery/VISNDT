@@ -91,7 +91,7 @@ export default function PublicHeader() {
                     <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
                     <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-industrial-lg py-1 z-20">
                       <Link
-                        href="/dashboard"
+                        href="/workspace/dashboard"
                         onClick={() => setUserMenuOpen(false)}
                         className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                       >
@@ -186,7 +186,7 @@ export default function PublicHeader() {
                     {user.name || user.email}
                   </div>
                   <Link
-                    href="/dashboard"
+                    href="/workspace/dashboard"
                     onClick={() => setMobileOpen(false)}
                     className="flex-1 text-center text-sm font-medium bg-gradient-to-r from-primary to-industrial-cyan text-white py-2.5 rounded-lg hover:opacity-90 transition-opacity"
                   >

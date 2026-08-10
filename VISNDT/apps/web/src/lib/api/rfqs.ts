@@ -180,6 +180,22 @@ export async function closeRfq(id: string): Promise<RfqDetailItem> {
 }
 
 /**
+ * Get responses for a specific RFQ.
+ * GET /rfqs/:id/responses (JWT)
+ */
+export async function getRfqResponsesById(
+  rfqId: string,
+  page = 1,
+  pageSize = 10,
+): Promise<PaginatedResponse<RfqResponseItem>> {
+  const res = await apiClient<ApiResponse<PaginatedResponse<RfqResponseItem>>>(
+    `/rfqs/${rfqId}/responses`,
+    { params: { page, pageSize } },
+  );
+  return res.data;
+}
+
+/**
  * Get current organization's RFQ responses.
  * GET /rfq-responses/mine (JWT)
  */

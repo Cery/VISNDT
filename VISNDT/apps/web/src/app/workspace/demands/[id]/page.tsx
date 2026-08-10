@@ -7,7 +7,7 @@ import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
 import DemandDetail from '@/components/demand/DemandDetail';
-import { getDemand, getDemandMatches, deleteDemand, publishDemand, closeDemand } from '@/services/demand.service';
+import { getDemand, getDemandMatches, publishDemand, closeDemand } from '@/services/demand.service';
 import type { DemandDetailItem } from '@/lib/api/demands';
 
 function DemandDetailContent({ id }: { id: string }) {
@@ -50,18 +50,6 @@ function DemandDetailContent({ id }: { id: string }) {
   useEffect(() => {
     load();
   }, [load]);
-
-  const handleDelete = useCallback(async () => {
-    if (!window.confirm('确定要删除此需求吗？此操作不可撤销。')) return;
-    setActionLoading('delete');
-    try {
-      await deleteDemand(id);
-      router.push('/workspace/demands');
-    } catch {
-      setError('删除需求失败。');
-      setActionLoading('');
-    }
-  }, [id, router]);
 
   const handlePublish = useCallback(async () => {
     setActionLoading('publish');
@@ -120,12 +108,6 @@ function DemandDetailContent({ id }: { id: string }) {
                 {/* Action buttons */}
                 {!isLoading && demand && (
                   <div className="flex items-center gap-2 mb-6">
-                    <button
-                      onClick={() => router.push(`/workspace/demands/${id}/edit`)}
-                      className="px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors"
-                    >
-                      编辑
-                    </button>
                     {canPublish && (
                       <button
                         onClick={handlePublish}
@@ -144,13 +126,6 @@ function DemandDetailContent({ id }: { id: string }) {
                         {actionLoading === 'close' ? '关闭中...' : '关闭'}
                       </button>
                     )}
-                    <button
-                      onClick={handleDelete}
-                      disabled={actionLoading === 'delete'}
-                      className="px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 border border-red-300 rounded-md hover:bg-red-100 disabled:opacity-50 transition-colors"
-                    >
-                      {actionLoading === 'delete' ? '删除中...' : '删除'}
-                    </button>
                   </div>
                 )}
                 <DemandDetail demand={demand} matchesCount={matchesCount} />

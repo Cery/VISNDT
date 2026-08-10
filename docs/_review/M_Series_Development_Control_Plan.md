@@ -371,7 +371,82 @@ M14.2.4 当前总目标已经收敛为：
   - 必须包含 UI 清单与页面边界
   - 必须验证不触达冻结后端模块
 
-## 8.4 `M14.3 Supplier Workspace`
+## 8.4 `M14.2.4-TEMP Overall Completion & Functional Integrity Audit`
+
+- 任务编号：`M14.2.4-TEMP`
+- 目标：对 `M14.2.4` 整体完成度、功能完整性与遗留问题做一次只读总审计，判断该阶段是否已从“契约冻结/边界修复”进入“功能闭环完成”
+- 审计范围：
+  - `docs/_review/333_M14.2.4.4C_WorkspaceRole_Contract_Freeze_Specification.md`
+  - `docs/_review/351_M14.2.4.6_Runtime_Verification_Audit_Report.md`
+  - `docs/_review/352_M14.2.4.7_Batch1_Workspace_Root_Access_Guard_Report.md`
+  - `docs/_review/353_M14.2.4.7_Batch2A_Buyer_Main_RoleGuard_Report.md`
+  - `docs/_review/354_M14.2.4.7_Batch2B_Buyer_Action_RoleGuard_Report.md`
+  - `docs/_review/355_M14.2.4.8_Notifications_Route_Integrity_Audit_Report.md`
+  - `docs/_review/356_M14.2.4.8_Notifications_Page_Foundation_Report.md`
+  - `docs/_review/357_M14.2.4.8_Notification_Batch_Delete_Access_Control_Report.md`
+  - `apps/web/src/app/workspace/**`
+  - `apps/web/src/components/workspace/**`
+- 禁止修改范围：
+  - `apps/api`
+  - `database`
+  - `prisma`
+  - `schema.prisma`
+  - 所有业务代码
+- 输出文档：
+  - `docs/_review/[编号]_M14.2.4_Overall_Completion_Audit_Report.md`
+- 完成标准：
+  - 给出 `M14.2.4` 当前完成度百分比与依据
+  - 给出“已完成功能清单 / 未完成功能清单 / 延后到下一阶段清单”
+  - 明确 `M14.2.4` 是否可以按“功能完整”口径关闭
+  - 明确哪些问题属于 `M14.2.5`，哪些问题属于后续工程质量或 UI 优化项
+- Audit 要求：
+  - 必须基于代码与既有报告双重证据
+  - 必须区分“功能未完成”与“质量/一致性问题”
+  - 必须输出阶段关闭建议：`可关闭 / 可关闭但附带遗留 / 不可关闭`
+
+## 8.5 `M14.2.5 Workspace Runtime Integrity & Namespace Closure`
+
+- 任务编号：`M14.2.5`
+- 目标：针对 `M14.2.4` 完成后暴露出的 Workspace 运行时一致性问题，补做页面级链路校验、接口语义修复与命名空间决策收口
+- 当前定位：
+  - 开发部分：`apps/web/src/app/workspace/**` 为主，必要时补充 `apps/web/src/lib/api/**` 与 `apps/web/src/services/**`
+  - 目标不是继续扩新功能，而是修正 Workspace 现有功能在运行时的完整性、命名空间一致性与消费链路正确性
+- 当前已知目的：
+  1. 复核 Workspace 路由、Sidebar、守卫与 API 调用链是否一致
+  2. 修复已存在页面中的高风险数据链路错误
+  3. 判断 Buyer Dashboard 是否继续保留 `/dashboard`，还是未来迁移到 `/workspace/dashboard`
+  4. 为后续 Workspace 页面统一命名空间与调用入口提供决策基线
+- 预计拆分为 `M14.2.5.X` 五部分：
+  1. `M14.2.5.1` Workspace Runtime Verification Audit
+     - 对应当前 `358` 审计
+     - 目标：输出 Workspace 路由、权限、Sidebar、API client 完整性结论
+  2. `M14.2.5.2` RFQ Detail Response Integrity Fix
+     - 对应当前 `359` 修复
+     - 目标：将 RFQ Detail 响应详情从组织维度误用修正为 RFQ 维度查询
+  3. `M14.2.5.3` Workspace Dashboard Namespace Decision Audit
+     - 对应当前 `360` 审计
+     - 目标：明确 `/dashboard` 与 `/workspace/dashboard` 的归属决策
+  4. `M14.2.5.4` Dashboard Namespace Migration or Baseline Freeze
+     - 目标：根据 `360` 决策结果，执行迁移或正式冻结 `/dashboard` 作为特例基线
+  5. `M14.2.5.5` Workspace Consumption Consistency Cleanup
+     - 目标：收口 `services` / `lib/api` 双入口并评估假搜索、页面一致性等低优先级遗留
+- 输入文档：
+  - `docs/_review/351_M14.2.4.6_Runtime_Verification_Audit_Report.md`
+  - `docs/_review/358_M14.2.5_Workspace_Runtime_Verification_Audit_Report.md`
+  - `docs/_review/359_M14.2.5_RFQ_Detail_Response_Integrity_Fix_Report.md`
+  - `docs/_review/360_M14.2.5_Workspace_Dashboard_Namespace_Decision_Audit_Report.md`
+- 输出文档：
+  - `docs/_review/[编号]_M14.2.5_*_Report.md`
+- 完成标准：
+  - 高风险运行时链路问题清零
+  - Dashboard 命名空间给出明确结论并落到后续动作
+  - Workspace 页面调用链、入口与审计基线不再互相矛盾
+- Audit 要求：
+  - 必须优先复用已有 API
+  - 必须避免触碰冻结的 Auth/Role/Sidebar 基线，除非单独放行
+  - 必须保持“单问题单任务单报告”
+
+## 8.6 `M14.3 Supplier Workspace`
 
 - 任务编号：`M14.3`
 - 目标：把 Supplier 相关现有 API 能力稳定产品化为平台内工作台，而不是独立商城
@@ -398,7 +473,7 @@ M14.2.4 当前总目标已经收敛为：
   - 必须验证“平台内工作台”定位
   - 必须验证不新扩数据库
 
-## 8.5 `M14.4 Buyer Workspace`
+## 8.7 `M14.4 Buyer Workspace`
 
 - 任务编号：`M14.4`
 - 目标：完善 Buyer Workspace 与 Supplier Workspace 的契约对齐与闭环协同
@@ -423,7 +498,7 @@ M14.2.4 当前总目标已经收敛为：
   - 必须对 Buyer 既有页面做回归检查
   - 必须记录是否影响 M13.9 Freeze
 
-## 8.6 `M14.5 Matching Workspace`
+## 8.8 `M14.5 Matching Workspace`
 
 - 任务编号：`M14.5`
 - 目标：把现有 Matching 能力在 Workspace 中做可见化、解释化、可运营化，但不重构算法
@@ -449,7 +524,7 @@ M14.2.4 当前总目标已经收敛为：
   - 必须说明是否只是 UI/消费层增强
   - 必须记录对 Match 闭环的实际提升
 
-## 8.7 `M15 Business Closed Loop`
+## 8.9 `M15 Business Closed Loop`
 
 - 任务编号：`M15`
 - 目标：在“不做支付、不做公开价格、不做独立商城”的前提下，形成平台撮合闭环

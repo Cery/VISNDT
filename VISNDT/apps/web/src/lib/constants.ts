@@ -13,6 +13,6 @@ export const ROUTES = {
   ABOUT: '/about',
   LOGIN: '/login',
   REGISTER: '/register',
-  DASHBOARD: '/dashboard',
+  DASHBOARD: '/workspace/dashboard',
   WORKSPACE: '/workspace',
 } as const;

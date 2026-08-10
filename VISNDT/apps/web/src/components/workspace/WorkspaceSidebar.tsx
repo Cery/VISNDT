@@ -17,7 +17,7 @@ interface NavItem {
 
 const NAV_CONFIG: Record<NavigableWorkspaceRole, NavItem[]> = {
   BUYER: [
-    { label: '仪表盘', href: '/dashboard', icon: '📊' },
+    { label: '仪表盘', href: '/workspace/dashboard', icon: '📊' },
     { label: '我的需求', href: '/workspace/demands', icon: '📋' },
     { label: '询价单', href: '/workspace/rfqs', icon: '📄' },
     { label: '匹配结果', href: '/workspace/matches', icon: '🔗' },

@@ -8,7 +8,7 @@ import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
 import RFQDetail from '@/components/rfq/RFQDetail';
 import RFQResponseList from '@/components/rfq/RFQResponseList';
-import { getRfq, getRfqResponses, deleteRfq, publishRfq, closeRfq } from '@/services/rfq.service';
+import { getRfq, getRfqResponses, publishRfq, closeRfq } from '@/services/rfq.service';
 import type { RfqDetailItem, RfqResponseItem } from '@/lib/api/rfqs';
 
 function RfqDetailContent({ id }: { id: string }) {
@@ -28,7 +28,7 @@ function RfqDetailContent({ id }: { id: string }) {
     try {
       const [rfqRes, responsesRes] = await Promise.allSettled([
         getRfq(id),
-        getRfqResponses(1, 50),
+        getRfqResponses(id, 1, 50),
       ]);
 
       if (rfqRes.status === 'fulfilled') {
@@ -39,8 +39,7 @@ function RfqDetailContent({ id }: { id: string }) {
       }
 
       if (responsesRes.status === 'fulfilled') {
-        const all = responsesRes.value.data || [];
-        setResponses(all.filter((r) => r.rfqId === id));
+        setResponses(responsesRes.value.data || []);
       }
     } catch {
       setError('发生意外错误。');
@@ -52,18 +51,6 @@ function RfqDetailContent({ id }: { id: string }) {
   useEffect(() => {
     load();
   }, [load]);
-
-  const handleDelete = useCallback(async () => {
-    if (!window.confirm('确定要删除此询价单吗？此操作不可撤销。')) return;
-    setActionLoading('delete');
-    try {
-      await deleteRfq(id);
-      router.push('/workspace/rfqs');
-    } catch {
-      setError('删除询价失败。');
-      setActionLoading('');
-    }
-  }, [id, router]);
 
   const handlePublish = useCallback(async () => {
     setActionLoading('publish');
@@ -122,12 +109,6 @@ function RfqDetailContent({ id }: { id: string }) {
                 {/* Action buttons */}
                 {!isLoading && rfq && (
                   <div className="flex items-center gap-2 mb-6">
-                    <button
-                      onClick={() => router.push(`/workspace/rfqs/${id}/edit`)}
-                      className="px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors"
-                    >
-                      编辑
-                    </button>
                     {canPublish && (
                       <button
                         onClick={handlePublish}
@@ -146,13 +127,6 @@ function RfqDetailContent({ id }: { id: string }) {
                         {actionLoading === 'close' ? '关闭中...' : '关闭'}
                       </button>
                     )}
-                    <button
-                      onClick={handleDelete}
-                      disabled={actionLoading === 'delete'}
-                      className="px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 border border-red-300 rounded-md hover:bg-red-100 disabled:opacity-50 transition-colors"
-                    >
-                      {actionLoading === 'delete' ? '删除中...' : '删除'}
-                    </button>
                   </div>
                 )}
                 <RFQDetail rfq={rfq} responseCount={responses.length} />

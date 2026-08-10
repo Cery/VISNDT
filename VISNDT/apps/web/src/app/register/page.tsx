@@ -30,7 +30,7 @@ export default function RegisterPage() {
         name || undefined,
         inviteToken || undefined,
       );
-      router.replace('/dashboard');
+      router.replace('/workspace/dashboard');
     } catch (err) {
       setStatus('error');
       if (err instanceof Error) {

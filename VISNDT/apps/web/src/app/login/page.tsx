@@ -23,7 +23,7 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      router.replace('/dashboard');
+      router.replace('/workspace/dashboard');
     } catch (err) {
       setStatus('error');
       if (err instanceof Error) {

@@ -5,6 +5,7 @@ import {
   getAvailableRfqs as fetchAvailableRfqs,
   getMyRfqs,
   getRfq as fetchRfq,
+  getRfqResponsesById as fetchRfqResponsesById,
   getMyRfqResponses as fetchMyRfqResponses,
   deleteRfq as apiDeleteRfq,
   publishRfq as apiPublishRfq,
@@ -60,10 +61,11 @@ export async function getMyRfqResponses(
 }
 
 export async function getRfqResponses(
+  rfqId: string,
   page = 1,
   pageSize = 10,
 ): Promise<PaginatedResponse<RfqResponseItem>> {
-  return getMyRfqResponses(page, pageSize);
+  return fetchRfqResponsesById(rfqId, page, pageSize);
 }
 
 export async function createRfqResponse(
