@@ -1,168 +1,112 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import Link from 'next/link';
+import { useCallback, useState } from 'react';
 import AuthGuard from '@/auth/AuthGuard';
-import RoleGuard from '@/auth/RoleGuard';
 import { useAuth } from '@/auth/AuthProvider';
-import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
-import StatCard from '@/components/workspace/StatCard';
-import DemandCard from '@/components/workspace/DemandCard';
-import RFQCard from '@/components/workspace/RFQCard';
-import WorkspaceEmpty from '@/components/workspace/WorkspaceEmpty';
-import { getDemands } from '@/services/demand.service';
-import { getRfqs } from '@/services/rfq.service';
-import type { DemandItem } from '@/lib/api/demands';
-import type { RfqItem } from '@/lib/api/rfqs';
+import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
+import type { WorkspaceRole } from '@/services/auth.service';
+
+interface WorkspaceEntryLink {
+  title: string;
+  description: string;
+  href: string;
+}
+
+const WORKSPACE_ENTRY_LINKS: Record<Exclude<WorkspaceRole, null>, WorkspaceEntryLink[]> = {
+  BUYER: [
+    {
+      title: 'Buyer Dashboard',
+      description: '进入 Buyer 角色的仪表盘总览。',
+      href: '/dashboard/buyer',
+    },
+    {
+      title: '我的需求',
+      description: '查看和管理 Buyer 需求列表。',
+      href: '/workspace/demands',
+    },
+    {
+      title: '询价单',
+      description: '进入 RFQ 列表和详情流转。',
+      href: '/workspace/rfqs',
+    },
+    {
+      title: '匹配结果',
+      description: '查看需求与产品的匹配结果。',
+      href: '/workspace/matches',
+    },
+  ],
+  SUPPLIER: [
+    {
+      title: 'Supplier Dashboard',
+      description: '进入 Supplier 角色的仪表盘总览。',
+      href: '/dashboard/supplier',
+    },
+    {
+      title: '供应商工作台',
+      description: '查看当前组织的 Supplier 工作区入口。',
+      href: '/workspace/supplier',
+    },
+    {
+      title: 'RFQ 响应',
+      description: '查看供应商侧 RFQ 列表。',
+      href: '/workspace/supplier/rfqs',
+    },
+    {
+      title: '我的响应',
+      description: '跟踪已提交的响应记录。',
+      href: '/workspace/supplier/responses',
+    },
+  ],
+};
 
 function WorkspaceContent() {
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
+  const toggleSidebar = useCallback(() => setSidebarOpen((value) => !value), []);
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
-  const hasOrganizationWorkspace = Boolean(
-    user
-    && user.organization
-    && user.organizationMember
-    && user.workspaceRole,
-  );
-  const [demands, setDemands] = useState<DemandItem[]>([]);
-  const [rfqs, setRfqs] = useState<RfqItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [demandsRes, rfqsRes] = await Promise.allSettled([
-          getDemands(1, 5),
-          getRfqs(),
-        ]);
-
-        if (demandsRes.status === 'fulfilled') {
-          setDemands(demandsRes.value.data || []);
-        }
-        if (rfqsRes.status === 'fulfilled') {
-          setRfqs(rfqsRes.value.data || []);
-        }
-      } catch {
-        // graceful fallback
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    loadData();
-  }, []);
+  const workspaceRole = user?.workspaceRole ?? null;
+  const entryLinks = workspaceRole ? WORKSPACE_ENTRY_LINKS[workspaceRole] : [];
 
   return (
     <div className="flex min-h-screen">
       <WorkspaceSidebar mobileOpen={sidebarOpen} onClose={closeSidebar} />
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex min-w-0 flex-1 flex-col">
         <WorkspaceHeader onMenuToggle={toggleSidebar} />
         <div className="flex-1 bg-slate-50 p-6">
-          <div className="max-w-[1200px] mx-auto space-y-8">
-            {/* Welcome */}
-            <div>
-              <h2 className="text-xl font-bold text-slate-900">
-                {hasOrganizationWorkspace
-                  ? '组织工作区'
-                  : '个人工作区'}
-              </h2>
-              <p className="text-slate-500 text-sm mt-1">
-                一站式管理您的需求、询价和匹配。
+          <div className="mx-auto max-w-[960px] space-y-6">
+            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h1 className="text-2xl font-bold text-slate-900">Workspace Entry</h1>
+              <p className="mt-2 text-sm text-slate-500">
+                这里仅保留工作区导航职责，不再承担 Dashboard 汇总或业务数据聚合。
+              </p>
+              <p className="mt-2 text-sm text-slate-500">
+                当前角色：{workspaceRole ?? '未配置'}
               </p>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <StatCard
-                label="我的需求"
-                value={isLoading ? '...' : demands.length}
-                description="活跃需求列表"
-                icon="📋"
-              />
-              <StatCard
-                label="收到的询价"
-                value={isLoading ? '...' : rfqs.length}
-                description="收到的询价单"
-                icon="📄"
-              />
-              <StatCard
-                label="组织"
-                value={hasOrganizationWorkspace ? '已激活' : '待处理'}
-                icon="🏢"
-              />
-            </div>
-
-            {/* 最近需求 */}
-            <section>
-              <h3 className="font-semibold text-slate-900 mb-3">
-                最近需求
-              </h3>
-              {isLoading ? (
-                <div className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div
-                      key={i}
-                      className="h-20 bg-slate-100 rounded-lg animate-pulse"
-                    />
-                  ))}
-                </div>
-              ) : demands.length > 0 ? (
-                <div className="space-y-3">
-                  {demands.slice(0, 5).map((d) => (
-                    <DemandCard
-                      key={d.id}
-                      id={d.id}
-                      title={d.title}
-                      status={d.status}
-                      category={d.category?.name}
-                      createdAt={d.createdAt}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <WorkspaceEmpty
-                  title="暂无需求"
-                  message="您还没有创建任何需求。"
-                  actionLabel="浏览产品"
-                  actionHref="/products"
-                />
-              )}
-            </section>
-
-            {/* 最近询价 */}
-            <section>
-              <h3 className="font-semibold text-slate-900 mb-3">
-                最近询价
-              </h3>
-              {isLoading ? (
-                <div className="space-y-3">
-                  {[1, 2].map((i) => (
-                    <div
-                      key={i}
-                      className="h-20 bg-slate-100 rounded-lg animate-pulse"
-                    />
-                  ))}
-                </div>
-              ) : rfqs.length > 0 ? (
-                <div className="space-y-3">
-                  {rfqs.slice(0, 5).map((r) => (
-                    <RFQCard
-                      key={r.id}
-                      id={r.id}
-                      title={r.title}
-                      status={r.status}
-                      createdAt={r.createdAt}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <WorkspaceEmpty
-                  title="暂无询价"
-                  message="您的组织尚未收到任何询价。"
-                />
-              )}
-            </section>
+            {workspaceRole ? (
+              <section className="grid gap-4 md:grid-cols-2">
+                {entryLinks.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-colors hover:border-slate-300"
+                  >
+                    <h2 className="text-lg font-semibold text-slate-900">{item.title}</h2>
+                    <p className="mt-2 text-sm text-slate-500">{item.description}</p>
+                  </Link>
+                ))}
+              </section>
+            ) : (
+              <section className="rounded-xl border border-amber-200 bg-amber-50 p-6">
+                <h2 className="text-lg font-semibold text-amber-900">未分配可用工作区角色</h2>
+                <p className="mt-2 text-sm text-amber-800">
+                  当前账号已登录，但尚未映射到 Buyer 或 Supplier 工作区。请联系管理员完成角色配置后再进入 Dashboard。
+                </p>
+              </section>
+            )}
           </div>
         </div>
       </div>
@@ -173,9 +117,7 @@ function WorkspaceContent() {
 export default function WorkspacePage() {
   return (
     <AuthGuard>
-      <RoleGuard roles={['BUYER', 'SUPPLIER']}>
-        <WorkspaceContent />
-      </RoleGuard>
+      <WorkspaceContent />
     </AuthGuard>
   );
 }

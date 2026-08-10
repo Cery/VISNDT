@@ -1,10 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/auth/AuthProvider';
-import { getUnreadCount } from '@/lib/api/notifications';
 import type { WorkspaceRole } from '@/services/auth.service';
 
 type NavigableWorkspaceRole = Exclude<WorkspaceRole, null>;
@@ -17,7 +15,7 @@ interface NavItem {
 
 const NAV_CONFIG: Record<NavigableWorkspaceRole, NavItem[]> = {
   BUYER: [
-    { label: '仪表盘', href: '/workspace/dashboard', icon: '📊' },
+    { label: '仪表盘', href: '/dashboard/buyer', icon: '📊' },
     { label: '我的需求', href: '/workspace/demands', icon: '📋' },
     { label: '询价单', href: '/workspace/rfqs', icon: '📄' },
     { label: '匹配结果', href: '/workspace/matches', icon: '🔗' },
@@ -25,6 +23,7 @@ const NAV_CONFIG: Record<NavigableWorkspaceRole, NavItem[]> = {
     { label: '设置', href: '/workspace/settings', icon: '⚙️' },
   ],
   SUPPLIER: [
+    { label: '仪表盘', href: '/dashboard/supplier', icon: '📊' },
     { label: '供应商工作台', href: '/workspace/supplier', icon: '🏭' },
     { label: 'RFQ响应', href: '/workspace/supplier/rfqs', icon: '📄' },
     { label: '我的响应', href: '/workspace/supplier/responses', icon: '📨' },
@@ -41,21 +40,8 @@ interface WorkspaceSidebarProps {
 export default function WorkspaceSidebar({ mobileOpen, onClose }: WorkspaceSidebarProps) {
   const pathname = usePathname();
   const { user, isLoading } = useAuth();
-  const [unreadCount, setUnreadCount] = useState(0);
   const workspaceRole = user ? user.workspaceRole : null;
   const navItems = workspaceRole ? NAV_CONFIG[workspaceRole] : [];
-
-  useEffect(() => {
-    async function loadUnreadCount() {
-      try {
-        const count = await getUnreadCount();
-        setUnreadCount(count);
-      } catch {
-        // Unread count is optional
-      }
-    }
-    loadUnreadCount();
-  }, []);
 
   const activeHref = navItems.reduce<string>((matchedHref, item) => {
     const matches = pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -98,7 +84,6 @@ export default function WorkspaceSidebar({ mobileOpen, onClose }: WorkspaceSideb
             )}
             {!isLoading && workspaceRole && navItems.map((item) => {
               const active = activeHref === item.href;
-              const isNotification = item.href === '/workspace/notifications';
               return (
                 <Link
                   key={item.href}
@@ -112,11 +97,6 @@ export default function WorkspaceSidebar({ mobileOpen, onClose }: WorkspaceSideb
                 >
                   <span className="text-base">{item.icon}</span>
                   <span className="flex-1">{item.label}</span>
-                  {isNotification && unreadCount > 0 && (
-                    <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full">
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </span>
-                  )}
                 </Link>
               );
             })}
