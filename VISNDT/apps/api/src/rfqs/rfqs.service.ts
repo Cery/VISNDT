@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { RFQStatus, Prisma, NotificationType, WorkflowAction, WorkflowEntityType } from '@prisma/client';
+import { RFQStatus, Prisma, NotificationType, WorkflowAction, WorkflowEntityType, DemandMatchStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRfqDto } from './dto/create-rfq.dto';
+import { CreateRfqFromMatchDto } from './dto/create-rfq-from-match.dto';
 import { UpdateRfqDto } from './dto/update-rfq.dto';
 import { SearchParamsDto } from '../common/dto/search-params.dto';
 import { NotificationsService } from '../notifications/notifications.service';
@@ -157,6 +158,111 @@ export class RfqsService {
       }
     } catch {
       // Notification failure should not affect the main flow
+    }
+
+    return rfq;
+  }
+
+  async createFromMatch(
+    dto: CreateRfqFromMatchDto,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    if (!user.organizationId) {
+      throw new BadRequestException(
+        'User must belong to a buyer organization to create RFQ from match',
+      );
+    }
+
+    const match = await this.prisma.demandMatch.findUnique({
+      where: { id: dto.matchId },
+      select: {
+        id: true,
+        demandId: true,
+        matchStatus: true,
+        demand: {
+          select: {
+            organizationId: true,
+            title: true,
+          },
+        },
+        offer: {
+          select: {
+            organizationId: true,
+          },
+        },
+      },
+    });
+
+    if (!match) {
+      throw new NotFoundException(`DemandMatch ${dto.matchId} not found`);
+    }
+
+    if (match.demand.organizationId !== user.organizationId) {
+      throw new BadRequestException(
+        'You do not have permission to create RFQ from this match',
+      );
+    }
+
+    if (match.matchStatus !== DemandMatchStatus.ACCEPTED) {
+      throw new BadRequestException(
+        `Cannot create RFQ from match with status "${match.matchStatus}". Only ACCEPTED matches are allowed.`,
+      );
+    }
+
+    const targetOrganizationId = match.offer?.organizationId;
+    if (!targetOrganizationId) {
+      throw new BadRequestException(
+        'Accepted match does not resolve to a target supplier organization',
+      );
+    }
+
+    const existingRfq = await this.prisma.rFQ.findFirst({
+      where: { sourceMatchId: match.id },
+      select: { id: true },
+    });
+    if (existingRfq) {
+      throw new BadRequestException(
+        `RFQ ${existingRfq.id} already exists for match ${match.id}`,
+      );
+    }
+
+    const rfq = await this.prisma.rFQ.create({
+      data: {
+        demandId: match.demandId,
+        sourceMatchId: match.id,
+        targetOrganizationId,
+        createdBy: user.id,
+      },
+    });
+
+    try {
+      await this.notificationsService.createForOrganization(targetOrganizationId, {
+        type: NotificationType.RFQ_UPDATE,
+        title: 'New RFQ Assigned',
+        message: `A new RFQ for demand "${match.demand.title || 'Untitled'}" has been assigned to your organization`,
+        referenceType: 'RFQ',
+        referenceId: rfq.id,
+      });
+    } catch {
+      // Notification failure should not affect the main flow
+    }
+
+    try {
+      await this.workflowEventsService.create(
+        {
+          entityType: WorkflowEntityType.RFQ,
+          entityId: rfq.id,
+          action: WorkflowAction.CREATED,
+          metadata: {
+            demandId: match.demandId,
+            sourceMatchId: match.id,
+            targetOrganizationId,
+          },
+        },
+        user,
+      );
+    } catch {
+      // Workflow event failure should not affect the main flow
     }
 
     return rfq;

@@ -175,6 +175,7 @@ model User {
   fileAssets          FileAsset[]
   auditLogs           AuditLog[]
   rfqs                RFQ[]
+  reviewedRFQResponses RFQResponse[] @relation("RFQResponseReviewer")
   createdInvitations  UserInvitation[]
   refreshTokens       RefreshToken[]
   inquiries           Inquiry[]
@@ -215,6 +216,7 @@ model Organization {
   users        User[]
   offers       Offer[]
   demands      Demand[]
+  targetedRfqs RFQ[] @relation("RFQTargetOrganization")
   rfqResponses RFQResponse[]
   invitations  UserInvitation[]
   inquiries    Inquiry[]
@@ -486,7 +488,7 @@ model Demand {
   createdByUser User              @relation(fields: [createdBy], references: [id])
   organization  Organization?     @relation(fields: [organizationId], references: [id])
   category      ProductCategory?  @relation(fields: [categoryId], references: [id])
-  rfq           RFQ?
+  rfqs          RFQ[]
   parameters    DemandParameter[]
   matches       DemandMatch[]
 
@@ -536,6 +538,7 @@ model DemandMatch {
   demand  Demand  @relation(fields: [demandId], references: [id])
   product Product @relation(fields: [productId], references: [id])
   offer   Offer?  @relation(fields: [offerId], references: [id])
+  rfqs    RFQ[]   @relation("RFQSourceMatch")
 
   @@unique([demandId, productId])
   @@index([productId])
@@ -545,22 +548,28 @@ model DemandMatch {
 }
 
 model RFQ {
-  id          String    @id @default(uuid()) @db.Uuid
-  demandId    String    @unique @map("demand_id") @db.Uuid
-  createdBy   String    @map("created_by") @db.Uuid
-  status      RFQStatus @default(DRAFT)
-  publishedAt DateTime? @map("published_at")
-  closedAt    DateTime? @map("closed_at")
+  id                   String    @id @default(uuid()) @db.Uuid
+  demandId             String    @map("demand_id") @db.Uuid
+  sourceMatchId        String?   @map("source_match_id") @db.Uuid
+  targetOrganizationId String?   @map("target_organization_id") @db.Uuid
+  createdBy            String    @map("created_by") @db.Uuid
+  status               RFQStatus @default(DRAFT)
+  publishedAt          DateTime? @map("published_at")
+  closedAt             DateTime? @map("closed_at")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  demand        Demand        @relation(fields: [demandId], references: [id])
-  createdByUser User          @relation(fields: [createdBy], references: [id])
-  responses     RFQResponse[]
+  demand              Demand        @relation(fields: [demandId], references: [id])
+  sourceMatch         DemandMatch?  @relation("RFQSourceMatch", fields: [sourceMatchId], references: [id])
+  targetOrganization  Organization? @relation("RFQTargetOrganization", fields: [targetOrganizationId], references: [id])
+  createdByUser       User          @relation(fields: [createdBy], references: [id])
+  responses           RFQResponse[]
 
   @@index([createdBy])
+  @@index([demandId])
   @@index([status])
+  @@index([targetOrganizationId, status])
   @@map("rfq")
 }
 
@@ -569,19 +578,25 @@ model RFQResponse {
   rfqId          String            @map("rfq_id") @db.Uuid
   organizationId String            @map("organization_id") @db.Uuid
   offerId        String?           @map("offer_id") @db.Uuid
+  reviewedBy     String?           @map("reviewed_by") @db.Uuid
+  reviewedAt     DateTime?         @map("reviewed_at")
+  decisionNote   String?           @map("decision_note")
   message        String?
   status         RFQResponseStatus @default(SUBMITTED)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  rfq          RFQ          @relation(fields: [rfqId], references: [id])
-  organization Organization @relation(fields: [organizationId], references: [id])
-  offer        Offer?       @relation(fields: [offerId], references: [id])
+  rfq            RFQ    @relation(fields: [rfqId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  offer          Offer?       @relation(fields: [offerId], references: [id])
+  reviewedByUser User?        @relation("RFQResponseReviewer", fields: [reviewedBy], references: [id])
 
   @@unique([rfqId, organizationId])
   @@index([organizationId])
   @@index([offerId])
+  @@index([reviewedBy])
+  @@index([rfqId, status])
   @@index([status])
   @@map("rfq_response")
 }

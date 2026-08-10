@@ -25,6 +25,7 @@ import { InquiriesModule } from './inquiries/inquiries.module';
 import { StorageModule } from './storage/storage.module';
 import { FileAssetModule } from './file-asset/file-asset.module';
 import { AuditLogModule } from './audit-log/audit-log.module';
+import { WorkspaceModule } from './workspace/workspace.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { AuditLogModule } from './audit-log/audit-log.module';
     StorageModule,
     FileAssetModule,
     AuditLogModule,
+    WorkspaceModule,
   ],
   providers: [
     {

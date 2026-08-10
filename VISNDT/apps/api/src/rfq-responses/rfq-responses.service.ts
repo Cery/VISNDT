@@ -3,6 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
   ConflictException,
+  ForbiddenException,
 } from '@nestjs/common';
 import {
   RFQResponseStatus,
@@ -11,12 +12,16 @@ import {
   OrganizationStatus,
   UserStatus,
   Prisma,
+  WorkflowAction,
+  WorkflowEntityType,
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRfqResponseDto } from './dto/create-rfq-response.dto';
 import { UpdateRfqResponseDto } from './dto/update-rfq-response.dto';
+import { DecideRfqResponseDto } from './dto/decide-rfq-response.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { NotificationsService } from '../notifications/notifications.service';
+import { WorkflowEventsService } from '../workflow-events/workflow-events.service';
 
 const RESPONSE_TRANSITIONS: Record<RFQResponseStatus, RFQResponseStatus[]> = {
   SUBMITTED: [RFQResponseStatus.VIEWED],
@@ -25,11 +30,43 @@ const RESPONSE_TRANSITIONS: Record<RFQResponseStatus, RFQResponseStatus[]> = {
   REJECTED: [],
 };
 
+type ResponseActor = {
+  id: string;
+  organizationId?: string | null;
+  workspaceRole?: 'SUPPLIER' | 'BUYER' | null;
+};
+
+type DecisionResponse = Prisma.RFQResponseGetPayload<{
+  include: {
+    organization: {
+      select: {
+        id: true;
+        name: true;
+      };
+    };
+    rfq: {
+      select: {
+        id: true;
+        demandId: true;
+        targetOrganizationId: true;
+        demand: {
+          select: {
+            id: true;
+            title: true;
+            organizationId: true;
+          };
+        };
+      };
+    };
+  };
+}>;
+
 @Injectable()
 export class RfqResponsesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notificationsService: NotificationsService,
+    private readonly workflowEventsService: WorkflowEventsService,
   ) {}
 
   async findByRfq(rfqId: string, pagination: PaginationDto) {
@@ -233,53 +270,223 @@ export class RfqResponsesService {
   async update(
     id: string,
     dto: UpdateRfqResponseDto,
-    user: { id: string; organizationId?: string | null },
+    user: ResponseActor,
   ) {
+    if (dto.status === RFQResponseStatus.VIEWED) {
+      return this.view(id, user);
+    }
+
+    if (dto.status === RFQResponseStatus.ACCEPTED) {
+      return this.accept(id, {}, user);
+    }
+
+    if (dto.status === RFQResponseStatus.REJECTED) {
+      return this.reject(id, {}, user);
+    }
+
+    throw new BadRequestException(
+      'RFQ response updates must use the buyer decision endpoints',
+    );
+  }
+
+  async view(id: string, user: ResponseActor) {
+    return this.transitionDecision(
+      id,
+      RFQResponseStatus.VIEWED,
+      WorkflowAction.REVIEWED,
+      'view',
+      user,
+    );
+  }
+
+  async accept(
+    id: string,
+    dto: DecideRfqResponseDto,
+    user: ResponseActor,
+  ) {
+    return this.transitionDecision(
+      id,
+      RFQResponseStatus.ACCEPTED,
+      WorkflowAction.ACCEPTED,
+      'accept',
+      user,
+      dto,
+    );
+  }
+
+  async reject(
+    id: string,
+    dto: DecideRfqResponseDto,
+    user: ResponseActor,
+  ) {
+    return this.transitionDecision(
+      id,
+      RFQResponseStatus.REJECTED,
+      WorkflowAction.REJECTED,
+      'reject',
+      user,
+      dto,
+    );
+  }
+
+  private async transitionDecision(
+    id: string,
+    targetStatus: RFQResponseStatus,
+    workflowAction: WorkflowAction,
+    actionLabel: 'view' | 'accept' | 'reject',
+    user: ResponseActor,
+    dto?: DecideRfqResponseDto,
+  ) {
+    const response = await this.getDecisionResponseOrFail(id);
+    this.assertBuyerDecisionAccess(response, user, actionLabel);
+
+    const allowed = RESPONSE_TRANSITIONS[response.status] ?? [];
+    if (!allowed.includes(targetStatus)) {
+      throw new BadRequestException(
+        `Cannot ${actionLabel} RFQ Response with status "${response.status}"`,
+      );
+    }
+
+    const reviewedAt = new Date();
+    const decisionNote = this.normalizeDecisionNote(dto?.decisionNote);
+    const updated = await this.prisma.rFQResponse.update({
+      where: { id },
+      data: {
+        status: targetStatus,
+        reviewedBy: user.id,
+        reviewedAt,
+        ...(targetStatus === RFQResponseStatus.VIEWED
+          ? {}
+          : { decisionNote }),
+      },
+    });
+
+    await this.createDecisionWorkflowEvent(
+      response,
+      workflowAction,
+      response.status,
+      user,
+      decisionNote,
+    );
+
+    if (
+      targetStatus === RFQResponseStatus.ACCEPTED ||
+      targetStatus === RFQResponseStatus.REJECTED
+    ) {
+      await this.notifyDecision(response, targetStatus, decisionNote);
+    }
+
+    return updated;
+  }
+
+  private async getDecisionResponseOrFail(id: string): Promise<DecisionResponse> {
     const response = await this.prisma.rFQResponse.findUnique({
       where: { id },
+      include: {
+        organization: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        rfq: {
+          select: {
+            id: true,
+            demandId: true,
+            targetOrganizationId: true,
+            demand: {
+              select: {
+                id: true,
+                title: true,
+                organizationId: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!response) {
       throw new NotFoundException(`RFQ Response ${id} not found`);
     }
 
-    // Ownership validation: only the organization that created the response can update it
-    if (user.organizationId && response.organizationId !== user.organizationId) {
-      throw new BadRequestException(
-        'You do not have permission to update this response',
+    return response;
+  }
+
+  private assertBuyerDecisionAccess(
+    response: DecisionResponse,
+    user: ResponseActor,
+    actionLabel: 'view' | 'accept' | 'reject',
+  ) {
+    if (!user.organizationId || user.workspaceRole !== 'BUYER') {
+      throw new ForbiddenException(
+        'Only buyer organization members can process RFQ responses',
       );
     }
 
-    if (dto.status) {
-      const allowed = RESPONSE_TRANSITIONS[response.status];
-      if (!allowed.includes(dto.status)) {
-        throw new BadRequestException(
-          `Cannot transition RFQ Response from ${response.status} to ${dto.status}`,
-        );
-      }
+    if (response.rfq.demand.organizationId !== user.organizationId) {
+      throw new ForbiddenException(
+        `You do not have permission to ${actionLabel} this RFQ response`,
+      );
     }
+  }
 
-    const updated = await this.prisma.rFQResponse.update({ where: { id }, data: dto });
+  private normalizeDecisionNote(decisionNote?: string) {
+    const normalized = decisionNote?.trim();
+    return normalized ? normalized : null;
+  }
 
-    // E4/E5: Response Accepted/Rejected — notify the response organization's admins
-    if (dto.status === RFQResponseStatus.ACCEPTED || dto.status === RFQResponseStatus.REJECTED) {
-      try {
-        const statusLabel = dto.status === RFQResponseStatus.ACCEPTED ? 'accepted' : 'rejected';
-        await this.notificationsService.createForOrganization(
-          response.organizationId,
-          {
-            type: NotificationType.RESPONSE_UPDATE,
-            title: `Response ${statusLabel.charAt(0).toUpperCase() + statusLabel.slice(1)}`,
-            message: `Your RFQ response has been ${statusLabel}`,
-            referenceType: 'RFQ_RESPONSE',
-            referenceId: response.id,
+  private async notifyDecision(
+    response: DecisionResponse,
+    status: RFQResponseStatus,
+    decisionNote: string | null,
+  ) {
+    try {
+      const decisionLabel = status === RFQResponseStatus.ACCEPTED ? 'accepted' : 'rejected';
+      const demandTitle = response.rfq.demand.title || 'Untitled';
+      const noteSuffix = decisionNote ? ` Note: ${decisionNote}` : '';
+
+      await this.notificationsService.createForOrganization(response.organizationId, {
+        type: NotificationType.RESPONSE_UPDATE,
+        title: `Response ${decisionLabel.charAt(0).toUpperCase() + decisionLabel.slice(1)}`,
+        message: `Your RFQ response for demand "${demandTitle}" has been ${decisionLabel}.${noteSuffix}`,
+        referenceType: 'RFQ_RESPONSE',
+        referenceId: response.id,
+      });
+    } catch {
+      // Notification failure should not affect the main flow
+    }
+  }
+
+  private async createDecisionWorkflowEvent(
+    response: DecisionResponse,
+    action: WorkflowAction,
+    previousStatus: RFQResponseStatus,
+    user: ResponseActor,
+    decisionNote?: string | null,
+  ) {
+    try {
+      await this.workflowEventsService.create(
+        {
+          entityType: WorkflowEntityType.RFQ_RESPONSE,
+          entityId: response.id,
+          action,
+          metadata: {
+            previousStatus,
+            rfqId: response.rfq.id,
+            demandId: response.rfq.demandId,
+            buyerOrganizationId: response.rfq.demand.organizationId,
+            supplierOrganizationId: response.organizationId,
+            ...(response.rfq.targetOrganizationId
+              ? { targetOrganizationId: response.rfq.targetOrganizationId }
+              : {}),
+            ...(decisionNote ? { decisionNote } : {}),
           },
-        );
-      } catch {
-        // Notification failure should not affect the main flow
-      }
+        },
+        user,
+      );
+    } catch {
+      // Workflow event failure should not affect the main flow
     }
-
-    return updated;
   }
 }

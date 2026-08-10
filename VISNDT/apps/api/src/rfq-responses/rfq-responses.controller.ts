@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { RfqResponsesService } from './rfq-responses.service';
 import { CreateRfqResponseDto } from './dto/create-rfq-response.dto';
 import { UpdateRfqResponseDto } from './dto/update-rfq-response.dto';
+import { DecideRfqResponseDto } from './dto/decide-rfq-response.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { ApiResponse } from '../common/dto/api-response.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -54,6 +55,46 @@ export class RfqResponsesController {
   @ApiParam({ name: 'id', description: 'Response UUID' })
   async findOne(@Param('id') id: string) {
     return ApiResponse.ok(await this.service.findOne(id));
+  }
+
+  @Post('rfq-responses/:id/view')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Mark RFQ response as viewed (buyer decision flow)' })
+  @ApiParam({ name: 'id', description: 'Response UUID' })
+  async view(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.view(id, user), 'Response viewed');
+  }
+
+  @Post('rfq-responses/:id/accept')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Accept RFQ response (buyer decision flow)' })
+  @ApiParam({ name: 'id', description: 'Response UUID' })
+  @ApiBody({ type: DecideRfqResponseDto, required: false })
+  async accept(
+    @Param('id') id: string,
+    @Body() dto: DecideRfqResponseDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.accept(id, dto, user), 'Response accepted');
+  }
+
+  @Post('rfq-responses/:id/reject')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Reject RFQ response (buyer decision flow)' })
+  @ApiParam({ name: 'id', description: 'Response UUID' })
+  @ApiBody({ type: DecideRfqResponseDto, required: false })
+  async reject(
+    @Param('id') id: string,
+    @Body() dto: DecideRfqResponseDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.reject(id, dto, user), 'Response rejected');
   }
 
   @Patch('rfq-responses/:id')

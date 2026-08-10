@@ -2,6 +2,7 @@ import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards } f
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { RfqsService } from './rfqs.service';
 import { CreateRfqDto } from './dto/create-rfq.dto';
+import { CreateRfqFromMatchDto } from './dto/create-rfq-from-match.dto';
 import { UpdateRfqDto } from './dto/update-rfq.dto';
 import { SearchParamsDto } from '../common/dto/search-params.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
@@ -79,12 +80,24 @@ export class RfqsController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create a new RFQ (authenticated)' })
+  @ApiOperation({ summary: 'Create a new RFQ by demandId (legacy migration endpoint)' })
   async create(
     @Body() dto: CreateRfqDto,
     @CurrentUser() user: AuthRequest['user'],
   ) {
     return ApiResponse.ok(await this.service.create(dto, user), 'RFQ created');
+  }
+
+  @Post('from-match')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a targeted RFQ from an accepted match (buyer only)' })
+  @ApiBody({ type: CreateRfqFromMatchDto })
+  async createFromMatch(
+    @Body() dto: CreateRfqFromMatchDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.createFromMatch(dto, user), 'RFQ created from match');
   }
 
   @Patch(':id')
