@@ -11,7 +11,7 @@ import {
   markAllAsRead,
   markAsRead,
   type NotificationItem,
-} from '@/lib/api/notifications';
+} from '@/services/notification.service';
 
 const PAGE_SIZE = 20;
 
