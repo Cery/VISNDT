@@ -156,357 +156,347 @@ function SupplierRfqDetailContent({ id }: { id: string }) {
         <WorkspaceHeader onMenuToggle={toggleSidebar} />
         <div className="flex-1 bg-slate-50 p-6">
           <div className="mx-auto max-w-[1200px]">
-            <RoleGuard roles={['SUPPLIER']}>
-              <div className="space-y-6">
-                <button
-                  type="button"
-                  onClick={() => router.push('/workspace/supplier/rfqs')}
-                  className="flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-slate-700"
-                >
-                  ← 返回供应商询价列表
-                </button>
+            <div className="space-y-6">
+              <button
+                type="button"
+                onClick={() => router.push('/workspace/supplier/rfqs')}
+                className="flex items-center gap-1 text-sm text-slate-500 transition-colors hover:text-slate-700"
+              >
+                ← 返回供应商询价列表
+              </button>
 
-                {isLoading ? (
-                  <div className="rounded-xl border border-slate-200 bg-white">
-                    <Loading />
-                  </div>
-                ) : error ? (
-                  <div className="rounded-xl border border-slate-200 bg-white p-6">
-                    <ErrorState message={error} onRetry={() => void loadRfq()} />
-                  </div>
-                ) : !rfq ? (
-                  <div className="rounded-xl border border-slate-200 bg-white p-6">
-                    <EmptyState message="未找到可展示的 RFQ 详情。" />
-                  </div>
-                ) : (
-                  <>
-                    <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                      <div className="flex flex-wrap items-start justify-between gap-4">
-                        <div className="space-y-3">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <RFQStatusBadge status={rfq.status} />
-                            <span className="text-xs text-slate-400">RFQ ID: {rfq.id}</span>
-                          </div>
-                          <div>
-                            <h1 className="text-2xl font-bold text-slate-900">{demandTitle}</h1>
-                            <p className="mt-1 text-sm text-slate-500">
-                              查看 RFQ 详情并提交您的响应
-                            </p>
-                          </div>
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const el = document.getElementById('rfq-response-form');
-                            if (el) {
-                              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            }
-                          }}
-                          className="rounded-md border border-indigo-600 bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          响应此RFQ
-                        </button>
-                      </div>
-
-                      <div className="mt-6 grid gap-4 md:grid-cols-3">
-                        <div className="rounded-lg bg-slate-50 p-4">
-                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                            Status
-                          </p>
-                          <div className="mt-2">
-                            <RFQStatusBadge status={rfq.status} />
-                          </div>
-                        </div>
-                        <div className="rounded-lg bg-slate-50 p-4">
-                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                            Published At
-                          </p>
-                          <p className="mt-2 text-sm text-slate-700">
-                            {formatDateTime(rfq.publishedAt)}
-                          </p>
-                        </div>
-                        <div className="rounded-lg bg-slate-50 p-4">
-                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                            Created At
-                          </p>
-                          <p className="mt-2 text-sm text-slate-700">
-                            {formatDateTime(rfq.createdAt)}
-                          </p>
-                        </div>
-                      </div>
-                    </section>
-
-                    <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                      <h2 className="text-lg font-semibold text-slate-900">Demand 信息</h2>
-                      <div className="mt-4 space-y-4">
-                        <div>
-                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                            标题
-                          </p>
-                          <p className="mt-2 text-base font-medium text-slate-900">
-                            {demandTitle}
-                          </p>
+              {isLoading ? (
+                <div className="rounded-xl border border-slate-200 bg-white">
+                  <Loading />
+                </div>
+              ) : error ? (
+                <div className="rounded-xl border border-slate-200 bg-white p-6">
+                  <ErrorState message={error} onRetry={() => void loadRfq()} />
+                </div>
+              ) : !rfq ? (
+                <div className="rounded-xl border border-slate-200 bg-white p-6">
+                  <EmptyState message="未找到可展示的 RFQ 详情。" />
+                </div>
+              ) : (
+                <>
+                  <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div className="space-y-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <RFQStatusBadge status={rfq.status} />
+                          <span className="text-xs text-slate-400">RFQ ID: {rfq.id}</span>
                         </div>
                         <div>
-                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                            描述
-                          </p>
-                          <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-600">
-                            {demandDescription || '暂无需求描述'}
-                          </p>
+                          <h1 className="text-2xl font-bold text-slate-900">{demandTitle}</h1>
+                          <p className="mt-1 text-sm text-slate-500">查看 RFQ 详情并提交您的响应</p>
                         </div>
                       </div>
-                    </section>
 
-                    <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                      <h2 className="text-lg font-semibold text-slate-900">Demand 参数</h2>
-                      <div className="mt-4">
-                        {demandParameters.length > 0 ? (
-                          <div className="overflow-hidden rounded-lg border border-slate-200">
-                            <table className="w-full text-sm">
-                              <thead className="bg-slate-50">
-                                <tr>
-                                  <th className="w-1/3 px-4 py-2.5 text-left font-medium text-slate-600">
-                                    参数
-                                  </th>
-                                  <th className="px-4 py-2.5 text-left font-medium text-slate-600">
-                                    值
-                                  </th>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const el = document.getElementById('rfq-response-form');
+                          if (el) {
+                            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          }
+                        }}
+                        className="rounded-md border border-indigo-600 bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        响应此RFQ
+                      </button>
+                    </div>
+
+                    <div className="mt-6 grid gap-4 md:grid-cols-3">
+                      <div className="rounded-lg bg-slate-50 p-4">
+                        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                          Status
+                        </p>
+                        <div className="mt-2">
+                          <RFQStatusBadge status={rfq.status} />
+                        </div>
+                      </div>
+                      <div className="rounded-lg bg-slate-50 p-4">
+                        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                          Published At
+                        </p>
+                        <p className="mt-2 text-sm text-slate-700">
+                          {formatDateTime(rfq.publishedAt)}
+                        </p>
+                      </div>
+                      <div className="rounded-lg bg-slate-50 p-4">
+                        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                          Created At
+                        </p>
+                        <p className="mt-2 text-sm text-slate-700">
+                          {formatDateTime(rfq.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h2 className="text-lg font-semibold text-slate-900">Demand 信息</h2>
+                    <div className="mt-4 space-y-4">
+                      <div>
+                        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                          标题
+                        </p>
+                        <p className="mt-2 text-base font-medium text-slate-900">{demandTitle}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                          描述
+                        </p>
+                        <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-600">
+                          {demandDescription || '暂无需求描述'}
+                        </p>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h2 className="text-lg font-semibold text-slate-900">Demand 参数</h2>
+                    <div className="mt-4">
+                      {demandParameters.length > 0 ? (
+                        <div className="overflow-hidden rounded-lg border border-slate-200">
+                          <table className="w-full text-sm">
+                            <thead className="bg-slate-50">
+                              <tr>
+                                <th className="w-1/3 px-4 py-2.5 text-left font-medium text-slate-600">
+                                  参数
+                                </th>
+                                <th className="px-4 py-2.5 text-left font-medium text-slate-600">
+                                  值
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                              {demandParameters.map((parameter) => (
+                                <tr
+                                  key={parameter.id}
+                                  className="transition-colors hover:bg-slate-50"
+                                >
+                                  <td className="px-4 py-2.5 font-medium text-slate-700">
+                                    {parameter.name}
+                                  </td>
+                                  <td className="px-4 py-2.5 text-slate-600">
+                                    {parameter.value}
+                                    {parameter.unit ? (
+                                      <span className="ml-1 text-slate-400">
+                                        {parameter.unit}
+                                      </span>
+                                    ) : null}
+                                  </td>
                                 </tr>
-                              </thead>
-                              <tbody className="divide-y divide-slate-100">
-                                {demandParameters.map((parameter) => (
-                                  <tr
-                                    key={parameter.id}
-                                    className="transition-colors hover:bg-slate-50"
-                                  >
-                                    <td className="px-4 py-2.5 font-medium text-slate-700">
-                                      {parameter.name}
-                                    </td>
-                                    <td className="px-4 py-2.5 text-slate-600">
-                                      {parameter.value}
-                                      {parameter.unit ? (
-                                        <span className="ml-1 text-slate-400">
-                                          {parameter.unit}
-                                        </span>
-                                      ) : null}
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        ) : (
-                          <p className="text-sm text-slate-500">
-                            当前详情接口未返回需求参数，页面不额外扩展 API。
-                          </p>
-                        )}
-                      </div>
-                    </section>
-
-                    <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-                      <h2 className="text-lg font-semibold text-slate-900">需求所属组织</h2>
-                      <div className="mt-4 space-y-3 text-sm text-slate-600">
-                        {demandOrganization ? (
-                          <>
-                            <div className="flex items-center justify-between gap-4 rounded-lg bg-slate-50 p-4">
-                              <span className="text-slate-500">组织名称</span>
-                              <span className="font-medium text-slate-900">
-                                {demandOrganization.name || '暂无'}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between gap-4 rounded-lg bg-slate-50 p-4">
-                              <span className="text-slate-500">组织类型</span>
-                              <span className="font-medium text-slate-900">
-                                {demandOrganization.type || '暂无'}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between gap-4 rounded-lg bg-slate-50 p-4">
-                              <span className="text-slate-500">组织状态</span>
-                              <span className="font-medium text-slate-900">
-                                {demandOrganization.status || '暂无'}
-                              </span>
-                            </div>
-                          </>
-                        ) : rfq.demand?.organizationId ? (
-                          <div className="rounded-lg bg-slate-50 p-4">
-                            <p className="text-slate-500">当前接口仅返回组织标识</p>
-                            <p className="mt-2 break-all font-medium text-slate-900">
-                              {rfq.demand.organizationId}
-                            </p>
-                          </div>
-                        ) : (
-                          <p className="text-sm text-slate-500">
-                            当前详情接口未返回组织详细信息，页面不额外扩展 API。
-                          </p>
-                        )}
-                      </div>
-                    </section>
-
-                    <section
-                      id="rfq-response-form"
-                      className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
-                    >
-                      <h2 className="text-lg font-semibold text-slate-900">响应此 RFQ</h2>
-                      <p className="mt-1 text-sm text-slate-500">
-                        填写以下信息并提交。Offer ID 为可选，message 为必填或选填按实际需要。
-                      </p>
-
-                      {submitSuccess ? (
-                        <div className="mt-5 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
-                          <div className="flex items-start gap-3">
-                            <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
-                              <svg
-                                className="h-3 w-3"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                                aria-hidden="true"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M16.704 5.29a1 1 0 010 1.42l-8 8a1 1 0 01-1.42 0l-4-4a1 1 0 011.42-1.42L8 12.58l7.29-7.29a1 1 0 011.414 0z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-emerald-800">
-                                响应提交成功
-                              </p>
-                              <p className="mt-1 text-sm text-emerald-700">
-                                您的 RFQ 响应已成功提交。无需刷新页面，如需再次提交请先联系管理员（同一组织对同一 RFQ 仅允许一次响应）。
-                              </p>
-                            </div>
-                          </div>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
                       ) : (
-                        <div className="mt-5 space-y-4">
-                          <div>
-                            <label
-                              htmlFor="response-offer-id"
-                              className="block text-sm font-medium text-slate-700"
-                            >
-                              Offer ID（可选）
-                            </label>
-                            <p className="mt-1 text-xs text-slate-500">
-                              如果您希望关联已发布的 Offer，请填写 Offer ID；留空则不绑定 Offer。
-                            </p>
-                            <input
-                              id="response-offer-id"
-                              type="text"
-                              value={responseOfferId}
-                              onChange={(e) => setResponseOfferId(e.target.value)}
-                              disabled={isSubmitting}
-                              placeholder="例如：off_xxxxxx"
-                              className="mt-2 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
-                            />
+                        <p className="text-sm text-slate-500">
+                          当前详情接口未返回需求参数，页面不额外扩展 API。
+                        </p>
+                      )}
+                    </div>
+                  </section>
+
+                  <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h2 className="text-lg font-semibold text-slate-900">需求所属组织</h2>
+                    <div className="mt-4 space-y-3 text-sm text-slate-600">
+                      {demandOrganization ? (
+                        <>
+                          <div className="flex items-center justify-between gap-4 rounded-lg bg-slate-50 p-4">
+                            <span className="text-slate-500">组织名称</span>
+                            <span className="font-medium text-slate-900">
+                              {demandOrganization.name || '暂无'}
+                            </span>
                           </div>
-
-                          <div>
-                            <label
-                              htmlFor="response-message"
-                              className="block text-sm font-medium text-slate-700"
-                            >
-                              响应消息（可选）
-                            </label>
-                            <p className="mt-1 text-xs text-slate-500">
-                              向需求方补充说明，例如交货周期、报价细节或其他备注。
-                            </p>
-                            <textarea
-                              id="response-message"
-                              rows={5}
-                              value={responseMessage}
-                              onChange={(e) => setResponseMessage(e.target.value)}
-                              disabled={isSubmitting}
-                              placeholder="请输入您对此 RFQ 的响应说明……"
-                              className="mt-2 block w-full resize-y rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
-                            />
+                          <div className="flex items-center justify-between gap-4 rounded-lg bg-slate-50 p-4">
+                            <span className="text-slate-500">组织类型</span>
+                            <span className="font-medium text-slate-900">
+                              {demandOrganization.type || '暂无'}
+                            </span>
                           </div>
+                          <div className="flex items-center justify-between gap-4 rounded-lg bg-slate-50 p-4">
+                            <span className="text-slate-500">组织状态</span>
+                            <span className="font-medium text-slate-900">
+                              {demandOrganization.status || '暂无'}
+                            </span>
+                          </div>
+                        </>
+                      ) : rfq.demand?.organizationId ? (
+                        <div className="rounded-lg bg-slate-50 p-4">
+                          <p className="text-slate-500">当前接口仅返回组织标识</p>
+                          <p className="mt-2 break-all font-medium text-slate-900">
+                            {rfq.demand.organizationId}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-slate-500">
+                          当前详情接口未返回组织详细信息，页面不额外扩展 API。
+                        </p>
+                      )}
+                    </div>
+                  </section>
 
-                          {submitError ? (
-                            <div className="rounded-lg border border-rose-200 bg-rose-50 p-4">
-                              <div className="flex items-start gap-3">
-                                <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rose-500 text-white">
-                                  <svg
-                                    className="h-3 w-3"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                    aria-hidden="true"
-                                  >
-                                    <path
-                                      fillRule="evenodd"
-                                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-                                      clipRule="evenodd"
-                                    />
-                                  </svg>
-                                </div>
-                                <div className="flex-1">
-                                  <p className="text-sm font-medium text-rose-800">
-                                    提交失败
-                                  </p>
-                                  <p className="mt-1 text-sm text-rose-700">{submitError}</p>
-                                </div>
-                              </div>
-                            </div>
-                          ) : null}
+                  <section
+                    id="rfq-response-form"
+                    className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
+                  >
+                    <h2 className="text-lg font-semibold text-slate-900">响应此 RFQ</h2>
+                    <p className="mt-1 text-sm text-slate-500">
+                      填写以下信息并提交。Offer ID 为可选，message 为必填或选填按实际需要。
+                    </p>
 
-                          <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-4">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setResponseMessage('');
-                                setResponseOfferId('');
-                                setSubmitError('');
-                                setSubmitSuccess(false);
-                              }}
-                              disabled={isSubmitting}
-                              className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                    {submitSuccess ? (
+                      <div className="mt-5 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+                        <div className="flex items-start gap-3">
+                          <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
+                            <svg
+                              className="h-3 w-3"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                              aria-hidden="true"
                             >
-                              清空
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => void handleSubmitResponse()}
-                              disabled={isSubmitting}
-                              className="inline-flex items-center gap-2 rounded-md border border-indigo-600 bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                            >
-                              {isSubmitting ? (
-                                <>
-                                  <svg
-                                    className="h-4 w-4 animate-spin"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    aria-hidden="true"
-                                  >
-                                    <circle
-                                      className="opacity-25"
-                                      cx="12"
-                                      cy="12"
-                                      r="10"
-                                      stroke="currentColor"
-                                      strokeWidth="4"
-                                    />
-                                    <path
-                                      className="opacity-75"
-                                      fill="currentColor"
-                                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                                    />
-                                  </svg>
-                                  提交中...
-                                </>
-                              ) : (
-                                <>提交响应</>
-                              )}
-                            </button>
+                              <path
+                                fillRule="evenodd"
+                                d="M16.704 5.29a1 1 0 010 1.42l-8 8a1 1 0 01-1.42 0l-4-4a1 1 0 011.42-1.42L8 12.58l7.29-7.29a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-emerald-800">响应提交成功</p>
+                            <p className="mt-1 text-sm text-emerald-700">
+                              您的 RFQ 响应已成功提交。无需刷新页面，如需再次提交请先联系管理员（同一组织对同一 RFQ 仅允许一次响应）。
+                            </p>
                           </div>
                         </div>
-                      )}
-                    </section>
-                  </>
-                )}
-              </div>
-            </RoleGuard>
+                      </div>
+                    ) : (
+                      <div className="mt-5 space-y-4">
+                        <div>
+                          <label
+                            htmlFor="response-offer-id"
+                            className="block text-sm font-medium text-slate-700"
+                          >
+                            Offer ID（可选）
+                          </label>
+                          <p className="mt-1 text-xs text-slate-500">
+                            如果您希望关联已发布的 Offer，请填写 Offer ID；留空则不绑定 Offer。
+                          </p>
+                          <input
+                            id="response-offer-id"
+                            type="text"
+                            value={responseOfferId}
+                            onChange={(e) => setResponseOfferId(e.target.value)}
+                            disabled={isSubmitting}
+                            placeholder="例如：off_xxxxxx"
+                            className="mt-2 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor="response-message"
+                            className="block text-sm font-medium text-slate-700"
+                          >
+                            响应消息（可选）
+                          </label>
+                          <p className="mt-1 text-xs text-slate-500">
+                            向需求方补充说明，例如交货周期、报价细节或其他备注。
+                          </p>
+                          <textarea
+                            id="response-message"
+                            rows={5}
+                            value={responseMessage}
+                            onChange={(e) => setResponseMessage(e.target.value)}
+                            disabled={isSubmitting}
+                            placeholder="请输入您对此 RFQ 的响应说明……"
+                            className="mt-2 block w-full resize-y rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                          />
+                        </div>
+
+                        {submitError ? (
+                          <div className="rounded-lg border border-rose-200 bg-rose-50 p-4">
+                            <div className="flex items-start gap-3">
+                              <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rose-500 text-white">
+                                <svg
+                                  className="h-3 w-3"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                  aria-hidden="true"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              </div>
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-rose-800">提交失败</p>
+                                <p className="mt-1 text-sm text-rose-700">{submitError}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ) : null}
+
+                        <div className="flex items-center justify-end gap-3 border-t border-slate-100 pt-4">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setResponseMessage('');
+                              setResponseOfferId('');
+                              setSubmitError('');
+                              setSubmitSuccess(false);
+                            }}
+                            disabled={isSubmitting}
+                            className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            清空
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => void handleSubmitResponse()}
+                            disabled={isSubmitting}
+                            className="inline-flex items-center gap-2 rounded-md border border-indigo-600 bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <svg
+                                  className="h-4 w-4 animate-spin"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  aria-hidden="true"
+                                >
+                                  <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                  />
+                                  <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                  />
+                                </svg>
+                                提交中...
+                              </>
+                            ) : (
+                              <>提交响应</>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </section>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -523,7 +513,9 @@ export default function SupplierRfqDetailPage({
 
   return (
     <AuthGuard>
-      <SupplierRfqDetailContent id={id} />
+      <RoleGuard roles={['SUPPLIER']}>
+        <SupplierRfqDetailContent id={id} />
+      </RoleGuard>
     </AuthGuard>
   );
 }

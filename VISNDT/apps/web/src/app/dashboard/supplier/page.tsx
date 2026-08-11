@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import AuthGuard from '@/auth/AuthGuard';
@@ -48,6 +49,37 @@ function formatOrganizationName(name?: string | null) {
   return name;
 }
 
+const DOMAIN_NAV_ITEMS = [
+  {
+    title: 'RFQ机会',
+    description: '进入定向 RFQ 列表，查看当前可跟进的询价机会。',
+    href: '/workspace/supplier/rfqs',
+    icon: '📄',
+  },
+  {
+    title: '我的响应',
+    description: '查看已提交响应的状态跟踪与历史记录。',
+    href: '/workspace/supplier/responses',
+    icon: '📨',
+  },
+  {
+    title: '通知中心',
+    description: '进入通知页面查看当前消息和提醒。',
+    href: '/workspace/notifications',
+    icon: '🔔',
+  },
+  {
+    title: '设置',
+    description: '进入工作区设置查看当前账号与偏好配置。',
+    href: '/workspace/settings',
+    icon: '⚙️',
+  },
+] as const;
+
+function countResponsesByStatus(statuses: string[], targetStatus: string) {
+  return statuses.filter((status) => status === targetStatus).length;
+}
+
 function SupplierDashboardContent() {
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -70,7 +102,14 @@ function SupplierDashboardContent() {
   });
 
   const visibleRfqs = (rfqsQuery.data ?? []).slice(0, 5);
-  const visibleResponses = (responsesQuery.data ?? []).slice(0, 5);
+  const responseItems = responsesQuery.data ?? [];
+  const visibleResponses = responseItems.slice(0, 3);
+  const responseStatuses = responseItems.map((response) => response.status);
+  const submittedResponseCount = countResponsesByStatus(responseStatuses, 'SUBMITTED');
+  const pendingResponseCount = responseStatuses.filter(
+    (status) => status !== 'ACCEPTED' && status !== 'REJECTED',
+  ).length;
+  const acceptedResponseCount = countResponsesByStatus(responseStatuses, 'ACCEPTED');
 
   const retryOverview = () => {
     void overviewQuery.refetch();
@@ -94,10 +133,10 @@ function SupplierDashboardContent() {
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-slate-900">
-                  Supplier Dashboard
+                  Supplier Business Workbench
                 </h1>
                 <p className="mt-1 text-sm text-slate-500">
-                  欢迎回来{user?.name ? `，${user.name}` : ''}。这里展示 Supplier 工作区概览、定向 RFQ 快照和响应跟踪。
+                  欢迎回来{user?.name ? `，${user.name}` : ''}。这里作为 Supplier Workspace 的业务状态与导航中心，只展示当前状态、待处理摘要和业务入口。
                 </p>
               </div>
               <div className="text-sm text-slate-500">
@@ -107,9 +146,9 @@ function SupplierDashboardContent() {
 
             <section className="space-y-4">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">Supplier Summary Cards</h2>
+                <h2 className="text-lg font-semibold text-slate-900">Business Status</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  数据仅来自 `workspace.service.ts` 的 Supplier Workspace API 封装。
+                  数据仅来自 `getSupplierWorkspaceOverview()`，用于展示 Supplier 当前业务状态。
                 </p>
               </div>
 
@@ -127,25 +166,19 @@ function SupplierDashboardContent() {
               ) : (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                   <StatCard
-                    label="RFQ Summary"
+                    label="Targeted RFQ"
                     value={overviewQuery.data.rfqSummary.total}
                     description={formatStatusCounts(overviewQuery.data.rfqSummary.statusCounts)}
                     icon="📄"
                   />
                   <StatCard
-                    label="Response Summary"
+                    label="Responses"
                     value={overviewQuery.data.responseSummary.total}
                     description={formatStatusCounts(overviewQuery.data.responseSummary.statusCounts)}
                     icon="📨"
                   />
                   <StatCard
-                    label="Notification Summary"
-                    value={overviewQuery.data.notificationSummary.unreadCount}
-                    description="当前未读通知数"
-                    icon="🔔"
-                  />
-                  <StatCard
-                    label="Match Summary"
+                    label="Matches"
                     value={overviewQuery.data.matchSummary.total}
                     description={formatStatusCounts(overviewQuery.data.matchSummary.statusCounts)}
                     icon="🔗"
@@ -158,7 +191,7 @@ function SupplierDashboardContent() {
               <div className="mb-4">
                 <h2 className="text-lg font-semibold text-slate-900">Targeted RFQ Snapshot</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  展示当前组织最近收到的定向 RFQ 快照，不提供 RFQ 操作入口。
+                  展示当前组织最近收到的定向 RFQ 机会摘要，不提供 RFQ 操作入口，也不扩展到 Marketplace 或全量 Demand 浏览。
                 </p>
               </div>
 
@@ -234,7 +267,7 @@ function SupplierDashboardContent() {
               <div className="mb-4">
                 <h2 className="text-lg font-semibold text-slate-900">Response Tracking</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  展示当前组织最近提交的响应状态和关联 Buyer 上下文。
+                  基于 `getSupplierWorkspaceResponses()` 展示响应状态摘要与最近跟踪记录，页面保持只读，不提供提交、编辑、撤回或决策按钮。
                 </p>
               </div>
 
@@ -245,63 +278,115 @@ function SupplierDashboardContent() {
                   message="加载响应跟踪数据失败，请稍后重试。"
                   onRetry={retryResponses}
                 />
-              ) : visibleResponses.length === 0 ? (
-                <EmptyState message="当前暂无可展示的响应记录。" />
               ) : (
                 <div className="space-y-4">
-                  {visibleResponses.map((response) => (
-                    <article
-                      key={response.id}
-                      className="rounded-lg border border-slate-200 bg-slate-50 p-4"
-                    >
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div className="space-y-2">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <RFQResponseStatusBadge status={response.status} />
-                            <span className="text-xs text-slate-400">
-                              Response ID: {response.id}
-                            </span>
-                          </div>
-                          <h3 className="text-base font-semibold text-slate-900">
-                            {response.rfq.title}
-                          </h3>
-                          <p className="text-sm text-slate-500">
-                            关联需求：{response.demand.title}
-                          </p>
-                        </div>
-                        <div className="text-right text-sm text-slate-500">
-                          <p>提交时间：{formatDateTime(response.createdAt)}</p>
-                          <p>更新时间：{formatDateTime(response.updatedAt)}</p>
-                        </div>
-                      </div>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                    <StatCard
+                      label="Submitted"
+                      value={submittedResponseCount}
+                      description="当前处于已提交状态的响应数"
+                      icon="📨"
+                    />
+                    <StatCard
+                      label="Pending"
+                      value={pendingResponseCount}
+                      description="尚未进入最终结果的响应数"
+                      icon="⏳"
+                    />
+                    <StatCard
+                      label="Accepted"
+                      value={acceptedResponseCount}
+                      description="已接受的响应数"
+                      icon="✅"
+                    />
+                  </div>
 
-                      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                        <div className="rounded-lg bg-white p-3">
-                          <p className="text-xs text-slate-500">Response status</p>
-                          <div className="mt-1">
-                            <RFQResponseStatusBadge status={response.status} />
+                  {visibleResponses.length === 0 ? (
+                    <EmptyState message="当前暂无可展示的响应记录。" />
+                  ) : (
+                    <div className="space-y-4">
+                      {visibleResponses.map((response) => (
+                        <article
+                          key={response.id}
+                          className="rounded-lg border border-slate-200 bg-slate-50 p-4"
+                        >
+                          <div className="flex flex-wrap items-start justify-between gap-3">
+                            <div className="space-y-2">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <RFQResponseStatusBadge status={response.status} />
+                                <span className="text-xs text-slate-400">
+                                  Response ID: {response.id}
+                                </span>
+                              </div>
+                              <h3 className="text-base font-semibold text-slate-900">
+                                {response.rfq.title}
+                              </h3>
+                              <p className="text-sm text-slate-500">
+                                关联需求：{response.demand.title}
+                              </p>
+                            </div>
+                            <div className="text-right text-sm text-slate-500">
+                              <p>提交时间：{formatDateTime(response.createdAt)}</p>
+                              <p>更新时间：{formatDateTime(response.updatedAt)}</p>
+                            </div>
                           </div>
-                        </div>
-                        <div className="rounded-lg bg-white p-3">
-                          <p className="text-xs text-slate-500">Related RFQ</p>
-                          <p className="mt-1 text-sm font-medium text-slate-900">
-                            {response.rfq.title}
-                          </p>
-                          <p className="mt-1 text-xs text-slate-400">
-                            Reference: {response.rfq.reference}
-                          </p>
-                        </div>
-                        <div className="rounded-lg bg-white p-3">
-                          <p className="text-xs text-slate-500">Buyer organization</p>
-                          <p className="mt-1 text-sm font-medium text-slate-900">
-                            {formatOrganizationName(response.buyerOrganization?.name)}
-                          </p>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
+
+                          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            <div className="rounded-lg bg-white p-3">
+                              <p className="text-xs text-slate-500">Response status</p>
+                              <div className="mt-1">
+                                <RFQResponseStatusBadge status={response.status} />
+                              </div>
+                            </div>
+                            <div className="rounded-lg bg-white p-3">
+                              <p className="text-xs text-slate-500">Related RFQ</p>
+                              <p className="mt-1 text-sm font-medium text-slate-900">
+                                {response.rfq.title}
+                              </p>
+                              <p className="mt-1 text-xs text-slate-400">
+                                Reference: {response.rfq.reference}
+                              </p>
+                            </div>
+                            <div className="rounded-lg bg-white p-3">
+                              <p className="text-xs text-slate-500">Buyer organization</p>
+                              <p className="mt-1 text-sm font-medium text-slate-900">
+                                {formatOrganizationName(response.buyerOrganization?.name)}
+                              </p>
+                            </div>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
+            </section>
+
+            <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="mb-4">
+                <h2 className="text-lg font-semibold text-slate-900">Domain Navigation</h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Supplier Workspace 作为导航中心，仅提供进入现有业务域页面的入口。
+                </p>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                {DOMAIN_NAV_ITEMS.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="rounded-lg border border-slate-200 bg-slate-50 p-5 transition-colors hover:border-slate-300 hover:bg-white"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <h3 className="text-base font-semibold text-slate-900">{item.title}</h3>
+                      <span className="text-xl">{item.icon}</span>
+                    </div>
+                    <p className="mt-3 text-sm text-slate-500">{item.description}</p>
+                    <span className="mt-4 inline-flex text-sm font-medium text-slate-700">
+                      进入页面
+                    </span>
+                  </Link>
+                ))}
+              </div>
             </section>
           </div>
         </div>

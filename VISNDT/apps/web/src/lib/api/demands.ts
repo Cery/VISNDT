@@ -9,6 +9,11 @@ export interface DemandItem {
   budgetRange?: string | null;
   quantity?: number | null;
   quantityUnit?: string | null;
+  expectedDeliveryDate?: string | null;
+  contactName?: string | null;
+  contactPhone?: string | null;
+  contactEmail?: string | null;
+  contactVisible?: boolean | null;
   category?: { id: string; name: string; slug: string } | null;
   organizationId: string;
   createdAt: string;
@@ -61,6 +66,10 @@ export interface CreateDemandParams {
   quantity?: number;
   quantityUnit?: string;
   expectedDeliveryDate?: string;
+  contactName?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  contactVisible?: boolean;
 }
 
 /**

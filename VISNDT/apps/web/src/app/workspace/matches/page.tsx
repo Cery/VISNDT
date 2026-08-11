@@ -6,8 +6,11 @@ import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
 import MatchList from '@/components/match/MatchList';
-import { getAllMatches } from '@/services/match.service';
-import { updateMatchStatus, rematchDemand } from '@/lib/api/demands';
+import {
+  getAllMatches,
+  updateMatchStatus,
+  rematchDemand,
+} from '@/services/match.service';
 import type { MatchItem } from '@/services/match.service';
 
 function MatchesContent() {

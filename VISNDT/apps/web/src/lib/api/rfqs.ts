@@ -229,3 +229,53 @@ export async function createRfqResponse(
   });
   return res.data;
 }
+
+/**
+ * Mark an RFQ response as viewed.
+ * POST /rfq-responses/:id/view (JWT)
+ */
+export async function viewRfqResponse(
+  responseId: string,
+): Promise<RfqResponseItem> {
+  const res = await apiClient<ApiResponse<RfqResponseItem>>(
+    `/rfq-responses/${responseId}/view`,
+    { method: 'POST' },
+  );
+  return res.data;
+}
+
+/**
+ * Accept an RFQ response.
+ * POST /rfq-responses/:id/accept (JWT)
+ */
+export async function acceptRfqResponse(
+  responseId: string,
+  params: { decisionNote?: string } = {},
+): Promise<RfqResponseItem> {
+  const res = await apiClient<ApiResponse<RfqResponseItem>>(
+    `/rfq-responses/${responseId}/accept`,
+    {
+      method: 'POST',
+      body: JSON.stringify(params),
+    },
+  );
+  return res.data;
+}
+
+/**
+ * Reject an RFQ response.
+ * POST /rfq-responses/:id/reject (JWT)
+ */
+export async function rejectRfqResponse(
+  responseId: string,
+  params: { decisionNote?: string } = {},
+): Promise<RfqResponseItem> {
+  const res = await apiClient<ApiResponse<RfqResponseItem>>(
+    `/rfq-responses/${responseId}/reject`,
+    {
+      method: 'POST',
+      body: JSON.stringify(params),
+    },
+  );
+  return res.data;
+}

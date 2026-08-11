@@ -76,6 +76,7 @@ function DemandDetailContent({ id }: { id: string }) {
   }, [id]);
 
   const canPublish = demand?.status === 'DRAFT';
+  const canEdit = demand?.status === 'DRAFT';
   const canClose = demand?.status === 'PUBLISHED' || demand?.status === 'PROCESSING';
 
   return (
@@ -108,6 +109,14 @@ function DemandDetailContent({ id }: { id: string }) {
                 {/* Action buttons */}
                 {!isLoading && demand && (
                   <div className="flex items-center gap-2 mb-6">
+                    {canEdit && (
+                      <button
+                        onClick={() => router.push(`/workspace/demands/${id}/edit`)}
+                        className="px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 transition-colors"
+                      >
+                        编辑
+                      </button>
+                    )}
                     {canPublish && (
                       <button
                         onClick={handlePublish}

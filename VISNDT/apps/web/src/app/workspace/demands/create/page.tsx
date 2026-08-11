@@ -7,7 +7,7 @@ import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
-import { createDemand } from '@/lib/api/demands';
+import { createDemand } from '@/services/demand.service';
 
 export default function DemandCreatePage() {
   return (

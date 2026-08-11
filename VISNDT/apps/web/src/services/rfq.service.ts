@@ -11,6 +11,9 @@ import {
   publishRfq as apiPublishRfq,
   closeRfq as apiCloseRfq,
   createRfqResponse as apiCreateRfqResponse,
+  viewRfqResponse as apiViewRfqResponse,
+  acceptRfqResponse as apiAcceptRfqResponse,
+  rejectRfqResponse as apiRejectRfqResponse,
 } from '@/lib/api/rfqs';
 import type { PaginatedResponse } from '@/types/api';
 import type {
@@ -73,4 +76,24 @@ export async function createRfqResponse(
   params: CreateRfqResponseParams,
 ): Promise<RfqResponseItem> {
   return apiCreateRfqResponse(rfqId, params);
+}
+
+export async function viewRfqResponse(
+  responseId: string,
+): Promise<RfqResponseItem> {
+  return apiViewRfqResponse(responseId);
+}
+
+export async function acceptRfqResponse(
+  responseId: string,
+  params: { decisionNote?: string } = {},
+): Promise<RfqResponseItem> {
+  return apiAcceptRfqResponse(responseId, params);
+}
+
+export async function rejectRfqResponse(
+  responseId: string,
+  params: { decisionNote?: string } = {},
+): Promise<RfqResponseItem> {
+  return apiRejectRfqResponse(responseId, params);
 }

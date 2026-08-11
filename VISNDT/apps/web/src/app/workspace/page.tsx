@@ -39,13 +39,13 @@ const WORKSPACE_ENTRY_LINKS: Record<Exclude<WorkspaceRole, null>, WorkspaceEntry
   ],
   SUPPLIER: [
     {
-      title: 'Supplier Dashboard',
-      description: '进入 Supplier 角色的仪表盘总览。',
+      title: 'Supplier Business Workbench',
+      description: '进入 Supplier 正式业务工作台，查看业务状态与导航入口。',
       href: '/dashboard/supplier',
     },
     {
-      title: '供应商工作台',
-      description: '查看当前组织的 Supplier 工作区入口。',
+      title: '供应商兼容入口',
+      description: '保留历史路由兼容壳页，仅用于兼容访问，不承担正式业务工作台职责。',
       href: '/workspace/supplier',
     },
     {

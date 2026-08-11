@@ -9,14 +9,12 @@ import { useAuth } from '@/auth/AuthProvider';
 import EmptyState from '@/components/common/EmptyState';
 import ErrorState from '@/components/common/ErrorState';
 import Loading from '@/components/common/Loading';
-import DemandStatusBadge from '@/components/demand/DemandStatusBadge';
-import RFQResponseStatusBadge from '@/components/rfq/RFQResponseStatusBadge';
+import BuyerActionSummary from '@/components/workspace/BuyerActionSummary';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import StatCard from '@/components/workspace/StatCard';
 import {
   getBuyerPendingDecisions,
-  getBuyerWorkspaceDemands,
   getBuyerWorkspaceOverview,
 } from '@/services/workspace.service';
 
@@ -27,6 +25,46 @@ function formatDateTime(value?: string | null) {
 
   return new Date(value).toLocaleString('zh-CN');
 }
+
+function formatStatusCounts(statusCounts?: Record<string, number>) {
+  const entries = Object.entries(statusCounts ?? {}).filter(([, count]) => count > 0);
+
+  if (entries.length === 0) {
+    return '暂无状态统计';
+  }
+
+  return entries
+    .slice(0, 3)
+    .map(([status, count]) => `${status} ${count}`)
+    .join(' / ');
+}
+
+const DOMAIN_NAV_ITEMS = [
+  {
+    title: '我的需求',
+    description: '查看 Demand 列表、状态和详情页入口。',
+    href: '/workspace/demands',
+    icon: '📋',
+  },
+  {
+    title: '询价管理',
+    description: '进入 RFQ 列表，查看询价进度与待决策响应。',
+    href: '/workspace/rfqs',
+    icon: '📄',
+  },
+  {
+    title: '匹配结果',
+    description: '查看当前 Matching 汇总与关联结果。',
+    href: '/workspace/matches',
+    icon: '🔗',
+  },
+  {
+    title: '通知中心',
+    description: '进入通知页面查看当前消息和提醒。',
+    href: '/workspace/notifications',
+    icon: '🔔',
+  },
+] as const;
 
 function BuyerDashboardContent() {
   const { user } = useAuth();
@@ -39,25 +77,16 @@ function BuyerDashboardContent() {
     queryFn: getBuyerWorkspaceOverview,
   });
 
-  const demandsQuery = useQuery({
-    queryKey: ['workspace', 'buyer', 'demands'],
-    queryFn: getBuyerWorkspaceDemands,
-  });
-
   const decisionsQuery = useQuery({
     queryKey: ['workspace', 'buyer', 'pending-decisions'],
     queryFn: getBuyerPendingDecisions,
   });
 
-  const visibleDemands = (demandsQuery.data ?? []).slice(0, 5);
-  const visibleDecisions = (decisionsQuery.data ?? []).slice(0, 5);
+  const pendingDecisionCount = decisionsQuery.data?.length ?? 0;
+  const visibleDecisions = (decisionsQuery.data ?? []).slice(0, 3);
 
   const retryOverview = () => {
     void overviewQuery.refetch();
-  };
-
-  const retryDemands = () => {
-    void demandsQuery.refetch();
   };
 
   const retryDecisions = () => {
@@ -74,10 +103,10 @@ function BuyerDashboardContent() {
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-slate-900">
-                  Buyer Dashboard
+                  Buyer Business Workbench
                 </h1>
                 <p className="mt-1 text-sm text-slate-500">
-                  欢迎回来{user?.name ? `，${user.name}` : ''}。这里展示 Buyer 工作区概览、需求总览和待决策响应。
+                  欢迎回来{user?.name ? `，${user.name}` : ''}。这里作为 Buyer Workspace 的业务状态与导航中心，只展示当前状态与入口，不承载业务操作。
                 </p>
               </div>
               <div className="text-sm text-slate-500">
@@ -87,9 +116,9 @@ function BuyerDashboardContent() {
 
             <section className="space-y-4">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">汇总卡片</h2>
+                <h2 className="text-lg font-semibold text-slate-900">Business Status</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  数据来自 Workspace API client，经由 `workspace.service.ts` 获取。
+                  数据仅来自 `workspace.service.ts` 的 Buyer Workspace 聚合接口。
                 </p>
               </div>
 
@@ -107,27 +136,27 @@ function BuyerDashboardContent() {
               ) : (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                   <StatCard
-                    label="活跃需求"
+                    label="Demand"
                     value={overviewQuery.data.demandSummary.total}
-                    description="Buyer 需求总量"
+                    description={formatStatusCounts(overviewQuery.data.demandSummary.statusCounts)}
                     icon="📋"
                   />
                   <StatCard
-                    label="匹配结果"
-                    value={overviewQuery.data.matchSummary.total}
-                    description="Workspace Match 汇总"
-                    icon="🔗"
-                  />
-                  <StatCard
-                    label="已发 RFQ"
+                    label="RFQ"
                     value={overviewQuery.data.rfqSummary.total}
                     description="Buyer RFQ 总量"
                     icon="📄"
                   />
                   <StatCard
-                    label="待决策响应"
+                    label="Matching"
+                    value={overviewQuery.data.matchSummary.total}
+                    description={formatStatusCounts(overviewQuery.data.matchSummary.statusCounts)}
+                    icon="🔗"
+                  />
+                  <StatCard
+                    label="Response Status"
                     value={overviewQuery.data.responseSummary.pendingCount}
-                    description={`已接受 ${overviewQuery.data.responseSummary.acceptedCount} / 已拒绝 ${overviewQuery.data.responseSummary.rejectedCount}`}
+                    description={`待决策 ${overviewQuery.data.responseSummary.pendingCount} / 已接受 ${overviewQuery.data.responseSummary.acceptedCount} / 已拒绝 ${overviewQuery.data.responseSummary.rejectedCount}`}
                     icon="⏳"
                   />
                 </div>
@@ -135,96 +164,13 @@ function BuyerDashboardContent() {
             </section>
 
             <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+              <div className="mb-4">
                 <div>
-                  <h2 className="text-lg font-semibold text-slate-900">Demand Overview</h2>
+                  <h2 className="text-lg font-semibold text-slate-900">Pending Actions</h2>
                   <p className="mt-1 text-sm text-slate-500">
-                    展示最近需求及其匹配、RFQ 进展。
+                    基于现有待决策响应数据，提示 Buyer 当前需要进入哪个业务域继续处理。
                   </p>
                 </div>
-                <Link
-                  href="/workspace/demands"
-                  className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
-                >
-                  查看全部需求
-                </Link>
-              </div>
-
-              {demandsQuery.isLoading ? (
-                <Loading />
-              ) : demandsQuery.isError ? (
-                <ErrorState
-                  message="加载 Buyer 需求概览失败，请稍后重试。"
-                  onRetry={retryDemands}
-                />
-              ) : visibleDemands.length === 0 ? (
-                <EmptyState message="当前暂无 Buyer 需求数据。" />
-              ) : (
-                <div className="space-y-4">
-                  {visibleDemands.map((demand) => (
-                    <article
-                      key={demand.id}
-                      className="rounded-lg border border-slate-200 bg-slate-50 p-4"
-                    >
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div className="space-y-2">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <DemandStatusBadge status={demand.status} />
-                            <span className="text-xs text-slate-400">Demand ID: {demand.id}</span>
-                          </div>
-                          <h3 className="text-base font-semibold text-slate-900">
-                            {demand.title}
-                          </h3>
-                        </div>
-                        <div className="text-right text-sm text-slate-500">
-                          <p>创建时间：{formatDateTime(demand.createdAt)}</p>
-                          <p>更新时间：{formatDateTime(demand.updatedAt)}</p>
-                        </div>
-                      </div>
-
-                      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="rounded-lg bg-white p-3">
-                          <p className="text-xs text-slate-500">状态</p>
-                          <p className="mt-1 text-sm font-medium text-slate-900">{demand.status}</p>
-                        </div>
-                        <div className="rounded-lg bg-white p-3">
-                          <p className="text-xs text-slate-500">匹配数</p>
-                          <p className="mt-1 text-sm font-medium text-slate-900">{demand.matchCount}</p>
-                        </div>
-                        <div className="rounded-lg bg-white p-3">
-                          <p className="text-xs text-slate-500">RFQ 数</p>
-                          <p className="mt-1 text-sm font-medium text-slate-900">{demand.rfqCount}</p>
-                        </div>
-                        <div className="rounded-lg bg-white p-3">
-                          <p className="text-xs text-slate-500">详情</p>
-                          <Link
-                            href={`/workspace/demands/${demand.id}`}
-                            className="mt-1 inline-flex text-sm font-medium text-slate-700 transition-colors hover:text-slate-900"
-                          >
-                            查看 Demand
-                          </Link>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              )}
-            </section>
-
-            <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-              <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-                <div>
-                  <h2 className="text-lg font-semibold text-slate-900">Pending RFQ Response Decisions</h2>
-                  <p className="mt-1 text-sm text-slate-500">
-                    展示等待 Buyer 处理的响应决策。
-                  </p>
-                </div>
-                <Link
-                  href="/workspace/rfqs"
-                  className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
-                >
-                  前往 RFQ 列表
-                </Link>
               </div>
 
               {decisionsQuery.isLoading ? (
@@ -234,65 +180,104 @@ function BuyerDashboardContent() {
                   message="加载待决策响应失败，请稍后重试。"
                   onRetry={retryDecisions}
                 />
-              ) : visibleDecisions.length === 0 ? (
-                <EmptyState message="当前没有待处理的 RFQ 响应决策。" />
               ) : (
                 <div className="space-y-4">
-                  {visibleDecisions.map((decision) => (
-                    <article
-                      key={decision.id}
-                      className="rounded-lg border border-slate-200 bg-slate-50 p-4"
-                    >
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div className="space-y-2">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <RFQResponseStatusBadge status={decision.status} />
-                            <span className="text-xs text-slate-400">
-                              Response ID: {decision.id}
-                            </span>
-                          </div>
-                          <h3 className="text-base font-semibold text-slate-900">
-                            {decision.demand.title}
-                          </h3>
-                          <p className="text-sm text-slate-500">
-                            供应商：{decision.supplierOrganization.name}
-                          </p>
-                        </div>
-                        <div className="text-right text-sm text-slate-500">
-                          <p>待处理起始：{formatDateTime(decision.pendingSince)}</p>
-                          <p>RFQ 更新时间：{formatDateTime(decision.rfq.updatedAt)}</p>
-                        </div>
-                      </div>
+                  <BuyerActionSummary
+                    title="待处理供应商响应"
+                    count={pendingDecisionCount}
+                    description="Buyer 当前仍有 RFQ 响应等待进入询价域查看和决策，本工作台仅负责状态提示与导航。"
+                    href="/workspace/rfqs"
+                    linkLabel="查看待决策响应"
+                  />
 
-                      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                        <div className="rounded-lg bg-white p-3">
-                          <p className="text-xs text-slate-500">RFQ 状态</p>
-                          <p className="mt-1 text-sm font-medium text-slate-900">{decision.rfq.status}</p>
-                        </div>
-                        <div className="rounded-lg bg-white p-3">
-                          <p className="text-xs text-slate-500">Demand 状态</p>
-                          <p className="mt-1 text-sm font-medium text-slate-900">{decision.demand.status}</p>
-                        </div>
-                        <div className="rounded-lg bg-white p-3">
-                          <p className="text-xs text-slate-500">Supplier 类型</p>
-                          <p className="mt-1 text-sm font-medium text-slate-900">
-                            {decision.supplierOrganization.type}
-                          </p>
-                        </div>
-                        <div className="rounded-lg bg-white p-3">
-                          <p className="text-xs text-slate-500">详情</p>
-                          <Link
-                            href={`/workspace/rfqs/${decision.rfq.id}`}
-                            className="mt-1 inline-flex text-sm font-medium text-slate-700 transition-colors hover:text-slate-900"
-                          >
-                            查看 RFQ
-                          </Link>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
+                  {visibleDecisions.length === 0 ? (
+                    <EmptyState message="当前没有待处理的 RFQ 响应决策。" />
+                  ) : (
+                    <div className="grid gap-3 lg:grid-cols-3">
+                      {visibleDecisions.map((decision) => (
+                        <article
+                          key={decision.id}
+                          className="rounded-lg border border-slate-200 bg-slate-50 p-4"
+                        >
+                          <div className="space-y-3">
+                            <div>
+                              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                                Response ID
+                              </p>
+                              <p className="mt-1 text-sm font-semibold text-slate-900">
+                                {decision.id}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-slate-500">关联 Demand</p>
+                              <p className="mt-1 text-sm font-medium text-slate-900">
+                                {decision.demand.title}
+                              </p>
+                            </div>
+                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                              <div>
+                                <p className="text-xs text-slate-500">供应商</p>
+                                <p className="mt-1 text-sm text-slate-900">
+                                  {decision.supplierOrganization.name}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-slate-500">待处理起始</p>
+                                <p className="mt-1 text-sm text-slate-900">
+                                  {formatDateTime(decision.pendingSince)}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between gap-3 border-t border-slate-200 pt-3">
+                              <div>
+                                <p className="text-xs text-slate-500">当前状态</p>
+                                <p className="mt-1 text-sm font-medium text-slate-900">
+                                  {decision.status}
+                                </p>
+                              </div>
+                              <Link
+                                href={`/workspace/rfqs/${decision.rfq.id}`}
+                                className="text-sm font-medium text-slate-700 transition-colors hover:text-slate-900"
+                              >
+                                查看 RFQ
+                              </Link>
+                            </div>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
+            </section>
+
+            <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">Domain Navigation</h2>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Workspace 作为导航中心，仅提供进入各业务域的现有入口。
+                  </p>
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                {DOMAIN_NAV_ITEMS.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="rounded-lg border border-slate-200 bg-slate-50 p-5 transition-colors hover:border-slate-300 hover:bg-white"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <h3 className="text-base font-semibold text-slate-900">{item.title}</h3>
+                      <span className="text-xl">{item.icon}</span>
+                    </div>
+                    <p className="mt-3 text-sm text-slate-500">{item.description}</p>
+                    <span className="mt-4 inline-flex text-sm font-medium text-slate-700">
+                      进入页面
+                    </span>
+                  </Link>
+                ))}
+              </div>
             </section>
           </div>
         </div>

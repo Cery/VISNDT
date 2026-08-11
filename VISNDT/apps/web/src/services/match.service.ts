@@ -1,7 +1,11 @@
 /**
  * Match Service Layer
  */
-import { getDemandMatches } from '@/lib/api/demands';
+import {
+  getDemandMatches,
+  rematchDemand as rematchDemandApi,
+  updateMatchStatus as updateMatchStatusApi,
+} from '@/lib/api/demands';
 import { getDemands } from '@/services/demand.service';
 import type { PaginatedResponse } from '@/types/api';
 
@@ -23,6 +27,18 @@ export async function getMatches(
   pageSize = 10,
 ): Promise<PaginatedResponse<MatchItem>> {
   return getDemandMatches(demandId, page, pageSize) as Promise<PaginatedResponse<MatchItem>>;
+}
+
+export async function updateMatchStatus(
+  demandId: string,
+  matchId: string,
+  status: string,
+) {
+  return updateMatchStatusApi(demandId, matchId, status);
+}
+
+export async function rematchDemand(demandId: string) {
+  return rematchDemandApi(demandId);
 }
 
 /**

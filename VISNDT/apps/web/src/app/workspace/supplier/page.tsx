@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useState } from 'react';
 import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
@@ -21,9 +22,9 @@ function SupplierWorkspaceContent() {
             <RoleGuard roles={['SUPPLIER']}>
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-xl font-bold text-slate-900">供应商工作台</h2>
+                  <h2 className="text-xl font-bold text-slate-900">供应商兼容入口（Compatibility Shell）</h2>
                   <p className="text-slate-500 text-sm mt-1">
-                    欢迎进入供应商工作区，后续将在这里承接询价处理与报价响应能力。
+                    该页面仅保留为历史路由兼容入口，用于维持 Supplier 工作区壳层访问，不承担业务工作台扩展职责。
                   </p>
                 </div>
 
@@ -34,19 +35,37 @@ function SupplierWorkspaceContent() {
                     </div>
                     <div className="space-y-3">
                       <div>
-                        <h3 className="text-base font-semibold text-slate-900">Supplier Workspace Ready</h3>
+                        <h3 className="text-base font-semibold text-slate-900">Dashboard 负责 Supplier Workbench</h3>
                         <p className="text-sm text-slate-500 mt-1">
-                          当前版本仅建立入口骨架，不接入 API、不展示业务数据。
+                          正式的 Supplier Business Status、RFQ Snapshot、Response Tracking 和 Domain Navigation 已统一归属到 `/dashboard/supplier`。
                         </p>
                       </div>
                       <div className="grid gap-3 sm:grid-cols-2">
                         <div className="rounded-lg bg-slate-50 p-4">
-                          <p className="text-sm font-medium text-slate-700">下一步入口</p>
-                          <p className="text-sm text-slate-500 mt-1">可从侧边栏进入供应商询价管理。</p>
+                          <p className="text-sm font-medium text-slate-700">推荐入口</p>
+                          <p className="text-sm text-slate-500 mt-1">
+                            Supplier 正式工作台入口为 `/dashboard/supplier`。
+                          </p>
                         </div>
                         <div className="rounded-lg bg-slate-50 p-4">
-                          <p className="text-sm font-medium text-slate-700">当前状态</p>
-                          <p className="text-sm text-slate-500 mt-1">页面骨架已接入 Supplier 角色守卫。</p>
+                          <p className="text-sm font-medium text-slate-700">当前职责</p>
+                          <p className="text-sm text-slate-500 mt-1">
+                            仅保留角色守卫与壳层兼容，不接入 domain API，不承接未来业务能力。
+                          </p>
+                        </div>
+                      </div>
+                      <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                        <p className="text-sm font-medium text-slate-700">兼容范围说明</p>
+                        <p className="mt-1 text-sm text-slate-500">
+                          本页不新增 RFQ 列表、Response 操作、产品管理或其他 Supplier 业务能力；相关业务导航请进入正式 Dashboard。
+                        </p>
+                        <div className="mt-4">
+                          <Link
+                            href="/dashboard/supplier"
+                            className="inline-flex items-center rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-800"
+                          >
+                            进入 Supplier Dashboard
+                          </Link>
                         </div>
                       </div>
                     </div>

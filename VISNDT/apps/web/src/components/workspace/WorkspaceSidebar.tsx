@@ -11,6 +11,7 @@ interface NavItem {
   label: string;
   href: string;
   icon: string;
+  badge?: string;
 }
 
 const NAV_CONFIG: Record<NavigableWorkspaceRole, NavItem[]> = {
@@ -24,9 +25,9 @@ const NAV_CONFIG: Record<NavigableWorkspaceRole, NavItem[]> = {
   ],
   SUPPLIER: [
     { label: '仪表盘', href: '/dashboard/supplier', icon: '📊' },
-    { label: '供应商工作台', href: '/workspace/supplier', icon: '🏭' },
     { label: 'RFQ响应', href: '/workspace/supplier/rfqs', icon: '📄' },
-    { label: '我的响应', href: '/workspace/supplier/responses', icon: '📨' },
+    { label: '我的响应', href: '/workspace/supplier/responses', icon: 'R' },
+    { label: '兼容入口', href: '/workspace/supplier', icon: '🏭', badge: 'Legacy' },
     { label: '通知中心', href: '/workspace/notifications', icon: '🔔' },
     { label: '设置', href: '/workspace/settings', icon: '⚙️' },
   ],
@@ -97,6 +98,11 @@ export default function WorkspaceSidebar({ mobileOpen, onClose }: WorkspaceSideb
                 >
                   <span className="text-base">{item.icon}</span>
                   <span className="flex-1">{item.label}</span>
+                  {item.badge && (
+                    <span className="rounded-full border border-slate-600 px-2 py-0.5 text-[10px] uppercase tracking-wide text-slate-400">
+                      {item.badge}
+                    </span>
+                  )}
                 </Link>
               );
             })}
