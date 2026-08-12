@@ -80,6 +80,7 @@ enum WorkflowEntityType {
   RFQ_RESPONSE
   OFFER
   MATCH
+  CONTENT
 }
 
 enum WorkflowAction {
@@ -112,6 +113,7 @@ enum FileEntityType {
   DEMAND
   RFQ
   RFQ_RESPONSE
+  CONTENT
 }
 
 enum FileType {
@@ -152,6 +154,25 @@ enum InquiryStatus {
   CLOSED
 }
 
+enum ContentType {
+  ARTICLE
+  KNOWLEDGE
+  SOLUTION
+  INSIGHT
+}
+
+enum ContentStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ContentMediaType {
+  IMAGE
+  ATTACHMENT
+}
+
 // ===========================================
 // Migration 001: Identity & Organization Domain
 // ===========================================
@@ -181,6 +202,7 @@ model User {
   inquiries           Inquiry[]
   offers              Offer[]
   createdProducts     Product[]
+  contents            Content[]
 
   @@index([organizationId])
   @@index([status])
@@ -666,6 +688,8 @@ model FileAsset {
 
   uploader User @relation(fields: [uploadedBy], references: [id])
   media    ProductMedia[]
+  contentCoverImages Content[]
+  contentMedia        ContentMedia[]
 
   @@index([entityType, entityId])
   @@index([uploadedBy])
@@ -721,4 +745,89 @@ model Inquiry {
   @@index([status])
   @@index([createdAt])
   @@map("inquiry")
+}
+
+// ===========================================
+// Migration 006: Content Domain
+// ===========================================
+
+model Content {
+  id            String        @id @default(uuid()) @db.Uuid
+  type          ContentType
+  title         String
+  slug          String        @unique
+  summary       String?
+  content       String
+  coverImageId  String?       @map("cover_image_id") @db.Uuid
+  status        ContentStatus @default(DRAFT)
+  authorId      String        @map("author_id") @db.Uuid
+  publishedAt   DateTime?     @map("published_at")
+  archivedAt    DateTime?     @map("archived_at")
+  scheduledPublishAt DateTime? @map("scheduled_publish_at")
+  seoTitle      String?       @map("seo_title")
+  seoDescription String?      @map("seo_description")
+  seoKeywords   String?       @map("seo_keywords")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  author     User       @relation(fields: [authorId], references: [id])
+  coverImage FileAsset? @relation(fields: [coverImageId], references: [id])
+  media      ContentMedia[]
+  revisions  ContentRevision[]
+
+  @@index([type, status])
+  @@index([authorId])
+  @@index([status])
+  @@index([status, scheduledPublishAt])
+  @@map("content")
+}
+
+// ===========================================
+// Migration 006: Content Media Domain
+// ===========================================
+
+model ContentMedia {
+  id          String           @id @default(uuid()) @db.Uuid
+  contentId   String           @map("content_id") @db.Uuid
+  fileAssetId String?          @map("file_asset_id") @db.Uuid
+  type        ContentMediaType @default(IMAGE)
+  caption     String?
+  altText     String?          @map("alt_text")
+  sortOrder   Int              @default(0) @map("sort_order")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  content   Content    @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  fileAsset FileAsset? @relation(fields: [fileAssetId], references: [id])
+
+  @@index([contentId])
+  @@index([fileAssetId])
+  @@map("content_media")
+}
+
+// ===========================================
+// Migration 007: Content Revision Domain
+// ===========================================
+
+model ContentRevision {
+  id             String   @id @default(uuid()) @db.Uuid
+  contentId      String   @map("content_id") @db.Uuid
+  version        Int
+  title          String
+  summary        String?
+  content        String
+  seoTitle       String?  @map("seo_title")
+  seoDescription String?  @map("seo_description")
+  seoKeywords    String?  @map("seo_keywords")
+  coverImageId   String?  @map("cover_image_id") @db.Uuid
+  snapshot       Json?
+  createdBy      String   @map("created_by") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  contentRef Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@index([contentId, version])
+  @@map("content_revision")
 }

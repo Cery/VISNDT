@@ -117,7 +117,16 @@ export class ProductsService {
   async findOne(id: string) {
     const product = await this.prisma.product.findUnique({
       where: { id },
-      include: { category: true, parameterValues: { include: { parameterDefinition: true } }, media: true, createdBy: { include: { organization: true } } },
+      include: {
+        category: true,
+        parameterValues: { include: { parameterDefinition: true } },
+        media: true,
+        createdBy: { include: { organization: true } },
+        // 公开询价链路：产品详情页需根据 offers 推导询价对象（offer + 组织）
+        offers: {
+          include: { organization: true },
+        },
+      },
     });
     if (!product) throw new NotFoundException(`产品 ${id} 未找到`);
     return product;

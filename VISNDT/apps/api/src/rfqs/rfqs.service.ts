@@ -6,7 +6,6 @@ import { CreateRfqFromMatchDto } from './dto/create-rfq-from-match.dto';
 import { UpdateRfqDto } from './dto/update-rfq.dto';
 import { SearchParamsDto } from '../common/dto/search-params.dto';
 import { NotificationsService } from '../notifications/notifications.service';
-import { WorkflowEventsService } from '../workflow-events/workflow-events.service';
 
 const RFQ_TRANSITIONS: Record<RFQStatus, RFQStatus[]> = {
   DRAFT: [RFQStatus.OPEN],
@@ -21,8 +20,151 @@ export class RfqsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notificationsService: NotificationsService,
-    private readonly workflowEventsService: WorkflowEventsService,
   ) {}
+
+  private assertRfqOwnership(
+    rfq: {
+      id: string;
+      createdBy: string;
+      demand?: { organizationId: string | null } | null;
+    },
+    user: { id: string; organizationId?: string | null },
+  ) {
+    const isCreator = rfq.createdBy === user.id;
+    const isSameOrg =
+      Boolean(user.organizationId) &&
+      rfq.demand?.organizationId === user.organizationId;
+
+    if (!isCreator && !isSameOrg) {
+      throw new BadRequestException(
+        'You do not have permission to update this RFQ',
+      );
+    }
+  }
+
+  private getWorkflowActionForRfqStatus(status: RFQStatus) {
+    const actionMap: Partial<Record<RFQStatus, WorkflowAction>> = {
+      [RFQStatus.OPEN]: WorkflowAction.OPENED,
+      [RFQStatus.RESPONDING]: WorkflowAction.RESPONDED,
+      [RFQStatus.CLOSED]: WorkflowAction.CLOSED,
+      [RFQStatus.CANCELLED]: WorkflowAction.WITHDRAWN,
+    };
+
+    const action = actionMap[status];
+    if (!action) {
+      throw new BadRequestException(
+        `RFQ status ${status} is not supported by the lifecycle boundary`,
+      );
+    }
+
+    return action;
+  }
+
+  private buildRfqStatusUpdateData(status: RFQStatus) {
+    if (status === RFQStatus.OPEN) {
+      return {
+        status,
+        publishedAt: new Date(),
+        closedAt: null,
+      };
+    }
+
+    if (status === RFQStatus.CLOSED) {
+      return {
+        status,
+        closedAt: new Date(),
+      };
+    }
+
+    return { status };
+  }
+
+  private async createRfqWorkflowEvent(
+    event: {
+      entityId: string;
+      action: WorkflowAction;
+      operatorId: string;
+      metadata?: Record<string, unknown>;
+    },
+    tx?: Prisma.TransactionClient,
+  ) {
+    const client = tx ?? this.prisma;
+
+    await client.workflowEvent.create({
+      data: {
+        entityType: WorkflowEntityType.RFQ,
+        entityId: event.entityId,
+        action: event.action,
+        operatorId: event.operatorId,
+        metadata: event.metadata as Prisma.InputJsonValue | undefined,
+      },
+    });
+  }
+
+  private async transitionRfqStatus(
+    rfq: {
+      id: string;
+      status: RFQStatus;
+      createdBy: string;
+      demandId?: string;
+      sourceMatchId?: string | null;
+      targetOrganizationId?: string | null;
+    },
+    targetStatus: RFQStatus,
+    operatorId: string,
+    options?: {
+      notifyCreator?: boolean;
+      tx?: Prisma.TransactionClient;
+    },
+  ) {
+    const allowed = RFQ_TRANSITIONS[rfq.status];
+    if (!allowed.includes(targetStatus)) {
+      throw new BadRequestException(
+        `Cannot transition RFQ from ${rfq.status} to ${targetStatus}`,
+      );
+    }
+
+    const client = options?.tx ?? this.prisma;
+    const updated = await client.rFQ.update({
+      where: { id: rfq.id },
+      data: this.buildRfqStatusUpdateData(targetStatus),
+    });
+
+    await this.createRfqWorkflowEvent(
+      {
+        entityId: rfq.id,
+        action: this.getWorkflowActionForRfqStatus(targetStatus),
+        operatorId,
+        metadata: {
+          previousStatus: rfq.status,
+          newStatus: targetStatus,
+          ...(rfq.demandId ? { demandId: rfq.demandId } : {}),
+          ...(rfq.sourceMatchId ? { sourceMatchId: rfq.sourceMatchId } : {}),
+          ...(rfq.targetOrganizationId
+            ? { targetOrganizationId: rfq.targetOrganizationId }
+            : {}),
+        },
+      },
+      options?.tx,
+    );
+
+    if (options?.notifyCreator) {
+      try {
+        await this.notificationsService.create({
+          userId: rfq.createdBy,
+          type: NotificationType.RFQ_UPDATE,
+          title: 'RFQ Status Updated',
+          message: `RFQ status changed to "${targetStatus}"`,
+          referenceType: 'RFQ',
+          referenceId: rfq.id,
+        });
+      } catch {
+        // Notification failure should not affect the main flow
+      }
+    }
+
+    return updated;
+  }
 
   async findAll(params: SearchParamsDto) {
     const { page = 1, pageSize = 20, keyword, status } = params;
@@ -140,6 +282,19 @@ export class RfqsService {
       },
     });
 
+    try {
+      await this.createRfqWorkflowEvent({
+        entityId: rfq.id,
+        action: WorkflowAction.CREATED,
+        operatorId: user.id,
+        metadata: {
+          demandId: dto.demandId,
+        },
+      });
+    } catch {
+      // Workflow event failure should not affect the main flow
+    }
+
     // E1: RFQ Created — notify the demand creator
     try {
       const demand = await this.prisma.demand.findUnique({
@@ -248,19 +403,16 @@ export class RfqsService {
     }
 
     try {
-      await this.workflowEventsService.create(
-        {
-          entityType: WorkflowEntityType.RFQ,
-          entityId: rfq.id,
-          action: WorkflowAction.CREATED,
-          metadata: {
-            demandId: match.demandId,
-            sourceMatchId: match.id,
-            targetOrganizationId,
-          },
+      await this.createRfqWorkflowEvent({
+        entityId: rfq.id,
+        action: WorkflowAction.CREATED,
+        operatorId: user.id,
+        metadata: {
+          demandId: match.demandId,
+          sourceMatchId: match.id,
+          targetOrganizationId,
         },
-        user,
-      );
+      });
     } catch {
       // Workflow event failure should not affect the main flow
     }
@@ -282,43 +434,25 @@ export class RfqsService {
       throw new NotFoundException(`RFQ ${id} not found`);
     }
 
-    // Ownership validation: user must be the creator or belong to the same org
-    const isCreator = rfq.createdBy === user.id;
-    const isSameOrg = user.organizationId && rfq.demand?.organizationId === user.organizationId;
-    if (!isCreator && !isSameOrg) {
-      throw new BadRequestException(
-        'You do not have permission to update this RFQ',
-      );
+    this.assertRfqOwnership(rfq, user);
+
+    if (!dto.status || dto.status === rfq.status) {
+      return rfq;
     }
 
-    if (dto.status) {
-      const allowed = RFQ_TRANSITIONS[rfq.status];
-      if (!allowed.includes(dto.status)) {
-        throw new BadRequestException(
-          `Cannot transition RFQ from ${rfq.status} to ${dto.status}`,
-        );
-      }
-    }
-
-    const updated = await this.prisma.rFQ.update({ where: { id }, data: dto });
-
-    // E2: RFQ Status Changed — notify the RFQ creator
-    if (dto.status) {
-      try {
-        await this.notificationsService.create({
-          userId: rfq.createdBy,
-          type: NotificationType.RFQ_UPDATE,
-          title: 'RFQ Status Updated',
-          message: `RFQ status changed to "${dto.status}"`,
-          referenceType: 'RFQ',
-          referenceId: rfq.id,
-        });
-      } catch {
-        // Notification failure should not affect the main flow
-      }
-    }
-
-    return updated;
+    return this.transitionRfqStatus(
+      {
+        id: rfq.id,
+        status: rfq.status,
+        createdBy: rfq.createdBy,
+        demandId: rfq.demandId,
+        sourceMatchId: rfq.sourceMatchId,
+        targetOrganizationId: rfq.targetOrganizationId,
+      },
+      dto.status,
+      user.id,
+      { notifyCreator: true },
+    );
   }
 
   async remove(id: string) {
@@ -351,10 +485,45 @@ export class RfqsService {
     }));
   }
 
-  async batchStatus(ids: string[], status: string) {
-    return this.prisma.rFQ.updateMany({
+  async batchStatus(
+    ids: string[],
+    status: string,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    const targetStatus = status as RFQStatus;
+    const rfqs = await this.prisma.rFQ.findMany({
       where: { id: { in: ids } },
-      data: { status: status as RFQStatus },
+      select: {
+        id: true,
+        status: true,
+        createdBy: true,
+        demandId: true,
+        sourceMatchId: true,
+        targetOrganizationId: true,
+      },
+    });
+
+    if (rfqs.length !== ids.length) {
+      const existingIds = new Set(rfqs.map((rfq) => rfq.id));
+      const missingIds = ids.filter((id) => !existingIds.has(id));
+      throw new NotFoundException(`RFQs not found: ${missingIds.join(', ')}`);
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      for (const rfq of rfqs) {
+        if (rfq.status === targetStatus) {
+          continue;
+        }
+
+        await this.transitionRfqStatus(
+          rfq,
+          targetStatus,
+          user.id,
+          { tx },
+        );
+      }
+
+      return { count: ids.length };
     });
   }
 
@@ -375,48 +544,26 @@ export class RfqsService {
       throw new NotFoundException(`RFQ ${id} not found`);
     }
 
-    // Permission: must be creator or same org
-    const isCreator = rfq.createdBy === user.id;
-    const isSameOrg =
-      user.organizationId &&
-      rfq.demand?.organizationId === user.organizationId;
-    if (!isCreator && !isSameOrg) {
-      throw new BadRequestException(
-        'You do not have permission to publish this RFQ',
-      );
-    }
+    this.assertRfqOwnership(rfq, user);
 
-    // State validation: only DRAFT → OPEN
     if (rfq.status !== RFQStatus.DRAFT) {
       throw new BadRequestException(
         `Cannot publish RFQ with status "${rfq.status}". Only DRAFT RFQs can be published.`,
       );
     }
 
-    const updated = await this.prisma.rFQ.update({
-      where: { id },
-      data: {
-        status: RFQStatus.OPEN,
-        publishedAt: new Date(),
+    return this.transitionRfqStatus(
+      {
+        id: rfq.id,
+        status: rfq.status,
+        createdBy: rfq.createdBy,
+        demandId: rfq.demandId,
+        sourceMatchId: rfq.sourceMatchId,
+        targetOrganizationId: rfq.targetOrganizationId,
       },
-    });
-
-    // Create WorkflowEvent
-    try {
-      await this.workflowEventsService.create(
-        {
-          entityType: WorkflowEntityType.RFQ,
-          entityId: rfq.id,
-          action: WorkflowAction.OPENED,
-          metadata: { previousStatus: rfq.status, newStatus: RFQStatus.OPEN },
-        },
-        user,
-      );
-    } catch {
-      // Workflow event failure should not affect the main flow
-    }
-
-    return updated;
+      RFQStatus.OPEN,
+      user.id,
+    );
   }
 
   /**
@@ -436,47 +583,25 @@ export class RfqsService {
       throw new NotFoundException(`RFQ ${id} not found`);
     }
 
-    // Permission: must be creator or same org
-    const isCreator = rfq.createdBy === user.id;
-    const isSameOrg =
-      user.organizationId &&
-      rfq.demand?.organizationId === user.organizationId;
-    if (!isCreator && !isSameOrg) {
+    this.assertRfqOwnership(rfq, user);
+
+    if (rfq.status !== RFQStatus.OPEN && rfq.status !== RFQStatus.RESPONDING) {
       throw new BadRequestException(
-        'You do not have permission to close this RFQ',
+        `Cannot close RFQ with status "${rfq.status}". Only OPEN or RESPONDING RFQs can be closed.`,
       );
     }
 
-    // State validation: only OPEN → CLOSED
-    if (rfq.status !== RFQStatus.OPEN) {
-      throw new BadRequestException(
-        `Cannot close RFQ with status "${rfq.status}". Only OPEN RFQs can be closed.`,
-      );
-    }
-
-    const updated = await this.prisma.rFQ.update({
-      where: { id },
-      data: {
-        status: RFQStatus.CLOSED,
-        closedAt: new Date(),
+    return this.transitionRfqStatus(
+      {
+        id: rfq.id,
+        status: rfq.status,
+        createdBy: rfq.createdBy,
+        demandId: rfq.demandId,
+        sourceMatchId: rfq.sourceMatchId,
+        targetOrganizationId: rfq.targetOrganizationId,
       },
-    });
-
-    // Create WorkflowEvent
-    try {
-      await this.workflowEventsService.create(
-        {
-          entityType: WorkflowEntityType.RFQ,
-          entityId: rfq.id,
-          action: WorkflowAction.CLOSED,
-          metadata: { previousStatus: rfq.status, newStatus: RFQStatus.CLOSED },
-        },
-        user,
-      );
-    } catch {
-      // Workflow event failure should not affect the main flow
-    }
-
-    return updated;
+      RFQStatus.CLOSED,
+      user.id,
+    );
   }
 }

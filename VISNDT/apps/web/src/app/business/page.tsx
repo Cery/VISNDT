@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '商务合作 – VISNDT',
+  title: '商务合作',
   description:
     '与VISNDT合作开展工业检测设备制造、技术协作和行业合作。',
 };

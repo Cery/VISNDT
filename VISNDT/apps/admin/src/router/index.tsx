@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { RequireAuth } from '../auth';
 import AdminLayout from '../layouts/AdminLayout';
-import { DemandDetail, DemandEdit, DemandList, FileAssetOrphanList, Home, InquiryDetail, InquiryList, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ParameterDefinitionCreate, ParameterDefinitionDetail, ParameterDefinitionEdit, ParameterDefinitionList, ParameterGroupCreate, ParameterGroupDetail, ParameterGroupEdit, ParameterGroupList, ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList, ProductCreate, ProductDetail, ProductEdit, ProductList, ProductMediaCreate, ProductMediaEdit, ProductMediaList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, AuditLogList, UserCreate, UserDetail, UserEdit, UserList } from '../pages';
+import { DemandDetail, DemandEdit, DemandList, FileAssetOrphanList, Home, InquiryDetail, InquiryList, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ParameterDefinitionCreate, ParameterDefinitionDetail, ParameterDefinitionEdit, ParameterDefinitionList, ParameterGroupCreate, ParameterGroupDetail, ParameterGroupEdit, ParameterGroupList, ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList, ProductCreate, ProductDetail, ProductEdit, ProductList, ProductMediaCreate, ProductMediaEdit, ProductMediaList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, AuditLogList, UserCreate, UserDetail, UserEdit, UserList, ContentList, ContentCreate, ContentEdit } from '../pages';
 
 const router = createBrowserRouter([
   {
@@ -61,6 +61,9 @@ const router = createBrowserRouter([
       { path: 'product-categories/:id/edit', element: <ProductCategoryEdit /> },
       { path: 'files/orphans', element: <FileAssetOrphanList /> },
       { path: 'audit-logs', element: <AuditLogList /> },
+      { path: 'content', element: <ContentList /> },
+      { path: 'content/create', element: <ContentCreate /> },
+      { path: 'content/:id', element: <ContentEdit /> },
     ],
   },
   {

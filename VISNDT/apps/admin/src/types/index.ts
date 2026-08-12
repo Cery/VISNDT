@@ -113,6 +113,22 @@ export type {
 } from './product-media.types';
 export type { FileAsset, UploadResponse } from './file-asset.types';
 export type {
+  Content,
+  ContentAuthor,
+  ContentCoverImage,
+  ContentStatus,
+  ContentType,
+  ContentListResponse,
+  QueryContentParams,
+  CreateContentDto,
+  UpdateContentDto,
+  ContentFormData,
+  ContentMedia,
+  ContentMediaType,
+  CreateContentMediaDto,
+  UpdateContentMediaDto,
+} from './content.types';
+export type {
   AuditLog,
   AuditAction,
   AuditLogListResponse,

@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { getCategories } from '@/lib/api/categories';
+import { getCategories } from '@/services/category.service';
 import Link from 'next/link';
 import Loading from '@/components/common/Loading';
 import ErrorState from '@/components/common/ErrorState';

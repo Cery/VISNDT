@@ -294,7 +294,13 @@ export class DemandsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Batch update demand status (ADMIN only)' })
   @ApiBody({ type: BatchStatusDto })
-  async batchStatus(@Body() dto: BatchStatusDto) {
-    return ApiResponse.ok(await this.service.batchStatus(dto.ids, dto.status), 'Batch status updated');
+  async batchStatus(
+    @Body() dto: BatchStatusDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(
+      await this.service.batchStatus(dto.ids, dto.status, user),
+      'Batch status updated',
+    );
   }
 }

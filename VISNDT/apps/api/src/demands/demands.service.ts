@@ -3,7 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { DemandStatus, DemandMatchStatus, WorkflowEntityType, WorkflowAction, NotificationType, RFQStatus } from '@prisma/client';
+import { DemandStatus, DemandMatchStatus, WorkflowEntityType, WorkflowAction, NotificationType, RFQStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateDemandDto } from './dto/create-demand.dto';
 import { UpdateDemandDto } from './dto/update-demand.dto';
@@ -82,6 +82,127 @@ export class DemandsService {
       );
     }
     return def;
+  }
+
+  private getDemandEditableData(dto: UpdateDemandDto) {
+    return {
+      title: dto.title,
+      description: dto.description,
+      budgetRange: dto.budgetRange,
+      quantity: dto.quantity,
+      quantityUnit: dto.quantityUnit,
+      expectedDeliveryDate: dto.expectedDeliveryDate
+        ? new Date(dto.expectedDeliveryDate)
+        : undefined,
+      contactName: dto.contactName,
+      contactPhone: dto.contactPhone,
+      contactEmail: dto.contactEmail,
+      contactVisible: dto.contactVisible,
+    };
+  }
+
+  private hasDemandEditableFields(dto: UpdateDemandDto) {
+    return Object.values(this.getDemandEditableData(dto)).some(
+      (value) => value !== undefined,
+    );
+  }
+
+  private async applyDemandStatusTransition(
+    tx: Prisma.TransactionClient,
+    demand: {
+      id: string;
+      status: DemandStatus;
+      rfqs?: Array<{ id: string; status: RFQStatus }>;
+    },
+    targetStatus: DemandStatus,
+    operatorId: string,
+    reason?: string,
+  ) {
+    if (targetStatus === DemandStatus.PUBLISHED) {
+      const updatedDemand = await tx.demand.update({
+        where: { id: demand.id },
+        data: {
+          status: DemandStatus.PUBLISHED,
+          publishedAt: new Date(),
+        },
+      });
+
+      await tx.workflowEvent.create({
+        data: {
+          entityType: WorkflowEntityType.DEMAND,
+          entityId: demand.id,
+          action: WorkflowAction.OPENED,
+          operatorId,
+          metadata: {
+            previousStatus: demand.status,
+            newStatus: DemandStatus.PUBLISHED,
+          },
+        },
+      });
+
+      return updatedDemand;
+    }
+
+    if (targetStatus === DemandStatus.CLOSED) {
+      const updatedDemand = await tx.demand.update({
+        where: { id: demand.id },
+        data: {
+          status: DemandStatus.CLOSED,
+          closedAt: new Date(),
+          closeReason: reason ?? null,
+        },
+      });
+
+      await tx.workflowEvent.create({
+        data: {
+          entityType: WorkflowEntityType.DEMAND,
+          entityId: demand.id,
+          action: WorkflowAction.CLOSED,
+          operatorId,
+          metadata: {
+            previousStatus: demand.status,
+            newStatus: DemandStatus.CLOSED,
+            closeReason: reason ?? null,
+          },
+        },
+      });
+
+      const openRfqs = (demand.rfqs ?? []).filter(
+        (rfq) => rfq.status === RFQStatus.OPEN,
+      );
+
+      if (openRfqs.length > 0) {
+        await tx.rFQ.updateMany({
+          where: { id: { in: openRfqs.map((rfq) => rfq.id) } },
+          data: {
+            status: RFQStatus.CLOSED,
+            closedAt: new Date(),
+          },
+        });
+
+        for (const rfq of openRfqs) {
+          await tx.workflowEvent.create({
+            data: {
+              entityType: WorkflowEntityType.RFQ,
+              entityId: rfq.id,
+              action: WorkflowAction.CLOSED,
+              operatorId,
+              metadata: {
+                previousStatus: RFQStatus.OPEN,
+                newStatus: RFQStatus.CLOSED,
+                reason: 'Associated demand was closed',
+              },
+            },
+          });
+        }
+      }
+
+      return updatedDemand;
+    }
+
+    throw new BadRequestException(
+      `Demand status transition to ${targetStatus} is not supported by the lifecycle boundary`,
+    );
   }
 
   // ==========================================
@@ -271,21 +392,35 @@ export class DemandsService {
       );
     }
 
+    const hasEditableFields = this.hasDemandEditableFields(dto);
+
+    if (dto.status && dto.status !== demand.status) {
+      if (hasEditableFields) {
+        throw new BadRequestException(
+          'Demand lifecycle status changes must be executed separately from generic field updates',
+        );
+      }
+
+      if (dto.status === DemandStatus.PUBLISHED) {
+        return this.publish(id, user);
+      }
+
+      if (dto.status === DemandStatus.CLOSED) {
+        return this.close(id, undefined, user);
+      }
+
+      throw new BadRequestException(
+        `Demand status transition from ${demand.status} to ${dto.status} must use the supported lifecycle boundary`,
+      );
+    }
+
+    if (!hasEditableFields) {
+      return demand;
+    }
+
     return this.prisma.demand.update({
       where: { id },
-      data: {
-        title: dto.title,
-        description: dto.description,
-        status: dto.status,
-        budgetRange: dto.budgetRange,
-        quantity: dto.quantity,
-        quantityUnit: dto.quantityUnit,
-        expectedDeliveryDate: dto.expectedDeliveryDate ? new Date(dto.expectedDeliveryDate) : undefined,
-        contactName: dto.contactName,
-        contactPhone: dto.contactPhone,
-        contactEmail: dto.contactEmail,
-        contactVisible: dto.contactVisible,
-      },
+      data: this.getDemandEditableData(dto),
     });
   }
 
@@ -320,32 +455,18 @@ export class DemandsService {
     }
 
     const [updated] = await this.prisma.$transaction(async (tx) => {
-      const updatedDemand = await tx.demand.update({
-        where: { id },
-        data: {
-          status: DemandStatus.PUBLISHED,
-          publishedAt: new Date(),
-        },
-      });
-
-      await tx.workflowEvent.create({
-        data: {
-          entityType: WorkflowEntityType.DEMAND,
-          entityId: id,
-          action: WorkflowAction.OPENED,
-          operatorId: user.id,
-          metadata: {
-            previousStatus: demand.status,
-            newStatus: DemandStatus.PUBLISHED,
-          },
-        },
-      });
+      const updatedDemand = await this.applyDemandStatusTransition(
+        tx,
+        demand,
+        DemandStatus.PUBLISHED,
+        user.id,
+      );
 
       return [updatedDemand];
     });
 
     // 触发异步匹配（不阻塞 publish 返回）
-    this.matchingService.match(id).catch((err) => {
+    this.matchingService.match(id, { trigger: 'publish', user }).catch((err) => {
       // 匹配失败不影响 publish 结果
       console.error(`Matching failed for demand ${id}:`, err);
     });
@@ -388,56 +509,13 @@ export class DemandsService {
     }
 
     const [updated] = await this.prisma.$transaction(async (tx) => {
-      const updatedDemand = await tx.demand.update({
-        where: { id },
-        data: {
-          status: DemandStatus.CLOSED,
-          closedAt: new Date(),
-          closeReason: reason ?? null,
-        },
-      });
-
-      await tx.workflowEvent.create({
-        data: {
-          entityType: WorkflowEntityType.DEMAND,
-          entityId: id,
-          action: WorkflowAction.CLOSED,
-          operatorId: user.id,
-          metadata: {
-            previousStatus: demand.status,
-            newStatus: DemandStatus.CLOSED,
-            closeReason: reason ?? null,
-          },
-        },
-      });
-
-      // Auto-close associated RFQs that are still open.
-      const openRfqs = demand.rfqs.filter((rfq) => rfq.status === RFQStatus.OPEN);
-      if (openRfqs.length > 0) {
-        await tx.rFQ.updateMany({
-          where: { id: { in: openRfqs.map((rfq) => rfq.id) } },
-          data: {
-            status: RFQStatus.CLOSED,
-            closedAt: new Date(),
-          },
-        });
-
-        for (const rfq of openRfqs) {
-          await tx.workflowEvent.create({
-            data: {
-              entityType: WorkflowEntityType.RFQ,
-              entityId: rfq.id,
-              action: WorkflowAction.CLOSED,
-              operatorId: user.id,
-              metadata: {
-                previousStatus: RFQStatus.OPEN,
-                newStatus: RFQStatus.CLOSED,
-                reason: 'Associated demand was closed',
-              },
-            },
-          });
-        }
-      }
+      const updatedDemand = await this.applyDemandStatusTransition(
+        tx,
+        demand,
+        DemandStatus.CLOSED,
+        user.id,
+        reason,
+      );
 
       return [updatedDemand];
     });
@@ -457,7 +535,10 @@ export class DemandsService {
     });
 
     // 重新执行匹配
-    const result = await this.matchingService.match(id);
+    const result = await this.matchingService.match(id, {
+      trigger: 'rematch',
+      user,
+    });
 
     // E6: Match Completed — notify the demand creator
     try {
@@ -724,11 +805,12 @@ export class DemandsService {
       if (action) {
         await tx.workflowEvent.create({
           data: {
-            entityType: WorkflowEntityType.DEMAND,
-            entityId: demandId,
+            entityType: WorkflowEntityType.MATCH,
+            entityId: matchId,
             action,
             operatorId: user.id,
             metadata: {
+              demandId,
               matchId,
               productId: match.productId,
               previousStatus: match.matchStatus,
@@ -802,11 +884,92 @@ export class DemandsService {
     }));
   }
 
-  async batchStatus(ids: string[], status: string) {
-    return this.prisma.demand.updateMany({
+  async batchStatus(
+    ids: string[],
+    status: string,
+    user: { id: string; organizationId?: string | null },
+  ) {
+    const targetStatus = status as DemandStatus;
+    const demands = await this.prisma.demand.findMany({
       where: { id: { in: ids } },
-      data: { status: status as DemandStatus },
+      select: {
+        id: true,
+        status: true,
+        rfqs: {
+          select: {
+            id: true,
+            status: true,
+          },
+        },
+      },
     });
+
+    if (demands.length !== ids.length) {
+      const existingIds = new Set(demands.map((demand) => demand.id));
+      const missingIds = ids.filter((id) => !existingIds.has(id));
+      throw new NotFoundException(
+        `Demands not found: ${missingIds.join(', ')}`,
+      );
+    }
+
+    const publishedIds: string[] = [];
+
+    const result = await this.prisma.$transaction(async (tx) => {
+      for (const demand of demands) {
+        if (demand.status === targetStatus) {
+          continue;
+        }
+
+        if (targetStatus === DemandStatus.PUBLISHED) {
+          if (!PUBLISHABLE_STATUSES.includes(demand.status)) {
+            throw new BadRequestException(
+              `Cannot publish demand ${demand.id} from status ${demand.status}`,
+            );
+          }
+
+          await this.applyDemandStatusTransition(
+            tx,
+            demand,
+            DemandStatus.PUBLISHED,
+            user.id,
+          );
+          publishedIds.push(demand.id);
+          continue;
+        }
+
+        if (targetStatus === DemandStatus.CLOSED) {
+          if (!CLOSABLE_STATUSES.includes(demand.status)) {
+            throw new BadRequestException(
+              `Cannot close demand ${demand.id} from status ${demand.status}`,
+            );
+          }
+
+          await this.applyDemandStatusTransition(
+            tx,
+            demand,
+            DemandStatus.CLOSED,
+            user.id,
+          );
+          continue;
+        }
+
+        throw new BadRequestException(
+          `Demand batch status transition to ${targetStatus} is not supported by the lifecycle boundary`,
+        );
+      }
+
+      return { count: ids.length };
+    });
+
+    for (const demandId of publishedIds) {
+      this.matchingService
+        .match(demandId, { trigger: 'publish', user })
+        .catch((err) => {
+          console.error(`Matching failed for demand ${demandId}:`, err);
+        });
+    }
+
+    return result;
   }
 
   // ==========================================

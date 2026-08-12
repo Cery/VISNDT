@@ -3,14 +3,31 @@ import "./globals.css";
 import PublicHeader from "@/components/layout/PublicHeader";
 import PublicFooter from "@/components/layout/PublicFooter";
 import Providers from "./providers";
+import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, SITE_KEYWORDS } from "@/lib/seo";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
-    template: '%s',
-    default: 'VISNDT – 工业检测设备平台',
+    template: `%s | ${SITE_NAME}`,
+    default: `${SITE_NAME} – 工业检测设备平台`,
   },
-  description:
-    'VISNDT是一个专业的工业无损检测设备平台——发现高精度内窥镜、检测相机和测量系统。',
+  description: SITE_DESCRIPTION,
+  keywords: SITE_KEYWORDS,
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    type: 'website',
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} – 工业检测设备平台`,
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: 'summary',
+    title: `${SITE_NAME} – 工业检测设备平台`,
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({

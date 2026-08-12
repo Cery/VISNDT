@@ -42,6 +42,7 @@ const menuItems = [
   },
   { key: '/notifications', icon: <BellOutlined />, label: '通知管理' },
   { key: '/audit-logs', icon: <AuditOutlined />, label: '审计日志' },
+  { key: '/content', icon: <FileTextOutlined />, label: '内容管理' },
 ];
 
 function AdminLayout() {

@@ -18,3 +18,4 @@ export { productMediaService } from './product-media.service';
 export { fileAssetService } from './file-asset.service';
 export { auditLogService } from './audit-log.service';
 export { productParameterService } from './product-parameter.service';
+export { contentService } from './content.service';

@@ -45,3 +45,6 @@ export { default as ProductMediaList } from './product-media/ProductMediaList';
 export { default as ProductMediaCreate } from './product-media/ProductMediaCreate';
 export { default as ProductMediaEdit } from './product-media/ProductMediaEdit';
 export { default as AuditLogList } from './AuditLogList';
+export { default as ContentList } from './content/ContentList';
+export { default as ContentCreate } from './content/ContentCreate';
+export { default as ContentEdit } from './content/ContentEdit';

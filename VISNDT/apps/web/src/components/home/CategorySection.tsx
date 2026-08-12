@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { getCategories } from '@/lib/api/categories';
+import { getCategories } from '@/services/category.service';
 import { translateCategoryName } from '@/lib/translate';
 
 export default function CategorySection() {

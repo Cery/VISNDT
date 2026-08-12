@@ -5,10 +5,39 @@ import ManufacturerInfo from '@/components/products/ManufacturerInfo';
 import InquirySection from '@/components/inquiry/InquirySection';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { translateCategoryName } from '@/lib/translate';
+import { SITE_DESCRIPTION } from '@/lib/seo';
 
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+/** 产品详情页动态 SEO Metadata（复用 service 层 getProduct，不引入新数据访问） */
+export async function generateMetadata({
+  params,
+}: ProductDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  try {
+    const product = await getProduct(slug);
+    return {
+      title: product.name,
+      description:
+        (product.description?.slice(0, 160) ?? '') ||
+        `VISNDT产品详情：${product.name}`,
+      openGraph: {
+        title: product.name,
+        description:
+          (product.description?.slice(0, 160) ?? '') || SITE_DESCRIPTION,
+        type: 'website',
+      },
+    };
+  } catch {
+    return {
+      title: '产品详情',
+      description: SITE_DESCRIPTION,
+    };
+  }
 }
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
@@ -20,6 +49,12 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   } catch {
     notFound();
   }
+
+  // 公开询价链路：从产品关联的 offers 中选取可询价报价（ACTIVE/SUBMITTED），
+  // 推导出询价目标 offerId 与组织 organizationId，供 InquirySection 使用。
+  const inquirateOffer = Array.isArray(product.offers)
+    ? product.offers.find((o) => o.status === 'ACTIVE' || o.status === 'SUBMITTED')
+    : undefined;
 
   return (
     <div className="max-w-[1200px] mx-auto px-6 py-8">
@@ -84,6 +119,8 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
           <InquirySection
             productId={product.id}
             productName={product.name}
+            offerId={inquirateOffer?.id}
+            organizationId={inquirateOffer?.organizationId}
           />
         </div>
       </div>

@@ -12,6 +12,11 @@ import { WorkflowEventsService } from '../workflow-events/workflow-events.servic
 export class MatchingService {
   private readonly logger = new Logger(MatchingService.name);
 
+  private readonly MATCH_CREATED_TRIGGER = {
+    publish: 'publish',
+    rematch: 'rematch',
+  } as const;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly scoring: ScoringService,
@@ -24,7 +29,13 @@ export class MatchingService {
    * 对指定 Demand 执行全量匹配。
    * 在 Demand.publish() 后调用。
    */
-  async match(demandId: string): Promise<MatchResultDto> {
+  async match(
+    demandId: string,
+    options?: {
+      trigger?: 'publish' | 'rematch';
+      user?: { id: string; organizationId?: string | null };
+    },
+  ): Promise<MatchResultDto> {
     const startTime = Date.now();
 
     // Step 1: 加载 Demand（含参数 + 参数定义）
@@ -172,10 +183,26 @@ export class MatchingService {
     scoredResults.sort((a, b) => b.matchScore - a.matchScore);
     const topResults = scoredResults.slice(0, DEFAULT_MATCH_CONFIG.maxMatchesPerDemand);
 
+    const existingMatches = await this.prisma.demandMatch.findMany({
+      where: {
+        demandId,
+        productId: {
+          in: topResults.map((result) => result.productId),
+        },
+      },
+      select: {
+        id: true,
+        productId: true,
+      },
+    });
+    const existingMatchByProductId = new Map(
+      existingMatches.map((match) => [match.productId, match.id]),
+    );
+
     // Step 6: 批量创建/更新 DemandMatch
     let matchedCount = 0;
     for (const result of topResults) {
-      await this.prisma.demandMatch.upsert({
+      const updatedMatch = await this.prisma.demandMatch.upsert({
         where: {
           demandId_productId: {
             demandId,
@@ -199,6 +226,24 @@ export class MatchingService {
           matchedAt: new Date(),
         },
       });
+
+      if (!existingMatchByProductId.has(result.productId) && options?.user) {
+        await this.createMatchWorkflowEvent(
+          updatedMatch.id,
+          WorkflowAction.CREATED,
+          options.user,
+          {
+            demandId,
+            productId: result.productId,
+            offerId: result.offerId,
+            matchScore: result.matchScore,
+            ...(options.trigger
+              ? { trigger: this.MATCH_CREATED_TRIGGER[options.trigger] }
+              : {}),
+          },
+        );
+      }
+
       matchedCount++;
     }
 
@@ -253,8 +298,11 @@ export class MatchingService {
     await this.createMatchWorkflowEvent(
       id,
       WorkflowAction.REVIEWED,
-      match.matchStatus,
       user,
+      {
+        demandId: match.demandId,
+        previousStatus: match.matchStatus,
+      },
     );
 
     return updated;
@@ -294,8 +342,11 @@ export class MatchingService {
     await this.createMatchWorkflowEvent(
       id,
       WorkflowAction.ACCEPTED,
-      match.matchStatus,
       user,
+      {
+        demandId: match.demandId,
+        previousStatus: match.matchStatus,
+      },
     );
 
     return updated;
@@ -335,8 +386,11 @@ export class MatchingService {
     await this.createMatchWorkflowEvent(
       id,
       WorkflowAction.REJECTED,
-      match.matchStatus,
       user,
+      {
+        demandId: match.demandId,
+        previousStatus: match.matchStatus,
+      },
     );
 
     return updated;
@@ -363,16 +417,29 @@ export class MatchingService {
   private async createMatchWorkflowEvent(
     entityId: string,
     action: WorkflowAction,
-    previousStatus: string,
-    user: { id: string },
+    user: { id: string; organizationId?: string | null },
+    metadata?: Record<string, unknown>,
   ) {
     try {
+      if (!user.organizationId) {
+        await this.prisma.workflowEvent.create({
+          data: {
+            entityType: WorkflowEntityType.MATCH,
+            entityId,
+            action,
+            operatorId: user.id,
+            metadata: metadata as any,
+          },
+        });
+        return;
+      }
+
       await this.workflowEventsService.create(
         {
           entityType: WorkflowEntityType.MATCH,
           entityId,
           action,
-          metadata: { previousStatus },
+          metadata,
         },
         user,
       );

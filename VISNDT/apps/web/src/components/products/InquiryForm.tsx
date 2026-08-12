@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { createInquiry } from '@/lib/api/inquiries';
+import { createInquiry } from '@/services/inquiry.service';
 import type { InquiryResponse } from '@/types/inquiry';
 
 interface InquiryFormProps {

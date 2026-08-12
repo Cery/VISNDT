@@ -173,6 +173,7 @@ export class RfqResponsesService {
         where: { id: rfqId },
         select: {
           id: true,
+          demandId: true,
           status: true,
           publishedAt: true,
           createdBy: true,
@@ -247,6 +248,25 @@ export class RfqResponsesService {
         throw error;
       }
     })();
+
+    try {
+      await this.workflowEventsService.create(
+        {
+          entityType: WorkflowEntityType.RFQ_RESPONSE,
+          entityId: response.id,
+          action: WorkflowAction.CREATED,
+          metadata: {
+            rfqId,
+            demandId: rfq.demandId,
+            organizationId,
+            ...(dto.offerId ? { offerId: dto.offerId } : {}),
+          },
+        },
+        user,
+      );
+    } catch {
+      // Workflow event failure should not affect the main flow
+    }
 
     // E3: RFQ Response Submitted — notify the RFQ creator
     try {

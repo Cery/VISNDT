@@ -7,6 +7,7 @@ import {
   getRfq as fetchRfq,
   getRfqResponsesById as fetchRfqResponsesById,
   getMyRfqResponses as fetchMyRfqResponses,
+  createRfq as apiCreateRfq,
   deleteRfq as apiDeleteRfq,
   publishRfq as apiPublishRfq,
   closeRfq as apiCloseRfq,
@@ -21,6 +22,7 @@ import type {
   RfqItem,
   RfqDetailItem,
   RfqResponseItem,
+  CreateRfqParams,
   CreateRfqResponseParams,
 } from '@/lib/api/rfqs';
 
@@ -38,6 +40,10 @@ export async function getRfqs(
   pageSize = 20,
 ): Promise<PaginatedResponse<RfqItem>> {
   return getMyRfqs(page, pageSize);
+}
+
+export async function createRfq(params: CreateRfqParams): Promise<RfqItem> {
+  return apiCreateRfq(params);
 }
 
 export async function getRfq(id: string): Promise<RfqDetailItem> {

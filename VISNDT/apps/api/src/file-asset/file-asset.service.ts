@@ -1,7 +1,7 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
-import { FileType } from '@prisma/client';
+import { ContentStatus, FileEntityType, FileType } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { Express } from 'express';
 
@@ -62,9 +62,14 @@ export class FileAssetService {
    *
    * @param file - Multer file object
    * @param userId - Uploader's user ID
+   * @param entityType - Owning entity type (defaults to PRODUCT)
    * @returns Created FileAsset record
    */
-  async upload(file: Express.Multer.File, userId: string) {
+  async upload(
+    file: Express.Multer.File,
+    userId: string,
+    entityType: FileEntityType = FileEntityType.PRODUCT,
+  ) {
     this.validateFile(file);
 
     const ext = file.originalname.split('.').pop() || 'bin';
@@ -81,8 +86,8 @@ export class FileAssetService {
     // Create FileAsset record in database
     const fileAsset = await this.prisma.fileAsset.create({
       data: {
-        entityType: 'PRODUCT',
-        entityId: '00000000-0000-0000-0000-000000000000', // Placeholder — will be linked via ProductMedia
+        entityType,
+        entityId: '00000000-0000-0000-0000-000000000000', // Placeholder — will be linked via owning entity media
         fileType: this.mapMimeTypeToFileType(file.mimetype),
         fileName: file.originalname,
         storageKey,
@@ -99,6 +104,10 @@ export class FileAssetService {
   /**
    * Get a signed download URL for a file.
    *
+   * Public access is gated by the owning entity's publication state:
+   * - Content-linked files are only downloadable when the Content is PUBLISHED.
+   * - Non-content files keep their previous (public) behavior.
+   *
    * @param id - FileAsset ID
    * @returns Pre-signed URL
    */
@@ -109,6 +118,22 @@ export class FileAssetService {
 
     if (!fileAsset) {
       throw new NotFoundException(`FileAsset ${id} not found`);
+    }
+
+    // Content-linked files must belong to a PUBLISHED Content to be publicly accessible.
+    if (fileAsset.entityType === FileEntityType.CONTENT) {
+      const contentMedias = await this.prisma.contentMedia.findMany({
+        where: { fileAssetId: id },
+        include: { content: { select: { status: true } } },
+      });
+
+      const content = contentMedias[0]?.content;
+      if (!content) {
+        throw new ForbiddenException('File is not linked to any content');
+      }
+      if (content.status !== ContentStatus.PUBLISHED) {
+        throw new ForbiddenException('Content is not published');
+      }
     }
 
     const url = await this.storage.getSignedUrl(fileAsset.storageKey);

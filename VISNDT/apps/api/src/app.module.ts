@@ -26,6 +26,9 @@ import { StorageModule } from './storage/storage.module';
 import { FileAssetModule } from './file-asset/file-asset.module';
 import { AuditLogModule } from './audit-log/audit-log.module';
 import { WorkspaceModule } from './workspace/workspace.module';
+import { ContentModule } from './content/content.module';
+import { ContentMediaModule } from './content-media/content-media.module';
+import { ContentRevisionModule } from './content-revision/content-revision.module';
 
 @Module({
   imports: [
@@ -60,6 +63,9 @@ import { WorkspaceModule } from './workspace/workspace.module';
     FileAssetModule,
     AuditLogModule,
     WorkspaceModule,
+    ContentModule,
+    ContentMediaModule,
+    ContentRevisionModule,
   ],
   providers: [
     {

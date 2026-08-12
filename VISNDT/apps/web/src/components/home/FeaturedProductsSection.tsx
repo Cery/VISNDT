@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
-import { getProducts } from '@/lib/api/products';
+import { getProducts } from '@/services/product.service';
 import ProductCard from '@/components/product/ProductCard';
 
 export default function FeaturedProductsSection() {

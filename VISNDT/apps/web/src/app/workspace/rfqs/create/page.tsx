@@ -7,8 +7,8 @@ import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
-import { getMyDemands } from '@/lib/api/demands';
-import { createRfq } from '@/lib/api/rfqs';
+import { getDemands } from '@/services/demand.service';
+import { createRfq } from '@/services/rfq.service';
 
 export default function RfqCreatePage() {
   return (
@@ -35,7 +35,7 @@ function RfqCreateContent() {
     isError: demandsError,
   } = useQuery({
     queryKey: ['my-demands'],
-    queryFn: () => getMyDemands(1, 100),
+    queryFn: () => getDemands(1, 100),
   });
 
   const demands = demandsData?.data ?? [];

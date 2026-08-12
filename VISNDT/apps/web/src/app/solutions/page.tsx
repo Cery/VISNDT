@@ -1,45 +1,33 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
+import { getContentList } from '@/services/content.service';
+import type { Content } from '@/types/content';
 
 export const metadata: Metadata = {
-  title: '工业检测解决方案 – VISNDT',
+  title: '工业检测解决方案',
   description:
     '探索面向航空航天、汽车、管道、电子和制造领域的工业检测解决方案。',
 };
 
-const SOLUTIONS = [
-  {
-    title: '航空航天检测',
-    description:
-      '针对飞机部件、涡轮叶片和复合材料结构的高精度无损检测解决方案。通过先进的视觉和超声检测系统确保飞行安全。',
-    scenario: '飞机发动机内窥镜检测、复合材料缺陷检测、焊缝质量评估。',
-  },
-  {
-    title: '汽车检测',
-    description:
-      '针对发动机部件、传动系统和车身结构的综合检测解决方案。在制造过程中及早发现缺陷。',
-    scenario: '发动机缸孔检测、铸件缺陷检测、装配线质量控制。',
-  },
-  {
-    title: '管道检测',
-    description:
-      '先进的管道检测相机和爬行器系统，用于管道内部检查。识别工业管道中的腐蚀、堵塞和结构问题。',
-    scenario: '市政排水检测、石化管道评估、暖通空调管道检测。',
-  },
-  {
-    title: '电子检测',
-    description:
-      '针对PCB组装、半导体制造和电子元器件质量保证的显微检测解决方案。',
-    scenario: 'PCB焊点检测、IC引线框架检查、连接器针脚验证。',
-  },
-  {
-    title: '制造检测',
-    description:
-      '覆盖制造全流程的在线和离线检测系统，从原材料检测到最终产品验证。',
-    scenario: '机加工件表面检测、焊缝检查、涂层质量评估。',
-  },
-];
+function formatDate(value?: string | null): string {
+  if (!value) return '';
+  return new Date(value).toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
 
-export default function SolutionsPage() {
+export default async function SolutionsPage() {
+  let contents: Content[] = [];
+  try {
+    const result = await getContentList({ type: 'SOLUTION', pageSize: 50 });
+    contents = result.data;
+  } catch {
+    // API unavailable — render empty state, keep hero visible
+    contents = [];
+  }
+
   return (
     <div>
       {/* Hero */}
@@ -58,28 +46,36 @@ export default function SolutionsPage() {
       </section>
 
       {/* Solution Cards */}
-      <section className="max-w-[1200px] mx-auto px-6 py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {SOLUTIONS.map((solution) => (
-            <div
-              key={solution.title}
-              className="rounded-xl border border-slate-200/80 shadow-industrial-sm p-6 hover:shadow-industrial-md transition-all"
-            >
-              <h3 className="font-semibold text-foreground mb-2">
-                {solution.title}
-              </h3>
-              <p className="text-sm text-slate-500 leading-relaxed mb-4">
-                {solution.description}
-              </p>
-              <div className="pt-3 border-t border-slate-100">
-                <span className="text-xs font-medium text-slate-400 uppercase tracking-wide">
-                  应用场景
-                </span>
-                <p className="text-xs text-slate-500 mt-1">{solution.scenario}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+      <section className="max-w-[1200px] mx-auto px-6 py-16">
+        {contents.length === 0 ? (
+          <div className="text-center py-20 text-slate-400">
+            <p className="text-lg">暂无已发布的解决方案，敬请期待。</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {contents.map((solution) => (
+              <Link
+                key={solution.id}
+                href={`/solutions/${solution.slug}`}
+                className="rounded-xl border border-slate-200/80 shadow-industrial-sm p-6 hover:shadow-industrial-md hover:-translate-y-1 transition-all duration-300"
+              >
+                <h3 className="font-semibold text-foreground mb-2">
+                  {solution.title}
+                </h3>
+                {solution.summary && (
+                  <p className="text-sm text-slate-500 leading-relaxed mb-4 line-clamp-4">
+                    {solution.summary}
+                  </p>
+                )}
+                <div className="pt-3 border-t border-slate-100 text-xs text-slate-400">
+                  {solution.publishedAt
+                    ? `发布于 ${formatDate(solution.publishedAt)}`
+                    : `更新于 ${formatDate(solution.updatedAt)}`}
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

@@ -1,4 +1,5 @@
 import type { ProductCategory } from './category';
+import type { Organization } from './organization';
 
 /** Product media (image, document, etc.) */
 export interface ProductMedia {
@@ -56,6 +57,26 @@ export interface Product {
 export interface ProductDetail extends Product {
   parameterValues: ProductParameterValue[];
   media: ProductMedia[];
+  offers: Offer[];
+  createdBy?: {
+    id: string;
+    organization: Organization | null;
+  } | null;
+}
+
+/** Offer (公开询价链路：产品详情页据其推导询价对象) */
+export interface Offer {
+  id: string;
+  organizationId: string;
+  productId: string;
+  title: string;
+  description: string | null;
+  price: string | null;
+  currency: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  organization: Organization;
 }
 
 /** Search parameters for GET /products */
