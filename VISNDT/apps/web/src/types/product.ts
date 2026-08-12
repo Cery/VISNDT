@@ -15,6 +15,17 @@ export interface ProductMedia {
   updatedAt: string;
 }
 
+/** Parameter option (for ENUM parameter definitions) */
+export interface ParameterOption {
+  id: string;
+  parameterDefinitionId: string;
+  value: string;
+  label: string;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 /** Parameter definition */
 export interface ParameterDefinition {
   id: string;
@@ -26,6 +37,8 @@ export interface ParameterDefinition {
   required: boolean;
   createdAt: string;
   updatedAt: string;
+  /** ENUM 选项（详情接口返回，用于动态参数筛选面板） */
+  options?: ParameterOption[];
 }
 
 /** Product parameter value */
@@ -79,6 +92,14 @@ export interface Offer {
   organization: Organization;
 }
 
+/** Single parameter filter for GET /products (exact value OR numeric range, mutually exclusive) */
+export interface ProductParameterFilter {
+  parameterDefinitionId: string;
+  value?: string;
+  valueMin?: number;
+  valueMax?: number;
+}
+
 /** Search parameters for GET /products */
 export interface ProductSearchParams {
   keyword?: string;
@@ -88,10 +109,5 @@ export interface ProductSearchParams {
   sortOrder?: 'asc' | 'desc';
   page?: number;
   pageSize?: number;
-  parameterFilters?: {
-    parameterDefinitionId: string;
-    value?: string;
-    valueMin?: number;
-    valueMax?: number;
-  }[];
+  parameterFilters?: ProductParameterFilter[];
 }

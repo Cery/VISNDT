@@ -1,10 +1,24 @@
-import { useEffect, useState, useCallback } from 'react';
+import { lazy, Suspense, useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Spin, Alert, Button, Space, Card, Descriptions, Tag, Modal, message, Typography } from 'antd';
 import { ArrowLeftOutlined, ReloadOutlined } from '@ant-design/icons';
 import { contentService } from '../../api';
 import type { Content, ContentStatus, ContentFormData } from '../../types';
-import { ContentForm, ContentMediaManager, ContentRevisionHistory, ContentScheduledPublish, ContentApprovalTimeline } from '../../components/content';
+import { ContentForm } from '../../components/content';
+
+// Lazy-load the auxiliary Content Operation panels so the Content edit page
+// ships a smaller initial bundle; each panel is only fetched when rendered.
+const ContentMediaManager = lazy(() => import('../../components/content/ContentMediaManager'));
+const ContentRevisionHistory = lazy(() => import('../../components/content/ContentRevisionHistory'));
+const ContentScheduledPublish = lazy(() => import('../../components/content/ContentScheduledPublish'));
+const ContentApprovalTimeline = lazy(() => import('../../components/content/ContentApprovalTimeline'));
+const ContentSeoPanel = lazy(() => import('../../components/content/ContentSeoPanel'));
+
+const panelFallback = (
+  <div style={{ textAlign: 'center', padding: 24 }}>
+    <Spin />
+  </div>
+);
 
 const { Title } = Typography;
 
@@ -228,20 +242,34 @@ export default function ContentEdit() {
         title=""
       />
 
+      <Card title="SEO 运营面板" style={{ marginTop: 16 }}>
+        <Suspense fallback={panelFallback}>
+          <ContentSeoPanel content={content} />
+        </Suspense>
+      </Card>
+
       <Card title="媒体管理" style={{ marginTop: 16 }}>
-        <ContentMediaManager contentId={content.id} />
+        <Suspense fallback={panelFallback}>
+          <ContentMediaManager contentId={content.id} />
+        </Suspense>
       </Card>
 
       <Card title="定时发布" style={{ marginTop: 16 }}>
-        <ContentScheduledPublish content={content} onChanged={loadContent} />
+        <Suspense fallback={panelFallback}>
+          <ContentScheduledPublish content={content} onChanged={loadContent} />
+        </Suspense>
       </Card>
 
       <Card title="审核时间线" style={{ marginTop: 16 }}>
-        <ContentApprovalTimeline contentId={content.id} />
+        <Suspense fallback={panelFallback}>
+          <ContentApprovalTimeline contentId={content.id} />
+        </Suspense>
       </Card>
 
       <Card title="版本历史" style={{ marginTop: 16 }}>
-        <ContentRevisionHistory contentId={content.id} />
+        <Suspense fallback={panelFallback}>
+          <ContentRevisionHistory contentId={content.id} />
+        </Suspense>
       </Card>
     </div>
   );

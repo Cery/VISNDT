@@ -7,13 +7,13 @@
 - Code Root: `F:\Desktop\VISNDT\VISNDT`
 - Branch baseline: `main`
 - Current product stage: `C. 业务闭环完善阶段`
-- Current M stage: `M18 内容运营能力实施（M18.1 Markdown 已完成，M18.2 Content Media 已实现，M18.3 SEO 已完成，M18.4 规划已完成，M18.4.1 Workflow Reliability Foundation 已完成，M18.4.2 Content Revision 已实现，M18.4.3 Scheduled Publish 已实现，M18.4.4 Approval Timeline 已实现，M18.4 阶段闭环完成，待 M18.5 内容运营稳定化）`
+- Current M stage: `M19 产品体验架构演进（M18.5 Content Operation Stabilization 已完成关闭；M19 产品体验架构冻结完成：457-460；M19.1.1 Product Search Frontend Integration（462）已完成：产品搜索能力接入 Web，动态参数筛选已落地；下一步 M19.1.2）`
 
 ## Current Phase Judgment
 
 VISNDT 已经完成基础建设、后端主域与 Admin 运营底座，也已完成 Buyer / Supplier 双侧 Workspace 主链。当前项目最准确的状态是：
 
-`M15 技术债治理已全面收口，M16 业务深化前稳定性审计已完成，可进入业务深化开发阶段。`
+`M15 技术债治理已全面收口，M16 业务深化前稳定性审计已完成，M17 内容域建设完成，M18 内容运营成熟化完成（M18.5 阶段关闭），M19 产品体验架构设计与规划已冻结，M19.1.1 产品搜索能力前端接入已完成，进入 M19.1 Product Center V2 后续开发。`
 
 ## Completed Baseline
 
@@ -327,19 +327,87 @@ VISNDT 已经完成基础建设、后端主域与 Admin 运营底座，也已完
 - **Freeze 兼容** ✅：无 schema / migration 变化；未改 WorkflowEvent Schema、WorkflowAction、Role、Permission、Notification、Public Content API、ContentRevision、`apps/web`
 - **Build** ✅：`apps/api` build exit 0、`apps/admin` build exit 0；`apps/web` 未修改（Not Required）
 
+## M18.5 Content Operation Stabilization（453，稳定化基线审计）
+
+- **M18.5.1 Content Operation Stability Audit（453）已完成**：M18.5 Stabilization Phase Started。对 M18.4 Content Operation Enhancement 全量能力执行稳定性审计，结论为达稳定运营状态（无高风险、无代码变更）
+- **Database Stability** ✅：`schema.prisma` 中 Content（status/publishedAt/archivedAt/scheduledPublishAt + `(status, scheduledPublishAt)` 复合索引）、ContentRevision（`@@index([contentId, version])` + Content 1:N cascade）、WorkflowEvent（`@@index([entityType, entityId])`）、AuditLog 均一致；`pnpm prisma migrate status` → 24 migrations up to date
+- **Workflow Boundary** ✅：WorkflowEvent（业务流程时间线，CREATED/SUBMITTED/REVIEWED/OPENED/CLOSED，metadata 仅含 to/scheduled，不存 old/new/快照）、AuditLog（系统审计，CREATE/UPDATE/STATUS_CHANGE，含 oldValue/newValue）、ContentRevision（版本快照，title/summary/content/SEO/coverImage，不含 workflow/audit）三层职责保持分离
+- **Scheduler Reliability** ✅：`ContentSchedulerService` 分钟级扫描（仅 REVIEW + scheduledPublishAt<=now）、`running` 防重入、复用 `publish()`、transition 原子条件更新幂等、单条失败隔离 + 下轮重试、`system@visndt.com` 可追踪身份
+- **Admin Operation** ✅：`ContentEdit.tsx` 完整组合「内容信息/生命周期按钮/内容表单/媒体管理/定时发布/审核时间线/版本历史」七个区块；Revision/Schedule/Timeline 组件均含错误处理、空状态、状态门控（仅 REVIEW 可配置定时发布）
+- **API Contract** ✅：Content CRUD + submit/review/publish/archive + approval-timeline（ADMIN-only）+ Revision endpoints + public 读接口（仅 PUBLISHED）契约稳定
+- **Build** ✅：`apps/api` build exit 0、`apps/admin` build exit 0、`apps/web` build exit 0（警告均为既有非阻断告警）
+- **Code Change** ✅：None（本任务仅审计，未新增功能/Schema/Migration/WorkflowAction/Role/Permission/NotificationType/Public API/`apps/web`）
+
+## M18.5.2 Content Operation Type & Bundle Optimization（454，稳定化优化）
+
+- **M18.5.2 Content Operation Type And Bundle Optimization（454）已完成**：Content Operation Stability Optimization Completed。治理 453 审计中的非业务风险项（TypeScript 类型导入规范 + Admin Bundle 结构）
+- **Type Import 优化** ✅：审计确认 453 所列 5 处组件层类型引用（RfqItem/DemandItem 等）已随类型重命名全部使用 `import type`，全局 `apps/admin/src` 无 value-style 类型导入残留，无需改动（已确认）
+- **Bundle 优化** ✅：`ContentEdit.tsx` 将 ContentMediaManager / ContentRevisionHistory / ContentScheduledPublish / ContentApprovalTimeline 改为 `React.lazy` + `Suspense` 按需加载（`ContentForm` 保持急切加载为主表单）；`components/content/index.ts` 移除 4 个被 lazy 化的组件静态重导出（仅保留 ContentForm）
+- **Bundle Size 对比** ✅：主 chunk `index-*.js` **1854.61 kB → 1844.77 kB**（gzip 562.89 → 559.82 kB）；新增 4 个独立 lazy chunk（ContentApprovalTimeline 1.45 kB / ContentScheduledPublish 1.54 kB / ContentRevisionHistory 3.66 kB / ContentMediaManager 4.41 kB），仅在 ContentEdit 渲染对应面板时按需加载
+- **功能完整性** ✅：ContentEdit 七区块（内容信息/生命周期按钮/内容表单/媒体管理/定时发布/审核时间线/版本历史）能力不减少；Revision/Schedule/Timeline/Media 仅改为按需加载，未改业务逻辑/API 调用/权限判断/UI 交互流程
+- **职责边界保持** ✅：WorkflowEvent（业务流程时间线）/ AuditLog（系统审计）/ ContentRevision（版本快照）职责不变
+- **Freeze 兼容** ✅：无 schema / migration / API / 后端业务逻辑变化；未改 WorkflowAction / Role / Permission / Notification / Public Content API / `apps/web`
+- **Build** ✅：`apps/api` build exit 0、`apps/admin` build exit 0（vite 警告为既有非阻断告警）、`apps/web` build exit 0（Next 编译通过，警告为既有项）
+
+## M18.5.3 Content SEO Operation Enhancement（455）
+
+- **M18.5.3 Content SEO Operation Enhancement（455）已完成**：Content Operation Stabilization 阶段推进。增强 Admin Content SEO 管理能力（SEO 运营面板 + 质量提示 + 搜索结果预览），验证 Web 前台 SEO Metadata 输出链路。能力增强，不引入独立 SEO 系统。
+- **SEO Operation Panel** ✅：`ContentEdit.tsx` 新增「SEO 运营面板」（`ContentSeoPanel`，`React.lazy` 按需加载，独立 chunk 3.71 kB），展示 SEO Title / SEO Description / SEO Keywords / Slug / Cover Image（封面图经 `fileAssetService.getSignedUrl` 渲染），与 Content Form 数据一致，复用现有 update API，不新增保存接口
+- **SEO Validation（非阻断）** ✅：`ContentSeoPanel` 内置长度质量提示——SEO 标题建议 30-60 字符、SEO 描述建议 120-160 字符，状态为 符合建议/过短/过长/未设置（Tag 展示 + Alert 非阻断提示）；关键词为可选不强制
+- **SEO Preview** ✅：新增 `ContentSeoPreview` 组件，Mock 搜索结果预览（Title / URL / Description），URL 按内容类型映射前台路由（KNOWLEDGE/SOLUTION 等）；仅展示，不生成 SEO
+- **Web SEO 验证** ✅：审计确认 `apps/web` 知识/解决方案详情页 `generateMetadata` 已正确输出 `title` / `description` / `keywords` / `canonical`（alternates）/ OpenGraph / JSON-LD（Article/TechArticle），封面+媒体首图回退，Twitter Card 继承根布局；无缺失，无需修复
+- **边界保持** ✅：SEO 信息继续属于 Content（seoTitle/seoDescription/seoKeywords）；未新增 SeoConfig/SeoKeyword/SeoHistory/SeoAnalytics 表、未新增 SEO Module/Service；WorkflowEvent/AuditLog/ContentRevision 职责不变；SEO 编辑仍复用 Content UPDATE AuditLog
+- **Freeze 兼容** ✅：无 schema / migration / API / 后端业务逻辑变化；未改 WorkflowAction / Role / Permission / Notification / Public Content API
+- **Build** ✅：`apps/api` build exit 0、`apps/admin` build exit 0（vite 警告为既有非阻断告警）、`apps/web` build exit 0（Next 编译通过，警告为既有项）
+
+## M18.5.4 Content Operation Final Audit（456）
+
+- **M18.5.4 Content Operation Final Audit（456）已完成**：基于 448-455 基线执行 Content Operation 最终稳定性审计，**M18.5 Content Operation Stabilization Closed（阶段关闭）**。Audit First，无代码变更（Code Change None）。
+- **Content Architecture** ✅：Content 实体（status/publishedAt/archivedAt/scheduledPublishAt/seoTitle/seoDescription/seoKeywords）完整；WorkflowEvent（业务时间线，仅 action+metadata，无快照/oldValue-newValue，CONTENT 实体豁免组织校验）、AuditLog（系统审计，CREATE/UPDATE/STATUS_CHANGE 含 operator/action/oldValue/newValue，不作为 Timeline 来源）、ContentRevision（内容快照，title/summary/content/SEO/coverImageId，不存 workflow 状态/approval timeline，contentId 1:N + version strategy max+1）三层职责边界无混用
+- **Database / Migration** ✅：`pnpm prisma migrate status` → **24 migrations found，Database schema is up to date**；Content 索引（type+status/status/status+scheduledPublishAt）、ContentMedia（contentId+fileAssetId）、ContentRevision（contentId+version）合理
+- **Workflow Reliability** ✅：Create（Content→WorkflowEvent CREATED→AuditLog CREATE→Revision v1，原子事务）；Update（DRAFT/REVIEW only→Revision v(n+1)→AuditLog UPDATE，原子事务）；Transition（原子 updateMany 条件更新保证幂等→WorkflowEvent→AuditLog STATUS_CHANGE）；Scheduler（仅 REVIEW + scheduledPublishAt≤now + running 锁 + 原子 transition + 失败隔离重试 + system 身份，无重复发布风险）；Timeline（WorkflowEvent.findContentTimeline，CONTENT 升序）
+- **Admin Operation** ✅：ContentEdit 七区块完整——内容信息、生命周期操作（submit/review/publish/archive）、媒体管理、版本历史、定时发布、审核时间线、SEO 运营面板；加载/错误/空状态与权限控制均存在
+- **Security** ✅：所有 Admin Content 接口 `@Roles(ADMIN)` + `@ApiBearerAuth()`；Public API（`/public`、`/public/:slug`）数据库层强制 `status=PUBLISHED` + `publicContentSelect` 显式投影（排除 status/archivedAt/authorId/scheduledPublishAt/工作流元数据），ThrottlerGuard 限流；Web SEO（knowledge/solutions generateMetadata 输出 title/description/keywords/canonical/OpenGraph/JSON-LD，无独立 SEO 架构）
+- **Build** ✅：`apps/api` build exit 0、`apps/admin` build exit 0（vite 大 chunk 警告为既有非阻断项）、`apps/web` build exit 0
+- **Risk Assessment** ✅：无 High Risk；无 Medium Risk；Low 建议（非阻断）——Admin 主 chunk >500k 警告为既有项，可后续按需 manualChunks 优化（不属本阶段范围）
+
+## M19 Product Experience Architecture Evolution（457-460，架构冻结）
+
+- **M19 阶段定位**：产品体验架构重构阶段（非普通开发阶段），目标为产品体验重构、供应商能力展示、搜索体验升级、运营体系规划。
+- **M19 架构冻结（457 平台能力重评审计）**：产品体系为 **A 平台标准产品库（Global Catalog）**；内容体系完整（High）；前端产品/供应商展示与参数筛选体验不足；确定 M19 前最高优先级为供应商展示断层与搜索能力闲置。
+- **M19 架构再评估 Blueprint（458）**：推荐 **Product Global Catalog + Offer Supplier Display**；不默认引入 `Product.organizationId`；不新增 `ProductFamily/Model/SupplierOffering`；梳理 Web/Admin M19-M20 演进路线与 AI Readiness 底座（Embedding/Vector/RAG 为 M20 规划）。
+- **M19 实施 Blueprint（459）**：冻结 Product Center 定位（工业检测设备标准产品目录 + 供应商能力展示 + 需求撮合 + 知识内容 + 未来 AI 选型入口）；定义产品列表/详情信息架构、动态参数搜索（ParameterDefinition 驱动）、Admin 产品运营中心、API 消费边界与数据复用原则（Backend Capability First，前端消费现有能力，零 Schema 变更）；拆分 M19.0-M19.4 阶段。
+- **M19.1 Product Center V2 实施规划（460）**：细化产品列表（Category Navigation + Search + Dynamic Parameter Filter + Sort + Grid + Pagination）与详情（Overview / Media Center / Technical Specification / Certification / Supplier Capability / Inquiry Entry）信息架构；识别前端改造范围（lib/api/products.ts 需透传 parameterFilters、ProductParameters 需按 ParameterGroup 分组、询价需改选供应商、ManufacturerInfo 需接入 offers）；确认 **Schema Change = None / Migration = None / API Change = None**；拆分 7 项开发任务（P0-P2）。
+- **M19 架构冻结结论**：保持 `Product Global Catalog + Offer Supplier Display`；禁止 `Product.organizationId`、`ProductFamily/Model/SupplierOffering`；**零 Schema 变更**；前端应消费后端已有能力（`GET /products` 参数筛选、`GET /products/:id` offers）。
+
+## M19.1.1 Product Search Capability Frontend Integration（462，M19.1 Development 第一阶段）
+
+- **M19.1.1 Started & Completed（462）**：基于 460 实施规划与 461 文档同步冻结结论，完成 Product Center V2 第一阶段能力接入——将后端已有产品搜索能力（`parameterFilters` 动态参数筛选）接入 Web 前端，`apps/web` build 通过（exit 0）。
+- **API Client（透传 parameterFilters）** ✅：`apps/web/src/lib/api/products.ts` 新增 `buildProductsQuery()`，将 `parameterFilters` 序列化为后端 qs 括号记法（`parameterFilters[0][parameterDefinitionId]` / `[value]` / `[valueMin]` / `[valueMax]`），经 endpoint 透传 `GET /products`；**API Contract 未改**（复用后端已有参数筛选能力）。
+- **Type Definition（扩展）** ✅：`apps/web/src/types/product.ts` 新增 `ParameterOption`、`ProductParameterFilter` 类型，`ProductSearchParams.parameterFilters` 复用 `ProductParameterFilter[]`，`ParameterDefinition` 增加可选 `options`（ENUM 选项）。
+- **动态参数数据源** ✅：新增 API Wrapper `apps/web/src/lib/api/parameter-definitions.ts`（`getParameterDefinitions` / `getParameterDefinition`，均 public）+ Service `apps/web/src/services/parameter-definition.service.ts`（`getFilterParameterDefinitions` 前端合并 ENUM options，遵循 `Page → Service → API Wrapper → Backend API`）。
+- **New Component（ParameterFilterPanel）** ✅：新增 `apps/web/src/components/products/ParameterFilterPanel.tsx`，由 `ParameterDefinition` 驱动，支持 NUMBER（范围 valueMin/valueMax，非法区间不提交）、ENUM（options 下拉）、STRING（文本精确）、BOOLEAN（是/否）；内联「清除」重置全部筛选；无硬编码业务参数（管径/像素/长度等）。
+- **Product Filter / Page State 接入** ✅：`ProductFilter.tsx` 集成动态参数筛选区块；`app/products/page.tsx` 增加 `parameterFilters` state、`handleParameterFilterChange`（变更后重置 page=1）、Defined 数据 query、`parameterFilters` 纳入 react-query queryKey 与 `getProducts` 调用，实现「UI State → 筛选数组 → GET /products → 列表更新」可预测链路。
+- **回归验证** ✅：原有关键词搜索、分类筛选、排序、分页均保持正常；`/products` 路由正常生成（5.46 kB）。
+- **架构约束保持** ✅：`Product Global Catalog + Offer Supplier Display`；未引入 `Product.organizationId` / `ProductFamily` / `ProductModel` / `SupplierOffering`；未触碰 Product Detail（`products/[slug]`）、Supplier Display、Admin。
+- **Freeze 兼容** ✅：**Schema Change = None / Migration = None / API Change = None**；未改 `apps/api`、`database/prisma`、`apps/admin`；未引入 Design System / AI Search / Vector Search / ProductFamily / Supplier Product Ownership。
+- **Build** ✅：`apps/web` `next build` exit 0（首次告警为既有机身 SWC Native DLL 环境警告 + 过时 `.next` 缓存，清理 `.next` 后全阶段成功；类型校验通过，仅既有非阻断 lint 警告）。
+
 ## Next Step
 
-### Priority 4 — M18.4 Workflow Operation Enhancement 阶段闭环
+### Priority 5 — M18.5 Content Operation Stabilization（稳定化阶段）
 
-M18.4.1（449）Workflow Reliability Foundation、M18.4.2（450）Content Revision、M18.4.3（451）Scheduled Publish 均已实现，**M18.4.4 Content Approval Timeline Enhancement（452）已完成（WorkflowEvent 审核时间线 + Admin 展示）**，**M18.4 Workflow Operation Enhancement 阶段闭环完成**。下一任务为 **M18.5 Content Operation Stabilization（内容运营稳定化）**。
+M18.4.1（449）Workflow Reliability Foundation、M18.4.2（450）Content Revision、M18.4.3（451）Scheduled Publish、M18.4.4（452）Approval Timeline 均已实现，**M18.4 Workflow Operation Enhancement 阶段闭环完成**；**M18.5.1 Content Operation Stability Audit（453）已完成（稳定化基线审计，无风险结论）**；**M18.5.2 Content Operation Type & Bundle Optimization（454）已完成（类型导入规范治理 + Admin Bundle 优化，主 chunk 1854.61→1844.77 kB + 4 个 lazy chunk）**；**M18.5.3 Content SEO Operation Enhancement（455）已完成（Admin SEO 运营面板 + 质量提示 + 搜索结果预览，Web SEO 链路验证通过）**；**M18.5.4 Content Operation Final Audit（456）已完成（最终稳定性审计，三层职责边界/数据库/调度/Admin/安全全 PASS，M18.5 Content Operation Stabilization 阶段关闭）**。**M19 阶段已启动（架构冻结完成）**：**M19 架构冻结（457-460 已完成）**——457 平台能力重评审计、458 M19 架构再评估 Blueprint、459 M19 实施 Blueprint、460 M19.1 Product Center V2 实施规划均已生成，**M19 产品体验架构状态冻结**；**M19.1.1 Product Search Frontend Integration（462）已完成**——后端已具备的 `parameterFilters` 动态参数筛选能力已接入 Web 前端（`lib/api/products.ts` 透传 + `ParameterFilterPanel` 动态面板 + 页面 state/query 同步，`apps/web` build exit 0，Schema/Migration/API 均 None）；下一阶段为 **M19.1.2**（Product Center V2 后续开发，如 ProductParameters 按 ParameterGroup 分组、询价改选供应商、ManufacturerInfo 接入 offers 等 460 规划任务）。
 
-进入前要求：
+M18.5 进入前要求：
 - [x] 449 报告生成（M18.4.1 Workflow Reliability Foundation 完成）
 - [x] 450 报告生成（M18.4.2 Content Revision Implementation 完成）
 - [x] 451 报告生成（M18.4.3 Content Scheduled Publish Implementation 完成）
 - [x] 452 报告生成（M18.4.4 Content Approval Timeline Enhancement 完成）
+- [x] 453 报告生成（M18.5.1 Content Operation Stability Audit 完成）
 - [x] M18.4 阶段闭环（Revision History / Scheduled Publish / Reviewer Record / Approval History 全部落地）
-- [x] 不新增 WorkflowAction / Role / Notification 类型 / CMS Scheduler / ApprovalHistory / Reviewer 表
+- [x] M18.5 稳定化基线审计通过（无高风险，无代码变更）
+- [x] 保持 WorkflowEvent / AuditLog / ContentRevision 三层职责分离、Public Content API 稳定
 
 ### Priority 2 — 已记录待办（低优先级）
 

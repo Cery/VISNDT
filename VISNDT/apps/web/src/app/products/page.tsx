@@ -4,6 +4,8 @@ import { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getProducts } from '@/services/product.service';
 import { getCategories } from '@/services/category.service';
+import { getFilterParameterDefinitions } from '@/services/parameter-definition.service';
+import type { ProductParameterFilter } from '@/types/product';
 import SearchBar from '@/components/products/SearchBar';
 import ProductFilter from '@/components/products/ProductFilter';
 import ProductGrid from '@/components/products/ProductGrid';
@@ -16,10 +18,16 @@ export default function ProductsPage() {
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
   const [page, setPage] = useState(1);
+  const [parameterFilters, setParameterFilters] = useState<ProductParameterFilter[]>([]);
 
   const { data: categoriesData } = useQuery({
     queryKey: ['categories'],
     queryFn: () => getCategories(1, 100),
+  });
+
+  const { data: parameterDefinitionsData } = useQuery({
+    queryKey: ['parameter-definitions'],
+    queryFn: () => getFilterParameterDefinitions(),
   });
 
   const {
@@ -28,7 +36,7 @@ export default function ProductsPage() {
     isError,
     error,
   } = useQuery({
-    queryKey: ['products', keyword, categoryId, sortBy, sortOrder, page],
+    queryKey: ['products', keyword, categoryId, sortBy, sortOrder, page, parameterFilters],
     queryFn: () =>
       getProducts({
         keyword: keyword || undefined,
@@ -38,6 +46,7 @@ export default function ProductsPage() {
         page,
         pageSize: 12,
         status: 'ACTIVE',
+        parameterFilters,
       }),
   });
 
@@ -57,7 +66,13 @@ export default function ProductsPage() {
     setPage(1);
   }, []);
 
+  const handleParameterFilterChange = useCallback((filters: ProductParameterFilter[]) => {
+    setParameterFilters(filters);
+    setPage(1);
+  }, []);
+
   const categories = categoriesData?.data ?? [];
+  const parameterDefinitions = parameterDefinitionsData ?? [];
 
   return (
     <div className="max-w-[1200px] mx-auto px-6 py-8">
@@ -83,6 +98,9 @@ export default function ProductsPage() {
             sortBy={sortBy}
             sortOrder={sortOrder}
             onSortChange={handleSortChange}
+            parameterDefinitions={parameterDefinitions}
+            parameterFilters={parameterFilters}
+            onParameterFilterChange={handleParameterFilterChange}
           />
         </aside>
 

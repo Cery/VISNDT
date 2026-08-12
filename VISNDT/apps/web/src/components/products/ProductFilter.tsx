@@ -1,7 +1,10 @@
 'use client';
 
 import type { ProductCategory } from '@/types/category';
+import type { ProductParameterFilter } from '@/types/product';
+import type { FilterParameterDefinition } from '@/services/parameter-definition.service';
 import { translateCategoryName } from '@/lib/translate';
+import ParameterFilterPanel from './ParameterFilterPanel';
 
 interface ProductFilterProps {
   categories: ProductCategory[];
@@ -10,6 +13,9 @@ interface ProductFilterProps {
   sortBy?: string;
   sortOrder?: string;
   onSortChange: (sortBy: string, sortOrder: string) => void;
+  parameterDefinitions: FilterParameterDefinition[];
+  parameterFilters: ProductParameterFilter[];
+  onParameterFilterChange: (filters: ProductParameterFilter[]) => void;
 }
 
 export default function ProductFilter({
@@ -19,6 +25,9 @@ export default function ProductFilter({
   sortBy = 'createdAt',
   sortOrder = 'desc',
   onSortChange,
+  parameterDefinitions,
+  parameterFilters,
+  onParameterFilterChange,
 }: ProductFilterProps) {
   return (
     <div className="space-y-6">
@@ -51,6 +60,13 @@ export default function ProductFilter({
           ))}
         </div>
       </div>
+
+      {/* Dynamic Parameter Filter */}
+      <ParameterFilterPanel
+        definitions={parameterDefinitions}
+        filters={parameterFilters}
+        onChange={onParameterFilterChange}
+      />
 
       {/* Sort Options */}
       <div>

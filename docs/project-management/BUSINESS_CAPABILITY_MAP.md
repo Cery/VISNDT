@@ -253,6 +253,44 @@ M17.0 完成内容域架构规划（436，只读设计）。定位为**工业检
 - **Security / Freeze** ✅：Timeline 接口 ADMIN-only、不公开，不返回 AuditLog / Revision 内容 / storageKey / 用户邮箱（operator 仅 id + name）；无 schema / migration 变化，未改 WorkflowAction / Role / Permission / Notification / AuditLog Schema / WorkflowEvent Schema / Public Content API / ContentRevision / `apps/web`
 - **Build** ✅：API / Admin build 通过（exit 0）；Web 未修改（Not Required）
 
+**M18.5.1 Content Operation Stability Audit（453，已完成）**：基于 448-452 基线执行 Content Operation Capability 稳定性审计，M18.5 Stabilization Phase Started，无代码变更：
+- **Database Stability** ✅：`Content`（status/publishedAt/archivedAt/scheduledPublishAt + `(status, scheduledPublishAt)` 索引）、`ContentRevision`（`@@index([contentId, version])` + Content 1:N cascade）、`WorkflowEvent`（`@@index([entityType, entityId])`）、`AuditLog` 一致；`pnpm prisma migrate status` → 24 migrations up to date
+- **Workflow Boundary** ✅：WorkflowEvent（业务流程时间线，CREATED/SUBMITTED/REVIEWED/OPENED/CLOSED，metadata 仅 to/scheduled，不存 old/new/快照）/ AuditLog（系统审计，CREATE/UPDATE/STATUS_CHANGE 含 old/new）/ ContentRevision（版本快照，title/summary/content/SEO/coverImage，不含 workflow/audit）三层职责分离保持
+- **Scheduler Reliability** ✅：`ContentSchedulerService` 分钟级扫描（仅 REVIEW + scheduledPublishAt<=now）+ `running` 防重入 + 复用 publish() + transition 原子条件更新幂等 + 单条失败隔离下轮重试 + `system@visndt.com` 可追踪身份
+- **Admin Operation** ✅：`ContentEdit.tsx` 完整组合「内容信息/生命周期按钮/内容表单/媒体管理/定时发布/审核时间线/版本历史」；Revision/Schedule/Timeline 组件含错误处理/空状态/状态门控（仅 REVIEW 配置定时发布）
+- **API Contract** ✅：CRUD + submit/review/publish/archive + approval-timeline（ADMIN-only）+ Revision + public 读（仅 PUBLISHED）契约稳定
+- **Build / Freeze** ✅：API/Admin/Web 均 exit 0（警告为既有非阻断告警）；Code Change None，未新增功能/Schema/Migration/WorkflowAction/Role/Permission/NotificationType/Public API/`apps/web`
+
+**M18.5.2 Content Operation Type & Bundle Optimization（454，已完成）**：治理 453 审计中的非业务风险项（类型导入规范 + Admin Bundle 结构），Content Operation Stability Optimization Completed。**Type Import**——453 所列 5 处组件层类型引用已随类型重命名全部使用 `import type`，全局 `apps/admin/src` 无 value-style 类型导入残留，无需改动；**Bundle**——`ContentEdit.tsx` 将 ContentMediaManager / ContentRevisionHistory / ContentScheduledPublish / ContentApprovalTimeline 改为 `React.lazy` + `Suspense` 按需加载，`components/content/index.ts` 移除 4 个被 lazy 化组件静态重导出（仅保留 ContentForm）；**Bundle Size**——主 chunk 1854.61→1844.77 kB（gzip 562.89→559.82 kB）+ 4 个独立 lazy chunk（ContentApprovalTimeline 1.45 / ContentScheduledPublish 1.54 / ContentRevisionHistory 3.66 / ContentMediaManager 4.41 kB）；**功能完整性**——ContentEdit 七区块能力不减少；**Freeze**——无 schema/migration/API/后端业务逻辑变化，未改 WorkflowAction/Role/Permission/Notification/Public Content API/`apps/web`；**Build**——API/Admin/Web 均 exit 0。
+
+**M18.5.3 Content SEO Operation Enhancement（455，已完成）**：增强 Admin Content SEO 管理能力，Content Management Capability SEO Operation Enhanced（Content Operation Stabilization 推进）。**Admin SEO Operation Panel**——`ContentEdit.tsx` 新增「SEO 运营面板」（`ContentSeoPanel`，React.lazy 按需加载，独立 chunk 3.71 kB）：展示 SEO Title / SEO Description / SEO Keywords / Slug / Cover Image（封面图经 `fileAssetService.getSignedUrl` 渲染），与 Content Form 数据一致，复用现有 update API，不新增保存接口；**SEO Validation（非阻断）**——SEO 标题建议 30-60 字符、SEO 描述建议 120-160 字符，状态 Tag（符合建议/过短/过长/未设置）+ Alert 非阻断提示，关键词可选不强制；**SEO Preview**——新增 `ContentSeoPreview` Mock 搜索结果预览（Title / URL / Description，URL 按类型映射前台 KNOWLEDGE/SOLUTION 路由），仅展示不生成 SEO；**Web SEO 验证**——`apps/web` 知识/解决方案详情页 `generateMetadata` 已正确输出 title/description/keywords/canonical/OpenGraph/JSON-LD（Article/TechArticle）+ 封面/媒体首图回退 + Twitter Card 继承根布局，无缺失无需修复；**边界保持**——SEO 信息仍属 Content（seoTitle/seoDescription/seoKeywords），未新增 SeoConfig/SeoKeyword/SeoHistory/SeoAnalytics 表、未新增 SEO Module/Service，SEO 编辑复用 Content UPDATE AuditLog，WorkflowEvent/AuditLog/ContentRevision 职责不变；**Freeze**——无 schema/migration/API/后端业务逻辑变化，未改 WorkflowAction/Role/Permission/Notification/Public Content API；**Build**——API/Admin/Web 均 exit 0。
+
+**M18.5.4 Content Operation Final Audit（456，已完成）**：基于 448-455 基线执行 Content Operation 最终稳定性审计，**M18.5 Content Operation Stabilization Closed（阶段关闭）**，Content Management Capability Stable。Content Domain 架构完整性、WorkflowEvent/AuditLog/ContentRevision 三层职责边界、Scheduled Publish 自动发布可靠性（REVIEW only + lte now + running 锁 + 原子 transition + 失败隔离重试 + system 身份）、Admin ContentEdit 七区块能力（内容信息/生命周期/媒体/版本历史/定时发布/审核时间线/SEO 面板）、API/Database/Permission/Public Content API 稳定性全 PASS；`pnpm prisma migrate status` 24 migrations up to date；所有 Admin 接口 `@Roles(ADMIN)`+`@ApiBearerAuth()`、Public 接口 DB 层强制 PUBLISHED + `publicContentSelect` 显式投影排除敏感字段 + ThrottlerGuard；三端 build 均 exit 0；No High/Medium Risk、Low 建议（Admin 主 chunk >500k 为既有项，可后续 manualChunks）；无代码变更，Code State = Documentation State。
+
+## M19 Product Center Capability Model（457-460 架构冻结）
+
+M19 产品体验架构演进（架构冻结，零 Schema 变更，前端消费后端已有能力）。产品中心能力模型按「已完成后端能力 / 待实施前端体验升级」区分：
+
+```
+Product Data Foundation
+        ↓
+Search Capability
+        ↓
+Supplier Capability Display
+        ↓
+Demand Matching
+        ↓
+Future AI Discovery
+```
+
+- **Product Data Foundation（后端 ✅ 已完成）**：Product 标准目录（Global Catalog）+ Category 分类树 + ParameterGroup/Definition/Value + ProductMedia；不引入 `Product.organizationId` / `ProductFamily` / `ProductModel` / `SupplierOffering`。
+- **Search Capability（后端 ✅ / 前端 ✅ M19.1.1）**：后端 `GET /products` 关键字 + 参数动态筛选（ParameterDefinition 驱动）能力已存在；前端动态参数筛选交互已由 **M19.1.1（462）** 接入 Web（`ParameterFilterPanel` NUMBER/ENUM/STRING/BOOLEAN + `lib/api/products.ts` 透传 parameterFilters + 页面 state/query 同步）；M19.3 搜索体验升级待后续。
+- **Supplier Capability Display（后端 ✅ / 前端 ⏳）**：供应商能力通过 Offer 挂载，`GET /products/:id` offers 提供制造商/供应商信息；前端供应商能力展示区块待 M19.2 Supplier Display。
+- **Demand Matching（后端 ✅ 已完成）**：Demand → Matching → RFQ → Response 撮合主链已闭环；产品中心与需求撮合衔接保持。
+- **Future AI Discovery（⏳ M20 规划）**：AI Readiness 底座（Embedding / Vector / RAG）为 M20 规划，当前不实施。
+
+**业务定位保持**：`工业检测设备信息平台 + 撮合平台`（信息展示 + 需求发布 + 平台撮合 + RFQ 响应协作），非 Supplier 独立商城 / 公开价格 / 交易结算。
+
 ## Lifecycle Event Coverage
 
 WorkflowEvent 已覆盖以下业务生命周期：
