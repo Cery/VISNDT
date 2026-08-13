@@ -8,6 +8,11 @@ export class SearchParamsDto {
   @IsString()
   keyword?: string;
 
+  @ApiPropertyOptional({ description: 'Filter by organization ID', example: 'uuid' })
+  @IsOptional()
+  @IsString()
+  organizationId?: string;
+
   @ApiPropertyOptional({ description: 'Filter by status', example: 'ACTIVE' })
   @IsOptional()
   @IsString()

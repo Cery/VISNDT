@@ -65,6 +65,11 @@ export default function Pagination({
       >
         下一页
       </button>
+
+      {/* Page indicator */}
+      <span className="text-xs text-muted-foreground ml-3">
+        {currentPage} / {totalPages}
+      </span>
     </nav>
   );
 }

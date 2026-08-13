@@ -9,6 +9,8 @@ interface InquiryFormProps {
   productName: string;
   offerId: string;
   organizationId: string;
+  /** 供应商名称（用于展示询价对象） */
+  organizationName?: string;
 }
 
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error';
@@ -32,6 +34,7 @@ export default function InquiryForm({
   productName,
   offerId,
   organizationId,
+  organizationName,
 }: InquiryFormProps) {
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM);
   const [status, setStatus] = useState<FormStatus>('idle');
@@ -123,13 +126,22 @@ export default function InquiryForm({
         发送询价
       </h3>
       <p className="text-xs text-slate-500">
-        对 {productName} 感兴趣？填写以下表单，我们将尽快回复。
+        {organizationName
+          ? `向 ${organizationName} 询价 ${productName}。填写以下表单，我们将尽快回复。`
+          : `对 ${productName} 感兴趣？填写以下表单，我们将尽快回复。`}
       </p>
 
       {/* Error Banner */}
       {status === 'error' && (
-        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-          {errorMsg}
+        <div className="rounded-md border border-red-200 bg-red-50 p-3">
+          <p className="text-sm text-red-700 mb-2">{errorMsg}</p>
+          <button
+            type="button"
+            onClick={() => setStatus('idle')}
+            className="text-xs text-red-600 hover:text-red-800 underline"
+          >
+            重新填写
+          </button>
         </div>
       )}
 

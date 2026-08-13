@@ -1,8 +1,10 @@
 import { getProduct } from '@/services/product.service';
+import { getParameterGroups } from '@/services/parameter-group.service';
 import ProductGallery from '@/components/products/ProductGallery';
 import ProductParameters from '@/components/products/ProductParameters';
 import ManufacturerInfo from '@/components/products/ManufacturerInfo';
-import InquirySection from '@/components/inquiry/InquirySection';
+import SupplierInquirySection from '@/components/inquiry/SupplierInquirySection';
+import EmptyState from '@/components/common/EmptyState';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -50,11 +52,8 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     notFound();
   }
 
-  // 公开询价链路：从产品关联的 offers 中选取可询价报价（ACTIVE/SUBMITTED），
-  // 推导出询价目标 offerId 与组织 organizationId，供 InquirySection 使用。
-  const inquirateOffer = Array.isArray(product.offers)
-    ? product.offers.find((o) => o.status === 'ACTIVE' || o.status === 'SUBMITTED')
-    : undefined;
+  // Load parameter groups for grouped display (public endpoint, no schema change)
+  const parameterGroups = await getParameterGroups();
 
   return (
     <div className="max-w-[1200px] mx-auto px-6 py-8">
@@ -84,10 +83,12 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
         {/* Product Gallery */}
-        <ProductGallery media={product.media} productName={product.name} />
+        <section id="media">
+          <ProductGallery media={product.media} productName={product.name} />
+        </section>
 
         {/* Product Info */}
-        <div className="space-y-6">
+        <section id="overview" className="space-y-6">
           <div>
             <h1 className="text-3xl font-extrabold text-foreground">{product.name}</h1>
             {product.model && (
@@ -109,34 +110,44 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             </div>
           )}
 
-          {/* Manufacturer Info */}
+          {/* Manufacturer Info (derived from offers.organization) */}
           <ManufacturerInfo
-            organization={null}
+            offers={product.offers}
             productName={product.name}
           />
 
-          {/* Inquiry Section */}
-          <InquirySection
+          {/* Supplier Capability + Inquiry (user must select Offer explicitly) */}
+          <SupplierInquirySection
             productId={product.id}
             productName={product.name}
-            offerId={inquirateOffer?.id}
-            organizationId={inquirateOffer?.organizationId}
+            offers={product.offers ?? []}
           />
-        </div>
+        </section>
       </div>
 
-      {/* Technical Parameters */}
-      <section className="mb-12">
+      {/* Technical Parameters (grouped by ParameterGroup) */}
+      <section id="specifications" className="mb-12">
         <h2 className="text-2xl font-extrabold text-foreground mb-6">技术参数</h2>
         <div className="rounded-xl border border-slate-200/80 shadow-industrial-sm bg-white p-6">
-          <ProductParameters parameters={product.parameterValues} />
+          {product.parameterValues.length > 0 ? (
+            <ProductParameters
+              parameters={product.parameterValues}
+              parameterGroups={parameterGroups}
+            />
+          ) : (
+            <EmptyState
+              icon="document"
+              message="暂无技术参数"
+              description="该产品尚未录入技术参数信息。"
+            />
+          )}
         </div>
       </section>
 
       {/* Product Media Documents */}
-      {product.media.filter((m) => m.mediaType !== 'IMAGE').length > 0 && (
-        <section>
-          <h2 className="text-2xl font-extrabold text-foreground mb-6">文档与证书</h2>
+      <section id="documents" className="mb-12">
+        <h2 className="text-2xl font-extrabold text-foreground mb-6">文档与证书</h2>
+        {product.media.filter((m) => m.mediaType !== 'IMAGE').length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {product.media
               .filter((m) => m.mediaType !== 'IMAGE')
@@ -163,8 +174,14 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                 </div>
               ))}
           </div>
-        </section>
-      )}
+        ) : (
+          <EmptyState
+            icon="document"
+            message="暂无文档与证书"
+            description="该产品尚未上传相关文档或证书。"
+          />
+        )}
+      </section>
     </div>
   );
 }

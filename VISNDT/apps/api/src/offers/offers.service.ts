@@ -21,7 +21,7 @@ export class OffersService {
   ) {}
 
   async findAll(params: SearchParamsDto) {
-    const { page = 1, pageSize = 20, keyword, status } = params;
+    const { page = 1, pageSize = 20, keyword, status, organizationId } = params;
     const skip = (page - 1) * pageSize;
 
     const where: Prisma.OfferWhereInput = {};
@@ -33,6 +33,9 @@ export class OffersService {
     }
     if (status) {
       where.status = status as OfferStatus;
+    }
+    if (organizationId) {
+      where.organizationId = organizationId;
     }
 
     const [data, total] = await Promise.all([

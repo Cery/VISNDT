@@ -86,17 +86,21 @@ export default function ParameterFilterPanel({
   const inputClass =
     'w-full px-3 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30';
 
+  const activeCount = filters.length;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold text-sm">参数筛选</h3>
-        <button
-          type="button"
-          onClick={handleClearAll}
-          className="text-xs text-primary hover:underline"
-        >
-          清除
-        </button>
+        {activeCount > 0 && (
+          <button
+            type="button"
+            onClick={handleClearAll}
+            className="text-xs text-primary hover:underline"
+          >
+            清除 ({activeCount})
+          </button>
+        )}
       </div>
 
       {definitions.map((def) => {

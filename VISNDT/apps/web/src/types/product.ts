@@ -15,6 +15,14 @@ export interface ProductMedia {
   updatedAt: string;
 }
 
+/** Parameter group (for grouping parameter definitions) */
+export interface ParameterGroup {
+  id: string;
+  name: string;
+  code: string;
+  description: string | null;
+}
+
 /** Parameter option (for ENUM parameter definitions) */
 export interface ParameterOption {
   id: string;

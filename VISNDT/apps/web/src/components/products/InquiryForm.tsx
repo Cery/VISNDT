@@ -7,8 +7,8 @@ import type { InquiryResponse } from '@/types/inquiry';
 interface InquiryFormProps {
   productId: string;
   productName: string;
-  offerId?: string;
-  organizationId?: string;
+  offerId: string;
+  organizationId: string;
 }
 
 interface FormData {
@@ -23,8 +23,8 @@ type FormStatus = 'idle' | 'submitting' | 'success' | 'error';
 export default function InquiryForm({
   productId,
   productName,
-  offerId = '',
-  organizationId = '',
+  offerId,
+  organizationId,
 }: InquiryFormProps) {
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -51,8 +51,8 @@ export default function InquiryForm({
     try {
       const res = await createInquiry({
         productId,
-        offerId: offerId || productId, // fallback: use productId if no offerId
-        organizationId: organizationId || productId, // fallback: use productId if no orgId
+        offerId,
+        organizationId,
         name: formData.name,
         email: formData.email,
         phone: formData.phone || undefined,

@@ -16,6 +16,10 @@ interface ProductFilterProps {
   parameterDefinitions: FilterParameterDefinition[];
   parameterFilters: ProductParameterFilter[];
   onParameterFilterChange: (filters: ProductParameterFilter[]) => void;
+  /** 是否有任何激活的筛选条件 */
+  hasActiveFilters?: boolean;
+  /** 清除所有筛选条件 */
+  onClearAll?: () => void;
 }
 
 export default function ProductFilter({
@@ -28,9 +32,24 @@ export default function ProductFilter({
   parameterDefinitions,
   parameterFilters,
   onParameterFilterChange,
+  hasActiveFilters,
+  onClearAll,
 }: ProductFilterProps) {
   return (
     <div className="space-y-6">
+      {/* Active Filters Header */}
+      {hasActiveFilters && onClearAll && (
+        <div className="flex items-center justify-between pb-3 border-b">
+          <span className="text-xs font-medium text-foreground">已筛选</span>
+          <button
+            type="button"
+            onClick={onClearAll}
+            className="text-xs text-primary hover:underline"
+          >
+            清除全部筛选
+          </button>
+        </div>
+      )}
       {/* Category Filter */}
       <div>
         <h3 className="font-semibold text-sm mb-3">分类</h3>

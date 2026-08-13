@@ -2,18 +2,18 @@
 
 ## Snapshot
 
-- Last calibrated: `2026-08-12`
+- Last calibrated: `2026-08-13`
 - Repository Root: `F:\Desktop\VISNDT`
 - Code Root: `F:\Desktop\VISNDT\VISNDT`
 - Branch baseline: `main`
 - Current product stage: `C. 业务闭环完善阶段`
-- Current M stage: `M19 产品体验架构演进（M18.5 Content Operation Stabilization 已完成关闭；M19 产品体验架构冻结完成：457-460；M19.1.1 Product Search Frontend Integration（462）已完成：产品搜索能力接入 Web，动态参数筛选已落地；下一步 M19.1.2）`
+- Current M stage: `M19 产品体验架构演进（M18.5 Content Operation Stabilization 已完成关闭；M19 产品体验架构冻结完成：457-460；M19.1.1-4 全部完成：462-465；M19.2.0 Architecture Audit（466）审计通过；M19.2.1 Supplier Capability Page（467）已完成；M19.2.2 Product Detail Supplier Section（468）已完成；M19.2.3 Pre-Audit（469）审计通过；M19.2.3 Information Architecture Audit（470）信息架构冻结；M19.2.3 Workspace Supplier Display Management（471）已完成；M19.2.4 Closure Audit（472）闭环审计通过——M19.2 CLOSED；M19.3.0 Search Experience Architecture Audit（473）审计通过——M19.3 搜索架构冻结；M19.3.1 Search Experience Development（474）已完成——Product Search UX 增强；M19.3.2 Search Experience Enhancement Development（475）已完成——Supplier Discovery Entry + Search Result UX 增强；M19.3.2.1 Supplier Discovery Boundary Correction（476）已完成——删除公开供应商目录/恢复 Product-driven 发现；M19.3.3 Closure Audit（477）已完成——M19.3 CLOSED；下一步 M19.4 Admin Product Operation Center）`
 
 ## Current Phase Judgment
 
 VISNDT 已经完成基础建设、后端主域与 Admin 运营底座，也已完成 Buyer / Supplier 双侧 Workspace 主链。当前项目最准确的状态是：
 
-`M15 技术债治理已全面收口，M16 业务深化前稳定性审计已完成，M17 内容域建设完成，M18 内容运营成熟化完成（M18.5 阶段关闭），M19 产品体验架构设计与规划已冻结，M19.1.1 产品搜索能力前端接入已完成，进入 M19.1 Product Center V2 后续开发。`
+`M15 技术债治理已全面收口，M16 业务深化前稳定性审计已完成，M17 内容域建设完成，M18 内容运营成熟化完成（M18.5 阶段关闭），M19 产品体验架构设计与规划已冻结，M19.1 Product Center V2 体验稳定化已全部完成（462-465），M19.2.0 架构审计已通过（466），M19.2.1 Supplier Public Page 已完成（467），M19.2.2 Product Detail Supplier Section 已完成（468），M19.2.3 Pre-Audit + IA Audit + Development 已完成（469-471），M19.2.4 Closure Audit 通过（472），M19.2 CLOSED，M19.3.0 Search Experience Architecture Audit（473）审计通过——搜索架构冻结，M19.3.1 Search Experience Development（474）已完成——Product Search UX 增强（URL 同步/关键词高亮/筛选Chips/清除全部/Supplier Discovery 入口），M19.3.2 Search Experience Enhancement Development（475）已完成——Search Result UX 增强（骨架屏/空状态/分页导航），M19.3.2.1 Supplier Discovery Boundary Correction（476）已完成——删除公开供应商目录/恢复 Product-driven Capability Discovery，M19.3.3 Closure Audit（477）已完成——M19.3 CLOSED，进入 M19.4 Admin Product Operation Center。`
 
 ## Completed Baseline
 
@@ -393,11 +393,213 @@ VISNDT 已经完成基础建设、后端主域与 Admin 运营底座，也已完
 - **Freeze 兼容** ✅：**Schema Change = None / Migration = None / API Change = None**；未改 `apps/api`、`database/prisma`、`apps/admin`；未引入 Design System / AI Search / Vector Search / ProductFamily / Supplier Product Ownership。
 - **Build** ✅：`apps/web` `next build` exit 0（首次告警为既有机身 SWC Native DLL 环境警告 + 过时 `.next` 缓存，清理 `.next` 后全阶段成功；类型校验通过，仅既有非阻断 lint 警告）。
 
+## M19.1.4 Product Center V2 Experience Stabilization（465，M19.1 Development 收尾）
+
+- **M19.1.4 Started & Completed（465）**：基于 459-464 冻结结论，完成 Product Center V2 全链路体验稳定化——产品列表空状态/结果统计/筛选指示、详情页 section 结构一致性/空数据状态、询价错误状态重试，`apps/web` build 通过（exit 0）。
+- **产品列表体验优化** ✅：新增结果计数（"共 N 个产品"）；空状态区分「无筛选结果」（搜索图标 + 调整筛选建议）与「无产品」（包裹图标 + 建设中文案）；`ParameterFilterPanel` 清除按钮显示激活筛选数（"清除 (N)"）。
+- **产品详情页结构一致性** ✅：添加 `id` 锚点（`#media`/`#overview`/`#specifications`/`#documents`）；技术参数无数据时显示 `EmptyState` 空状态；文档与证书无数据时同样显示空状态。
+- **询价错误状态完善** ✅：`InquiryForm` 错误状态新增「重新填写」按钮，提交失败后可直接恢复表单。
+- **通用组件增强** ✅：`EmptyState` 组件升级为支持图标（search/package/document/default）+ 描述文案，提升全站空状态一致性。
+- **回归验证** ✅：产品列表分类筛选、参数筛选、排序、分页均正常；产品详情 Overview / Media / Specs / Supplier / Inquiry / Documents 全链路正常；`/products` 路由 6.17 kB，`/products/[slug]` 路由 4.38 kB。
+- **架构约束保持** ✅：`Product Global Catalog + Offer Supplier Display`；`ProductCard` 仅消费 `Product` 类型可用字段；未触碰 Admin / Backend / Database。
+- **Freeze 兼容** ✅：**Schema Change = None / Migration = None / API Change = None**；未改 `apps/api`、`database/prisma`、`apps/admin`。
+- **Build** ✅：`apps/web` `next build` exit 0（编译 + 类型校验 + 静态页 28/28 通过）；仅既有非阻断 lint 警告。
+
+## M19.2.0 Supplier Display Capability Architecture Audit（466，M19.2 开发前架构审计）
+
+- **M19.2.0 Audit Started & Completed（466）**：基于 457-465 历史报告冻结结论，对 M19.2 Supplier Display Capability Enhancement 进行开发前架构审计，审计通过，M19.2 进入开发阶段。**Code Change = None / Schema Change = None**。
+- **Repository Verification** ✅：`F:\Desktop\VISNDT`（main branch），工作区未提交修改为既有 M18.5 文件，不影响历史任务。
+- **M19.1 Completion Verification** ✅：462-465 全部完成，产品列表/详情/供应商/询价全链路体验稳定化。
+- **Database Capability Assessment** ✅：Product → Offer → Organization 关系链完整；Organization 当前 name/type/status 可支撑基础 Supplier Display；**Zero Schema Change 可行**。
+- **API Capability Assessment** ✅：`GET /products/:id`（含 offers + organization）、`GET /organizations/:id`（public）、`GET /offers`（public）可复用；M19.2 可基于现有 API 完成，无需新增端点。
+- **Frontend Capability Assessment** ✅：`SupplierCapabilityList` / `SupplierInquirySection` / `ManufacturerInfo` 基础组件已完成（M19.1.2-3），可作为 M19.2 增量增强基础；未来入口：Public Supplier Page（P0）/ Product Detail Enhancement（P1）/ Workspace Supplier Center（P2）。
+- **Architecture Decision** ✅：继续 `Product Global Catalog + Offer Supplier Display`；禁止 Product.organizationId / SupplierStore / Marketplace / Transaction；Supplier = Capability Provider。
+- **M19.2 Development Boundary** ✅：P0 — Public Supplier Capability Page（`/suppliers/[id]`）；P1 — Product Detail Supplier Section Enhancement；P2 — Workspace Supplier Display Management。
+- **Risk Assessment** ✅：No High Risk；Medium — Organization 字段不足（可通过前端展示优化缓解）、Offer 数据质量依赖；Low — 架构冻结突破、功能蔓延。
+- **SEO / Content Relationship** ✅：Supplier Display 不直接依赖 Content Center；Supplier 页面 SEO 可复用 M16.3 模式；Content Center 与 Supplier 关联为 M19.3+ 规划。
+- **Freeze 兼容** ✅：**Code Change = None / Schema Change = None / Migration = None / API Change = None**；未改 `apps/api`、`database/prisma`、`apps/web`、`apps/admin`。
+- **Build** ✅：Not Required（本任务仅审计，无代码变更）。
+
+## M19.2.1 Supplier Capability Page Development（467，M19.2 Development 第一阶段）
+
+- **M19.2.1 Started & Completed（467）**：基于 466 审计结论，完成 Public Supplier Capability Page 开发——新增 `/suppliers/[id]` 路由、`SupplierPublicProfile` 组件、`SupplierOfferList` 组件、API 与服务层封装，`apps/web` build 通过（exit 0）。
+- **Supplier Public Page** ✅：新增 `app/suppliers/[id]/page.tsx`（动态路由，server-rendered），包含 Breadcrumb 导航、SupplierPublicProfile 区块、SupplierOfferList 区块；支持 `generateMetadata` 动态 SEO。
+- **SupplierPublicProfile** ✅：新增 `components/supplier/SupplierPublicProfile.tsx`，展示 organization.name（首字母头像）、organization.type（中文标签）、organization.status（状态徽章）；使用 API 真实字段，不虚构不存在字段。
+- **SupplierOfferList** ✅：新增 `components/supplier/SupplierOfferList.tsx`，展示供应商 Offer 列表（title/description/status），支持点击跳转对应产品详情页；空状态显示 EmptyState（"暂无供应产品"）。
+- **API Wrapper** ✅：新增 `lib/api/offers.ts`（`getOffers`，支持 `organizationId` 过滤），遵循现有 `apiClient` 模式。
+- **Service Layer** ✅：新增 `services/organization.service.ts`、`services/offer.service.ts`，遵循 `Page → Service → API Wrapper → Backend API` 分层。
+- **Backend Adaptation** ✅：`SearchParamsDto` 新增 `organizationId` 可选参数（`IsOptional`/`@IsString`）；`OffersService.findAll` 新增 `organizationId` where 过滤；`OrganizationsService.findOnePublic` 新增 `status`/`createdAt`/`updatedAt` 返回字段。**Schema Change = None / Migration = None**。
+- **架构约束保持** ✅：`Product Global Catalog + Offer Supplier Display`；Supplier = Capability Provider；未引入 `Product.organizationId` / SupplierStore / Marketplace / Transaction；未展示 Price / Inventory / 交易状态。
+- **Freeze 兼容** ✅：**Schema Change = None / Migration = None**；未改 `database/prisma`、`apps/admin`。
+- **Build** ✅：`apps/web` `next build` exit 0（编译 + 类型校验 + 静态页 28/28 通过）；`/suppliers/[id]` 路由 164 B（ƒ dynamic）；仅既有非阻断 lint 警告。
+
+## M19.2.2 Product Detail Supplier Section Enhancement（468，M19.2 Development 第二阶段）
+
+- **M19.2.2 Started & Completed（468）**：基于 466-467 冻结结论，增强 Product Detail 页面供应商展示能力——ManufacturerInfo 和 SupplierCapabilityList 新增供应商主页链接，建立 Product Detail → Supplier Public Profile 公开浏览链路。**Code Change = Minimal（Frontend only）**。
+- **ManufacturerInfo Enhancement** ✅：新增「查看供应商详情 →」链接（`/suppliers/[organizationId]`），位于制造商信息卡片底部，分隔线区隔，点击跳转至 Supplier Public Profile 页。
+- **SupplierCapabilityList Enhancement** ✅：每个供应商卡片底部新增「供应商主页」链接（`/suppliers/[organizationId]`），使用 `e.stopPropagation()` 防止触发展开选择，点击跳转至 Supplier Public Profile 页。
+- **Supplier Information Source** ✅：所有 Supplier Display 数据保持 `Offer.organization` 为唯一来源，未使用 `Product.createdBy.organization`。
+- **架构约束保持** ✅：`Product Global Catalog + Offer Supplier Display`；Product → Offer → Organization → Supplier Public Profile；未引入 `Product.organizationId` / SupplierStore / Marketplace / Transaction。
+- **Freeze 兼容** ✅：**Schema Change = None / Migration = None / API Change = None**；未改 `apps/api`、`database/prisma`、`apps/admin`。
+- **Build** ✅：`apps/web` `next build` exit 0（编译 + 类型校验 + 静态页 28/28 通过）；`/products/[slug]` 路由 4.51 kB；仅既有非阻断 lint 警告。
+
+## M19.2.3 Pre-Audit Workspace Supplier Display Management Architecture Audit（469，M19.2 开发前架构审计）
+
+- **M19.2.3 Pre-Audit Started & Completed（469）**：基于 466-468 完成状态，对 M19.2.3 Workspace Supplier Display Management 进行开发前架构审计，审计通过。**Code Change = None**。
+- **Workspace Capability Audit** ✅：Workspace API 为 RFQ/Response 协作导向（`GET /workspace/supplier/overview` / `rfqs` / `responses`），无 Offer 管理、无 Profile 管理 API；`PATCH /organizations/:id` 仅 ADMIN，Supplier 不可自助更新 Profile；`PATCH /offers/:id` 已支持 org-scoped 更新。
+- **Database Capability Audit** ✅：Organization（name/type/status）+ Offer（title/description/status）+ OrganizationMember（role）可支撑基础 Display Management；**Zero Schema Change 可行**。
+- **API Capability Audit** ✅：可复用 `GET /organizations/:id`（读取 Profile）+ `GET /offers?organizationId=`（读取自有 Offer）+ `PATCH /offers/:id`（更新 Offer 状态）；无需新增 API 端点。
+- **Frontend Capability Audit** ✅：`/dashboard/supplier` Domain Navigation 可扩展「展示管理」入口；`SupplierPublicProfile` / `SupplierOfferList` 组件可复用；`WorkspaceSidebar` / `WorkspaceHeader` 布局可复用。
+- **M19.2.3 Development Boundary** ✅：M19.2.3a — Supplier Display Management（Read-Only View）——Profile Preview（只读）+ Offer Management（状态管理）；禁止 Profile 编辑（需 ADMIN）、禁止 Schema 变更、禁止 Supplier Store/Marketplace。
+- **Architecture Decision** ✅：继续 `Product Global Catalog + Offer Supplier Display`；Supplier = Capability Provider；M19.2.3 可保持 Zero Schema Change + Zero API Change。
+- **Freeze 兼容** ✅：**Code Change = None / Schema Change = None / Migration = None / API Change = None**；未改 `apps/api`、`database/prisma`、`apps/web`、`apps/admin`。
+- **Build** ✅：Not Required（本任务仅审计，无代码变更）。
+
+## M19.2.3 Information Architecture Audit（470，M19.2.3 信息架构冻结）
+
+- **M19.2.3 Information Architecture Audit Started & Completed（470）**：基于 466-469 完成状态，完成 Supplier Display Management 信息架构冻结——设计 7 模块页面结构（Display Overview / Company Identity / Capability Overview / Product Capability / Offer Management / Public Preview / Display Completeness），输出现有字段能力矩阵（50+ 字段评估），冻结 M19.2.3 开发边界。**Code Change = None**。
+- **Information Architecture Design** ✅：页面结构 7 模块（概览 / 企业身份 / 能力概览 / 产品能力 / 供应管理 / 公开预览 / 展示完整度）；路由 `/workspace/supplier/display`；Dashboard Domain Navigation 新增「展示管理」入口。
+- **Supplier Display Data Matrix** ✅：输出 7 模块 × 50+ 字段评估矩阵——Each=Existing 字段可直接支持（Organization 6/Offer 10/Product 3/ProductCategory 2/OrganizationMember 3/Inquiry 3）；Missing（logo/description/website/location）标记为 M19.3+ Future Enhancement。
+- **Capability Classification** ✅：Existing Capability（35+ fields 可直接支持）→ Frontend Derived（Display Completeness / Product Coverage / Category Coverage 无需 Schema）→ Future Enhancement（6 fields 需独立 Schema/API 审计，M19.3+）。
+- **Semantic Freeze** ✅：所有展示语义使用「Products Supplier Can Provide」，禁止「Supplier Products / Store Products」；Supplier = Capability Provider。
+- **Architecture Decision** ✅：继续 `Product Global Catalog + Offer Supplier Display`；Zero Schema Change 可行；Zero API Change 可行；5 个现有 API 可复用。
+- **Freeze 兼容** ✅：**Code Change = None / Schema Change = None / Migration = None / API Change = None**；未改 `apps/api`、`database/prisma`、`apps/web`、`apps/admin`。
+- **Build** ✅：Not Required（本任务仅审计，无代码变更）。
+
+## M19.2.3 Workspace Supplier Display Management Development（471，M19.2.3a Development）
+
+- **M19.2.3 Development Started & Completed（471）**：基于 466-470 完成状态，完成 Supplier Display Management 工作台开发——Dashboard Domain Navigation 新增「展示管理」入口，`/workspace/supplier/display` 页面实现 5 模块（Display Overview / Company Identity / Product Capability / Offer Management / Public Preview）。**Code Change = Frontend only**。
+- **Dashboard Navigation** ✅：`/dashboard/supplier` Domain Navigation 新增「展示管理」入口（图标 📋，跳转 `/workspace/supplier/display`）。
+- **Module 1 — Display Overview** ✅：统计卡片（活跃 Offer / 产品覆盖 / RFQ / 展示完整度），前端计算 Display Completeness（5 项检查）。
+- **Module 2 — Company Identity** ✅：只读展示 Organization 信息（name/type/status/createdAt/updatedAt），含公开页面链接。
+- **Module 3 — Product Capability** ✅："Products Supplier Can Provide" 列表（Offer → Product → ProductCategory），语义合规。
+- **Module 4 — Offer Management** ✅：Offer 表格（标题/描述/状态/关联产品/时间），只读展示。
+- **Module 5 — Public Preview** ✅：复用 SupplierPublicProfile + SupplierOfferList，预览公开页面效果。
+- **Component Reuse** ✅：复用 SupplierPublicProfile / SupplierOfferList / WorkspaceSidebar / WorkspaceHeader / StatCard / EmptyState / ErrorState / Loading；无重复组件。
+- **Architecture Freeze** ✅：继续 `Product Global Catalog + Offer Supplier Display`；Supplier = Capability Provider；未引入 Supplier Store / Marketplace / Transaction。
+- **Zero Impact** ✅：**Schema Change = None / Migration = None / New API = None**；仅前端新增 1 文件 + 修改 1 文件。
+- **Build** ✅：`apps/web` `npx next build` exit 0（编译 + 类型校验通过，33/33 静态页，`/workspace/supplier/display` 5.41 kB）；仅既存非阻断 lint 警告（no-page-custom-font / no-img-element / no-unused-vars）。
+
+## M19.2.4 Supplier Display Capability Closure Audit（472，M19.2 闭环审计）
+
+- **M19.2.4 Closure Audit Started & Completed（472）**：对 M19.2 阶段进行最终闭环审计——验证 466-471 全部完成、Architecture Freeze 保持、Data Flow 链路完整、Frontend 8 项能力全部就绪、Component/API/Permission 边界清晰、Schema/Migration 均 None。**M19.2 CLOSED**。**Code Change = None**。
+- **Architecture Freeze** ✅：Product Global Catalog（Product 无 organizationId/supplierId）+ Offer Supplier Display（Offer.organizationId + Offer.productId）+ Supplier = Capability Provider。
+- **Data Flow** ✅：Product → Offer → Organization → Supplier Public Profile → Workspace Display Management 完整链路。
+- **Frontend Capability Matrix** ✅：8 项能力全部就绪——Product Detail Supplier Display / Product→Supplier Navigation / Public Profile / Dashboard Nav / Display Overview / Company Identity / Product Capability / Offer Management / Public Preview。
+- **Component Boundary** ✅：三层边界清晰（components/products / components/supplier / components/workspace），无组件逻辑复制。
+- **API Boundary** ✅：5 个现有 API 可复用，100% 无新增端点。
+- **Permission Boundary** ✅：Supplier 可查看自身展示 + 管理 Offer；禁止修改 Organization Profile（ADMIN only）；Public 可查看公开页面。
+- **M19.2 Closure Decision** ✅：**READY FOR CLOSE**——全部 6 任务完成、架构冻结保持、Zero Schema Change、Zero New API、Supplier 定位正确、无 Supplier Store/Marketplace。
+- **Future Enhancement** ✅：M19.3+ 候选（Organization Profile 编辑/Logo/Description/Website/Display Ranking/AI）标记为记录，不进入开发。
+- **Freeze 兼容** ✅：**Code Change = None / Schema Change = None / Migration = None / API Change = None**。
+- **Build** ✅：Not Required（本任务仅审计，无代码变更）。
+
+## M19.3.0 Search Experience Enhancement Architecture Audit（473，M19.3 开发前架构审计）
+
+- **M19.3.0 Audit Started & Completed（473）**：基于 M19.2 CLOSED 状态，对 M19.3 Search Experience Enhancement 进行开发前架构审计——明确 VISNDT 搜索体系定位为「Industrial Inspection Capability Discovery（工业检测能力发现）」，冻结搜索信息架构，划定四类搜索边界，评估现有能力，确认零 Schema/API 变更。**Code Change = None**。
+- **Search Positioning** ✅：VISNDT Search = Industrial Inspection Capability Discovery（工业检测能力发现），不等于普通电商搜索；禁止定位为商品商城搜索 / 店铺搜索 / 卖家搜索。
+- **Search Domain Boundary** ✅：四类搜索边界明确——Product Search（检测设备寻找，数据源 Product/ProductCategory/ProductParameter）、Supplier Capability Search（供应能力寻找，数据源 Offer/Organization/Supplier Public Profile，Supplier = Capability Provider）、Knowledge Search（内容资产搜索，数据源 Content，未来规划，当前不开发）、Matching Search（需求匹配，保持 RFQ Matching Domain，禁止合并为普通 Search）。
+- **Search Information Architecture** ✅：四层 IA 冻结——Product Discovery（Keyword Search / Category Filter / Parameter Filter / Product Detail）→ Supplier Capability Discovery（Supplier Identity / Capability / Offer Coverage / Public Profile）→ Knowledge Discovery（Articles / Solutions / Technical Knowledge，未来规划）→ Matching Discovery（Demand / RFQ / Match Result，独立域）。
+- **Existing Capability Assessment** ✅：
+  - Product Search：后端 `GET /products` 支持 keyword（name/model/description）+ categoryId + parameterFilters（AND 逻辑，精确匹配/数值范围）+ sortBy/sortOrder + pagination；前端 `/products` 已集成 SearchBar + ProductFilter（分类+动态参数筛选 NUMBER/ENUM/STRING/BOOLEAN）+ ProductGrid（结果计数+空状态）+ Pagination；**Capability = Existing，M19.3 仅需 UX 增强**。
+  - Supplier Capability Search：后端 `GET /organizations/:id`（public）+ `GET /offers?organizationId=`（keyword 搜索 title/description）；前端 `/suppliers/[id]`（SupplierPublicProfile + SupplierOfferList）；**Capability = Partial**——无 Supplier 列表/搜索页，Supplier 发现仅通过 Product Detail → Supplier Public Profile 间接链路；M19.3 可新增 Supplier Discovery Entry。
+  - Knowledge Search：后端 `GET /content/public`（仅 PUBLISHED，type 筛选+分页）；前端 `/knowledge`、`/solutions` 列表页（无搜索 UI）；**Capability = Missing**——M19.3 仅规划边界，不开发。
+  - Matching Search：后端 Demand/Match API 已存在；前端 Buyer Workspace 内；**Capability = Existing**——保持 RFQ Matching Domain，不纳入通用搜索。
+- **Search Engine Decision** ✅：**Database Query First**——当前数据规模不需 Elasticsearch/Algolia/Meilisearch；`GET /products` 已支持 keyword + category + parameterFilters + sort + pagination，满足当前搜索需求；引入搜索引擎为 M20+ 规划。
+- **M19.3 Development Boundary** ✅：
+  - **Included**：Product Search UX Enhancement（搜索框/建议/高亮/无结果引导）、Filter Experience Enhancement（筛选状态持久化/URL 同步/筛选面包屑/清除全部）、Search Result UX（结果计数/排序优化/Loading Skeleton/空状态区分）、Supplier Discovery Entry（产品搜索页 Supplier 入口/`/suppliers` 列表页）。
+  - **Excluded**：Knowledge CMS / AI Search / Semantic Search / Vector Database / Intelligent Recommendation / Elasticsearch / 第三方搜索服务。
+- **Schema/API Impact** ✅：**Schema Change = None / Migration = None / API Change = None**；M19.3 完全基于现有 API 能力，前端消费后端已有能力（Backend Capability First）。
+- **Architecture Decision** ✅：**M19.3 Search Experience Enhancement Architecture Ready**——搜索边界冻结、四层 IA 明确、现有能力可支撑、零 Schema/API 变更、Database Query First、Development Allowed。
+- **Freeze 兼容** ✅：**Code Change = None / Schema Change = None / Migration = None / API Change = None**；未改 `apps/api`、`database/prisma`、`apps/web`、`apps/admin`。
+- **Build** ✅：Not Required（本任务仅审计，无代码变更）。
+
+## M19.3.1 Search Experience Development（474，M19.3 第一阶段搜索体验增强）
+
+- **M19.3.1 Development Started & Completed（474）**：基于 473 已冻结的搜索架构，完成 VISNDT 工业检测能力发现（Industrial Inspection Capability Discovery）的第一阶段搜索体验增强。**Code Change = Frontend Only**。
+- **Search Input Enhancement** ✅：`SearchBar.tsx` 新增清除 (X) 按钮 + `initialValue` prop（URL 恢复）+ `onClear` 回调 + 输入框 focus 自动恢复；用户明确知道当前搜索关键词。
+- **Search State Management (URL Sync)** ✅：`products/page.tsx` 全面改写——使用 `useSearchParams` + `useRouter` 实现 URL Query State Sync（keyword/categoryId/sortBy/sortOrder/page/pf），支持浏览器前进/后退、页面刷新状态保持、可分享搜索 URL；`router.replace` 避免浏览器历史膨胀。
+- **Active Filter Chips** ✅：搜索结果区域上方新增 Active Filter Chips（关键词/分类/参数筛选），每个 Chip 可单独清除，底部「清除全部」一键重置；侧边栏 `ProductFilter` 新增 `hasActiveFilters` + `onClearAll` 双入口清除。
+- **Keyword Highlight** ✅：新增 `HighlightText.tsx` 组件——前端仅关键字高亮（case-insensitive），`<mark>` 标签 amber 背景色；`ProductCard` 集成 name/model/description 三字段高亮。**零后端修改**。
+- **Supplier Discovery Entry** ✅：`ProductCard` 底部新增「查看供应商能力」入口（图标 + 文字），为 M19.3.2+ Supplier Discovery 建立预留位置；hover 时颜色联动 Product Card 交互。
+- **Search Result Experience** ✅：`ProductGrid` 已有 result count + loading skeleton + empty state（区分筛选/无数据），本次增强 `searchKeyword` prop 透传至 ProductCard 以支持关键词高亮。
+- **Schema/API Impact** ✅：**Schema Change = None / Migration = None / API Change = None**；完全基于现有 `GET /products` API 能力，纯前端消费后端已有能力（Backend Capability First）。
+- **Architecture Freeze 兼容** ✅：**Product Global Catalog + Offer Supplier Display 保持**；未修改 `apps/api`、`database/prisma`、`apps/admin`；未引入 Elasticsearch/Algolia/第三方搜索服务；未新增 Search API；未修改 SearchProductDto；未修改 Prisma Schema。
+- **Build** ✅：`apps/web` `npx next build` exit 0，type check 通过，33 static pages 生成，`/products` 7.68 kB；pre-existing ESLint warnings only（layout fonts, img element, unused var）。
+
+## M19.3.2 Search Experience Enhancement Development（475，Search Result UX） + M19.3.2.1 Boundary Correction（476）
+
+- **M19.3.2 Development Started & Completed（475）**：基于 473-474 已冻结的搜索架构与 Product Search UX 增强，完成 VISNDT 工业检测能力发现（Industrial Inspection Capability Discovery）的搜索体验增强——Search Result UX 增强。**Code Change = Frontend Only**。
+- **Search Result UX Enhancement** ✅：
+  - **Loading Skeleton** ✅：`ProductGrid.tsx` 新增 `isLoading` 状态——加载中显示头部骨架屏（`animate-pulse`）+ 6 个产品卡片骨架屏。
+  - **Empty State Enhancement** ✅：`ProductGrid.tsx` 空状态根据场景动态展示——有筛选条件时区分"未找到匹配产品"（带关键词上下文）vs "暂无产品"（无筛选时"产品目录正在建设中"）。
+  - **Result Count Context** ✅：`ProductGrid.tsx` 结果计数增加搜索上下文展示。
+  - **Pagination Navigation** ✅：`Pagination.tsx` 新增页码指示器（`currentPage / totalPages`）。
+- **Supplier Discovery Entry** ✅：`ProductCard.tsx` 底部「查看供应商能力」Link（`/products/${product.id}#suppliers`），保持 Product-driven Capability Discovery。
+- **Schema/API Impact** ✅：**Schema Change = None / Migration = None / API Change = None**。
+- **Architecture Freeze 兼容** ✅：**Product Global Catalog + Offer Supplier Display 保持**。
+
+- **M19.3.2.1 Boundary Correction（476）**：475 中新增的 `/suppliers` 公开供应商列表页违反了 Supplier = Capability Provider 架构原则，形成了 Public Supplier Directory。**Code Change = Frontend Only**。
+- **Boundary Correction Actions** ✅：
+  - **Deleted** ✅：`apps/web/src/app/suppliers/page.tsx`——公开供应商列表页（`/suppliers`）已删除，消除 Public Supplier Directory 入口。
+  - **Removed Entry** ✅：`apps/web/src/app/products/page.tsx` 头部「浏览供应商能力」Link（→ `/suppliers`）已删除。
+  - **Kept Product-driven** ✅：`ProductCard.tsx`「查看供应商能力」→ `/products/${product.id}#suppliers`（Product Context 驱动），保持。
+  - **Kept Supplier Profile** ✅：`/suppliers/[id]` 保持为 Supplier Public Capability Profile（非 Directory）。
+- **Correct Discovery Flow** ✅：`Product Search → Product Detail → Supplier Capability Section → Supplier Public Profile`（Find Product → Discover Capability Provider）。
+- **Forbidden Flow Removed** ✅：`/suppliers` (Supplier Directory → Browse Suppliers → Choose Supplier) 已删除。
+- **Schema/API Impact** ✅：**Schema Change = None / Migration = None / API Change = None**。
+- **Build** ✅：`apps/web` `npx next build` exit 0，type check 通过，`/suppliers` 静态页已移除；pre-existing ESLint warnings only。
+
+## M19.3.3 Search Experience Enhancement Closure Audit（477，M19.3 Final Closure）
+
+- **M19.3.3 Closure Audit Started & Completed（477）**：基于 473-476 基线，执行 M19.3 Search Experience Enhancement 最终闭环审计。**Code Change = None（Audit Only）**。
+- **Architecture Closure Verification** ✅：
+  - **Industrial Capability Discovery** ✅：搜索定位保持，非 E-Commerce Search。
+  - **Product Search** ✅：Keyword + Category + Parameter Filter + Sort + Pagination，基于 `GET /products`。
+  - **Supplier Capability Discovery** ✅：Product → Offer → Organization → Supplier Capability Profile（`/suppliers/[id]`），Product-driven。
+  - **No Supplier Directory** ✅：`/suppliers` 已删除，仅保留 `/suppliers/[id]` Capability Profile。
+  - **No Marketplace** ✅：无 Supplier Store / Ranking / Seller。
+  - **No Search Engine** ✅：Database Query First，未引入 Elasticsearch / Algolia / Meilisearch。
+  - **No AI Search** ✅：未引入 Vector / Semantic / AI Search。
+  - **Knowledge Search** ✅：Content Search 未进入 M19.3，保持独立域。
+  - **Matching Search** ✅：Demand → DemandMatch → RFQ 保持独立域，未合并为 General Search。
+- **476 Correction Verified** ✅：`/suppliers` 公开供应商列表页已删除；`/products` 头部供应商入口已移除；ProductCard 保持 `/products/${id}#suppliers`（Product-driven）。
+- **Route Verification** ✅：允许的路由 `/products`、`/products/[slug]`、`/suppliers/[id]`、`/knowledge`、`/solutions`；`/suppliers` 不存在。
+- **Component Boundary** ✅：`components/products`（Product）、`components/supplier`（Supplier Profile）、`components/workspace`（Workspace）无职责混乱，无 Supplier Directory / Marketplace UI。
+- **API/Schema Impact** ✅：**Schema Change = None / Migration = None / API Change = None**（473-476 全部确认）。
+- **Documentation Synchronized** ✅：PROJECT_STATUS.md / PROJECT_ROADMAP.md / MODULE_COMPLETION_MATRIX.md / BUSINESS_CAPABILITY_MAP.md 全部同步。
+- **Decision** ✅：**M19.3 Search Experience Enhancement — CLOSED**。Architecture FROZEN。Code State = Documentation State。Next Stage: M19.4 Admin Product Operation Center。
+
+## M19.1.3 Product Supplier Capability & Inquiry Experience Enhancement（464，M19.1 Development 第三阶段）
+
+- **M19.1.3 Started & Completed（464）**：基于 459-463 冻结结论，完成 Product Center V2 供应商能力与询价体验完善——ManufacturerInfo 接入 offers.organization 数据、SupplierCapabilityList 展示增强、Inquiry 交互流程完善，`apps/web` build 通过（exit 0）。
+- **ManufacturerInfo 数据统一** ✅：`ManufacturerInfo.tsx` 新增 `offers` prop，优先从 `offers` 中推导制造商信息（取第一个 ACTIVE/SUBMITTED offer 的 organization），统一制造商信息与供应商能力数据源；产品详情页改为传入 `offers={product.offers}` 替代 `organization={null}`。
+- **SupplierCapabilityList 展示增强** ✅：空状态增加引导性图标与文案（"如果您是该产品的供应商，请联系我们加入平台"）；供应商卡片增加 organization.type 标签；选中状态增加「已选择供应商」指示器；提示文案根据是否选中动态切换。
+- **Inquiry 交互流程完善** ✅：`SupplierInquirySection` 选中供应商后展示选中横幅（"询价对象：XXX"）+「切换供应商」按钮；`InquiryForm` 新增 `organizationName` prop，选中供应商时显示"向 XXX 询价 YYY"。
+- **防无供应商提交** ✅：`SupplierInquirySection` 仅在 `selectedOffer` 非 null 时展示 InquiryForm，`InquiryForm` 的 `offerId`/`organizationId` 为必填，无 fallback 逻辑。
+- **回归验证** ✅：产品详情页整体布局不变，原有 ProductGallery、ProductParameters、Breadcrumb、Documents 均保持正常；`/products/[slug]` 路由正常生成（4.34 kB，dynamic）。
+- **架构约束保持** ✅：`Product Global Catalog + Offer Supplier Display`；未引入 `Product.organizationId` / `ProductFamily` / `ProductModel` / `SupplierOffering`；未触碰 Admin / Backend / Database；未展示 Price / Inventory / Transaction。
+- **Freeze 兼容** ✅：**Schema Change = None / Migration = None / API Change = None**；未改 `apps/api`、`database/prisma`、`apps/admin`。
+- **Build** ✅：`apps/web` `next build` exit 0（编译 + 类型校验 + 静态页 28/28 通过）；仅既有非阻断 lint 警告。
+
+## M19.1.2 Product Detail Experience Enhancement（463，M19.1 Development 第二阶段）
+
+- **M19.1.2 Started & Completed（463）**：基于 459-462 冻结结论，完成 Product Center V2 详情体验升级——技术参数从平铺展示升级为 ParameterGroup 分组展示、接入 Offer.organization 供应商能力展示、禁止 Inquiry 自动选择第一个 Offer，`apps/web` build 通过（exit 0）。
+- **Technical Specification 分组展示** ✅：`ProductParameters.tsx` 升级为 `ParameterGroup` 分组展示，接收 `parameterGroups` 参数（通过 `GET /parameter-groups` public endpoint 加载），按 `parameterDefinition.parameterGroupId` 分组，未分组参数归入「其他参数」；无硬编码参数组名。
+- **ParameterGroup 数据源** ✅：新增 `lib/api/parameter-groups.ts`（`getParameterGroups`，public）+ `services/parameter-group.service.ts`，遵循 `Page → Service → API Wrapper → Backend API`；**API Change = None**（复用已有 public endpoint）。
+- **Supplier Capability 展示** ✅：新增 `SupplierCapabilityList.tsx`（产品页供应商列表，显示 Offer 的 organization.name / title / status / description，支持选中高亮）+ `SupplierInquirySection.tsx`（client component，管理 Offer 选择状态，选中后展示 InquiryForm）。
+- **Inquiry Flow 改造** ✅：产品详情页移除 `inquirateOffer` 自动推导逻辑（原 `product.offers.find(...)`），改为 `SupplierInquirySection` 要求用户明确选择 Offer 后才展示 InquiryForm；`InquiryForm.tsx` 移除 `offerId || productId` / `organizationId || productId` fallback，改为必填 props。
+- **Type 扩展** ✅：`types/product.ts` 新增 `ParameterGroup` 接口（id/name/code/description）。
+- **回归验证** ✅：产品详情页整体布局不变（Overview / Media Center / Technical Specification / Documents），原有 ManufacturerInfo、ProductGallery、Breadcrumb 均保持正常；`/products/[slug]` 路由正常生成（3.86 kB，dynamic）。
+- **架构约束保持** ✅：`Product Global Catalog + Offer Supplier Display`；未引入 `Product.organizationId` / `ProductFamily` / `ProductModel` / `SupplierOffering`；未触碰 Admin / Backend / Database。
+- **Freeze 兼容** ✅：**Schema Change = None / Migration = None / API Change = None**；未改 `apps/api`、`database/prisma`、`apps/admin`；未引入 Design System / AI Search / Vector Search / ProductFamily / Supplier Product Ownership。
+- **Build** ✅：`apps/web` `next build` exit 0（编译 + 类型校验 + 静态页 28/28 通过）；仅既有非阻断 lint 警告。
+
 ## Next Step
 
 ### Priority 5 — M18.5 Content Operation Stabilization（稳定化阶段）
 
-M18.4.1（449）Workflow Reliability Foundation、M18.4.2（450）Content Revision、M18.4.3（451）Scheduled Publish、M18.4.4（452）Approval Timeline 均已实现，**M18.4 Workflow Operation Enhancement 阶段闭环完成**；**M18.5.1 Content Operation Stability Audit（453）已完成（稳定化基线审计，无风险结论）**；**M18.5.2 Content Operation Type & Bundle Optimization（454）已完成（类型导入规范治理 + Admin Bundle 优化，主 chunk 1854.61→1844.77 kB + 4 个 lazy chunk）**；**M18.5.3 Content SEO Operation Enhancement（455）已完成（Admin SEO 运营面板 + 质量提示 + 搜索结果预览，Web SEO 链路验证通过）**；**M18.5.4 Content Operation Final Audit（456）已完成（最终稳定性审计，三层职责边界/数据库/调度/Admin/安全全 PASS，M18.5 Content Operation Stabilization 阶段关闭）**。**M19 阶段已启动（架构冻结完成）**：**M19 架构冻结（457-460 已完成）**——457 平台能力重评审计、458 M19 架构再评估 Blueprint、459 M19 实施 Blueprint、460 M19.1 Product Center V2 实施规划均已生成，**M19 产品体验架构状态冻结**；**M19.1.1 Product Search Frontend Integration（462）已完成**——后端已具备的 `parameterFilters` 动态参数筛选能力已接入 Web 前端（`lib/api/products.ts` 透传 + `ParameterFilterPanel` 动态面板 + 页面 state/query 同步，`apps/web` build exit 0，Schema/Migration/API 均 None）；下一阶段为 **M19.1.2**（Product Center V2 后续开发，如 ProductParameters 按 ParameterGroup 分组、询价改选供应商、ManufacturerInfo 接入 offers 等 460 规划任务）。
+M18.4.1（449）Workflow Reliability Foundation、M18.4.2（450）Content Revision、M18.4.3（451）Scheduled Publish、M18.4.4（452）Approval Timeline 均已实现，**M18.4 Workflow Operation Enhancement 阶段闭环完成**；**M18.5.1 Content Operation Stability Audit（453）已完成（稳定化基线审计，无风险结论）**；**M18.5.2 Content Operation Type & Bundle Optimization（454）已完成（类型导入规范治理 + Admin Bundle 优化，主 chunk 1854.61→1844.77 kB + 4 个 lazy chunk）**；**M18.5.3 Content SEO Operation Enhancement（455）已完成（Admin SEO 运营面板 + 质量提示 + 搜索结果预览，Web SEO 链路验证通过）**；**M18.5.4 Content Operation Final Audit（456）已完成（最终稳定性审计，三层职责边界/数据库/调度/Admin/安全全 PASS，M18.5 Content Operation Stabilization 阶段关闭）**。**M19 阶段已启动（架构冻结完成）**：**M19 架构冻结（457-460 已完成）**——457 平台能力重评审计、458 M19 架构再评估 Blueprint、459 M19 实施 Blueprint、460 M19.1 Product Center V2 实施规划均已生成，**M19 产品体验架构状态冻结**；**M19.1.1 Product Search Frontend Integration（462）已完成**——后端已具备的 `parameterFilters` 动态参数筛选能力已接入 Web 前端（`lib/api/products.ts` 透传 + `ParameterFilterPanel` 动态面板 + 页面 state/query 同步，`apps/web` build exit 0，Schema/Migration/API 均 None）；**M19.1.2 Product Detail Experience Enhancement（463）已完成**——技术参数 ParameterGroup 分组展示、Supplier Capability 展示（Offer.organization）、Inquiry 禁止自动选择 Offer（`apps/web` build exit 0，Schema/Migration/API 均 None）；**M19.1.3 Supplier Capability & Inquiry Experience Enhancement（464）已完成**——ManufacturerInfo 接入 offers.organization、Supplier 展示增强、Inquiry 交互完善（`apps/web` build exit 0，Schema/Migration/API 均 None）；**M19.1.4 Product Center V2 Experience Stabilization（465）已完成**——产品列表/详情/供应商/询价全链路体验稳定化（`apps/web` build exit 0，Schema/Migration/API 均 None）；**M19.2.0 Supplier Display Architecture Audit（466）已完成**——架构审计通过（Code Change = None）；**M19.2.1 Supplier Capability Page（467）已完成**——Public Supplier Page（`apps/web` build exit 0）；**M19.2.2 Product Detail Supplier Section（468）已完成**——ManufacturerInfo + SupplierCapabilityList 供应商主页链接（`apps/web` build exit 0）；**M19.2.3 Pre-Audit（469）已完成**——审计通过（Code Change = None）；**M19.2.3 Information Architecture Audit（470）已完成**——信息架构冻结（Code Change = None）；**M19.2.3 Workspace Supplier Display Management（471）已完成**——Dashboard 展示管理入口 + 5 模块 Display Management 页面（`apps/web` build exit 0）；**M19.2.4 Supplier Display Capability Closure Audit（472）已完成**——闭环审计通过，M19.2 CLOSED；**M19.3.0 Search Experience Enhancement Architecture Audit（473）已完成**——搜索架构冻结，搜索边界明确，四层 IA 冻结，零 Schema/API 变更，M19.3 开发边界冻结；**M19.3.2.1 Supplier Discovery Boundary Correction（476）已完成**——删除公开供应商目录/恢复 Product-driven Capability Discovery，Supplier = Capability Provider 边界重新对齐，`apps/web` build exit 0，Schema/Migration/API 均 None；**M19.3.3 Search Experience Enhancement Closure Audit（477）已完成**——M19.3 CLOSED，架构冻结保持，四类搜索边界验证通过，零 Schema/API 变更，Code State = Documentation State；下一阶段为 **M19.4 Admin Product Operation Center**。
 
 M18.5 进入前要求：
 - [x] 449 报告生成（M18.4.1 Workflow Reliability Foundation 完成）

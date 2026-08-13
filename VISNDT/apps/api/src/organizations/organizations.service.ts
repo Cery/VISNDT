@@ -89,6 +89,9 @@ export class OrganizationsService {
         id: true,
         name: true,
         type: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
     if (!org) throw new NotFoundException(`Organization ${id} not found`);

@@ -63,6 +63,12 @@ const DOMAIN_NAV_ITEMS = [
     icon: '📨',
   },
   {
+    title: '展示管理',
+    description: '查看和管理供应商公开展示能力，包括企业身份、产品能力和供应管理。',
+    href: '/workspace/supplier/display',
+    icon: '📋',
+  },
+  {
     title: '通知中心',
     description: '进入通知页面查看当前消息和提醒。',
     href: '/workspace/notifications',
