@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Button, Spin, Alert, Typography, Input, Space, message, Modal } from 'antd';
-import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Table, Button, Spin, Alert, Typography, Input, Space, message, Modal, Card, Row, Col, Statistic } from 'antd';
+import { PlusOutlined, ReloadOutlined, GroupOutlined, ToolOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { SorterResult } from 'antd/es/table/interface';
 import { parameterGroupService } from '../../api/parameter-group.service';
+import { parameterDefinitionService } from '../../api/parameter-definition.service';
 import type { ParameterGroup } from '../../types/parameter.types';
 import BatchOperations from '../../components/BatchOperations';
 
@@ -29,6 +30,7 @@ function ParameterGroupList() {
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [batchLoading, setBatchLoading] = useState(false);
+  const [paramStats, setParamStats] = useState({ groupCount: 0, defCount: 0 });
   const [query, setQuery] = useState<QueryParams>({
     page: 1,
     pageSize: 20,
@@ -64,6 +66,22 @@ function ParameterGroupList() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Load parameter governance statistics
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const [groups, defs] = await Promise.all([
+          parameterGroupService.getList({ page: 1, pageSize: 1 }),
+          parameterDefinitionService.getList({ pageSize: 1 }),
+        ]);
+        setParamStats({ groupCount: groups.total, defCount: defs.total });
+      } catch {
+        // Stats load failure is non-critical
+      }
+    };
+    loadStats();
+  }, []);
 
   const handleTableChange = useCallback(
     (
@@ -247,6 +265,22 @@ function ParameterGroupList() {
           创建分组
         </Button>
       </div>
+
+      {/* Parameter Governance Stats */}
+      {paramStats.groupCount > 0 && (
+        <Row gutter={16} style={{ marginBottom: 16 }}>
+          <Col xs={12} sm={8}>
+            <Card size="small">
+              <Statistic title="参数组" value={paramStats.groupCount} prefix={<GroupOutlined />} />
+            </Card>
+          </Col>
+          <Col xs={12} sm={8}>
+            <Card size="small">
+              <Statistic title="参数定义" value={paramStats.defCount} prefix={<ToolOutlined />} />
+            </Card>
+          </Col>
+          </Row>
+      )}
 
       {pageState.status === 'empty' ? (
         <>

@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Input, Select, Space, Spin, Alert, Button, Tag, Typography, message, Modal, Checkbox } from 'antd';
-import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Table, Input, Select, Space, Spin, Alert, Button, Tag, Typography, message, Modal, Checkbox, Card, Row, Col, Statistic } from 'antd';
+import { SearchOutlined, ReloadOutlined, AppstoreOutlined, CheckCircleOutlined, EditOutlined, StopOutlined, TagsOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { SorterResult } from 'antd/es/table/interface';
-import { productService, extractErrorMessage } from '../api';
+import { productService, categoriesService, extractErrorMessage } from '../api';
 import type { Product, SearchProductParams } from '../types';
+import type { ProductCategory } from '../types/category.types';
 import BatchOperations from '../components/BatchOperations';
 
 const { Title } = Typography;
@@ -18,10 +19,19 @@ type PageState =
 interface QueryParams {
   keyword: string;
   status: string;
+  categoryId: string;
   sortBy: string;
   sortOrder: string;
   page: number;
   pageSize: number;
+}
+
+interface GovernanceStats {
+  total: number;
+  active: number;
+  draft: number;
+  inactive: number;
+  categoryCount: number;
 }
 
 const STATUS_OPTIONS = [
@@ -54,9 +64,12 @@ function ProductList() {
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [batchLoading, setBatchLoading] = useState(false);
+  const [governanceStats, setGovernanceStats] = useState<GovernanceStats>({ total: 0, active: 0, draft: 0, inactive: 0, categoryCount: 0 });
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [query, setQuery] = useState<QueryParams>({
     keyword: '',
     status: '',
+    categoryId: '',
     sortBy: 'createdAt',
     sortOrder: 'desc',
     page: 1,
@@ -78,6 +91,9 @@ function ProductList() {
       if (query.status) {
         params.status = query.status;
       }
+      if (query.categoryId) {
+        params.categoryId = query.categoryId;
+      }
 
       const result = await productService.getList(params);
       setPageState({
@@ -96,6 +112,36 @@ function ProductList() {
     fetchProducts();
   }, [fetchProducts]);
 
+  // Load governance statistics and categories on mount
+  useEffect(() => {
+    const loadGovernanceData = async () => {
+      try {
+        const [allProducts, catsData] = await Promise.all([
+          productService.getList({ page: 1, pageSize: 1 }),
+          categoriesService.getList(),
+        ]);
+        const total = allProducts.total;
+        setCategories(catsData);
+        // Fetch status counts
+        const [activeRes, draftRes, inactiveRes] = await Promise.all([
+          productService.getList({ page: 1, pageSize: 1, status: 'ACTIVE' }),
+          productService.getList({ page: 1, pageSize: 1, status: 'DRAFT' }),
+          productService.getList({ page: 1, pageSize: 1, status: 'INACTIVE' }),
+        ]);
+        setGovernanceStats({
+          total,
+          active: activeRes.total,
+          draft: draftRes.total,
+          inactive: inactiveRes.total,
+          categoryCount: catsData.length,
+        });
+      } catch {
+        // Stats load failure is non-critical
+      }
+    };
+    loadGovernanceData();
+  }, []);
+
   const handleSearch = useCallback((value: string) => {
     setQuery((prev) => ({ ...prev, keyword: value, page: 1 }));
   }, []);
@@ -104,10 +150,15 @@ function ProductList() {
     setQuery((prev) => ({ ...prev, status: value, page: 1 }));
   }, []);
 
+  const handleCategoryChange = useCallback((value: string) => {
+    setQuery((prev) => ({ ...prev, categoryId: value, page: 1 }));
+  }, []);
+
   const handleReset = useCallback(() => {
     setQuery({
       keyword: '',
       status: '',
+      categoryId: '',
       sortBy: 'createdAt',
       sortOrder: 'desc',
       page: 1,
@@ -336,6 +387,37 @@ function ProductList() {
         管理平台产品目录，包括产品信息、分类、参数和媒体资源
       </Typography.Text>
 
+      {/* Governance Statistics Dashboard */}
+      {(governanceStats.total > 0) && (
+        <Row gutter={16} style={{ marginBottom: 16 }}>
+          <Col xs={12} sm={6} md={4}>
+            <Card size="small">
+              <Statistic title="产品总数" value={governanceStats.total} prefix={<AppstoreOutlined />} />
+            </Card>
+          </Col>
+          <Col xs={12} sm={6} md={4}>
+            <Card size="small">
+              <Statistic title="已上架" value={governanceStats.active} valueStyle={{ color: '#52c41a' }} prefix={<CheckCircleOutlined />} />
+            </Card>
+          </Col>
+          <Col xs={12} sm={6} md={4}>
+            <Card size="small">
+              <Statistic title="草稿" value={governanceStats.draft} valueStyle={{ color: '#faad14' }} prefix={<EditOutlined />} />
+            </Card>
+          </Col>
+          <Col xs={12} sm={6} md={4}>
+            <Card size="small">
+              <Statistic title="已下架" value={governanceStats.inactive} valueStyle={{ color: '#ff4d4f' }} prefix={<StopOutlined />} />
+            </Card>
+          </Col>
+          <Col xs={12} sm={6} md={4}>
+            <Card size="small">
+              <Statistic title="产品分类" value={governanceStats.categoryCount} prefix={<TagsOutlined />} />
+            </Card>
+          </Col>
+        </Row>
+      )}
+
       <Space style={{ marginBottom: 16 }} wrap>
         <Button
           type="primary"
@@ -357,6 +439,14 @@ function ProductList() {
           onChange={handleStatusChange}
           options={STATUS_OPTIONS}
           style={{ width: 160 }}
+        />
+        <Select
+          placeholder="按分类筛选"
+          allowClear
+          value={query.categoryId || undefined}
+          onChange={handleCategoryChange}
+          options={categories.map((c) => ({ value: c.id, label: c.name }))}
+          style={{ width: 200 }}
         />
         <Button icon={<ReloadOutlined />} onClick={handleReset}>
           重置

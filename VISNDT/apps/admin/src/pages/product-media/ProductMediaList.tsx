@@ -12,11 +12,18 @@ import {
   Image,
   Space,
   Tooltip,
+  Row,
+  Col,
+  Card,
+  Statistic,
 } from 'antd';
 import {
   PlusOutlined,
   DownloadOutlined,
   EyeOutlined,
+  FileImageOutlined,
+  FileTextOutlined,
+  FileProtectOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { productMediaService } from '../../api/product-media.service';
@@ -58,6 +65,7 @@ function ProductMediaList() {
   const [query, setQuery] = useState<QueryParams>({ page: 1, pageSize: 20 });
   /** Cache of resolved signed URLs keyed by fileAssetId */
   const [signedUrlCache, setSignedUrlCache] = useState<Record<string, string | null>>({});
+  const [mediaStats, setMediaStats] = useState({ total: 0, images: 0, documents: 0, certificates: 0 });
 
   const fetchData = useCallback(async () => {
     if (!productId) return;
@@ -75,6 +83,11 @@ function ProductMediaList() {
           data: result.data,
           total: result.total,
         });
+        // Compute media stats
+        const images = result.data.filter((i) => i.mediaType === 'IMAGE').length;
+        const documents = result.data.filter((i) => i.mediaType === 'DOCUMENT').length;
+        const certificates = result.data.filter((i) => i.mediaType === 'CERTIFICATE').length;
+        setMediaStats({ total: result.total, images, documents, certificates });
         // Resolve signed URLs for image previews using inline fileAsset data
         result.data.forEach((item) => {
           const fa = item.fileAsset;
@@ -323,6 +336,32 @@ function ProductMediaList() {
           添加媒体
         </Button>
       </div>
+
+      {/* Media Statistics */}
+      {mediaStats.total > 0 && (
+        <Row gutter={16} style={{ marginBottom: 16 }}>
+          <Col xs={12} sm={6}>
+            <Card size="small">
+              <Statistic title="媒体总数" value={mediaStats.total} />
+            </Card>
+          </Col>
+          <Col xs={12} sm={6}>
+            <Card size="small">
+              <Statistic title="图片" value={mediaStats.images} prefix={<FileImageOutlined />} valueStyle={{ color: '#1890ff' }} />
+            </Card>
+          </Col>
+          <Col xs={12} sm={6}>
+            <Card size="small">
+              <Statistic title="文档" value={mediaStats.documents} prefix={<FileTextOutlined />} valueStyle={{ color: '#52c41a' }} />
+            </Card>
+          </Col>
+          <Col xs={12} sm={6}>
+            <Card size="small">
+              <Statistic title="证书" value={mediaStats.certificates} prefix={<FileProtectOutlined />} valueStyle={{ color: '#fa8c16' }} />
+            </Card>
+          </Col>
+        </Row>
+      )}
 
       {pageState.status === 'empty' ? (
         <Alert

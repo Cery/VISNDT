@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Button, Spin, Alert, Typography, Input, Space, message, Modal } from 'antd';
-import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Table, Button, Spin, Alert, Typography, Input, Space, message, Modal, Card, Row, Col, Statistic } from 'antd';
+import { PlusOutlined, ReloadOutlined, ApartmentOutlined, NodeIndexOutlined, FileTextOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { categoryService, extractErrorMessage } from '../../api';
 import type { ProductCategory } from '../../types/category.types';
@@ -21,12 +21,41 @@ function ProductCategoryList() {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [batchLoading, setBatchLoading] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [categoryStats, setCategoryStats] = useState({ total: 0, maxDepth: 0, leafCount: 0 });
+
+  // Compute category tree statistics
+  const computeStats = useCallback((allCategories: ProductCategory[]) => {
+    const total = allCategories.length;
+    let maxDepth = 0;
+    let leafCount = 0;
+
+    const walkTree = (nodes: ProductCategory[], depth: number) => {
+      maxDepth = Math.max(maxDepth, depth);
+      nodes.forEach((node) => {
+        if (node.children && node.children.length > 0) {
+          walkTree(node.children, depth + 1);
+        } else {
+          leafCount++;
+        }
+      });
+    };
+
+    // Find root nodes (no parentId) and walk
+    const roots = allCategories.filter((c) => !c.parentId);
+    if (roots.length > 0) {
+      walkTree(roots, 1);
+    } else {
+      walkTree(allCategories, 1);
+    }
+    setCategoryStats({ total, maxDepth, leafCount });
+  }, []);
 
   const fetchData = useCallback(async () => {
     setPageState({ status: 'loading' });
     try {
       // 获取所有分类数据（不分页），树形需要完整数据
       const result = await categoryService.getList({ pageSize: 100 });
+      computeStats(result.data);
       if (result.data.length === 0) {
         setPageState({ status: 'empty' });
       } else {
@@ -245,6 +274,27 @@ function ProductCategoryList() {
           创建分类
         </Button>
       </div>
+
+      {/* Category Governance Stats */}
+      {categoryStats.total > 0 && (
+        <Row gutter={16} style={{ marginBottom: 16 }}>
+          <Col xs={12} sm={8}>
+            <Card size="small">
+              <Statistic title="分类总数" value={categoryStats.total} prefix={<ApartmentOutlined />} />
+            </Card>
+          </Col>
+          <Col xs={12} sm={8}>
+            <Card size="small">
+              <Statistic title="树深度" value={categoryStats.maxDepth} suffix="层" prefix={<NodeIndexOutlined />} />
+            </Card>
+          </Col>
+          <Col xs={12} sm={8}>
+            <Card size="small">
+              <Statistic title="叶子分类" value={categoryStats.leafCount} prefix={<FileTextOutlined />} />
+            </Card>
+          </Col>
+        </Row>
+      )}
 
       {pageState.status === 'empty' ? (
         <>

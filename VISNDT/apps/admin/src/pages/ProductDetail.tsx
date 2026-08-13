@@ -16,6 +16,9 @@ import {
   Row,
   Col,
   message,
+  Breadcrumb,
+  Statistic,
+  Tooltip,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -26,6 +29,10 @@ import {
   FileTextOutlined,
   FileProtectOutlined,
   FileUnknownOutlined,
+  AppstoreOutlined,
+  SettingOutlined,
+  ShopOutlined,
+  HomeOutlined,
 } from '@ant-design/icons';
 import { productService } from '../api';
 import type { ProductDetail, ProductParameterValue } from '../types';
@@ -165,8 +172,26 @@ export default function ProductDetailPage() {
 
   const product = pageState.data;
 
+  const mediaCount = product.media?.length || 0;
+  const paramCount = product.parameterValues?.length || 0;
+  const offerCount = (product as any).offers?.length || 0;
+
   return (
     <div>
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb style={{ marginBottom: 12 }}>
+        <Breadcrumb.Item>
+          <a onClick={() => navigate('/')}><HomeOutlined /> 首页</a>
+        </Breadcrumb.Item>
+        <Breadcrumb.Item>
+          <a onClick={() => navigate('/products')}>产品管理</a>
+        </Breadcrumb.Item>
+        {product.category && (
+          <Breadcrumb.Item>{product.category.name}</Breadcrumb.Item>
+        )}
+        <Breadcrumb.Item>{product.name}</Breadcrumb.Item>
+      </Breadcrumb>
+
       <Space style={{ marginBottom: 16 }}>
         <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/products')}>
           返回列表
@@ -186,6 +211,32 @@ export default function ProductDetailPage() {
       </Space>
 
       <Title level={3}>{product.name}</Title>
+
+      {/* Governance Stats */}
+      <Row gutter={16} style={{ marginBottom: 16 }}>
+        <Col xs={12} sm={6}>
+          <Card size="small">
+            <Statistic title="媒体资源" value={mediaCount} prefix={<PictureOutlined />} />
+          </Card>
+        </Col>
+        <Col xs={12} sm={6}>
+          <Card size="small">
+            <Statistic title="产品参数" value={paramCount} prefix={<SettingOutlined />} />
+          </Card>
+        </Col>
+        <Col xs={12} sm={6}>
+          <Card size="small">
+            <Statistic title="供应能力" value={offerCount} prefix={<ShopOutlined />} />
+          </Card>
+        </Col>
+        <Col xs={12} sm={6}>
+          <Card size="small">
+            <Tooltip title="产品治理状态">
+              <Statistic title="治理状态" value={STATUS_LABEL_MAP[product.status] || product.status} prefix={<AppstoreOutlined />} valueStyle={{ color: STATUS_COLOR[product.status] === 'green' ? '#52c41a' : STATUS_COLOR[product.status] === 'orange' ? '#faad14' : '#ff4d4f' }} />
+            </Tooltip>
+          </Card>
+        </Col>
+      </Row>
 
       <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
