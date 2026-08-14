@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/auth/AuthProvider';
+import GlobalSearchBar from '@/components/search/GlobalSearchBar';
 
 const NAV_ITEMS = [
   { href: '/', label: '首页' },
@@ -31,7 +32,7 @@ export default function PublicHeader() {
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-industrial-sm">
       <div className="w-full">
-        <div className="max-w-[1200px] mx-auto flex h-[4.5rem] items-center justify-between px-6">
+        <div className="max-w-[1200px] mx-auto flex h-[4.5rem] items-center justify-between px-6 gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
             <span className="text-xl font-bold font-mono tracking-tight">
@@ -41,7 +42,7 @@ export default function PublicHeader() {
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -62,6 +63,11 @@ export default function PublicHeader() {
               );
             })}
           </nav>
+
+          {/* Desktop Search Bar */}
+          <div className="hidden lg:flex flex-1 max-w-md mx-4">
+            <GlobalSearchBar />
+          </div>
 
           {/* Desktop Auth Section */}
           <div className="hidden md:flex items-center gap-3 flex-shrink-0">
@@ -158,8 +164,13 @@ export default function PublicHeader() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t bg-white/95 backdrop-blur-sm">
-          <nav className="max-w-[1200px] mx-auto px-6 py-3 space-y-1">
+        <div className="lg:hidden border-t bg-white/95 backdrop-blur-sm">
+          <div className="max-w-[1200px] mx-auto px-6 py-3 space-y-3">
+            {/* Mobile Search */}
+            <div className="pb-3 border-b border-slate-100">
+              <GlobalSearchBar />
+            </div>
+            <nav className="space-y-1">
             {NAV_ITEMS.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -223,6 +234,7 @@ export default function PublicHeader() {
             </div>
           </nav>
         </div>
+      </div>
       )}
     </header>
   );

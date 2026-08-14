@@ -29,6 +29,7 @@ import { WorkspaceModule } from './workspace/workspace.module';
 import { ContentModule } from './content/content.module';
 import { ContentMediaModule } from './content-media/content-media.module';
 import { ContentRevisionModule } from './content-revision/content-revision.module';
+import { ContentTagModule } from './content-tag/content-tag.module';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { ContentRevisionModule } from './content-revision/content-revision.modul
     ContentModule,
     ContentMediaModule,
     ContentRevisionModule,
+    ContentTagModule,
   ],
   providers: [
     {

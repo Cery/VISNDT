@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { getProducts } from '@/services/product.service';
 import { getCategories } from '@/services/category.service';
@@ -11,6 +10,7 @@ import type { ProductParameterFilter } from '@/types/product';
 import SearchBar from '@/components/products/SearchBar';
 import ProductFilter from '@/components/products/ProductFilter';
 import ProductGrid from '@/components/products/ProductGrid';
+import CompareBar from '@/components/products/CompareBar';
 import Pagination from '@/components/common/Pagination';
 import ErrorState from '@/components/common/ErrorState';
 
@@ -61,6 +61,7 @@ function ProductsPageContent() {
   const [parameterFilters, setParameterFilters] = useState<ProductParameterFilter[]>(
     initialState.parameterFilters,
   );
+  const [compareIds, setCompareIds] = useState<string[]>([]);
 
   // Sync state to URL (replace, not push — avoids bloating browser history)
   const syncURL = useCallback(
@@ -175,8 +176,27 @@ function ProductsPageContent() {
     setSortOrder('desc');
     setPage(1);
     setParameterFilters([]);
+    setCompareIds([]);
     syncURL('', undefined, 'createdAt', 'desc', 1, []);
   }, [syncURL]);
+
+  const handleCompareToggle = useCallback((id: string) => {
+    setCompareIds((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((i) => i !== id);
+      }
+      if (prev.length >= 4) return prev; // max 4
+      return [...prev, id];
+    });
+  }, []);
+
+  const handleCompareRemove = useCallback((id: string) => {
+    setCompareIds((prev) => prev.filter((i) => i !== id));
+  }, []);
+
+  const handleCompareClear = useCallback(() => {
+    setCompareIds([]);
+  }, []);
 
   const categories = categoriesData?.data ?? [];
   const parameterDefinitions = parameterDefinitionsData ?? [];
@@ -303,6 +323,8 @@ function ProductsPageContent() {
                 hasActiveFilters={hasActiveFilters}
                 searchKeyword={keyword}
                 currentPage={page}
+                compareIds={compareIds}
+                onCompareToggle={handleCompareToggle}
               />
               <Pagination
                 currentPage={page}
@@ -313,6 +335,14 @@ function ProductsPageContent() {
           )}
         </div>
       </div>
+
+      {/* Compare Bar — floating bottom bar */}
+      <CompareBar
+        compareIds={compareIds}
+        products={productsData?.data ?? []}
+        onRemove={handleCompareRemove}
+        onClear={handleCompareClear}
+      />
     </div>
   );
 }

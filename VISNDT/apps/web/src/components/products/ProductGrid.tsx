@@ -15,6 +15,10 @@ interface ProductGridProps {
   currentPage?: number;
   /** 每页数量 */
   pageSize?: number;
+  /** 已选对比产品 ID 列表 */
+  compareIds?: string[];
+  /** 对比选择回调 */
+  onCompareToggle?: (id: string) => void;
 }
 
 export default function ProductGrid({
@@ -25,6 +29,8 @@ export default function ProductGrid({
   searchKeyword,
   currentPage,
   pageSize: _pageSize = 12,
+  compareIds = [],
+  onCompareToggle,
 }: ProductGridProps) {
   if (isLoading) {
     return (
@@ -96,7 +102,13 @@ export default function ProductGrid({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} searchKeyword={searchKeyword} />
+          <ProductCard
+            key={product.id}
+            product={product}
+            searchKeyword={searchKeyword}
+            isCompared={compareIds.includes(product.id)}
+            onCompareToggle={onCompareToggle}
+          />
         ))}
       </div>
     </div>

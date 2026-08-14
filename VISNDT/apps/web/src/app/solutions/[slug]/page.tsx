@@ -127,10 +127,37 @@ export default async function SolutionDetailPage({
           </p>
         )}
 
+        {/* Tag Chips */}
+        {solution.tags && solution.tags.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 mb-8">
+            <span className="text-xs text-slate-400 mr-1">标签：</span>
+            {solution.tags.map(({ tag }) => (
+              <Link
+                key={tag.id}
+                href={`/tags/${tag.slug}`}
+                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+              >
+                {tag.name}
+              </Link>
+            ))}
+          </div>
+        )}
+
         <div className="mb-8">
           <MarkdownRenderer content={solution.content} />
         </div>
       </article>
+
+      {/* More from this type */}
+      <div className="mt-12 pt-8 border-t border-slate-200">
+        <Link
+          href="/solutions"
+          className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors"
+        >
+          <span>更多行业方案</span>
+          <span className="text-xs">&rarr;</span>
+        </Link>
+      </div>
     </div>
   );
 }

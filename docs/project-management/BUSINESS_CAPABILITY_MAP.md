@@ -27,6 +27,9 @@ VISNDT 当前支持的是：
 - 查看产品参数、媒体、文档
 - 浏览知识中心内容（动态 Content API，仅 PUBLISHED）与内容详情（**Markdown 安全渲染，M18.1**）
 - 浏览解决方案（动态 Content API，仅 PUBLISHED）与方案详情（**Markdown 安全渲染，M18.1**）
+- 浏览文章中心（**/articles + /articles/[slug]，M20.2.4**）与行业洞察（**/insights + /insights/[slug]，M20.2.4**）
+- 浏览内容标签（**/tags/[slug] 标签聚合页，M20.2.3**）与按标签筛选内容（**GET /content/public?tag=slug，M20.2.3**）
+- 内容发现增强（**M20.2.5**：内容详情页标签芯片展示 + "更多"导航链接，连通 Content Detail → Tag Landing → Type List 发现路径）
 - 内容分享元数据（**OpenGraph，知识/方案详情页，M18.3**）
 - 内容结构化识别（**JSON-LD Article / TechArticle，M18.3**）与站点抓取（**/sitemap.xml，仅 PUBLISHED，M18.3**）
 - 对产品发起公开询价（关联产品与组织，进入后台运营处理）
@@ -34,7 +37,7 @@ VISNDT 当前支持的是：
 
 ### Current Limitation
 
-- `/knowledge`、`/solutions` 已动态化（M17.4），内容详情已升级为 Markdown 安全渲染（M18.1），内容媒体管理已实现（M18.2：Content→ContentMedia→FileAsset 链路 + 媒体画廊/附件展示 + 下载发布状态校验），内容 SEO 展示层已完成（M18.3：OpenGraph / JSON-LD / Sitemap / Canonical），但仍无搜索、无标签，生产正式域名 SEO 参数（NEXT_PUBLIC_SITE_URL）待部署配置
+- `/knowledge`、`/solutions` 已动态化（M17.4），内容详情已升级为 Markdown 安全渲染（M18.1），内容媒体管理已实现（M18.2：Content→ContentMedia→FileAsset 链路 + 媒体画廊/附件展示 + 下载发布状态校验），内容 SEO 展示层已完成（M18.3：OpenGraph / JSON-LD / Sitemap / Canonical），内容标签体系已建立（M20.2.3：ContentTag + ContentTagRelation + /tags/[slug] 标签聚合页 + 按标签筛选内容），生产正式域名 SEO 参数（NEXT_PUBLIC_SITE_URL）待部署配置
 - 公开询价链路已打通，但依赖产品存在可询价状态的 Offer（ACTIVE/SUBMITTED）
 
 ## Buyer Can Do What
@@ -69,6 +72,7 @@ VISNDT 当前支持的是：
 - 查看 Demand / Match / RFQ / RFQ Response / Offer
 - 管理 Inquiry / Notification
 - 管理 Content（内容列表/创建/编辑/生命周期操作，M17.3；**正文 Markdown 编辑+预览，类型/筛选支持 INSIGHT 参数百科，M18.1**）
+- 管理 Content Tags（**标签 CRUD + 内容标签关联，M20.2.3**）
 - 查看 Audit Log
 - 执行 FileAsset Orphan Cleanup
 - 查看 Dashboard 统计与待处理事项
@@ -294,6 +298,43 @@ Future AI Discovery
 - **Admin Platform Governance（后端 ✅ / 前端 ✅ / M19.4.0 Architecture Audit ✅ / M19.4.1 Design Freeze ✅ / M19.4.2 Development ✅ / M19.4.3 Product Model Audit ✅ / M19.4.4 Closure Audit ✅ / M19.4 CLOSED）**：Admin = **Platform Governance Center**（数据治理 + 内容治理 + 产品治理 + 供应商治理 + 运营审计），非 Supplier Store Management / Transaction Management。Admin 前端 18 类管理能力——Dashboard、Product CRUD + Media、Category CRUD、ParameterGroup/ParameterDefinition CRUD、User CRUD、Organization CRUD、Demand List/Detail/Edit、Matching Monitor + Match Detail、RFQ CRUD、RFQ Response Detail、Offer List/Detail、Inquiry List/Detail、Notification List/Detail、FileAsset Orphan Cleanup、AuditLog List、Content CRUD（含 Markdown 编辑 + Media + Revision History + Scheduled Publish + SEO + Approval Timeline）。后端全 CRUD API + 生命周期操作 + RBAC（@Roles(ADMIN) + RolesGuard）+ AuditLog + WorkflowEvent。**M19.4.4（482）Phase Closure Audit**——M19.4 CLOSED，M19 COMPLETED。Final Architecture: Product = Global Catalog, Supplier = Capability Provider, Offer = Capability Mapping, Parameter = Industrial Search Foundation, Search = Database Query First, Matching = Weighted Scoring。Future Candidates (Frozen): ProductStatus enum, WorkflowEntityType.PRODUCT, Product @@unique([name, model]), ParameterTemplate, Semantic Alias, Vector embedding (M20+), Knowledge Graph (M20+), AI Matching (M21+), Supplier Product Model (M20)。禁止：Supplier Store / Marketplace / Transaction / ERP / Inventory / Order / Payment / SKU。
 
 - **Future AI Discovery（⏳ M20 规划）**：AI Readiness 底座（Embedding / Vector / RAG）为 M20 规划，当前不实施。
+
+## M20 Architecture Planning Status（483，M20.0.0 Pre-Audit）
+
+> M20.0.0 前置架构审核已完成（483，Audit Only，No Code Change）。M20 定位：**Frontend Platformization（前端平台化与体验升级）**，非业务模型扩张。
+
+### M20 Direction Freeze
+
+- **P1 — Frontend Platformization**：提升平台使用体验（`apps/web` 33 pages + `apps/admin` 50 pages 体验升级），不引入新业务模型。Zero Schema/API change；Backend Capability First。
+- **P2 — Content Asset Planning**：构建 Product-Content 关联、Content Discovery、Scenario Framework。Planning phase；API additions require separate audit。
+- **P3 — AI Readiness Planning**：数据质量评估、标签体系设计、文本资产规范。Planning/Audit phase only；No Vector DB / Embedding / AI Agent / AI Infrastructure。
+
+### M20 Scope Freeze
+
+**Allowed**: Frontend Experience Upgrade, Platformization (UX/UI/Workflow), Content Integration Planning, Data Quality Assessment, Label System Design, Text Asset Guidelines.
+
+**Forbidden**: Marketplace, Supplier Store, Transaction, ERP, AI Infrastructure (Vector DB, Embedding, Agent), Schema Change (without dedicated audit), New Business Model.
+
+### M20 Architecture Constraints
+
+Product = Global Catalog, Supplier = Capability Provider, Offer = Capability Mapping, Search = Database Query First, Admin = Platform Governance — all maintained.
+
+### Future Candidate Registry（Frozen）
+
+ProductStatus enum, WorkflowEntityType.PRODUCT, Product @@unique([name, model]), ParameterTemplate, Semantic Alias, Vector embedding, Knowledge Graph, AI Matching, Supplier Product Model — all frozen；M20 evaluates only (no implementation).
+
+**M20 Status**: `COMPLETED` — M20.0.0 前置审核完成，M20.1 Search Experience Phase 闭环（M20.1.1~M20.1.4 CLOSED），M20.2 Content Asset Integration 阶段闭环（M20.2.0~M20.2.6 CLOSED/FROZEN）。Next Step: M20.3 Commercial Conversion Architecture Audit。
+
+### M20.1.1 Product Discovery Enhancement Development（486，Phase 1/P0 Completed）
+
+M20.1.1 Phase 1 (P0) 前端开发完成（Zero Backend/Schema/API Change）：
+- **Product Detail Tabs**: 4-tab navigation (Overview/Specifications/Suppliers/Documents) + URL hash sync
+- **Product Detail Nav**: Sticky sidebar (desktop, scroll-spy, mobile hidden)
+- **Product Info Enhancement**: Status badge (color-coded), last updated date, description expand/collapse
+- **CompareBar**: Floating bottom bar, max 4 products, compare link
+- **ComparePage**: `/products/compare?ids=`, parameter matrix with difference highlighting + best-value detection
+
+Build: apps/web exit 0. Route `/products/compare` — 4.06 kB. 6 new files + 4 modified files. Phase 2 (P1) and Phase 3 (P2) remain planned.
 
 **业务定位保持**：`工业检测设备信息平台 + 撮合平台`（信息展示 + 需求发布 + 平台撮合 + RFQ 响应协作），非 Supplier 独立商城 / 公开价格 / 交易结算。
 

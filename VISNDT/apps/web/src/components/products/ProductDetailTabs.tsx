@@ -1,0 +1,86 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+
+export type ProductTab = 'overview' | 'specifications' | 'suppliers' | 'documents';
+
+interface TabDefinition {
+  id: ProductTab;
+  label: string;
+  anchor: string;
+}
+
+const TABS: TabDefinition[] = [
+  { id: 'overview', label: '产品概览', anchor: '#overview' },
+  { id: 'specifications', label: '技术参数', anchor: '#specifications' },
+  { id: 'suppliers', label: '供应商', anchor: '#suppliers' },
+  { id: 'documents', label: '文档证书', anchor: '#documents' },
+];
+
+interface ProductDetailTabsProps {
+  children: (activeTab: ProductTab) => React.ReactNode;
+  defaultTab?: ProductTab;
+}
+
+export default function ProductDetailTabs({
+  children,
+  defaultTab = 'overview',
+}: ProductDetailTabsProps) {
+  const [activeTab, setActiveTab] = useState<ProductTab>(defaultTab);
+
+  // Sync tab from URL hash on mount and hash change
+  useEffect(() => {
+    const syncFromHash = () => {
+      const hash = window.location.hash.replace('#', '');
+      const matched = TABS.find((t) => t.anchor.replace('#', '') === hash);
+      if (matched) {
+        setActiveTab(matched.id);
+      }
+    };
+
+    syncFromHash();
+    window.addEventListener('hashchange', syncFromHash);
+    return () => window.removeEventListener('hashchange', syncFromHash);
+  }, []);
+
+  const handleTabClick = useCallback((tab: ProductTab) => {
+    setActiveTab(tab);
+    const def = TABS.find((t) => t.id === tab);
+    if (def) {
+      window.location.hash = def.anchor;
+    }
+  }, []);
+
+  return (
+    <div>
+      {/* Tab Bar — desktop: horizontal tabs, mobile: horizontal scroll */}
+      <div className="sticky top-0 z-10 bg-white border-b border-slate-200 mb-8 overflow-x-auto">
+        <nav className="flex gap-0 min-w-max" role="tablist" aria-label="产品详情导航">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              role="tab"
+              aria-selected={activeTab === tab.id}
+              onClick={() => handleTabClick(tab.id)}
+              className={`
+                relative px-5 py-3 text-sm font-medium transition-colors whitespace-nowrap
+                ${
+                  activeTab === tab.id
+                    ? 'text-primary border-b-2 border-primary'
+                    : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent'
+                }
+              `}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Tab Content */}
+      <div role="tabpanel">
+        {children(activeTab)}
+      </div>
+    </div>
+  );
+}

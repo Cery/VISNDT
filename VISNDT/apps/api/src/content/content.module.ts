@@ -5,9 +5,10 @@ import { ContentSchedulerService } from './content.scheduler';
 import { AuthModule } from '../auth/auth.module';
 import { WorkflowEventsModule } from '../workflow-events/workflow-events.module';
 import { ContentRevisionModule } from '../content-revision/content-revision.module';
+import { ContentTagModule } from '../content-tag/content-tag.module';
 
 @Module({
-  imports: [AuthModule, WorkflowEventsModule, ContentRevisionModule],
+  imports: [AuthModule, WorkflowEventsModule, ContentRevisionModule, ContentTagModule],
   controllers: [ContentController],
   providers: [ContentService, ContentSchedulerService],
   exports: [ContentService],

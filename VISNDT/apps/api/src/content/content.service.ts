@@ -50,6 +50,13 @@ const publicContentSelect = {
     },
     orderBy: { sortOrder: 'asc' },
   },
+  tags: {
+    select: {
+      tag: {
+        select: { id: true, name: true, slug: true, type: true },
+      },
+    },
+  },
 } satisfies Prisma.ContentSelect;
 
 @Injectable()
@@ -62,12 +69,21 @@ export class ContentService {
   ) {}
 
   async findAll(query: QueryContentDto) {
-    const { page = 1, pageSize = 20, type, status } = query;
+    const { page = 1, pageSize = 20, type, status, keyword, tag } = query;
     const skip = (page - 1) * pageSize;
 
     const where: Prisma.ContentWhereInput = {};
     if (type) where.type = type;
     if (status) where.status = status;
+    if (keyword) {
+      where.OR = [
+        { title: { contains: keyword, mode: 'insensitive' } },
+        { summary: { contains: keyword, mode: 'insensitive' } },
+      ];
+    }
+    if (tag) {
+      where.tags = { some: { tag: { slug: tag } } };
+    }
 
     const [data, total] = await Promise.all([
       this.prisma.content.findMany({
@@ -91,13 +107,22 @@ export class ContentService {
    * Forces status = PUBLISHED at the DB level; only public fields are returned.
    */
   async findAllPublic(query: QueryContentDto) {
-    const { page = 1, pageSize = 20, type } = query;
+    const { page = 1, pageSize = 20, type, keyword, tag } = query;
     const skip = (page - 1) * pageSize;
 
     const where: Prisma.ContentWhereInput = {
       status: ContentStatus.PUBLISHED,
       ...(type ? { type } : {}),
     };
+    if (keyword) {
+      where.OR = [
+        { title: { contains: keyword, mode: 'insensitive' } },
+        { summary: { contains: keyword, mode: 'insensitive' } },
+      ];
+    }
+    if (tag) {
+      where.tags = { some: { tag: { slug: tag } } };
+    }
 
     const [data, total] = await Promise.all([
       this.prisma.content.findMany({

@@ -1,4 +1,4 @@
-import { IsOptional, IsIn, Max, Min } from 'class-validator';
+import { IsOptional, IsIn, IsString, Max, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -12,6 +12,16 @@ export class QueryContentDto {
   @IsOptional()
   @IsIn(['DRAFT', 'REVIEW', 'PUBLISHED', 'ARCHIVED'])
   status?: 'DRAFT' | 'REVIEW' | 'PUBLISHED' | 'ARCHIVED';
+
+  @ApiPropertyOptional({ description: 'Keyword search on title and summary' })
+  @IsOptional()
+  @IsString()
+  keyword?: string;
+
+  @ApiPropertyOptional({ description: 'Filter content by tag slug' })
+  @IsOptional()
+  @IsString()
+  tag?: string;
 
   @ApiPropertyOptional({ description: 'Page number (1-based)', default: 1 })
   @IsOptional()

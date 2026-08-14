@@ -1,6 +1,17 @@
 export type ContentType = 'ARTICLE' | 'KNOWLEDGE' | 'SOLUTION' | 'INSIGHT';
 export type ContentStatus = 'DRAFT' | 'REVIEW' | 'PUBLISHED' | 'ARCHIVED';
 export type ContentMediaType = 'IMAGE' | 'ATTACHMENT';
+export type ContentTagType = 'TOPIC' | 'INDUSTRY' | 'APPLICATION' | 'TECHNOLOGY';
+
+export interface ContentTag {
+  id: string;
+  name: string;
+  slug: string;
+  type: ContentTagType;
+  description?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface ContentMediaFileAsset {
   id: string;

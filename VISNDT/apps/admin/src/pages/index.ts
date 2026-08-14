@@ -48,3 +48,6 @@ export { default as AuditLogList } from './AuditLogList';
 export { default as ContentList } from './content/ContentList';
 export { default as ContentCreate } from './content/ContentCreate';
 export { default as ContentEdit } from './content/ContentEdit';
+export { default as ContentTagList } from './content-tags/ContentTagList';
+export { default as ContentTagCreate } from './content-tags/ContentTagCreate';
+export { default as ContentTagEdit } from './content-tags/ContentTagEdit';

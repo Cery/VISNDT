@@ -1,10 +1,7 @@
 import { getProduct } from '@/services/product.service';
 import { getParameterGroups } from '@/services/parameter-group.service';
-import ProductGallery from '@/components/products/ProductGallery';
-import ProductParameters from '@/components/products/ProductParameters';
-import ManufacturerInfo from '@/components/products/ManufacturerInfo';
-import SupplierInquirySection from '@/components/inquiry/SupplierInquirySection';
-import EmptyState from '@/components/common/EmptyState';
+import ProductDetailContent from '@/components/products/ProductDetailContent';
+import ProductDetailNav from '@/components/products/ProductDetailNav';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -81,107 +78,17 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         <span className="text-foreground truncate max-w-[200px]">{product.name}</span>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-        {/* Product Gallery */}
-        <section id="media">
-          <ProductGallery media={product.media} productName={product.name} />
-        </section>
+      {/* Two-column layout: Nav sidebar + Main content */}
+      <div className="flex gap-8">
+        <ProductDetailNav />
 
-        {/* Product Info */}
-        <section id="overview" className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-extrabold text-foreground">{product.name}</h1>
-            {product.model && (
-              <p className="text-slate-500 mt-1 font-mono text-sm">型号：{product.model}</p>
-            )}
-            {product.category && (
-              <span className="inline-block mt-3 text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full font-medium">
-                {translateCategoryName(product.category.name)}
-              </span>
-            )}
-          </div>
-
-          {product.description && (
-            <div>
-              <h2 className="font-semibold text-sm text-slate-700 mb-2">产品描述</h2>
-              <p className="text-sm text-slate-500 whitespace-pre-wrap leading-relaxed">
-                {product.description}
-              </p>
-            </div>
-          )}
-
-          {/* Manufacturer Info (derived from offers.organization) */}
-          <ManufacturerInfo
-            offers={product.offers}
-            productName={product.name}
+        <div className="flex-1 min-w-0">
+          <ProductDetailContent
+            product={product}
+            parameterGroups={parameterGroups}
           />
-
-          {/* Supplier Capability + Inquiry (user must select Offer explicitly) */}
-          <SupplierInquirySection
-            productId={product.id}
-            productName={product.name}
-            offers={product.offers ?? []}
-          />
-        </section>
-      </div>
-
-      {/* Technical Parameters (grouped by ParameterGroup) */}
-      <section id="specifications" className="mb-12">
-        <h2 className="text-2xl font-extrabold text-foreground mb-6">技术参数</h2>
-        <div className="rounded-xl border border-slate-200/80 shadow-industrial-sm bg-white p-6">
-          {product.parameterValues.length > 0 ? (
-            <ProductParameters
-              parameters={product.parameterValues}
-              parameterGroups={parameterGroups}
-            />
-          ) : (
-            <EmptyState
-              icon="document"
-              message="暂无技术参数"
-              description="该产品尚未录入技术参数信息。"
-            />
-          )}
         </div>
-      </section>
-
-      {/* Product Media Documents */}
-      <section id="documents" className="mb-12">
-        <h2 className="text-2xl font-extrabold text-foreground mb-6">文档与证书</h2>
-        {product.media.filter((m) => m.mediaType !== 'IMAGE').length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {product.media
-              .filter((m) => m.mediaType !== 'IMAGE')
-              .map((doc) => (
-                <div
-                  key={doc.id}
-                  className="rounded-xl border border-slate-200/80 shadow-industrial-sm hover:shadow-industrial-md hover:-translate-y-1 transition-all duration-300 bg-white p-4 flex items-center gap-3"
-                >
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-xs text-primary font-medium">
-                      {doc.mediaType === 'CERTIFICATE' ? '证书' : '文档'}
-                    </span>
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-slate-700 truncate">
-                      {doc.title || '文档'}
-                    </p>
-                    {doc.description && (
-                      <p className="text-xs text-slate-400 truncate">
-                        {doc.description}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-          </div>
-        ) : (
-          <EmptyState
-            icon="document"
-            message="暂无文档与证书"
-            description="该产品尚未上传相关文档或证书。"
-          />
-        )}
-      </section>
+      </div>
     </div>
   );
 }

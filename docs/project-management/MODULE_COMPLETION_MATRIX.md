@@ -84,4 +84,74 @@
 - **M19 阶段定位**：产品体验架构重构阶段（非普通开发阶段），目标为产品体验重构 / 供应商能力展示 / 搜索体验升级 / 运营体系规划。
 - **架构冻结结论**：保持 `Product Global Catalog + Offer Supplier Display`；禁止 `Product.organizationId` / `ProductFamily` / `ProductModel` / `SupplierOffering`；**零 Schema 变更**；前端消费后端已有能力（Backend Capability First）。
 - **M19 执行路线**：M19.0 Architecture Freeze → M19.1 Product Center V2 → M19.2 Supplier Display → M19.3 Search Experience → M19.4 Admin Product Operation Center → M20 Frontend Platformization → M21+ AI Enhancement。
+
+## M20 Architecture Planning（483，M20.0.0 Pre-Audit）
+
+> M20 定位：**Frontend Platformization（前端平台化与体验升级）**，非业务模型扩张。M20.0.0 前置架构审核已完成（483，Audit Only，No Code Change）。
+
+### M20 Direction Freeze
+
+| Priority | Direction | Objective | Scope | Constraint |
+|----------|-----------|-----------|-------|------------|
+| **P1** | Frontend Platformization | 提升平台使用体验，不引入新业务模型 | `apps/web` 33 pages + `apps/admin` 50 pages 体验升级 | Zero Schema/API change；Backend Capability First |
+| **P2** | Content Asset Planning | 构建 Product-Content 关联、Content Discovery、Scenario Framework | Planning phase；API additions require separate audit | No schema change without dedicated audit |
+| **P3** | AI Readiness Planning | 数据质量评估、标签体系设计、文本资产规范 | Planning/Audit phase only | No Vector DB / Embedding / AI Agent / AI Infrastructure |
+
+### M20 Scope Freeze
+
+| Allowed | Forbidden |
+|---------|-----------|
+| Frontend Experience Upgrade | Marketplace |
+| Platformization (UX/UI/Workflow) | Supplier Store |
+| Content Integration Planning | Transaction / ERP |
+| Data Quality Assessment | AI Infrastructure (Vector DB, Embedding, Agent) |
+| Label System Design | Schema Change (without dedicated audit) |
+| Text Asset Guidelines | New Business Model |
+
+### M20 Architecture Constraints（Maintain）
+
+```
+Product = Global Catalog        ✅
+Supplier = Capability Provider  ✅
+Offer = Capability Mapping      ✅
+Search = Database Query First   ✅
+Admin = Platform Governance     ✅
+```
+
+### M20 Future Candidate Registry（Frozen）
+
+| # | Candidate | M20 Action | Target Stage |
+|---|-----------|------------|-------------|
+| 1 | ProductStatus enum | No action | M20.4.x (after lifecycle audit) |
+| 2 | WorkflowEntityType.PRODUCT | No action | M20.4.x (after lifecycle audit) |
+| 3 | Product @@unique([name, model]) | No action | M20.4.x |
+| 4 | ParameterTemplate | Evaluate in M20.8 | M20.8 |
+| 5 | Semantic Alias model | Evaluate in M20.10 | M21+ |
+| 6 | Vector embedding | Evaluate in M20.10 | M21+ |
+| 7 | Knowledge Graph tables | Evaluate in M20.10 | M21+ |
+| 8 | AI Matching Enhancement | No action | M21+ |
+| 9 | Supplier Product Model | No action | M20 (frozen) |
+
+**M20 Status**: `COMPLETED`（M20.0.0 前置审核完成，M20.1 Search Experience Phase 闭环（M20.1.1~M20.1.4 CLOSED），M20.2 Content Asset Integration 阶段闭环（M20.2.0~M20.2.6 CLOSED/FROZEN）。Next Step: M20.3 Commercial Conversion Architecture Audit。
+
+### M20.1.1 Product Discovery Enhancement Development（486，Phase 1/P0 Development）
+
+> M20.1.1 Phase 1 (P0) 开发已完成（486，Frontend Development）。5 P0 components implemented, build exit 0。
+
+**Implemented Components**:
+
+| Component | Type | Description |
+|-----------|------|-------------|
+| `ProductDetailTabs` | New | 4-tab navigation (Overview/Specifications/Suppliers/Documents) + URL hash sync |
+| `ProductDetailNav` | New | Sticky sidebar nav (desktop, scroll-spy) |
+| `ProductDetailContent` | New | Client wrapper: tabs + status badge + last updated + description toggle |
+| `CompareBar` | New | Floating bottom bar: product selection, max 4, clear, compare link |
+| `CompareTable` | New | Parameter matrix: group headers, difference highlighting, best-value detection |
+| `ComparePage` | New | `/products/compare?ids=`, URL-driven, Suspense boundary |
+
+**Modified Files**: `products/[slug]/page.tsx`, `products/page.tsx`, `ProductCard.tsx`, `ProductGrid.tsx`
+
+**Build**: apps/web exit 0. Route `/products/compare` — 4.06 kB. Backend/Schema/API = None.
+
+**Note**: Phase 2 (P1: Type Renderer, Collapse, Lightbox, Gallery, Card) and Phase 3 (P2: Sort Controls, View Mode) remain planned for future M20.1.1.x tasks.
 - **当前状态**：M19 架构冻结完成（457-460），M19.1 Product Center V2 体验稳定化全部完成（462-465），M19.2.0 Supplier Display 架构审计（466），M19.2.1 Supplier Capability Page（467），M19.2.2 Product Detail Supplier Section（468），M19.2.3 Workspace Supplier Display Management（471），M19.2.4 Closure Audit（472）已完成。**M19.2 CLOSED。Supplier Display 三端能力已建立：Public Supplier Page + Product Detail Supplier Navigation + Workspace Display Management。M19.3.0 Search Experience Architecture Audit（473）已完成——搜索架构冻结，搜索定位 Industrial Capability Discovery，四类搜索边界/四层 IA 冻结，Database Query First，零 Schema/API 变更。M19.3.1 Search Experience Development（474）已完成——Product Search UX 增强。M19.3.2 Search Experience Enhancement Development（475）已完成——Search Result UX 增强。M19.3.2.1 Supplier Discovery Boundary Correction（476）已完成——边界修正。M19.3.3 Closure Audit（477）已完成——M19.3 CLOSED。M19.4.0 Admin Product Operation Center Architecture Audit（478）已完成——Admin 架构审计通过，Admin = Platform Governance Center，18 类管理能力 + 28 个 Prisma 模型 + 全 CRUD API + RBAC + AuditLog + WorkflowEvent，M19.4 可基于现有数据模型开发，无需 Schema/API 变更。M19.4.1 Pre-Development Design Audit（479）已完成——设计冻结，Product Governance / Category / Parameter / Media / Audit 治理边界冻结，零 Schema/API 变更。M19.4.2 Admin Product Operation Center Development（480）已完成——Admin Product Governance 治理能力增强，Product/Category/Parameter/Media 四类治理统计可视化落地，`apps/admin` build exit 0，Schema/Migration/API 均 None。M19.4.3 Product Model and Capability Architecture Audit（481）已完成——产品能力模型长期架构审核通过，Product Global Catalog / Supplier Capability / Parameter / Search / Matching / AI Future 全 PASS，零 Schema/API 变更。M19.4.4 Product Capability Governance Closure Audit（482）已完成——M19.4 CLOSED，M19 COMPLETED。**

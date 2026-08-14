@@ -161,6 +161,13 @@ enum ContentType {
   INSIGHT
 }
 
+enum ContentTagType {
+  TOPIC
+  INDUSTRY
+  APPLICATION
+  TECHNOLOGY
+}
+
 enum ContentStatus {
   DRAFT
   REVIEW
@@ -775,6 +782,7 @@ model Content {
   coverImage FileAsset? @relation(fields: [coverImageId], references: [id])
   media      ContentMedia[]
   revisions  ContentRevision[]
+  tags       ContentTagRelation[]
 
   @@index([type, status])
   @@index([authorId])
@@ -830,4 +838,38 @@ model ContentRevision {
 
   @@index([contentId, version])
   @@map("content_revision")
+}
+
+// ===========================================
+// Migration 008: Content Tagging & Taxonomy
+// ===========================================
+
+model ContentTag {
+  id          String         @id @default(uuid()) @db.Uuid
+  name        String
+  slug        String         @unique
+  type        ContentTagType
+  description String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  relations ContentTagRelation[]
+
+  @@map("content_tag")
+}
+
+model ContentTagRelation {
+  id        String   @id @default(uuid()) @db.Uuid
+  contentId String   @map("content_id") @db.Uuid
+  tagId     String   @map("tag_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+
+  content Content    @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  tag     ContentTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([contentId, tagId])
+  @@index([tagId])
+  @@index([contentId])
+  @@map("content_tag_relation")
 }

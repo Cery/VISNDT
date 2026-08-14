@@ -7,11 +7,47 @@ interface ProductCardProps {
   product: Product;
   /** Current search keyword for highlighting (frontend only) */
   searchKeyword?: string;
+  /** Whether this product is selected for comparison */
+  isCompared?: boolean;
+  /** Compare toggle callback */
+  onCompareToggle?: (id: string) => void;
 }
 
-export default function ProductCard({ product, searchKeyword }: ProductCardProps) {
+export default function ProductCard({
+  product,
+  searchKeyword,
+  isCompared = false,
+  onCompareToggle,
+}: ProductCardProps) {
   return (
-    <div className="group block rounded-xl border border-slate-200/80 shadow-industrial-sm hover:shadow-industrial-lg hover:-translate-y-1 transition-all duration-300 bg-white p-4">
+    <div className="group block rounded-xl border border-slate-200/80 shadow-industrial-sm hover:shadow-industrial-lg hover:-translate-y-1 transition-all duration-300 bg-white p-4 relative">
+      {/* Compare Checkbox */}
+      {onCompareToggle && (
+        <div className="absolute top-2 right-2 z-10">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onCompareToggle(product.id);
+            }}
+            className={`
+              w-5 h-5 rounded border-2 flex items-center justify-center transition-colors
+              ${isCompared
+                ? 'bg-primary border-primary text-white'
+                : 'border-slate-300 hover:border-primary bg-white'
+              }
+            `}
+            aria-label={isCompared ? `取消对比 ${product.name}` : `对比 ${product.name}`}
+          >
+            {isCompared && (
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M2 5l2 2 4-4" />
+              </svg>
+            )}
+          </button>
+        </div>
+      )}
       <Link href={`/products/${product.id}`} className="block">
         {/* Placeholder image */}
         <div className="aspect-video bg-gradient-to-br from-slate-100 to-industrial-slate rounded-md mb-3 flex items-center justify-center">

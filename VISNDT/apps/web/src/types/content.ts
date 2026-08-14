@@ -55,10 +55,25 @@ export interface Content {
   author?: ContentAuthor;
   coverImage?: ContentCoverImage | null;
   media?: ContentMedia[];
+  tags?: { tag: ContentTag }[];
 }
 
 export interface ContentListParams {
   type?: ContentType;
+  keyword?: string;
+  tag?: string;
   page?: number;
   pageSize?: number;
+}
+
+export type ContentTagType = 'TOPIC' | 'INDUSTRY' | 'APPLICATION' | 'TECHNOLOGY';
+
+export interface ContentTag {
+  id: string;
+  name: string;
+  slug: string;
+  type: ContentTagType;
+  description?: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
