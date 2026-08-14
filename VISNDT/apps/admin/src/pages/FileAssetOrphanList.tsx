@@ -18,7 +18,7 @@ import { ExclamationCircleOutlined, ReloadOutlined, SearchOutlined } from '@ant-
 import { fileAssetService } from '../api';
 import type { FileAsset } from '../types';
 import { getFileTypeIcon, formatFileSize } from '../utils/file-utils';
-import BatchOperations from '../components/BatchOperations';
+import { BatchActionBar } from '../components/operation';
 
 const { Title } = Typography;
 const { confirm } = Modal;
@@ -276,12 +276,17 @@ function FileAssetOrphanList() {
         </Space>
       </div>
 
-      <BatchOperations
+      <BatchActionBar
         selectedRowKeys={selectedRowKeys}
-        onBatchDelete={handleBatchDelete}
+        actions={[
+          { key: 'delete', label: '清理孤立文件', danger: true, icon: undefined, confirmTitle: '清理孤立文件', confirmContent: '此操作将永久从数据库和存储中删除文件，且不可撤销。' },
+        ]}
+        onAction={async (actionKey, ids) => {
+          if (actionKey === 'delete') {
+            await handleBatchDelete(ids);
+          }
+        }}
         loading={batchLoading}
-        deleteTitle="清理孤立文件"
-        deleteDescription="此操作将永久从数据库和存储中删除文件，且不可撤销。"
       />
 
       <Table<FileAsset>
@@ -294,7 +299,7 @@ function FileAssetOrphanList() {
           showSizeChanger: true,
           showTotal: (total) => `共 ${total} 个孤立文件`,
         }}
-        scroll={{ x: 1200 }}
+        scroll={{ x: 'max-content' }}
         locale={{ emptyText: searchText || filterFileType ? '未找到匹配的孤立文件' : '暂无数据' }}
       />
     </div>

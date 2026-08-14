@@ -96,6 +96,7 @@ export default function ContentTagList() {
       title: '操作',
       key: 'actions',
       width: 160,
+      fixed: 'right' as const,
       render: (_, record) => (
         <Space>
           <Button
@@ -141,6 +142,7 @@ export default function ContentTagList() {
           columns={columns}
           dataSource={state.data}
           rowKey="id"
+          scroll={{ x: 'max-content' }}
           pagination={{ pageSize: 20, showSizeChanger: true, showTotal: (total) => `共 ${total} 条` }}
         />
       )}

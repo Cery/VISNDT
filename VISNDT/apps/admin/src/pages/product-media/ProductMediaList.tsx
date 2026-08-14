@@ -273,6 +273,7 @@ function ProductMediaList() {
       title: '操作',
       key: 'actions',
       width: 220,
+      fixed: 'right' as const,
       render: (_: unknown, record: ProductMediaItem) => {
         const fa = record.fileAsset ?? null;
         return (
@@ -375,6 +376,7 @@ function ProductMediaList() {
           columns={columns}
           dataSource={pageState.data}
           rowKey="id"
+          scroll={{ x: 'max-content' }}
           onChange={handleTableChange}
           pagination={{
             current: query.page,

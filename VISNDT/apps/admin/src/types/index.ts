@@ -118,6 +118,8 @@ export type {
   ContentCoverImage,
   ContentStatus,
   ContentType,
+  ContentTagType,
+  ContentTag,
   ContentListResponse,
   QueryContentParams,
   CreateContentDto,

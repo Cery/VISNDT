@@ -6,7 +6,7 @@ import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { SorterResult } from 'antd/es/table/interface';
 import { parameterDefinitionService } from '../../api/parameter-definition.service';
 import type { ParameterDefinition } from '../../types/parameter-definition.types';
-import BatchOperations from '../../components/BatchOperations';
+import { BatchActionBar } from '../../components/operation';
 
 const { Title } = Typography;
 
@@ -233,6 +233,7 @@ function ParameterDefinitionList() {
       title: '操作',
       key: 'actions',
       width: 80,
+      fixed: 'right' as const,
       render: (_: unknown, record: ParameterDefinition) => (
         <Space>
           <Button
@@ -314,9 +315,16 @@ function ParameterDefinitionList() {
             </Button>
           </Space>
 
-          <BatchOperations
+          <BatchActionBar
             selectedRowKeys={selectedRowKeys}
-            onBatchDelete={handleBatchDelete}
+            actions={[
+              { key: 'delete', label: '批量删除', danger: true, icon: undefined, confirmTitle: '确认删除', confirmContent: `确定要删除选中的 ${selectedRowKeys.length} 个参数定义吗？此操作不可撤销。` },
+            ]}
+            onAction={async (actionKey, ids) => {
+              if (actionKey === 'delete') {
+                await handleBatchDelete(ids);
+              }
+            }}
             loading={batchLoading}
           />
 
@@ -324,6 +332,7 @@ function ParameterDefinitionList() {
           columns={columns}
           dataSource={pageState.data}
           rowKey="id"
+          scroll={{ x: 'max-content' }}
           rowSelection={{
             selectedRowKeys,
             onChange: (keys) => setSelectedRowKeys(keys),

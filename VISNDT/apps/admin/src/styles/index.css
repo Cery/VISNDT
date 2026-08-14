@@ -19,6 +19,108 @@ body {
   height: 100%;
 }
 
+/* ============================================
+   Responsive Admin Operation Center
+   Desktop: 1440px+ | Tablet: 768px | Mobile: 375px
+   ============================================ */
+
+/* Tablet: auto-collapse sidebar */
+@media (max-width: 1024px) {
+  .admin-layout .ant-layout-sider {
+    position: fixed !important;
+    z-index: 100;
+    height: 100vh;
+  }
+
+  .admin-layout .ant-layout-sider:not(.ant-layout-sider-collapsed) + .ant-layout {
+    margin-left: 200px;
+  }
+
+  .admin-layout .ant-layout-content {
+    margin: 16px !important;
+    padding: 16px !important;
+  }
+}
+
+/* Tablet & Mobile: compact content */
+@media (max-width: 768px) {
+  .admin-layout .ant-layout-sider {
+    position: fixed !important;
+    z-index: 100;
+    height: 100vh;
+  }
+
+  .admin-layout .ant-layout-sider:not(.ant-layout-sider-collapsed) {
+    left: 0;
+  }
+
+  .admin-layout .ant-layout-sider:not(.ant-layout-sider-collapsed) + .ant-layout {
+    margin-left: 0;
+  }
+
+  .admin-layout .ant-layout-header {
+    padding: 0 12px !important;
+  }
+
+  .admin-layout .ant-layout-content {
+    margin: 8px !important;
+    padding: 12px !important;
+    border-radius: 4px !important;
+  }
+
+  /* Mobile: hide desktop header title, show compact */
+  .admin-header-title {
+    display: none;
+  }
+
+  .admin-header-mobile {
+    display: flex !important;
+  }
+
+  /* Mobile: filter bar wraps */
+  .admin-filter-bar {
+    flex-direction: column;
+    align-items: stretch !important;
+  }
+
+  .admin-filter-bar > * {
+    width: 100% !important;
+  }
+
+  /* Mobile: stat cards full width */
+  .admin-stat-row .ant-col {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  /* Mobile: batch bar stack */
+  .admin-batch-bar {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch !important;
+  }
+}
+
+/* Mobile overlay for sidebar */
+.admin-mobile-overlay {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .admin-mobile-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 99;
+  }
+}
+
+/* Table horizontal scroll (all admin tables) */
+.ant-table-wrapper {
+  overflow-x: auto;
+}
+
 /* Markdown 预览基础样式（GFM） */
 .markdown-preview {
   font-size: 14px;

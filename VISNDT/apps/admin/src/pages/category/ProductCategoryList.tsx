@@ -5,7 +5,7 @@ import { PlusOutlined, ReloadOutlined, ApartmentOutlined, NodeIndexOutlined, Fil
 import type { ColumnsType } from 'antd/es/table';
 import { categoryService, extractErrorMessage } from '../../api';
 import type { ProductCategory } from '../../types/category.types';
-import BatchOperations from '../../components/BatchOperations';
+import { BatchActionBar } from '../../components/operation';
 
 const { Title } = Typography;
 
@@ -228,6 +228,7 @@ function ProductCategoryList() {
       title: '操作',
       key: 'actions',
       width: 80,
+      fixed: 'right' as const,
       render: (_: unknown, record: ProductCategory) => (
         <Space>
           <Button
@@ -330,9 +331,16 @@ function ProductCategoryList() {
             </Button>
           </Space>
 
-          <BatchOperations
+          <BatchActionBar
             selectedRowKeys={selectedRowKeys}
-            onBatchDelete={handleBatchDelete}
+            actions={[
+              { key: 'delete', label: '批量删除', danger: true, icon: undefined, confirmTitle: '确认删除', confirmContent: `确定要删除选中的 ${selectedRowKeys.length} 个分类吗？此操作不可撤销。` },
+            ]}
+            onAction={async (actionKey, ids) => {
+              if (actionKey === 'delete') {
+                await handleBatchDelete(ids);
+              }
+            }}
             loading={batchLoading}
           />
 
@@ -340,6 +348,7 @@ function ProductCategoryList() {
             columns={columns}
             dataSource={filteredData}
             rowKey="id"
+            scroll={{ x: 'max-content' }}
             rowSelection={{
               selectedRowKeys,
               onChange: (keys) => setSelectedRowKeys(keys),

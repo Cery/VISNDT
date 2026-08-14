@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Select, Space, Spin, Alert, Button, Tag, Typography } from 'antd';
-import { ReloadOutlined } from '@ant-design/icons';
+import { Table, Space, Spin, Alert, Button, Tag, Typography } from 'antd';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { contentService } from '../../api';
 import type { Content, ContentType, ContentStatus } from '../../types';
+import { ExportButton, AdvancedFilterPanel } from '../../components/operation';
+import type { ExportColumn } from '../../utils/export';
 
 const { Title } = Typography;
 
@@ -14,6 +15,7 @@ type PageState =
   | { status: 'success'; data: Content[]; total: number };
 
 interface QueryParams {
+  keyword: string;
   type: ContentType | '';
   status: ContentStatus | '';
   page: number;
@@ -57,10 +59,19 @@ const TYPE_LABEL_MAP: Record<string, string> = {
   INSIGHT: '洞察',
 };
 
+const CONTENT_EXPORT_COLUMNS: ExportColumn<Content>[] = [
+  { key: 'title', title: '标题' },
+  { key: 'type', title: '类型', render: (item) => TYPE_LABEL_MAP[item.type] || item.type },
+  { key: 'status', title: '状态', render: (item) => STATUS_LABEL_MAP[item.status] || item.status },
+  { key: 'createdAt', title: '创建时间', render: (item) => new Date(item.createdAt).toLocaleDateString() },
+  { key: 'updatedAt', title: '更新时间', render: (item) => new Date(item.updatedAt).toLocaleDateString() },
+];
+
 function ContentList() {
   const navigate = useNavigate();
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
   const [query, setQuery] = useState<QueryParams>({
+    keyword: '',
     type: '',
     status: '',
     page: 1,
@@ -73,6 +84,7 @@ function ContentList() {
       const result = await contentService.getList({
         page: query.page,
         pageSize: query.pageSize,
+        ...(query.keyword ? { keyword: query.keyword } : {}),
         ...(query.type ? { type: query.type } : {}),
         ...(query.status ? { status: query.status } : {}),
       });
@@ -91,16 +103,8 @@ function ContentList() {
     fetchContents();
   }, [fetchContents]);
 
-  const handleTypeChange = useCallback((value: ContentType | '') => {
-    setQuery((prev) => ({ ...prev, type: value, page: 1 }));
-  }, []);
-
-  const handleStatusChange = useCallback((value: ContentStatus | '') => {
-    setQuery((prev) => ({ ...prev, status: value, page: 1 }));
-  }, []);
-
   const handleReset = useCallback(() => {
-    setQuery({ type: '', status: '', page: 1, pageSize: 20 });
+    setQuery({ keyword: '', type: '', status: '', page: 1, pageSize: 20 });
   }, []);
 
   const handleTableChange = useCallback((pagination: TablePaginationConfig) => {
@@ -189,6 +193,7 @@ function ContentList() {
       title: '操作',
       key: 'actions',
       width: 120,
+      fixed: 'right' as const,
       render: (_: unknown, record: Content) => (
         <Button type="link" onClick={() => navigate(`/content/${record.id}`)}>
           编辑
@@ -210,31 +215,35 @@ function ContentList() {
         <Button type="primary" onClick={() => navigate('/content/create')}>
           创建内容
         </Button>
-        <Select
-          placeholder="按类型筛选"
-          allowClear
-          value={query.type || undefined}
-          onChange={handleTypeChange}
-          options={TYPE_OPTIONS}
-          style={{ width: 160 }}
+        <AdvancedFilterPanel
+          fields={[
+            { key: 'keyword', label: '内容', type: 'keyword', placeholder: '按标题搜索', width: 240 },
+            { key: 'type', label: '类型', type: 'select', options: TYPE_OPTIONS, width: 160 },
+            { key: 'status', label: '状态', type: 'select', options: STATUS_OPTIONS, width: 160 },
+          ]}
+          values={{ keyword: query.keyword, type: query.type, status: query.status }}
+          onChange={(values) => {
+            setQuery((prev) => ({ ...prev, ...values, page: 1 }));
+          }}
+          onSearch={fetchContents}
+          onReset={handleReset}
         />
-        <Select
-          placeholder="按状态筛选"
-          allowClear
-          value={query.status || undefined}
-          onChange={handleStatusChange}
-          options={STATUS_OPTIONS}
-          style={{ width: 160 }}
+        <ExportButton<Content>
+          data={pageState.status === 'success' ? pageState.data : []}
+          columns={CONTENT_EXPORT_COLUMNS}
+          fileName="内容列表"
+          onExportAll={async () => {
+            const all = await contentService.getList({ page: 1, pageSize: 10000 });
+            return all.data;
+          }}
         />
-        <Button icon={<ReloadOutlined />} onClick={handleReset}>
-          重置
-        </Button>
       </Space>
 
       <Table<Content>
         columns={columns}
         dataSource={pageState.data}
         rowKey="id"
+        scroll={{ x: 'max-content' }}
         onChange={handleTableChange}
         pagination={{
           current: query.page,

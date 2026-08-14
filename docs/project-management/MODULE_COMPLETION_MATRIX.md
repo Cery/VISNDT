@@ -18,7 +18,7 @@
 | Notification | `DONE` | `85%` | 列表、未读数、已读、批量已读、Workspace 页面已落地 | 主要剩余运行态验证和一致性治理 |
 | Workflow | `DONE` | `90%` | WorkflowEvent 已覆盖全部主链生命周期；**Content 生命周期 WorkflowEvent 可靠性已修复（M18.4.1：CONTENT 豁免组织约束，emitEvent 不再静默吞错）** | Match/RFQ/Response 事件已补齐，主体语义已统一；Content 事件可靠性已由 M18.4.1 修复 |
 | Inquiry | `MOSTLY_DONE` | `85%` | Inquiry 模型、API、Admin 页面已存在，公开产品详情页已接入完整 `offerId + organizationId` 询价数据链 | 后续可增强询价状态流转与运营视图 |
-| Admin | `DONE` | `95%` | Dashboard、Users、Organizations、Products、Demands、RFQs、Offers、Inquiries、AuditLog、FileAsset 全覆盖；**Content 管理基础已落地（M17.3：列表/编辑器/生命周期操作）**；**Content 正文升级为 Markdown 编辑+预览（M18.1：MarkdownEditor 组件）**；**Content 类型与筛选支持 INSIGHT 参数百科（M18.1）**；**Content 媒体管理已实现（M18.2：ContentMediaManager 组件，上传/图片附件判别/编辑/排序/级联删除）** | 更偏运营效率升级，不是能力空白；SEO 深化（M18.3）已由 Web 展示层完成 |
+| Admin | `DONE` | `97%` | Dashboard、Users、Organizations、Products、Demands、RFQs、Offers、Inquiries、AuditLog、FileAsset 全覆盖；**Content 管理基础已落地（M17.3：列表/编辑器/生命周期操作）**；**Content 正文升级为 Markdown 编辑+预览（M18.1：MarkdownEditor 组件）**；**Content 类型与筛选支持 INSIGHT 参数百科（M18.1）**；**Content 媒体管理已实现（M18.2：ContentMediaManager 组件，上传/图片附件判别/编辑/排序/级联删除）**；**Admin Operation Center 升级已完成（M20.4.1：分组菜单 + 面包屑 + 用户头像/通知 + 移动端抽屉 + Dashboard 运营驾驶舱 recharts 图表 + 16 页面 Table 体验升级 + 响应式三端适配 + 6 个 operation 基础组件）** | 更偏运营效率升级，不是能力空白；SEO 深化（M18.3）已由 Web 展示层完成；M20.4.1 已完成 Admin 专业运营中心基础 |
 
 ## Frontend
 
@@ -132,7 +132,7 @@ Admin = Platform Governance     ✅
 | 8 | AI Matching Enhancement | No action | M21+ |
 | 9 | Supplier Product Model | No action | M20 (frozen) |
 
-**M20 Status**: `CLOSED`（M20.0.0 前置审核完成，M20.1 Search Experience Phase 闭环（M20.1.1~M20.1.4 CLOSED/FROZEN），M20.2 Content Asset Integration 阶段闭环（M20.2.0~M20.2.6 CLOSED/FROZEN），M20.3 Commercial Conversion 阶段闭环（M20.3.0~M20.3.2 CLOSED/FROZEN，502 Audit PASS，503 Development PASS，504 Closure Audit PASS））。Next Step: M20.4 Content Commercial Intelligence Architecture Audit（505）。
+**M20 Status**: `IN PROGRESS`（M20.0.0 前置审核完成，M20.1 Search Experience Phase 闭环，M20.2 Content Asset Integration 阶段闭环，M20.3 Commercial Conversion 阶段闭环，M20.4.0 Admin Platform Professionalization Architecture Audit（505）通过，M20.4.0.1 Admin Operation Center Experience Architecture Audit（506）通过——PASS，AUTHORIZED，Operation Center 体验架构评估完成，Desktop 75%/Tablet 10%/Mobile 5%，零 Schema/API 变更）。Next Step: M20.4.1 Admin Operation Center Foundation Development（507）。
 
 ### M20.3 Commercial Conversion Architecture Audit（502，Completed）& M20.3.1 Development（503，Completed）& M20.3.2 Closure Audit（504，Completed）
 
@@ -175,8 +175,41 @@ M20.0  Architecture Planning        -- CLOSED
 M20.1  Search Experience            -- CLOSED (FROZEN)
 M20.2  Content Asset Integration    -- CLOSED (FROZEN)
 M20.3  Commercial Conversion        -- CLOSED (FROZEN)
-M20.4  ContentProductRelation       -- FUTURE (pending)
-M21+   AI Enhancement               -- FUTURE (pending)
+M20.4  Operation Readiness Upgrade   -- AUTHORIZED (audit complete)
+M20.5  ContentProductRelation        -- FUTURE (pending)
+M21+   AI Enhancement                -- FUTURE (pending)
+```
+
+### M20.4.0 Admin Platform Professionalization Architecture Audit（505，Completed）
+
+> M20.4.0 Admin 专业化架构审计（505，Architecture Audit Only，No Code Change）。M20.4 定位：Admin 从 Development Management Panel 升级为 Professional Operation Center。
+
+**Audit Result**: `PASS` — M20.4 AUTHORIZED，零 Schema/API 变更，Admin frontend-only。
+
+**Domain Capability Ratings**:
+
+| Domain | Rating | Score |
+|--------|--------|-------|
+| Content Management | EXCELLENT | 90% |
+| Product Management | GOOD | 75% |
+| Parameter Management | GOOD | 75% |
+| User Management | GOOD | 70% |
+| Organization Management | ADEQUATE | 65% |
+| Dashboard | BASIC | 60% |
+| Commercial Operations | ADEQUATE | 60% |
+| Media Library | ADEQUATE | 55% |
+| Permission (RBAC) | `BASIC` | `50%` | **M20.4.3（509）**：Permission 组件体系（PermissionGuard/PermissionButton/RoleCapabilityCard）+ usePermission Hook + AdminRole 4 级角色定义（SUPER_ADMIN/ADMIN/OPERATOR/VIEWER）+ 17 个权限点 | 后续可增强 Menu 权限过滤、Route Guard、后端权限细化 |
+| Audit Log | `BASIC` | `50%` | **M20.4.3（509）**：AuditLog 增强（AdvancedFilterPanel + ExportButton + 操作者姓名+邮箱展示 + 实体类型下拉 + 操作者关键词搜索） | 后续可增强审计详情、变更对比、自动告警 |
+
+**M20.4 Phase Structure**:
+```
+M20.4.0 Architecture Audit (505)  ← COMPLETED
+M20.4.0.1 Experience Architecture Audit (506)  ← COMPLETED
+M20.4.1 Admin Operation Center Foundation (507)  ← COMPLETED
+M20.4.2 Admin Data Operation Enhancement (508)  ← COMPLETED
+M20.4.3 Admin Permission & Workflow Enhancement (509)  ← COMPLETED
+M20.4.4 Admin Professionalization Closure (510)  ← COMPLETED
+M20.4 CLOSED
 ```
 
 ### M20.1.1 Product Discovery Enhancement Development（486，Phase 1/P0 Development）

@@ -5,7 +5,7 @@ import { ReloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { notificationService } from '../api';
 import type { Notification, NotificationQueryParams } from '../types';
-import BatchOperations from '../components/BatchOperations';
+import { BatchActionBar } from '../components/operation';
 
 const { Title } = Typography;
 
@@ -235,6 +235,7 @@ function NotificationList() {
       title: '操作',
       key: 'action',
       width: 80,
+      fixed: 'right' as const,
       render: (_: unknown, record: Notification) => (
         <Button
           type="text"
@@ -288,9 +289,16 @@ function NotificationList() {
         </Button>
       </Space>
 
-      <BatchOperations
+      <BatchActionBar
         selectedRowKeys={selectedRowKeys}
-        onBatchDelete={handleBatchDelete}
+        actions={[
+          { key: 'delete', label: '批量删除', danger: true, icon: undefined, confirmTitle: '确认删除', confirmContent: `确定要删除选中的 ${selectedRowKeys.length} 条通知吗？此操作不可撤销。` },
+        ]}
+        onAction={async (actionKey, ids) => {
+          if (actionKey === 'delete') {
+            await handleBatchDelete(ids);
+          }
+        }}
         loading={batchLoading}
       />
 
@@ -298,6 +306,7 @@ function NotificationList() {
         columns={columns}
         dataSource={pageState.data}
         rowKey="id"
+        scroll={{ x: 'max-content' }}
         rowSelection={{
           selectedRowKeys,
           onChange: (keys) => setSelectedRowKeys(keys),

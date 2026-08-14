@@ -1,9 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Table, Spin, Alert, Button, Tag, Typography, Space, Select, Input, Card } from 'antd';
+import { Table, Spin, Alert, Button, Tag, Typography, Card, Space } from 'antd';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
-import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import { ReloadOutlined } from '@ant-design/icons';
 import { auditLogService } from '../api';
 import type { AuditLog, AuditAction } from '../types';
+import { AdvancedFilterPanel, ExportButton } from '../components/operation';
+import { RoleCapabilityCard } from '../components/permission';
+import type { ExportColumn } from '../utils/export';
 
 const { Title } = Typography;
 
@@ -23,13 +26,35 @@ const ACTION_COLOR: Record<string, string> = {
   LOGIN: 'purple',
 };
 
-const ACTION_OPTIONS: { label: string; value: string }[] = [
+const ACTION_OPTIONS = [
   { label: '全部', value: '' },
-  { label: 'CREATE', value: 'CREATE' },
-  { label: 'UPDATE', value: 'UPDATE' },
-  { label: 'DELETE', value: 'DELETE' },
-  { label: 'STATUS_CHANGE', value: 'STATUS_CHANGE' },
-  { label: 'LOGIN', value: 'LOGIN' },
+  { label: '创建', value: 'CREATE' },
+  { label: '更新', value: 'UPDATE' },
+  { label: '删除', value: 'DELETE' },
+  { label: '状态变更', value: 'STATUS_CHANGE' },
+  { label: '登录', value: 'LOGIN' },
+];
+
+const ENTITY_TYPE_OPTIONS = [
+  { label: '全部', value: '' },
+  { label: 'Product', value: 'Product' },
+  { label: 'Content', value: 'Content' },
+  { label: 'User', value: 'User' },
+  { label: 'Organization', value: 'Organization' },
+  { label: 'Demand', value: 'Demand' },
+  { label: 'Inquiry', value: 'Inquiry' },
+  { label: 'RFQ', value: 'RFQ' },
+  { label: 'Offer', value: 'Offer' },
+];
+
+const AUDIT_EXPORT_COLUMNS: ExportColumn<AuditLog>[] = [
+  { key: 'createdAt', title: '时间', render: (item) => new Date(item.createdAt).toLocaleString() },
+  { key: 'action', title: '操作类型', render: (item) => ACTION_LABEL_MAP[item.action] || item.action },
+  { key: 'entityType', title: '实体类型' },
+  { key: 'entityId', title: '实体编号' },
+  { key: 'operator', title: '操作者', render: (item) => item.operator?.name || item.operator?.email || '' },
+  { key: 'oldValue', title: '变更前', render: (item) => (item.oldValue ? JSON.stringify(item.oldValue) : '') },
+  { key: 'newValue', title: '变更后', render: (item) => (item.newValue ? JSON.stringify(item.newValue) : '') },
 ];
 
 type PageState =
@@ -38,22 +63,40 @@ type PageState =
   | { status: 'empty' }
   | { status: 'success'; data: AuditLog[]; total: number };
 
+interface QueryParams {
+  keyword: string;
+  action: string;
+  entityType: string;
+  page: number;
+  pageSize: number;
+}
+
 function AuditLogList() {
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
-  const [actionFilter, setActionFilter] = useState<string>('');
-  const [entityTypeFilter, setEntityTypeFilter] = useState<string>('');
+  const [query, setQuery] = useState<QueryParams>({
+    keyword: '',
+    action: '',
+    entityType: '',
+    page: 1,
+    pageSize: 20,
+  });
 
   const fetchAuditLogs = useCallback(async () => {
     setPageState({ status: 'loading' });
     try {
-      const params: { page: number; pageSize: number; action?: string; entityType?: string } = {
-        page,
-        pageSize,
+      const params: {
+        page: number;
+        pageSize: number;
+        action?: string;
+        entityType?: string;
+        keyword?: string;
+      } = {
+        page: query.page,
+        pageSize: query.pageSize,
       };
-      if (actionFilter) params.action = actionFilter;
-      if (entityTypeFilter) params.entityType = entityTypeFilter;
+      if (query.action) params.action = query.action;
+      if (query.entityType) params.entityType = query.entityType;
+      if (query.keyword) params.keyword = query.keyword;
 
       const result = await auditLogService.getList(params);
       if (result.data.length === 0) {
@@ -70,22 +113,28 @@ function AuditLogList() {
         err instanceof Error ? err.message : '加载审计日志失败';
       setPageState({ status: 'error', message });
     }
-  }, [page, pageSize, actionFilter, entityTypeFilter]);
+  }, [query]);
 
   useEffect(() => {
     fetchAuditLogs();
   }, [fetchAuditLogs]);
 
+  const handleReset = useCallback(() => {
+    setQuery({ keyword: '', action: '', entityType: '', page: 1, pageSize: 20 });
+  }, []);
+
   const handleTableChange = useCallback(
     (pagination: TablePaginationConfig) => {
-      setPage(pagination.current || 1);
-      setPageSize(pagination.pageSize || 20);
+      setQuery((prev) => ({
+        ...prev,
+        page: pagination.current || 1,
+        pageSize: pagination.pageSize || 20,
+      }));
     },
     [],
   );
 
   const handleRefresh = () => {
-    setPage(1);
     fetchAuditLogs();
   };
 
@@ -125,7 +174,7 @@ function AuditLogList() {
       title: '操作类型',
       dataIndex: 'action',
       key: 'action',
-      width: 140,
+      width: 120,
       render: (action: AuditAction) => (
         <Tag color={ACTION_COLOR[action] || 'default'}>{ACTION_LABEL_MAP[action] || action}</Tag>
       ),
@@ -134,7 +183,7 @@ function AuditLogList() {
       title: '实体类型',
       dataIndex: 'entityType',
       key: 'entityType',
-      width: 140,
+      width: 120,
       render: (type: string) => <Tag>{type}</Tag>,
     },
     {
@@ -151,15 +200,22 @@ function AuditLogList() {
       title: '操作者',
       dataIndex: 'operator',
       key: 'operator',
-      width: 180,
+      width: 200,
       render: (operator: AuditLog['operator']) =>
-        operator ? operator.name || operator.email : '-',
+        operator ? (
+          <Space size={4}>
+            <span>{operator.name || '-'}</span>
+            <span style={{ color: '#999', fontSize: 12 }}>({operator.email})</span>
+          </Space>
+        ) : (
+          '-'
+        ),
     },
     {
-      title: '旧值',
+      title: '变更前',
       dataIndex: 'oldValue',
       key: 'oldValue',
-      width: 200,
+      width: 180,
       ellipsis: true,
       render: (val: AuditLog['oldValue']) =>
         val ? (
@@ -171,10 +227,10 @@ function AuditLogList() {
         ),
     },
     {
-      title: '新值',
+      title: '变更后',
       dataIndex: 'newValue',
       key: 'newValue',
-      width: 200,
+      width: 180,
       ellipsis: true,
       render: (val: AuditLog['newValue']) =>
         val ? (
@@ -193,34 +249,38 @@ function AuditLogList() {
         审计日志
       </Title>
 
+      <RoleCapabilityCard />
+
       <Card size="small" style={{ marginBottom: 16 }}>
-        <Space wrap>
-          <span>操作类型:</span>
-          <Select
-            value={actionFilter}
-            onChange={(v) => {
-              setActionFilter(v);
-              setPage(1);
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
+          <AdvancedFilterPanel
+            fields={[
+              { key: 'keyword', label: '操作者', type: 'keyword', placeholder: '按操作者姓名或邮箱搜索', width: 240 },
+              { key: 'action', label: '操作类型', type: 'select', options: ACTION_OPTIONS, width: 140 },
+              { key: 'entityType', label: '实体类型', type: 'select', options: ENTITY_TYPE_OPTIONS, width: 140 },
+            ]}
+            values={{ keyword: query.keyword, action: query.action, entityType: query.entityType }}
+            onChange={(values) => {
+              setQuery((prev) => ({ ...prev, ...values, page: 1 }));
             }}
-            options={ACTION_OPTIONS}
-            style={{ width: 160 }}
+            onSearch={fetchAuditLogs}
+            onReset={handleReset}
           />
-          <span>实体类型:</span>
-          <Input
-            placeholder="如 DEMAND, OFFER"
-            value={entityTypeFilter}
-            onChange={(e) => {
-              setEntityTypeFilter(e.target.value);
-              setPage(1);
-            }}
-            style={{ width: 180 }}
-            prefix={<SearchOutlined />}
-            allowClear
-          />
-          <Button icon={<ReloadOutlined />} onClick={handleRefresh}>
-            刷新
-          </Button>
-        </Space>
+          <Space>
+            <Button icon={<ReloadOutlined />} onClick={handleRefresh}>
+              刷新
+            </Button>
+            <ExportButton<AuditLog>
+              data={pageState.status === 'success' ? pageState.data : []}
+              columns={AUDIT_EXPORT_COLUMNS}
+              fileName="审计日志"
+              onExportAll={async () => {
+                const all = await auditLogService.getList({ page: 1, pageSize: 10000 });
+                return all.data;
+              }}
+            />
+          </Space>
+        </div>
       </Card>
 
       {pageState.status === 'empty' ? (
@@ -237,14 +297,14 @@ function AuditLogList() {
           rowKey="id"
           onChange={handleTableChange}
           pagination={{
-            current: page,
-            pageSize,
+            current: query.page,
+            pageSize: query.pageSize,
             total: pageState.total,
             showSizeChanger: true,
             pageSizeOptions: ['10', '20', '50'],
             showTotal: (total, range) => `${range[0]}-${range[1]} / ${total}`,
           }}
-          scroll={{ x: 1200 }}
+          scroll={{ x: 'max-content' }}
         />
       )}
     </div>

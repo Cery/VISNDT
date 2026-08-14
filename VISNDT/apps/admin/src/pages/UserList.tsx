@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Input, Select, Space, Spin, Alert, Button, Tag, Typography, message, Modal } from 'antd';
-import { SearchOutlined, ReloadOutlined, EyeOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { Table, Space, Spin, Alert, Button, Tag, Typography, message, Modal } from 'antd';
+import { EyeOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { userService } from '../api';
 import type { User, SearchUserParams } from '../types';
-import BatchOperations from '../components/BatchOperations';
+import { ExportButton, BatchActionBar, AdvancedFilterPanel } from '../components/operation';
+import type { ExportColumn } from '../utils/export';
 
 const { Title } = Typography;
 
@@ -46,6 +47,13 @@ const STATUS_LABEL_MAP: Record<string, string> = {
   SUSPENDED: '已停用',
 };
 
+const USER_EXPORT_COLUMNS: ExportColumn<User>[] = [
+  { key: 'email', title: '邮箱' },
+  { key: 'name', title: '姓名', render: (item) => item.name || '' },
+  { key: 'status', title: '状态', render: (item) => STATUS_LABEL_MAP[item.status] || item.status },
+  { key: 'createdAt', title: '创建时间', render: (item) => new Date(item.createdAt).toLocaleDateString() },
+];
+
 function UserList() {
   const navigate = useNavigate();
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
@@ -84,14 +92,6 @@ function UserList() {
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
-
-  const handleSearch = useCallback((value: string) => {
-    setQuery((prev) => ({ ...prev, keyword: value, page: 1 }));
-  }, []);
-
-  const handleStatusChange = useCallback((value: string) => {
-    setQuery((prev) => ({ ...prev, status: value, page: 1 }));
-  }, []);
 
   const handleReset = useCallback(() => {
     setQuery({
@@ -230,6 +230,7 @@ function UserList() {
       title: '操作',
       key: 'action',
       width: 140,
+      fixed: 'right' as const,
       render: (_: unknown, record: User) => (
         <Space size="small">
           <Button
@@ -267,7 +268,7 @@ function UserList() {
         管理平台用户账户，用户可关联组织并分配角色
       </Typography.Text>
 
-      <Space style={{ marginBottom: 16 }} wrap>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
         <Button
           type="primary"
           icon={<PlusOutlined />}
@@ -275,31 +276,51 @@ function UserList() {
         >
           创建用户
         </Button>
-        <Input.Search
-          placeholder="按邮箱或姓名搜索"
-          allowClear
-          onSearch={handleSearch}
-          style={{ width: 320 }}
-          prefix={<SearchOutlined />}
-        />
-        <Select
-          placeholder="按状态筛选"
-          allowClear
-          value={query.status || undefined}
-          onChange={handleStatusChange}
-          options={STATUS_OPTIONS}
-          style={{ width: 160 }}
-        />
-        <Button icon={<ReloadOutlined />} onClick={handleReset}>
-          重置
-        </Button>
-      </Space>
+        <Space>
+          <ExportButton<User>
+            data={pageState.status === 'success' ? pageState.data : []}
+            columns={USER_EXPORT_COLUMNS}
+            fileName="用户列表"
+            onExportAll={async () => {
+              const all = await userService.getList({ page: 1, pageSize: 10000 });
+              return all.data;
+            }}
+          />
+        </Space>
+      </div>
 
-      <BatchOperations
+      <AdvancedFilterPanel
+        fields={[
+          { key: 'keyword', label: '用户', type: 'keyword', placeholder: '按邮箱或姓名搜索', width: 320 },
+          { key: 'status', label: '状态', type: 'select', options: STATUS_OPTIONS, width: 160 },
+        ]}
+        values={{ keyword: query.keyword, status: query.status }}
+        onChange={(values) => {
+          setQuery((prev) => ({ ...prev, ...values, page: 1 }));
+        }}
+        onSearch={fetchUsers}
+        onReset={handleReset}
+      />
+
+      <BatchActionBar
         selectedRowKeys={selectedRowKeys}
-        onBatchDelete={handleBatchDelete}
-        onBatchStatus={handleBatchStatus}
-        statusOptions={BATCH_STATUS_OPTIONS}
+        actions={[
+          ...BATCH_STATUS_OPTIONS.map((opt) => ({
+            key: `status:${opt.value}`,
+            label: opt.label,
+            confirmTitle: '确认状态变更',
+            confirmContent: `确定要将选中的 ${selectedRowKeys.length} 项状态变更为「${opt.label}」吗？`,
+          })),
+          { key: 'delete', label: '批量删除', danger: true, icon: undefined, confirmTitle: '确认删除', confirmContent: `确定要删除选中的 ${selectedRowKeys.length} 个用户吗？此操作不可撤销。` },
+        ]}
+        onAction={async (actionKey, ids) => {
+          if (actionKey === 'delete') {
+            await handleBatchDelete(ids);
+          } else if (actionKey.startsWith('status:')) {
+            const status = actionKey.replace('status:', '');
+            await handleBatchStatus(ids, status);
+          }
+        }}
         loading={batchLoading}
       />
 
@@ -307,6 +328,7 @@ function UserList() {
         columns={columns}
         dataSource={pageState.data}
         rowKey="id"
+        scroll={{ x: 'max-content' }}
         rowSelection={{
           selectedRowKeys,
           onChange: (keys) => setSelectedRowKeys(keys),

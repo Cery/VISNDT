@@ -5,7 +5,7 @@ import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import { rfqService } from '../api';
 import type { Rfq } from '../types';
-import BatchOperations from '../components/BatchOperations';
+import { BatchActionBar } from '../components/operation';
 
 const { Title } = Typography;
 
@@ -247,6 +247,7 @@ function RfqList() {
       title: '操作',
       key: 'actions',
       width: 100,
+      fixed: 'right' as const,
       render: (_: unknown, record: Rfq) => (
         <Space>
           <Button
@@ -303,11 +304,25 @@ function RfqList() {
         </Button>
       </Space>
 
-      <BatchOperations
+      <BatchActionBar
         selectedRowKeys={selectedRowKeys}
-        onBatchDelete={handleBatchDelete}
-        onBatchStatus={handleBatchStatus}
-        statusOptions={BATCH_STATUS_OPTIONS}
+        actions={[
+          ...BATCH_STATUS_OPTIONS.map((opt) => ({
+            key: `status:${opt.value}`,
+            label: opt.label,
+            confirmTitle: '确认状态变更',
+            confirmContent: `确定要将选中的 ${selectedRowKeys.length} 项状态变更为「${opt.label}」吗？`,
+          })),
+          { key: 'delete', label: '批量删除', danger: true, icon: undefined, confirmTitle: '确认删除', confirmContent: `确定要删除选中的 ${selectedRowKeys.length} 个 RFQ 吗？此操作不可撤销。` },
+        ]}
+        onAction={async (actionKey, ids) => {
+          if (actionKey === 'delete') {
+            await handleBatchDelete(ids);
+          } else if (actionKey.startsWith('status:')) {
+            const status = actionKey.replace('status:', '');
+            await handleBatchStatus(ids, status);
+          }
+        }}
         loading={batchLoading}
       />
 
@@ -322,6 +337,7 @@ function RfqList() {
           columns={columns}
           dataSource={pageState.data}
           rowKey="id"
+          scroll={{ x: 'max-content' }}
           rowSelection={{
             selectedRowKeys,
             onChange: (keys) => setSelectedRowKeys(keys),

@@ -7,7 +7,7 @@ import type { SorterResult } from 'antd/es/table/interface';
 import { parameterGroupService } from '../../api/parameter-group.service';
 import { parameterDefinitionService } from '../../api/parameter-definition.service';
 import type { ParameterGroup } from '../../types/parameter.types';
-import BatchOperations from '../../components/BatchOperations';
+import { BatchActionBar } from '../../components/operation';
 
 const { Title } = Typography;
 
@@ -219,6 +219,7 @@ function ParameterGroupList() {
       title: '操作',
       key: 'actions',
       width: 120,
+      fixed: 'right' as const,
       render: (_: unknown, record: ParameterGroup) => (
         <Space>
           <Button
@@ -316,9 +317,16 @@ function ParameterGroupList() {
             </Button>
           </Space>
 
-          <BatchOperations
+          <BatchActionBar
             selectedRowKeys={selectedRowKeys}
-            onBatchDelete={handleBatchDelete}
+            actions={[
+              { key: 'delete', label: '批量删除', danger: true, icon: undefined, confirmTitle: '确认删除', confirmContent: `确定要删除选中的 ${selectedRowKeys.length} 个参数组吗？此操作不可撤销。` },
+            ]}
+            onAction={async (actionKey, ids) => {
+              if (actionKey === 'delete') {
+                await handleBatchDelete(ids);
+              }
+            }}
             loading={batchLoading}
           />
 
@@ -326,6 +334,7 @@ function ParameterGroupList() {
           columns={columns}
           dataSource={pageState.data}
           rowKey="id"
+          scroll={{ x: 'max-content' }}
           rowSelection={{
             selectedRowKeys,
             onChange: (keys) => setSelectedRowKeys(keys),

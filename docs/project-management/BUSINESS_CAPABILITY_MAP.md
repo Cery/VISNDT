@@ -76,7 +76,16 @@ VISNDT 当前支持的是：
 - 管理 Content Tags（**标签 CRUD + 内容标签关联，M20.2.3**）
 - 查看 Audit Log
 - 执行 FileAsset Orphan Cleanup
+- **使用运营驾驶舱（M20.4.1：recharts 趋势图/分布图/商业漏斗 + 分组菜单 + 面包屑 + 响应式三端适配）**
+- **管理 16 个核心列表页面（M20.4.1：统一 Table 横向滚动 + 固定操作列 + 响应式）**
 - 查看 Dashboard 统计与待处理事项
+- **导出数据（M20.4.2：CSV 导出——Product/Content/User/Organization 列表，支持当前页+全量导出）**
+- **批量操作（M20.4.2：BatchActionBar——统一批量删除/状态变更框架，支持 Product/User/Organization）**
+- **高级筛选（M20.4.2：AdvancedFilterPanel——关键词/选择器/日期范围统一筛选组件）**
+- **导入数据（M20.4.2：ImportButton——CSV 文件解析+前端预览，基础导入能力建立）**
+- **角色权限控制（M20.4.3：PermissionGuard 权限守卫 + PermissionButton 权限按钮 + RoleCapabilityCard 角色能力卡片 + usePermission Hook + AdminRole 4 级角色（SUPER_ADMIN/ADMIN/OPERATOR/VIEWER）+ 17 个权限点）**
+- **审计日志增强（M20.4.3：AdvancedFilterPanel + ExportButton + 操作者姓名+邮箱展示 + 实体类型下拉 + 操作者关键词搜索）**
+- **组件体系收敛（M20.4.4：BatchOperations→BatchActionBar 全量迁移 9 页，operation/ 10 组件 + permission/ 3 组件，零重复实现）**
 
 ## What The Platform Already Proves
 
@@ -325,7 +334,7 @@ Product = Global Catalog, Supplier = Capability Provider, Offer = Capability Map
 
 ProductStatus enum, WorkflowEntityType.PRODUCT, Product @@unique([name, model]), ParameterTemplate, Semantic Alias, Vector embedding, Knowledge Graph, AI Matching, Supplier Product Model — all frozen；M20 evaluates only (no implementation).
 
-**M20 Status**: `CLOSED` — M20.0.0 前置审核完成，M20.1 Search Experience Phase 闭环（M20.1.1~M20.1.4 CLOSED/FROZEN），M20.2 Content Asset Integration 阶段闭环（M20.2.0~M20.2.6 CLOSED/FROZEN），M20.3 Commercial Conversion 阶段闭环（M20.3.0~M20.3.2 CLOSED/FROZEN，502 Audit PASS，503 Development PASS，504 Closure Audit PASS）。Next Step: M20.4 Content Commercial Intelligence Architecture Audit（505）。
+**M20 Status**: `IN PROGRESS` — M20.0.0 前置审核完成，M20.1 Search Experience Phase 闭环，M20.2 Content Asset Integration 阶段闭环，M20.3 Commercial Conversion 阶段闭环，M20.4.0 Admin Platform Professionalization Architecture Audit（505）通过，M20.4.0.1 Admin Operation Center Experience Architecture Audit（506）通过——PASS，AUTHORIZED，Operation Center 体验架构评估完成，Desktop 75%/Tablet 10%/Mobile 5%，零 Schema/API 变更。Next Step: M20.4.1 Admin Operation Center Foundation Development（507）。
 
 ### M20.3 Commercial Conversion Architecture Audit（502，Completed）& M20.3.1 Development（503，Completed）& M20.3.2 Closure Audit（504，Completed）
 
@@ -373,9 +382,48 @@ M20.0  Architecture Planning        -- CLOSED
 M20.1  Search Experience            -- CLOSED (FROZEN)
 M20.2  Content Asset Integration    -- CLOSED (FROZEN)
 M20.3  Commercial Conversion        -- CLOSED (FROZEN)
-M20.4  ContentProductRelation       -- FUTURE (pending)
-M21+   AI Enhancement               -- FUTURE (pending)
+M20.4  Operation Readiness Upgrade   -- AUTHORIZED (audit complete)
+M20.5  ContentProductRelation        -- FUTURE (pending)
+M21+   AI Enhancement                -- FUTURE (pending)
 ```
+
+### M20.4.0 Admin Platform Professionalization Architecture Audit（505，Completed）
+
+> M20.4.0 Admin 专业化架构审计（505，Architecture Audit Only）。Admin 从 Development Management Panel 升级为 Professional Operation Center。
+
+**Audit Result**: `PASS` — M20.4 AUTHORIZED，零 Schema/API 变更，Admin frontend-only。
+
+**Capability Ratings**:
+- Content Management: 90% (EXCELLENT)
+- Product Management: 75% (GOOD)
+- User Management: 70% (GOOD)
+- Dashboard: 60% (BASIC)
+- Commercial Operations: 60% (ADEQUATE)
+- Import/Export: 0% (NONE) — Critical Gap
+- Permission: 30% (BASIC) — No RBAC
+
+**P0 Priority**: Dashboard charts + Product Import/Export
+
+### M20.4.0.1 Admin Operation Center Experience Architecture Audit（506，Completed）
+
+> M20.4.0.1 Admin Operation Center 体验架构审计（506，Architecture Audit Only）。Admin 从 Development Panel 升级为 Operation Center 的体验评估。
+
+**Audit Result**: `PASS` — AUTHORIZED，零 Schema/API 变更，Admin frontend-only。
+
+**Responsive Ratings**:
+- Desktop (1440px): 75% (GOOD)
+- Tablet (768px): 10% (NOT SUPPORTED)
+- Mobile (375px): 5% (NOT SUPPORTED)
+
+**Key UX Gaps**:
+- P0: No Breadcrumb, No Multi-tab, No User Info in Header, No Charts, No Fixed Columns, No Horizontal Scroll
+- P1: No Mobile Layout, No Card List View, No Funnel View, No Export
+- P2: No Column Config, No Global Search, No Real-time Updates
+
+**Revised M20.4 Structure**:
+- M20.4.1 Admin Operation Center Foundation (Layout + Dashboard + Table)
+- M20.4.2 Admin Operation Center Enhancement (Import/Export + Funnel + Column Config)
+- M20.4.3 Admin Responsive & Mobile (Tablet/Mobile Layout + Card List)
 
 ### M20.1.1 Product Discovery Enhancement Development（486，Phase 1/P0 Completed）
 

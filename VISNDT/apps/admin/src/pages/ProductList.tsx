@@ -1,13 +1,14 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Input, Select, Space, Spin, Alert, Button, Tag, Typography, message, Modal, Checkbox, Card, Row, Col, Statistic } from 'antd';
-import { SearchOutlined, ReloadOutlined, AppstoreOutlined, CheckCircleOutlined, EditOutlined, StopOutlined, TagsOutlined } from '@ant-design/icons';
+import { Table, Space, Spin, Alert, Button, Tag, Typography, message, Modal, Checkbox, Card, Row, Col, Statistic } from 'antd';
+import { AppstoreOutlined, CheckCircleOutlined, EditOutlined, StopOutlined, TagsOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { SorterResult } from 'antd/es/table/interface';
 import { productService, categoriesService, extractErrorMessage } from '../api';
 import type { Product, SearchProductParams } from '../types';
 import type { ProductCategory } from '../types/category.types';
-import BatchOperations from '../components/BatchOperations';
+import { ExportButton, BatchActionBar, AdvancedFilterPanel } from '../components/operation';
+import type { ExportColumn } from '../utils/export';
 
 const { Title } = Typography;
 
@@ -58,6 +59,14 @@ const STATUS_LABEL_MAP: Record<string, string> = {
   DRAFT: '草稿',
   INACTIVE: '已下架',
 };
+
+const PRODUCT_EXPORT_COLUMNS: ExportColumn<Product>[] = [
+  { key: 'name', title: '名称' },
+  { key: 'model', title: '型号', render: (item) => item.model || '' },
+  { key: 'category', title: '分类', render: (item) => item.category?.name || '' },
+  { key: 'status', title: '状态', render: (item) => STATUS_LABEL_MAP[item.status] || item.status },
+  { key: 'createdAt', title: '创建时间', render: (item) => new Date(item.createdAt).toLocaleDateString() },
+];
 
 function ProductList() {
   const navigate = useNavigate();
@@ -140,18 +149,6 @@ function ProductList() {
       }
     };
     loadGovernanceData();
-  }, []);
-
-  const handleSearch = useCallback((value: string) => {
-    setQuery((prev) => ({ ...prev, keyword: value, page: 1 }));
-  }, []);
-
-  const handleStatusChange = useCallback((value: string) => {
-    setQuery((prev) => ({ ...prev, status: value, page: 1 }));
-  }, []);
-
-  const handleCategoryChange = useCallback((value: string) => {
-    setQuery((prev) => ({ ...prev, categoryId: value, page: 1 }));
   }, []);
 
   const handleReset = useCallback(() => {
@@ -352,6 +349,7 @@ function ProductList() {
       title: '操作',
       key: 'actions',
       width: 160,
+      fixed: 'right' as const,
       render: (_: unknown, record: Product) => (
         <Space>
           <Button
@@ -418,46 +416,56 @@ function ProductList() {
         </Row>
       )}
 
-      <Space style={{ marginBottom: 16 }} wrap>
-        <Button
-          type="primary"
-          onClick={() => navigate('/products/create')}
-        >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
+        <Button type="primary" onClick={() => navigate('/products/create')}>
           创建产品
         </Button>
-        <Input.Search
-          placeholder="按名称、型号或描述搜索"
-          allowClear
-          onSearch={handleSearch}
-          style={{ width: 320 }}
-          prefix={<SearchOutlined />}
-        />
-        <Select
-          placeholder="按状态筛选"
-          allowClear
-          value={query.status || undefined}
-          onChange={handleStatusChange}
-          options={STATUS_OPTIONS}
-          style={{ width: 160 }}
-        />
-        <Select
-          placeholder="按分类筛选"
-          allowClear
-          value={query.categoryId || undefined}
-          onChange={handleCategoryChange}
-          options={categories.map((c) => ({ value: c.id, label: c.name }))}
-          style={{ width: 200 }}
-        />
-        <Button icon={<ReloadOutlined />} onClick={handleReset}>
-          重置
-        </Button>
-      </Space>
+        <Space>
+          <ExportButton<Product>
+            data={pageState.status === 'success' ? pageState.data : []}
+            columns={PRODUCT_EXPORT_COLUMNS}
+            fileName="产品列表"
+            onExportAll={async () => {
+              const all = await productService.getList({ page: 1, pageSize: 10000 });
+              return all.data;
+            }}
+          />
+        </Space>
+      </div>
 
-      <BatchOperations
+      <AdvancedFilterPanel
+        fields={[
+          { key: 'keyword', label: '产品', type: 'keyword', placeholder: '按名称、型号或描述搜索', width: 320 },
+          { key: 'status', label: '状态', type: 'select', options: STATUS_OPTIONS, width: 160 },
+          { key: 'categoryId', label: '分类', type: 'select', options: categories.map((c) => ({ value: c.id, label: c.name })), width: 200 },
+        ]}
+        values={{ keyword: query.keyword, status: query.status, categoryId: query.categoryId }}
+        onChange={(values) => {
+          setQuery((prev) => ({ ...prev, ...values, page: 1 }));
+        }}
+        onSearch={fetchProducts}
+        onReset={handleReset}
+      />
+
+      <BatchActionBar
         selectedRowKeys={selectedRowKeys}
-        onBatchDelete={handleBatchDelete}
-        onBatchStatus={handleBatchStatus}
-        statusOptions={BATCH_STATUS_OPTIONS}
+        actions={[
+          ...BATCH_STATUS_OPTIONS.map((opt) => ({
+            key: `status:${opt.value}`,
+            label: opt.label,
+            confirmTitle: '确认状态变更',
+            confirmContent: `确定要将选中的 ${selectedRowKeys.length} 项状态变更为「${opt.label}」吗？`,
+          })),
+          { key: 'delete', label: '批量删除', danger: true, icon: undefined, confirmTitle: '确认删除', confirmContent: `确定要删除选中的 ${selectedRowKeys.length} 个产品吗？此操作不可撤销。` },
+        ]}
+        onAction={async (actionKey, ids) => {
+          if (actionKey === 'delete') {
+            await handleBatchDelete(ids);
+          } else if (actionKey.startsWith('status:')) {
+            const status = actionKey.replace('status:', '');
+            await handleBatchStatus(ids, status);
+          }
+        }}
         loading={batchLoading}
       />
 
@@ -465,6 +473,7 @@ function ProductList() {
         columns={columns}
         dataSource={pageState.data}
         rowKey="id"
+        scroll={{ x: 'max-content' }}
         rowSelection={{
           selectedRowKeys,
           onChange: (keys) => setSelectedRowKeys(keys),
