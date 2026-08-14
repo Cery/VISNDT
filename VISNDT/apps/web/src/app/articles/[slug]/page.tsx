@@ -10,6 +10,7 @@ import {
 } from '@/lib/seo';
 import MarkdownRenderer from '@/components/markdown/MarkdownRenderer';
 import MediaGallery from '@/components/content/MediaGallery';
+import ContentCommercialCTA from '@/components/content/ContentCommercialCTA';
 
 interface ArticleDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -147,6 +148,11 @@ export default async function ArticleDetailPage({
 
         <MediaGallery media={content.media} />
       </article>
+
+      {/* Commercial CTA */}
+      <div className="mt-8 mb-8">
+        <ContentCommercialCTA type="explore-products" />
+      </div>
 
       {/* More from this type */}
       <div className="mt-12 pt-8 border-t border-slate-200">

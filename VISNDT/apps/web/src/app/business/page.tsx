@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { getContentBySlug } from '@/services/content.service';
 import MarkdownRenderer from '@/components/markdown/MarkdownRenderer';
 import MediaGallery from '@/components/content/MediaGallery';
+import ContentCommercialCTA from '@/components/content/ContentCommercialCTA';
 
 export const metadata: Metadata = {
   title: '商务合作',
@@ -85,6 +86,11 @@ export default async function BusinessPage() {
           </div>
           <MediaGallery media={content.media} />
         </article>
+
+        {/* Commercial CTA */}
+        <div className="mt-8">
+          <ContentCommercialCTA type="submit-inquiry" />
+        </div>
       </div>
     );
   }
@@ -133,6 +139,11 @@ export default async function BusinessPage() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* Commercial CTA */}
+      <section className="max-w-[1200px] mx-auto px-6 pb-20">
+        <ContentCommercialCTA type="submit-inquiry" />
       </section>
     </div>
   );

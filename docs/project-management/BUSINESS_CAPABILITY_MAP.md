@@ -32,6 +32,7 @@ VISNDT 当前支持的是：
 - 内容发现增强（**M20.2.5**：内容详情页标签芯片展示 + "更多"导航链接，连通 Content Detail → Tag Landing → Type List 发现路径）
 - 内容分享元数据（**OpenGraph，知识/方案详情页，M18.3**）
 - 内容结构化识别（**JSON-LD Article / TechArticle，M18.3**）与站点抓取（**/sitemap.xml，仅 PUBLISHED，M18.3**）
+- 从内容页面进入商业转化路径（**M20.3.1**：知识/方案/文章/洞察详情页 + 商务/关于页商业 CTA，引导至产品目录 / 询价）
 - 对产品发起公开询价（关联产品与组织，进入后台运营处理）
 - 注册 / 登录
 
@@ -95,6 +96,7 @@ VISNDT 当前支持的是：
 - 内容媒体管理（**M18.2 已实现（446：Content→ContentMedia→FileAsset 链路 + Admin 媒体区块 + Web 画廊 + 下载发布状态校验）**）
 - 面向运营成熟阶段的数据化 SEO 能力（**M18.3 已完成（447）：OpenGraph / JSON-LD / Sitemap / Canonical**；公开询价入口已稳定启用）
 - 内容工作流运营增强（**M18.4 已完成架构规划（448）：Revision History / Scheduled Publish / Reviewer Record / Approval History 冻结设计，M18.4.1（449）已完成前置整改：WorkflowEvent 可靠性修复 + Content 生命周期 AuditLog 接入，M18.4.2（450）已完成 Revision History：ContentRevision 独立表 + 版本快照事务保存 + Admin 版本历史 UI，M18.4.3（451）已完成 Scheduled Publish：Content.scheduledPublishAt + ContentSchedulerService 轻量扫描 + 幂等/可追踪/失败恢复，M18.4.4（452）已完成 Approval Timeline：WorkflowEvent 审核时间线 + Admin 展示，M18.4 阶段闭环**）
+ 97→- 内容→商业转化路径（**M20.3.1（503）已完成**：Content 页面商业 CTA 已实现，6 页面 + 1 新组件 `ContentCommercialCTA`，三端 build exit 0，零 Schema/API/Search 变更；**M20.3.2（504）闭环审计通过**：PASS，M20.3 CLOSED/FROZEN，Content → Product → Inquiry 商业转化路径已建立）
 
 ## M16.0 Audit Conclusion
 
@@ -323,7 +325,57 @@ Product = Global Catalog, Supplier = Capability Provider, Offer = Capability Map
 
 ProductStatus enum, WorkflowEntityType.PRODUCT, Product @@unique([name, model]), ParameterTemplate, Semantic Alias, Vector embedding, Knowledge Graph, AI Matching, Supplier Product Model — all frozen；M20 evaluates only (no implementation).
 
-**M20 Status**: `COMPLETED` — M20.0.0 前置审核完成，M20.1 Search Experience Phase 闭环（M20.1.1~M20.1.4 CLOSED），M20.2 Content Asset Integration 阶段闭环（M20.2.0~M20.2.6 CLOSED/FROZEN）。Next Step: M20.3 Commercial Conversion Architecture Audit。
+**M20 Status**: `CLOSED` — M20.0.0 前置审核完成，M20.1 Search Experience Phase 闭环（M20.1.1~M20.1.4 CLOSED/FROZEN），M20.2 Content Asset Integration 阶段闭环（M20.2.0~M20.2.6 CLOSED/FROZEN），M20.3 Commercial Conversion 阶段闭环（M20.3.0~M20.3.2 CLOSED/FROZEN，502 Audit PASS，503 Development PASS，504 Closure Audit PASS）。Next Step: M20.4 Content Commercial Intelligence Architecture Audit（505）。
+
+### M20.3 Commercial Conversion Architecture Audit（502，Completed）& M20.3.1 Development（503，Completed）& M20.3.2 Closure Audit（504，Completed）
+
+> M20.3 商业转化架构审计（502，Architecture Audit Only，No Code Change）。M20.3 定位：商业转化架构定义，非业务模型扩张。
+
+**Audit Result**: `PASS` — M20.3 AUTHORIZED（Frontend-only CTA，零 Schema/API 变更）。
+
+**Commercial Conversion Funnel Assessment**:
+
+```
+Current Funnel: PARTIAL
+
+SEO Traffic → Content Pages → [DEAD END] ← 无商业转化路径
+SEO Traffic → Product Pages → Inquiry → Demand → RFQ → Offer ← 完整
+
+Gap: Content → Product / Content → Inquiry
+```
+
+**Architecture Decisions**:
+
+| Capability | Current | Decision |
+|------------|---------|----------|
+| Content → Product | Missing | AUTHORIZED（Frontend CTA） |
+| Content → Inquiry | Missing | AUTHORIZED（复用 InquiryForm） |
+| Content → RFQ | Missing | DEFERRED（M20.4+） |
+| Content → Supplier | Missing | DEFERRED（M20.4+） |
+| Content Recommendation | Missing | DEFERRED（M21+） |
+| ContentProductRelation | Not exist | REJECTED（Schema 冻结） |
+| ContentInquiryRelation | Not exist | REJECTED（不必要） |
+
+**M20.3.1 Development Scope**（6 pages，Frontend-only，No Schema/API/Search change）:
+
+| Page | CTA Type |
+|------|----------|
+| `/knowledge/[slug]` | "Explore Products" CTA |
+| `/solutions/[slug]` | "Inquiry CTA" section |
+| `/articles/[slug]` | "Explore Products" CTA |
+| `/insights/[slug]` | "Inquiry CTA" section |
+| `/business` | "Contact Us" CTA |
+| `/about` | "Explore Platform" CTA |
+
+**Phase Status**:
+```
+M20.0  Architecture Planning        -- CLOSED
+M20.1  Search Experience            -- CLOSED (FROZEN)
+M20.2  Content Asset Integration    -- CLOSED (FROZEN)
+M20.3  Commercial Conversion        -- CLOSED (FROZEN)
+M20.4  ContentProductRelation       -- FUTURE (pending)
+M21+   AI Enhancement               -- FUTURE (pending)
+```
 
 ### M20.1.1 Product Discovery Enhancement Development（486，Phase 1/P0 Completed）
 
