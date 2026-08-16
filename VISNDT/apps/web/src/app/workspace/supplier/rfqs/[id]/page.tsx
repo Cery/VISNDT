@@ -8,9 +8,10 @@ import EmptyState from '@/components/common/EmptyState';
 import ErrorState from '@/components/common/ErrorState';
 import Loading from '@/components/common/Loading';
 import RFQStatusBadge from '@/components/rfq/RFQStatusBadge';
+import RFQResponseStatusBadge from '@/components/rfq/RFQResponseStatusBadge';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
-import { getRfq, createRfqResponse } from '@/services/rfq.service';
+import { getRfq, createRfqResponse, getMyRfqResponses } from '@/services/rfq.service';
 import { ApiError } from '@/lib/api-client';
 
 type BaseRfqDetail = Awaited<ReturnType<typeof getRfq>>;
@@ -98,6 +99,14 @@ function SupplierRfqDetailContent({ id }: { id: string }) {
   const [submitError, setSubmitError] = useState('');
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
+  const [existingResponse, setExistingResponse] = useState<{
+    id: string;
+    status: string;
+    createdAt: string;
+    message?: string | null;
+  } | null>(null);
+  const [isCheckingResponse, setIsCheckingResponse] = useState(true);
+
   const loadRfq = useCallback(async () => {
     setIsLoading(true);
     setError('');
@@ -113,9 +122,30 @@ function SupplierRfqDetailContent({ id }: { id: string }) {
     }
   }, [id]);
 
+  const checkExistingResponse = useCallback(async () => {
+    setIsCheckingResponse(true);
+    try {
+      const result = await getMyRfqResponses(1, 50);
+      const matched = (result.data ?? []).find((r) => r.rfqId === id);
+      if (matched) {
+        setExistingResponse({
+          id: matched.id,
+          status: matched.status,
+          createdAt: matched.createdAt,
+          message: matched.message,
+        });
+      }
+    } catch {
+      // Non-critical; silently skip
+    } finally {
+      setIsCheckingResponse(false);
+    }
+  }, [id]);
+
   useEffect(() => {
     void loadRfq();
-  }, [loadRfq]);
+    void checkExistingResponse();
+  }, [loadRfq, checkExistingResponse]);
 
   const handleSubmitResponse = useCallback(async () => {
     setSubmitError('');
@@ -338,6 +368,79 @@ function SupplierRfqDetailContent({ id }: { id: string }) {
                       )}
                     </div>
                   </section>
+
+                  <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h2 className="text-lg font-semibold text-slate-900">产品匹配信息</h2>
+                    <p className="mt-1 text-sm text-slate-500">
+                      以下展示该 RFQ 关联需求的匹配上下文，帮助您了解采购方的产品要求。
+                    </p>
+                    <div className="mt-4 space-y-4">
+                      <div className="rounded-lg bg-slate-50 p-4">
+                        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                          Demand ID
+                        </p>
+                        <p className="mt-2 text-sm font-medium text-slate-900">
+                          {rfq.demandId || rfq.demand?.id || '暂无'}
+                        </p>
+                      </div>
+                      {demandParameters.length > 0 ? (
+                        <div className="rounded-lg bg-slate-50 p-4">
+                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                            匹配参数
+                          </p>
+                          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                            {demandParameters.map((p) => (
+                              <div key={p.id} className="flex items-center gap-2 rounded bg-white px-3 py-2">
+                                <span className="text-sm font-medium text-slate-700">{p.name}:</span>
+                                <span className="text-sm text-slate-600">{p.value}{p.unit ? ` ${p.unit}` : ''}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-slate-500">暂无产品匹配参数信息。</p>
+                      )}
+                    </div>
+                  </section>
+
+                  {!isCheckingResponse && existingResponse ? (
+                    <section className="rounded-xl border border-blue-200 bg-blue-50 p-6 shadow-sm">
+                      <div className="flex items-start gap-4">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-base font-semibold text-blue-900">您的响应状态</h3>
+                          <p className="mt-1 text-sm text-blue-700">
+                            您已对此 RFQ 提交了响应，当前状态如下：
+                          </p>
+                          <div className="mt-3 flex flex-wrap items-center gap-3">
+                            <RFQResponseStatusBadge status={existingResponse.status} />
+                            <span className="text-xs text-blue-500">
+                              提交时间：{formatDateTime(existingResponse.createdAt)}
+                            </span>
+                          </div>
+                          {existingResponse.message ? (
+                            <div className="mt-3 rounded bg-white/60 p-3">
+                              <p className="text-xs text-slate-500">您的响应说明：</p>
+                              <p className="mt-1 text-sm text-slate-700">{existingResponse.message}</p>
+                            </div>
+                          ) : null}
+                          <div className="mt-4">
+                            <button
+                              type="button"
+                              onClick={() => router.push('/workspace/supplier/responses')}
+                              className="text-sm font-medium text-blue-700 underline hover:text-blue-900"
+                            >
+                              查看所有响应记录 →
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  ) : null}
 
                   <section
                     id="rfq-response-form"

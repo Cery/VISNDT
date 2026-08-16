@@ -235,9 +235,12 @@ function Home() {
       children: (
         <div>
           {/* ===== Platform KPIs ===== */}
-          <Title level={5} style={{ marginBottom: 12, color: '#666' }}>
-            平台统计
-          </Title>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <div style={{ width: 4, height: 18, borderRadius: 2, background: '#1677ff' }} />
+            <Title level={5} style={{ margin: 0 }}>
+              平台统计
+            </Title>
+          </div>
           <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
             <Col xs={12} sm={8} lg={4}>
               <Card hoverable onClick={() => navigate('/products')} style={{ cursor: 'pointer' }}>
@@ -310,10 +313,13 @@ function Home() {
           </Row>
 
           {/* ===== Business KPIs ===== */}
-          <Title level={5} style={{ marginBottom: 12, color: '#666' }}>
-            <BarChartOutlined style={{ marginRight: 6 }} />
-            商业运营
-          </Title>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <div style={{ width: 4, height: 18, borderRadius: 2, background: '#52c41a' }} />
+            <Title level={5} style={{ margin: 0 }}>
+              <BarChartOutlined style={{ marginRight: 6 }} />
+              商业运营
+            </Title>
+          </div>
           <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
             <Col xs={12} sm={8} lg={4}>
               <Card hoverable onClick={() => navigate('/inquiries')} style={{ cursor: 'pointer' }}>
@@ -387,10 +393,13 @@ function Home() {
           </Row>
 
           {/* ===== Matching Intelligence Overview ===== */}
-          <Title level={5} style={{ marginBottom: 12, color: '#666' }}>
-            <ExperimentOutlined style={{ marginRight: 6 }} />
-            匹配引擎状态
-          </Title>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <div style={{ width: 4, height: 18, borderRadius: 2, background: '#722ed1' }} />
+            <Title level={5} style={{ margin: 0 }}>
+              <ExperimentOutlined style={{ marginRight: 6 }} />
+              匹配引擎状态
+            </Title>
+          </div>
           <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
             <Col xs={12} sm={6} lg={6}>
               <Card>
@@ -451,10 +460,13 @@ function Home() {
           </Row>
 
           {/* ===== Pending Items ===== */}
-          <Title level={5} style={{ marginBottom: 12, color: '#666' }}>
-            <ExclamationCircleOutlined style={{ marginRight: 6 }} />
-            待处理事项
-          </Title>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <div style={{ width: 4, height: 18, borderRadius: 2, background: '#faad14' }} />
+            <Title level={5} style={{ margin: 0 }}>
+              <ExclamationCircleOutlined style={{ marginRight: 6 }} />
+              待处理事项
+            </Title>
+          </div>
           <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
             <Col xs={12} sm={6} lg={4}>
               <Card>
@@ -794,8 +806,10 @@ function Home() {
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 16,
+          alignItems: 'flex-start',
+          marginBottom: 20,
+          flexWrap: 'wrap',
+          gap: 12,
         }}
       >
         <div>
@@ -803,7 +817,7 @@ function Home() {
             运营驾驶舱
           </Title>
           <Text type="secondary" style={{ fontSize: 13 }}>
-            VISNDT 工业检测平台运营中心
+            VISNDT 工业检测平台运营中心 · 实时掌握平台运营状态与业务趋势
           </Text>
         </div>
         <Space>
@@ -824,11 +838,14 @@ function Home() {
       />
 
       {/* Quick Actions */}
-      <Title level={5} style={{ marginBottom: 12, color: '#666' }}>
-        快捷操作
-      </Title>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+        <div style={{ width: 4, height: 18, borderRadius: 2, background: '#13c2c2' }} />
+        <Title level={5} style={{ margin: 0 }}>
+          快捷操作
+        </Title>
+      </div>
       <Card style={{ marginBottom: 16 }}>
-        <Space wrap>
+        <Space wrap size="middle">
           <Button
             type="primary"
             icon={<UserAddOutlined />}
@@ -836,20 +853,23 @@ function Home() {
           >
             创建用户
           </Button>
-          <Button icon={<TeamOutlined />} onClick={() => navigate('/users')}>
-            查看用户
-          </Button>
           <Button icon={<PlusOutlined />} onClick={() => navigate('/organizations/create')}>
             创建组织
           </Button>
-          <Button icon={<BankOutlined />} onClick={() => navigate('/organizations')}>
-            查看组织
+          <Button icon={<ShoppingOutlined />} onClick={() => navigate('/products/create')}>
+            创建产品
           </Button>
-          <Button icon={<ShoppingOutlined />} onClick={() => navigate('/products')}>
-            查看产品
+          <Button icon={<FileTextOutlined />} onClick={() => navigate('/content/create')}>
+            创建内容
           </Button>
           <Button icon={<BellOutlined />} onClick={() => navigate('/notifications')}>
             通知中心
+          </Button>
+          <Button icon={<TeamOutlined />} onClick={() => navigate('/users')}>
+            查看用户
+          </Button>
+          <Button icon={<BankOutlined />} onClick={() => navigate('/organizations')}>
+            查看组织
           </Button>
         </Space>
       </Card>

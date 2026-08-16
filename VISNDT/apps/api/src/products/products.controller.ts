@@ -43,8 +43,8 @@ export class ProductsController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get product by ID (public)' })
-  @ApiParam({ name: 'id', description: 'Product UUID' })
+  @ApiOperation({ summary: 'Get product by ID or slug (public)' })
+  @ApiParam({ name: 'id', description: 'Product UUID or slug' })
   async findOne(@Param('id') id: string) {
     return ApiResponse.ok(await this.service.findOne(id));
   }

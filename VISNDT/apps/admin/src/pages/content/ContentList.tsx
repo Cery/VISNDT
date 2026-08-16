@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Space, Spin, Alert, Button, Tag, Typography } from 'antd';
+import { Table, Space, Spin, Alert, Button, Tag, Typography, Card, Row, Col, Statistic } from 'antd';
+import { FileTextOutlined, CheckCircleOutlined, EditOutlined, ClockCircleOutlined, StopOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { contentService } from '../../api';
 import type { Content, ContentType, ContentStatus } from '../../types';
@@ -20,6 +21,14 @@ interface QueryParams {
   status: ContentStatus | '';
   page: number;
   pageSize: number;
+}
+
+interface GovernanceStats {
+  total: number;
+  published: number;
+  draft: number;
+  review: number;
+  archived: number;
 }
 
 const TYPE_OPTIONS = [
@@ -70,6 +79,7 @@ const CONTENT_EXPORT_COLUMNS: ExportColumn<Content>[] = [
 function ContentList() {
   const navigate = useNavigate();
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
+  const [governanceStats, setGovernanceStats] = useState<GovernanceStats>({ total: 0, published: 0, draft: 0, review: 0, archived: 0 });
   const [query, setQuery] = useState<QueryParams>({
     keyword: '',
     type: '',
@@ -102,6 +112,32 @@ function ContentList() {
   useEffect(() => {
     fetchContents();
   }, [fetchContents]);
+
+  // Load governance statistics on mount
+  useEffect(() => {
+    const loadGovernanceData = async () => {
+      try {
+        const allContent = await contentService.getList({ page: 1, pageSize: 1 });
+        const total = allContent.total;
+        const [publishedRes, draftRes, reviewRes, archivedRes] = await Promise.all([
+          contentService.getList({ page: 1, pageSize: 1, status: 'PUBLISHED' }),
+          contentService.getList({ page: 1, pageSize: 1, status: 'DRAFT' }),
+          contentService.getList({ page: 1, pageSize: 1, status: 'REVIEW' }),
+          contentService.getList({ page: 1, pageSize: 1, status: 'ARCHIVED' }),
+        ]);
+        setGovernanceStats({
+          total,
+          published: publishedRes.total,
+          draft: draftRes.total,
+          review: reviewRes.total,
+          archived: archivedRes.total,
+        });
+      } catch {
+        // Stats load failure is non-critical
+      }
+    };
+    loadGovernanceData();
+  }, []);
 
   const handleReset = useCallback(() => {
     setQuery({ keyword: '', type: '', status: '', page: 1, pageSize: 20 });
@@ -204,12 +240,46 @@ function ContentList() {
 
   return (
     <div>
-      <Title level={4} style={{ marginBottom: 4 }}>
-        内容管理
-      </Title>
-      <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16, fontSize: 13 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+        <div style={{ width: 4, height: 20, borderRadius: 2, background: '#52c41a' }} />
+        <Title level={4} style={{ margin: 0 }}>
+          内容管理
+        </Title>
+      </div>
+      <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16, marginLeft: 12, fontSize: 13 }}>
         管理知识、文章与解决方案内容
       </Typography.Text>
+
+      {/* Governance Statistics Dashboard */}
+      {(governanceStats.total > 0) && (
+        <Row gutter={16} style={{ marginBottom: 16 }}>
+          <Col xs={12} sm={6} md={4}>
+            <Card size="small">
+              <Statistic title="内容总数" value={governanceStats.total} prefix={<FileTextOutlined />} />
+            </Card>
+          </Col>
+          <Col xs={12} sm={6} md={4}>
+            <Card size="small">
+              <Statistic title="已发布" value={governanceStats.published} valueStyle={{ color: '#52c41a' }} prefix={<CheckCircleOutlined />} />
+            </Card>
+          </Col>
+          <Col xs={12} sm={6} md={4}>
+            <Card size="small">
+              <Statistic title="草稿" value={governanceStats.draft} valueStyle={{ color: '#faad14' }} prefix={<EditOutlined />} />
+            </Card>
+          </Col>
+          <Col xs={12} sm={6} md={4}>
+            <Card size="small">
+              <Statistic title="审核中" value={governanceStats.review} valueStyle={{ color: '#fa8c16' }} prefix={<ClockCircleOutlined />} />
+            </Card>
+          </Col>
+          <Col xs={12} sm={6} md={4}>
+            <Card size="small">
+              <Statistic title="已归档" value={governanceStats.archived} valueStyle={{ color: '#ff4d4f' }} prefix={<StopOutlined />} />
+            </Card>
+          </Col>
+        </Row>
+      )}
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Button type="primary" onClick={() => navigate('/content/create')}>

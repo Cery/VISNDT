@@ -4,7 +4,6 @@ import { Layout, Menu, Button, Breadcrumb, Dropdown, Avatar, Badge, Space, Drawe
 import type { MenuProps } from 'antd';
 import {
   DashboardOutlined,
-  ShoppingOutlined,
   FileTextOutlined,
   NodeIndexOutlined,
   UserOutlined,
@@ -22,9 +21,13 @@ import {
   HomeOutlined,
   MenuOutlined,
   BarChartOutlined,
-  ThunderboltOutlined,
   RiseOutlined,
   MonitorOutlined,
+  GlobalOutlined,
+  AppstoreOutlined,
+  SafetyOutlined,
+  TeamOutlined,
+  ExperimentOutlined,
 } from '@ant-design/icons';
 import { authStore } from '../stores/auth.store';
 
@@ -39,12 +42,12 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
   core: {
     label: '核心运营',
     items: [
-      { key: '/home', icon: <DashboardOutlined />, label: '仪表盘' },
+      { key: '/home', icon: <DashboardOutlined />, label: '运营仪表盘' },
       { key: '/analytics', icon: <BarChartOutlined />, label: '数据分析' },
       { key: '/business-analytics', icon: <RiseOutlined />, label: '业务分析' },
       { key: '/monitoring', icon: <MonitorOutlined />, label: '运营监控' },
-      { key: '/audit-intelligence', icon: <AuditOutlined />, label: '审计智能' },
-      { key: '/products', icon: <ShoppingOutlined />, label: '产品管理' },
+      { key: '/audit-intelligence', icon: <SafetyOutlined />, label: '审计智能' },
+      { key: '/products', icon: <AppstoreOutlined />, label: '产品管理' },
       { key: '/content', icon: <FileTextOutlined />, label: '内容管理' },
       { key: '/content/tags', icon: <TagsOutlined />, label: '标签管理' },
       { key: '/media', icon: <PictureOutlined />, label: '媒体中心' },
@@ -63,7 +66,7 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
   system: {
     label: '系统管理',
     items: [
-      { key: '/users', icon: <UserOutlined />, label: '用户管理' },
+      { key: '/users', icon: <TeamOutlined />, label: '用户管理' },
       { key: '/organizations', icon: <BankOutlined />, label: '组织管理' },
       {
         key: 'parameters',
@@ -77,14 +80,14 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
       },
       { key: '/notifications', icon: <BellOutlined />, label: '通知管理' },
       { key: '/audit-logs', icon: <AuditOutlined />, label: '审计日志' },
-      { key: '/embedding', icon: <ThunderboltOutlined />, label: 'AI 数据准备' },
+      { key: '/embedding', icon: <ExperimentOutlined />, label: 'AI 数据准备' },
     ],
   },
 };
 
 // Breadcrumb route mapping
 const breadcrumbMap: Record<string, string> = {
-  '/home': '仪表盘',
+  '/home': '运营仪表盘',
   '/analytics': '数据分析',
   '/business-analytics': '业务分析',
   '/monitoring': '运营监控',
@@ -194,6 +197,13 @@ function AdminLayout() {
     },
     { type: 'divider' },
     {
+      key: 'visit-site',
+      icon: <GlobalOutlined />,
+      label: '访问网站',
+      onClick: () => window.open('/', '_blank'),
+    },
+    { type: 'divider' },
+    {
       key: 'logout',
       icon: <LogoutOutlined />,
       label: '退出登录',
@@ -233,17 +243,32 @@ function AdminLayout() {
             style={{
               height: 64,
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#fff',
-              fontSize: collapsed ? 14 : 18,
-              fontWeight: 700,
               overflow: 'hidden',
               whiteSpace: 'nowrap',
               borderBottom: '1px solid rgba(255,255,255,0.1)',
+              padding: collapsed ? '0 8px' : '0 16px',
             }}
           >
-            {collapsed ? 'V' : 'VISNDT'}
+            <span style={{
+              fontSize: collapsed ? 14 : 20,
+              fontWeight: 800,
+              fontFamily: 'ui-monospace, monospace',
+              letterSpacing: '0.02em',
+              background: 'linear-gradient(135deg, #1677ff, #36cfc9)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>
+              {collapsed ? 'V' : 'VISNDT'}
+            </span>
+            {!collapsed && (
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
+                运营中心
+              </span>
+            )}
           </div>
           {renderSiderMenu()}
         </Sider>
@@ -303,6 +328,9 @@ function AdminLayout() {
             )}
             <span className="admin-header-title" style={{ fontSize: 16, fontWeight: 600, whiteSpace: 'nowrap' }}>
               VISNDT 运营中心
+            </span>
+            <span className="admin-header-title" style={{ fontSize: 12, color: '#999', marginLeft: 8, borderLeft: '1px solid #e8e8e8', paddingLeft: 8 }}>
+              工业检测平台
             </span>
           </div>
 

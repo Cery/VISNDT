@@ -25,11 +25,10 @@ const NAV_CONFIG: Record<NavigableWorkspaceRole, NavItem[]> = {
   ],
   SUPPLIER: [
     { label: '仪表盘', href: '/dashboard/supplier', icon: '📊' },
-    { label: 'RFQ响应', href: '/workspace/supplier/rfqs', icon: '📄' },
-    { label: '我的响应', href: '/workspace/supplier/responses', icon: 'R' },
-    { label: '兼容入口', href: '/workspace/supplier', icon: '🏭', badge: 'Legacy' },
-    { label: '通知中心', href: '/workspace/notifications', icon: '🔔' },
-    { label: '设置', href: '/workspace/settings', icon: '⚙️' },
+    { label: 'RFQs', href: '/workspace/supplier/rfqs', icon: '📄' },
+    { label: 'Responses', href: '/workspace/supplier/responses', icon: '📨' },
+    { label: 'Notifications', href: '/workspace/notifications', icon: '🔔' },
+    { label: 'Display', href: '/workspace/supplier/display', icon: '📋' },
   ],
 };
 

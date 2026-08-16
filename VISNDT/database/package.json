@@ -8,7 +8,8 @@
     "migrate": "prisma migrate dev",
     "studio": "prisma studio",
     "seed": "tsx seed_admin.ts",
-    "seed:content": "tsx seed_content.ts"
+    "seed:content": "tsx seed_content.ts",
+    "seed:demo": "tsx seed_demo.ts"
   },
   "devDependencies": {
     "prisma": "^5.22.0",

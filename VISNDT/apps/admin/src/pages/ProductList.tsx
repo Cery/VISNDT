@@ -378,10 +378,13 @@ function ProductList() {
 
   return (
     <div>
-      <Title level={4} style={{ marginBottom: 4 }}>
-        产品管理
-      </Title>
-      <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16, fontSize: 13 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+        <div style={{ width: 4, height: 20, borderRadius: 2, background: '#1677ff' }} />
+        <Title level={4} style={{ margin: 0 }}>
+          产品管理
+        </Title>
+      </div>
+      <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16, marginLeft: 12, fontSize: 13 }}>
         管理平台产品目录，包括产品信息、分类、参数和媒体资源
       </Typography.Text>
 

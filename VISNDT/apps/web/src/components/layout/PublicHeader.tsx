@@ -7,9 +7,9 @@ import { useAuth } from '@/auth/AuthProvider';
 import GlobalSearchBar from '@/components/search/GlobalSearchBar';
 
 const NAV_ITEMS = [
-  { href: '/', label: '首页' },
-  { href: '/products', label: '产品' },
-  { href: '/categories', label: '分类' },
+  { href: '/', label: '首页', exact: true },
+  { href: '/products', label: '产品中心' },
+  { href: '/categories', label: '产品分类' },
   { href: '/solutions', label: '解决方案' },
   { href: '/knowledge', label: '知识中心' },
   { href: '/business', label: '商务合作' },
@@ -29,8 +29,14 @@ export default function PublicHeader() {
     router.refresh();
   };
 
+  const isActive = (href: string, exact?: boolean) => {
+    if (exact) return pathname === href;
+    if (href === '/') return pathname === '/';
+    return pathname.startsWith(href);
+  };
+
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-industrial-sm">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-industrial-sm border-b border-slate-100">
       <div className="w-full">
         <div className="max-w-[1200px] mx-auto flex h-[4.5rem] items-center justify-between px-6 gap-4">
           {/* Logo */}
@@ -39,24 +45,27 @@ export default function PublicHeader() {
               <span className="text-foreground">VIS</span>
               <span className="bg-gradient-to-r from-primary to-industrial-cyan bg-clip-text text-transparent">NDT</span>
             </span>
+            <span className="hidden sm:inline-flex text-xs text-slate-400 font-medium tracking-wide">
+              工业检测平台
+            </span>
           </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-1">
             {NAV_ITEMS.map((item) => {
-              const isActive = pathname === item.href;
+              const active = isActive(item.href, item.exact);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={`relative px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                    isActive
+                    active
                       ? 'text-primary bg-primary/5'
                       : 'text-muted-foreground hover:text-foreground hover:bg-slate-50'
                   }`}
                 >
                   {item.label}
-                  {isActive && (
+                  {active && (
                     <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-primary rounded-full" />
                   )}
                 </Link>
@@ -97,7 +106,7 @@ export default function PublicHeader() {
                     <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
                     <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-industrial-lg py-1 z-20">
                       <Link
-                        href="/workspace/dashboard"
+                        href="/dashboard"
                         onClick={() => setUserMenuOpen(false)}
                         className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                       >
@@ -172,14 +181,14 @@ export default function PublicHeader() {
             </div>
             <nav className="space-y-1">
             {NAV_ITEMS.map((item) => {
-              const isActive = pathname === item.href;
+              const active = isActive(item.href, item.exact);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setMobileOpen(false)}
                   className={`block px-3 py-2.5 rounded-md text-sm font-medium transition-colors ${
-                    isActive
+                    active
                       ? 'bg-primary/5 text-primary'
                       : 'text-muted-foreground hover:bg-slate-50 hover:text-foreground'
                   }`}
@@ -197,7 +206,7 @@ export default function PublicHeader() {
                     {user.name || user.email}
                   </div>
                   <Link
-                    href="/workspace/dashboard"
+                    href="/dashboard"
                     onClick={() => setMobileOpen(false)}
                     className="flex-1 text-center text-sm font-medium bg-gradient-to-r from-primary to-industrial-cyan text-white py-2.5 rounded-lg hover:opacity-90 transition-opacity"
                   >

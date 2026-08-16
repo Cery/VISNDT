@@ -2,16 +2,19 @@ import Link from 'next/link';
 
 export default function HeroSection() {
   return (
-    <section className="relative bg-industrial-dark py-28 md:py-36 overflow-hidden">
+    <section className="relative bg-industrial-dark py-24 md:py-36 lg:py-40 overflow-hidden">
       {/* Grid pattern overlay */}
       <div className="absolute inset-0 bg-grid-pattern bg-grid-md opacity-40" />
-      {/* Left glow */}
+      {/* Top-left glow */}
       <div className="absolute -left-20 top-0 w-96 h-96 bg-primary/20 rounded-full blur-[120px]" />
-      {/* Right glow */}
-      <div className="absolute -right-20 bottom-0 w-96 h-96 bg-industrial-cyan/10 rounded-full blur-[120px]" />
+      {/* Right-center glow */}
+      <div className="absolute -right-20 top-1/3 w-96 h-96 bg-industrial-cyan/10 rounded-full blur-[120px]" />
+      {/* Bottom glow */}
+      <div className="absolute left-1/3 -bottom-20 w-80 h-80 bg-primary/10 rounded-full blur-[100px]" />
 
       <div className="relative z-10 max-w-[1200px] mx-auto px-6 text-center">
-        <div className="inline-flex items-center gap-2 mb-6">
+        {/* Platform Badge */}
+        <div className="inline-flex items-center gap-2 mb-6 animate-fade-in">
           <span className="inline-block w-8 h-px bg-industrial-cyan/60" />
           <span className="text-sm font-medium text-industrial-cyan tracking-widest uppercase">
             工业检测解决方案平台
@@ -19,30 +22,72 @@ export default function HeroSection() {
           <span className="inline-block w-8 h-px bg-industrial-cyan/60" />
         </div>
 
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-4 leading-tight">
-          探索工业内窥镜产品
+        {/* Main Heading */}
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-5 leading-tight animate-slide-up">
+          工业无损检测
           <br />
-          <span className="text-industrial-cyan">与技术解决方案</span>
+          <span className="bg-gradient-to-r from-industrial-cyan to-primary bg-clip-text text-transparent">
+            产品与技术方案
+          </span>
+          {' '}一站式平台
         </h1>
-        <p className="text-slate-400 text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
-          专业的工业无损检测设备平台——发现来自领先制造商的高精度内窥镜、检测相机和测量系统。
+
+        <p className="text-slate-400 text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed animate-slide-up">
+          连接工业检测需求方与能力提供商——发现高精度内窥镜、检测相机、测量系统，
+          获取面向航空航天、汽车、管道、制造等行业的专业检测解决方案。
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        {/* Primary CTAs */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-14 animate-slide-up">
           <Link
             href="/products"
-            className="inline-flex items-center justify-center px-8 py-3.5 bg-gradient-to-r from-industrial-cyan to-primary text-white rounded-lg font-semibold shadow-industrial-lg hover:opacity-95 transition-all hover:-translate-y-0.5"
+            className="inline-flex items-center justify-center px-8 py-3.5 bg-gradient-to-r from-industrial-cyan to-primary text-white rounded-lg font-semibold shadow-industrial-lg hover:opacity-95 transition-all hover:-translate-y-0.5 hover:shadow-glow"
           >
-            浏览产品
-            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
             </svg>
+            浏览产品
           </Link>
           <Link
-            href="/categories"
-            className="inline-flex items-center justify-center px-8 py-3.5 border border-white/20 backdrop-blur-sm bg-white/5 text-white rounded-lg font-semibold hover:bg-white/10 transition-all hover:-translate-y-0.5"
+            href="/solutions"
+            className="inline-flex items-center justify-center px-8 py-3.5 border border-white/20 backdrop-blur-sm bg-white/5 text-white rounded-lg font-semibold hover:bg-white/10 hover:border-industrial-cyan/30 transition-all hover:-translate-y-0.5"
           >
-            查看分类
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            探索解决方案
+          </Link>
+          <Link
+            href="/register"
+            className="inline-flex items-center justify-center px-8 py-3.5 border border-white/20 backdrop-blur-sm bg-white/5 text-white rounded-lg font-semibold hover:bg-white/10 hover:border-primary/30 transition-all hover:-translate-y-0.5"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            提交需求
+          </Link>
+        </div>
+
+        {/* Role Entry Points */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in">
+          <span className="text-sm text-slate-500">快速入口：</span>
+          <Link
+            href="/register?role=BUYER"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-slate-300 hover:bg-white/10 hover:text-white transition-all"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            我是检测需求方
+          </Link>
+          <Link
+            href="/register?role=SUPPLIER"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white/5 border border-white/10 text-sm text-slate-300 hover:bg-white/10 hover:text-white transition-all"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+            我是能力提供商
           </Link>
         </div>
       </div>

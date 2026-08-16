@@ -114,9 +114,14 @@ export class ProductsService {
     return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
   }
 
-  async findOne(id: string) {
+  // UUID format regex: 8-4-4-4-12 hex digits (lenient — supports demo deterministic IDs)
+  private static readonly UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  async findOne(idOrSlug: string) {
+    const isUuid = ProductsService.UUID_REGEX.test(idOrSlug);
+
     const product = await this.prisma.product.findUnique({
-      where: { id },
+      where: isUuid ? { id: idOrSlug } : { slug: idOrSlug },
       include: {
         category: true,
         parameterValues: { include: { parameterDefinition: true } },
@@ -128,7 +133,7 @@ export class ProductsService {
         },
       },
     });
-    if (!product) throw new NotFoundException(`产品 ${id} 未找到`);
+    if (!product) throw new NotFoundException(`产品 ${idOrSlug} 未找到`);
     return product;
   }
 

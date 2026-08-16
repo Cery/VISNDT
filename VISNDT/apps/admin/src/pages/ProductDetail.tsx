@@ -192,25 +192,31 @@ export default function ProductDetailPage() {
         <Breadcrumb.Item>{product.name}</Breadcrumb.Item>
       </Breadcrumb>
 
-      <Space style={{ marginBottom: 16 }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/products')}>
-          返回列表
-        </Button>
-        <Button
-          icon={<EditOutlined />}
-          onClick={() => navigate(`/products/${id}/edit`)}
-        >
-          编辑产品
-        </Button>
-        <Button
-          icon={<PictureOutlined />}
-          onClick={() => navigate(`/products/${id}/media`)}
-        >
-          管理媒体
-        </Button>
-      </Space>
-
-      <Title level={3}>{product.name}</Title>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
+          <div style={{ width: 4, height: 24, borderRadius: 2, background: '#1677ff', flexShrink: 0 }} />
+          <Title level={3} style={{ margin: 0 }}>{product.name}</Title>
+          <Tag color={STATUS_COLOR[product.status] || 'default'}>{STATUS_LABEL_MAP[product.status] || product.status}</Tag>
+        </div>
+        <Space>
+          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/products')}>
+            返回列表
+          </Button>
+          <Button
+            icon={<EditOutlined />}
+            type="primary"
+            onClick={() => navigate(`/products/${id}/edit`)}
+          >
+            编辑产品
+          </Button>
+          <Button
+            icon={<PictureOutlined />}
+            onClick={() => navigate(`/products/${id}/media`)}
+          >
+            管理媒体
+          </Button>
+        </Space>
+      </div>
 
       {/* Governance Stats */}
       <Row gutter={16} style={{ marginBottom: 16 }}>

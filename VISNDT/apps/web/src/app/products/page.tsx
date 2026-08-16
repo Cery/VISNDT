@@ -218,10 +218,18 @@ function ProductsPageContent() {
       <div className="mb-6 sm:mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground">产品</h1>
-            <p className="text-muted-foreground mt-1 text-sm sm:text-base">浏览工业检测设备</p>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground">
+              产品中心
+            </h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+              浏览工业无损检测设备，按分类、参数快速筛选
+            </p>
           </div>
-          
+          {productsData?.total !== undefined && !isLoading && (
+            <span className="text-sm text-muted-foreground flex-shrink-0">
+              共 <span className="font-semibold text-foreground">{productsData.total}</span> 款产品
+            </span>
+          )}
         </div>
       </div>
 

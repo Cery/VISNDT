@@ -42,6 +42,7 @@ export interface RfqResponseItem {
   status: string;
   offerId?: string | null;
   message?: string | null;
+  decisionNote?: string | null;
   createdAt: string;
   updatedAt: string;
   rfq?: {

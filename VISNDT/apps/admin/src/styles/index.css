@@ -99,6 +99,39 @@ body {
     gap: 8px;
     align-items: stretch !important;
   }
+
+  /* Mobile: dashboard cards full width */
+  .admin-dashboard .ant-card {
+    margin-bottom: 8px;
+  }
+
+  /* Mobile: table action buttons wrap */
+  .ant-table-cell .ant-space {
+    flex-wrap: wrap;
+    gap: 4px !important;
+  }
+
+  /* Mobile: breadcrumb compact */
+  .ant-breadcrumb {
+    font-size: 12px;
+  }
+
+  /* Mobile: page padding */
+  .admin-layout .ant-layout-content > div {
+    padding: 8px !important;
+  }
+}
+
+/* Tablet: medium screen optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .admin-layout .ant-layout-content {
+    margin: 12px !important;
+    padding: 16px !important;
+  }
+
+  .admin-layout .ant-layout-content > div {
+    padding: 16px !important;
+  }
 }
 
 /* Mobile overlay for sidebar */

@@ -33,6 +33,7 @@ import { ContentTagModule } from './content-tag/content-tag.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { EmbeddingModule } from './embedding/embedding.module';
 import { SemanticModule } from './semantic/semantic.module';
+import { AIModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { SemanticModule } from './semantic/semantic.module';
     AnalyticsModule,
     EmbeddingModule,
     SemanticModule,
+    AIModule,
   ],
   providers: [
     {
