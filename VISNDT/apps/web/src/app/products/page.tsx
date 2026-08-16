@@ -7,6 +7,7 @@ import { getProducts } from '@/services/product.service';
 import { getCategories } from '@/services/category.service';
 import { getFilterParameterDefinitions } from '@/services/parameter-definition.service';
 import type { ProductParameterFilter } from '@/types/product';
+import { trackEvent, buildEvent } from '@/lib/analytics';
 import SearchBar from '@/components/products/SearchBar';
 import ProductFilter from '@/components/products/ProductFilter';
 import ProductGrid from '@/components/products/ProductGrid';
@@ -122,6 +123,7 @@ function ProductsPageContent() {
       setKeyword(kw);
       setPage(1);
       syncURL(kw, categoryId, sortBy, sortOrder, 1, parameterFilters);
+      trackEvent(buildEvent('product_filter', { source: '/products', metadata: { action: 'search', keyword: kw } }));
     },
     [categoryId, sortBy, sortOrder, parameterFilters, syncURL],
   );
@@ -135,6 +137,7 @@ function ProductsPageContent() {
       setCategoryId(catId);
       setPage(1);
       syncURL(keyword, catId, sortBy, sortOrder, 1, parameterFilters);
+      trackEvent(buildEvent('product_filter', { source: '/products', metadata: { action: 'category', categoryId: catId } }));
     },
     [keyword, sortBy, sortOrder, parameterFilters, syncURL],
   );
@@ -147,6 +150,7 @@ function ProductsPageContent() {
       setSortOrder(so);
       setPage(1);
       syncURL(keyword, categoryId, field, order, 1, parameterFilters);
+      trackEvent(buildEvent('product_filter', { source: '/products', metadata: { action: 'sort', sortBy: field, sortOrder: order } }));
     },
     [keyword, categoryId, parameterFilters, syncURL],
   );
@@ -156,6 +160,7 @@ function ProductsPageContent() {
       setParameterFilters(filters);
       setPage(1);
       syncURL(keyword, categoryId, sortBy, sortOrder, 1, filters);
+      trackEvent(buildEvent('product_filter', { source: '/products', metadata: { action: 'parameter', filterCount: filters.length } }));
     },
     [keyword, categoryId, sortBy, sortOrder, syncURL],
   );
@@ -209,19 +214,19 @@ function ProductsPageContent() {
     (keyword ? 1 : 0) + (categoryId ? 1 : 0) + parameterFilters.length;
 
   return (
-    <div className="max-w-[1200px] mx-auto px-6 py-8">
-      <div className="mb-8">
+    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div className="mb-6 sm:mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-extrabold text-foreground">产品</h1>
-            <p className="text-muted-foreground mt-1">浏览工业检测设备</p>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground">产品</h1>
+            <p className="text-muted-foreground mt-1 text-sm sm:text-base">浏览工业检测设备</p>
           </div>
           
         </div>
       </div>
 
       {/* Search */}
-      <div className="mb-6 max-w-lg">
+      <div className="mb-6 max-w-full sm:max-w-lg">
         <SearchBar
           onSearch={handleSearch}
           onClear={handleClearSearch}
@@ -229,7 +234,7 @@ function ProductsPageContent() {
         />
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         {/* Sidebar Filter */}
         <aside className="lg:w-64 flex-shrink-0">
           <ProductFilter

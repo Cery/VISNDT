@@ -11,16 +11,24 @@ export class AdminService {
       activeUsers,
       totalOrganizations,
       totalProducts,
+      totalContent,
       totalDemands,
       publishedDemands,
+      totalInquiries,
+      totalRfqs,
+      totalOffers,
       totalMatches,
     ] = await Promise.all([
       this.prisma.user.count(),
       this.prisma.user.count({ where: { status: 'ACTIVE' } }),
       this.prisma.organization.count(),
       this.prisma.product.count(),
+      this.prisma.content.count(),
       this.prisma.demand.count(),
       this.prisma.demand.count({ where: { status: 'PUBLISHED' } }),
+      this.prisma.inquiry.count(),
+      this.prisma.rFQ.count(),
+      this.prisma.offer.count(),
       this.prisma.demandMatch.count(),
     ]);
 
@@ -35,9 +43,21 @@ export class AdminService {
       products: {
         total: totalProducts,
       },
+      content: {
+        total: totalContent,
+      },
       demands: {
         total: totalDemands,
         published: publishedDemands,
+      },
+      inquiries: {
+        total: totalInquiries,
+      },
+      rfqs: {
+        total: totalRfqs,
+      },
+      offers: {
+        total: totalOffers,
       },
       matching: {
         totalMatches,
@@ -98,6 +118,7 @@ export class AdminService {
     const [
       usersPending,
       demandsPending,
+      inquiriesPending,
       rfqPending,
       unreadNotifications,
     ] = await Promise.all([
@@ -106,6 +127,9 @@ export class AdminService {
       }),
       this.prisma.demand.count({
         where: { status: 'DRAFT' },
+      }),
+      this.prisma.inquiry.count({
+        where: { status: 'NEW' },
       }),
       this.prisma.rFQ.count({
         where: { status: { in: ['DRAFT', 'OPEN'] } },
@@ -118,9 +142,54 @@ export class AdminService {
     return {
       usersPending,
       demandsPending,
+      inquiriesPending,
       rfqPending,
       unreadNotifications,
     };
+  }
+
+  async getDashboardTrend() {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const events = await this.prisma.conversionEvent.findMany({
+      where: { createdAt: { gte: sevenDaysAgo } },
+      select: { event: true, createdAt: true },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    // Build daily trend map for the last 7 days
+    const dailyMap: Record<string, {
+      pageViews: number; productViews: number; contentViews: number;
+      searches: number; inquiries: number; ctaClicks: number;
+    }> = {};
+
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      dailyMap[key] = { pageViews: 0, productViews: 0, contentViews: 0, searches: 0, inquiries: 0, ctaClicks: 0 };
+    }
+
+    for (const evt of events) {
+      const key = evt.createdAt.toISOString().slice(0, 10);
+      if (!dailyMap[key]) continue;
+      switch (evt.event) {
+        case 'PAGE_VIEW': dailyMap[key].pageViews++; break;
+        case 'PRODUCT_VIEW': dailyMap[key].productViews++; break;
+        case 'CONTENT_VIEW': dailyMap[key].contentViews++; break;
+        case 'SEARCH': dailyMap[key].searches++; break;
+        case 'INQUIRY_START':
+        case 'INQUIRY_SUBMIT': dailyMap[key].inquiries++; break;
+        case 'CTA_CLICK': dailyMap[key].ctaClicks++; break;
+      }
+    }
+
+    return Object.entries(dailyMap).map(([date, counts]) => ({
+      date,
+      ...counts,
+    }));
   }
 
   async getSystemStatus() {

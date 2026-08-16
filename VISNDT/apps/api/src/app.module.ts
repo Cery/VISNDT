@@ -30,6 +30,9 @@ import { ContentModule } from './content/content.module';
 import { ContentMediaModule } from './content-media/content-media.module';
 import { ContentRevisionModule } from './content-revision/content-revision.module';
 import { ContentTagModule } from './content-tag/content-tag.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { EmbeddingModule } from './embedding/embedding.module';
+import { SemanticModule } from './semantic/semantic.module';
 
 @Module({
   imports: [
@@ -68,6 +71,9 @@ import { ContentTagModule } from './content-tag/content-tag.module';
     ContentMediaModule,
     ContentRevisionModule,
     ContentTagModule,
+    AnalyticsModule,
+    EmbeddingModule,
+    SemanticModule,
   ],
   providers: [
     {

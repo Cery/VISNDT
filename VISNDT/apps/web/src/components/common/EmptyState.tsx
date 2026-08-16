@@ -1,7 +1,15 @@
+import Link from 'next/link';
+
 interface EmptyStateProps {
+  title?: string;
   message?: string;
   description?: string;
   icon?: 'search' | 'package' | 'document' | 'default';
+  action?: {
+    label: string;
+    href?: string;
+    onClick?: () => void;
+  };
 }
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -27,13 +35,33 @@ const iconMap: Record<string, React.ReactNode> = {
   ),
 };
 
-export default function EmptyState({ message = '暂无数据', description, icon = 'default' }: EmptyStateProps) {
+export default function EmptyState({ title, message = '暂无数据', description, icon = 'default', action }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[200px] py-12 text-center">
       <div className="mb-3">{iconMap[icon] ?? iconMap.default}</div>
+      {title && <p className="text-base font-semibold text-slate-600 mb-1">{title}</p>}
       <p className="text-sm font-medium text-slate-500">{message}</p>
       {description && (
         <p className="text-xs text-slate-400 mt-1 max-w-sm">{description}</p>
+      )}
+      {action && (
+        <div className="mt-4">
+          {action.href ? (
+            <Link
+              href={action.href}
+              className="text-sm bg-gradient-to-r from-primary to-industrial-cyan text-white rounded-lg px-4 py-2 hover:opacity-90 transition-opacity inline-block"
+            >
+              {action.label}
+            </Link>
+          ) : action.onClick ? (
+            <button
+              onClick={action.onClick}
+              className="text-sm bg-gradient-to-r from-primary to-industrial-cyan text-white rounded-lg px-4 py-2 hover:opacity-90 transition-opacity"
+            >
+              {action.label}
+            </button>
+          ) : null}
+        </div>
       )}
     </div>
   );

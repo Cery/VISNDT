@@ -42,4 +42,11 @@ export class AdminController {
     const status = await this.adminService.getSystemStatus();
     return ApiResponse.ok(status);
   }
+
+  @Get('trend')
+  @ApiOperation({ summary: 'Get 7-day platform trend from analytics events (ADMIN only)' })
+  async getTrend() {
+    const trend = await this.adminService.getDashboardTrend();
+    return ApiResponse.ok(trend);
+  }
 }

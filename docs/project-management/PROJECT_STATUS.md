@@ -2,18 +2,18 @@
 
 ## Snapshot
 
-- Last calibrated: `2026-08-15`
+- Last calibrated: `2026-08-16`
 - Repository Root: `F:\Desktop\VISNDT`
 - Code Root: `F:\Desktop\VISNDT\VISNDT`
 - Branch baseline: `main`
-- Current product stage: `C. 业务闭环完善阶段`
-- Current M stage: `M20 Frontend Platformization（M19 COMPLETED；M20.0.0 Architecture Planning Pre-Audit（483）已完成——M20 方向冻结；M20.1 Search Experience Phase 闭环（M20.1.1~M20.1.4 CLOSED）；M20.2 Content Asset Integration 闭环（M20.2.0~M20.2.6 CLOSED/FROZEN）；M20.3 Commercial Conversion 闭环（M20.3.0~M20.3.2 CLOSED/FROZEN）；M20.4 Admin Platform Professionalization 闭环（M20.4.0~M20.4.4 CLOSED——507 Foundation + 508 Data Operation + 509 Permission + 510 Closure），零 Schema/API/Migration 变更，Admin Frontend Only）`
+- Current product stage: `D. AI & Platform Enhancement（AI 增强与平台化升级）`
+- Current M stage: `M21 AI & Platform Enhancement（M19 COMPLETED；M20 CLOSED；M21.0（511）PASS；M21.1（512）PASS；M21.1c（512.1）PASS；M21.2（513）PASS——68%/C+；M21.2.x.1（513.1）COMPLETED——Web Runtime Experience Hardening；M21.2.x.2（513.2）COMPLETED——SEO Structured Data Enhancement（515 主体 + 516 Product List Metadata Complement），SEO 覆盖率 100%（12/12 路由），P0 SEO 缺口 3/3 已解决；M21.2.x.3.1（517）COMPLETED——Content Contextual CTA Optimization，5 文件（1 新增 ContentProductCTA 组件 + 4 页面替换），Content→Contextual Product Discovery→Inquiry 体验路径建立；M21.2.x.3.2.1（518）COMPLETED——Product Inquiry Context Presentation，4 文件（1 新增 ProductInquiryContext 组件 + 3 文件修改），Product→Context Confirmation→Inquiry Entry 体验链路建立，"提交询价"→"咨询此设备"；M21.2.x.3.2.2（518.2）COMPLETED——Inquiry Entry Experience Optimization，2 文件（SupplierInquirySection + InquiryForm），6 处术语去交易化（"询价对象"→"已选择供应商"、"发送询价"→移除、"提交询价失败"→"提交咨询失败"等），成功状态增强（产品名称 + 返回产品详情 + 继续咨询）；M21.2.x.3.3（519）COMPLETED——Conversion Tracking Foundation，7 文件（3 新增：events.ts + tracker.ts + TrackOnMount.tsx + 4 集成：Product Detail + Content CTA + Inquiry Flow），5 事件类型（product_view/cta_click/inquiry_start/inquiry_submit/page_view）+ Adapter Pattern，Conversion Flow 完整追踪链。M21.2 Web Platform Experience Evolution — CLOSED（513-519 全部完成）。M21.3（520）COMPLETED——Data Intelligence Infrastructure Architecture Audit，Audit Only（29 Model 数据资产盘点 + 5 维度评级：Business Data B+/Event Tracking B/Analytics Readiness C+/BI D/AI Data C），M21.3 Readiness = CONDITIONAL PASS（阻塞：L1 Events 无持久化），M21.3 Roadmap 5 子阶段规划（Data Asset Governance → Analytics Event Persistence → BI Foundation → Data-Driven Optimization → AI Data Preparation）。M21.3.1（521）COMPLETED——Data Asset Governance Audit，Audit Only（29 Model + 20 Enum 全量盘点 + 7 域数据质量矩阵：Content A-/Product B+/Buyer B+/System B+/Offer B/Inquiry B/Identity B- + 13 项 Gap（P0:3/P1:6/P2:4）+ 生命周期评估 + Entity Relationship），Data Maturity = B。M21.3.2 Pre-Development Audit（522）COMPLETED——Analytics Event Persistence Pre-Development Audit，Audit Only（ConversionEvent 模型设计冻结 + 11 Event Types 定义 + API Boundary 设计 + Index Strategy 7 Index + Storage Strategy PostgreSQL + Responsibility Separation 确认）。M21.3.2 Development（522）COMPLETED——Analytics Event Persistence Foundation，Database（ConversionEventType Enum + ConversionEvent Model + Migration 009）+ Backend（AnalyticsModule + POST /api/analytics/events Batch Write）+ Frontend（ApiTrackingAdapter + PageViewTracker + 4 新事件类型集成：page_view/content_view/search/product_filter），ConversionEvent Persistence Foundation Completed。Next: 523_M21.3.3_BI_Foundation）。M21.3.3 Pre-Development Audit（523）COMPLETED——BI Foundation Pre-Development Audit，Audit Only（Current Analytics Data Inventory + BI Data Requirement Analysis + Query Architecture Decision: Option B Analytics Query Service + Admin BI Boundary + RBAC: ADMIN Only + 6 Conditions），Readiness = CONDITIONAL PASS（No Schema Change + No New Dependencies + Read-Only API + ADMIN Only + No Aggregation Tables + No AI/ML）。Next: 523_M21.3.3_BI_Foundation_Development）。M21.3.3 Development（523）COMPLETED——BI Foundation Development，Backend（AnalyticsReadService + AnalyticsReadController + 3 GET APIs：dashboard/statistics/events + ADMIN-only RBAC）+ Admin（Analytics Page + OverviewCards + TrendChart + TopProductsTable + TopContentTable + Menu Integration），BI Foundation Completed：Analytics Query Layer + Admin Dashboard。Next: 524_M21.3.4_Data_Driven_Optimization）。M21.3.4 Pre-Development Audit（524）COMPLETED——Data-Driven Optimization Pre-Development Audit，Audit Only（Current Capability M21.3.3 Baseline: Backend B+/API B/DB B+/Admin B，8 Gaps Identified：G1 memory load+G2 no time range+G3 UUID display+G4 groupBy broken+G5 no DatePicker+G6 no date truncation+G7 no entity filter+G8 no conversion rate），Proposed M21.3.4 Scope：Backend Query Optimization（4 tasks）+ API Enhancement（3 tasks）+ Admin UI Enhancement（3 tasks）+ Data Quality（2 tasks），Impact Level 1（Analytics Module Enhancement），0 Permission Requests，6 Conditions MET，Readiness = CONDITIONAL PASS。Next: 524_M21.3.4_Data_Driven_Optimization_Development）。M21.3.4 Development（524）COMPLETED——Data-Driven Optimization Development，Backend（DATE_TRUNC via $queryRaw + Time Range + Entity Name Resolution + Memory Optimization）+ Admin（RangePicker + Refresh + Real Names），6/8 Gaps Resolved（G1 memory load+G2 time range+G3 UUID display+G4 groupBy fixed+G5 DatePicker+G6 date truncation），Impact Level 1，0 Schema Changes，0 Migrations，0 New Dependencies。Next: 525_M21.3.5_AI_Data_Preparation_Pre_Development_Audit）。M21.3.5 Pre-Development Audit（525）COMPLETED——AI Data Preparation Pre-Development Audit，Audit Only（7 Domain Data Asset Inventory：30 Model/239 Field/8 Event Types + 6 Dimension AI Readiness：Structured Data B+/Event Data B+/Semantic Metadata B/Entity Relationship B+/User Context B-/Knowledge Asset B+ + 10 Gaps（P0:3 G1 Vector Infrastructure/G2 Content Chunking/G4 Embedding Pipeline，P1:4 G3 Product slug/seoTitle/G5 User Profile/G6 Semantic Mapping/G10 Metadata，P2:3 G7 Session/G8 Knowledge Graph/G9 Data Quality）+ Architecture：3-Phase AI Data Preparation（pgvector + Embedding VECTOR(1536) + ContentChunk + EmbeddingService + Admin UI + Product slug），M21.3.5 Readiness = PASS，AI Data Foundation = B+。M21.3.5 Development（525）COMPLETED——AI Data Preparation Development，Database（Migration 010：pgvector extension + Content.embedding/Product.embedding VECTOR(1536) + Product.slug/seoTitle + ContentChunk table）+ Backend（EmbeddingModule + EmbeddingService + EmbeddingController + 8 ADMIN-only endpoints）+ Admin（EmbeddingManagement page + router + menu），AI Data Preparation Foundation Completed。M21.3 Data Intelligence Infrastructure — CLOSED（M21.3.1-M21.3.5 全部完成）。M21.4.0 Semantic Layer Pre-Development Audit（526）COMPLETED——Audit Only（7 Dimension Readiness：B+/B/B+/B+/B/C/C + 11 Gaps：P0:3/P1:4/P2:4 + Architecture：Vector Index + Semantic Module + RetrievalService + RankingService + Search API + Unified Search），M21.4 Readiness = CONDITIONAL PASS。M21.4.1 Vector Index Foundation（527）COMPLETED——Database-Only（Migration 011：3 IVFFlat indexes + cosine_similarity function），P0 GAP-01/GAP-02 RESOLVED。M21.4.2 Embedding Data Population（528）COMPLETED——Data Population（OpenRouter text-embedding-3-small：8 Content + 5 Product + 8 Chunk，100% Coverage，21/21 embeddings 1536-dim），P1 GAP-04 RESOLVED。M21.4.3 Semantic Module Foundation（529）COMPLETED——SemanticModule + RetrievalService + EmbeddingCacheService + SemanticController，P0 GAP-03 RESOLVED。M21.4.4 Semantic Search API Foundation（530）COMPLETED——SemanticQueryService + SemanticQueryController + DTO + Query Contract Frozen，Internal API。M21.4.5 Semantic Retrieval Enhancement（531）COMPLETED——threshold filtering + diagnostics + unified retrieve() + metadata + query normalization，P1 GAP-05 RESOLVED。M21.4.6 Semantic Ranking Foundation（532）COMPLETED——RankingService + RankingStrategy + Contract Frozen，semanticScore + rankingScore，P1 GAP-06 RESOLVED。M21.4.7 Unified Search Ranking Foundation（533）COMPLETED——UnifiedSearchService + UnifiedSearchContract + UnifiedSearchDto，Retrieval→Ranking→Unified Response orchestration，P1 GAP-07 RESOLVED。M21.4 CLOSED——3/3 P0 GAPs + 4/4 P1 GAPs 全部解决。M21.5.0 Pre-Development Architecture Audit（534）COMPLETED——Audit PASS：API/Auth Ready，Semantic Protected，BFF Deferred，Responsive Web → PWA → Native App 路径。M21.5.1 Responsive Web Foundation（535）COMPLETED——2 new files + 18 modified files，Responsive Layout + Mobile Navigation + WorkspaceLayout + Responsive Hooks + 三端适配（Mobile/Tablet/Desktop），apps/web build exit 0，零 API/Schema/Migration 变更。M21.5.2 Progressive Web App Foundation（536）COMPLETED——6 new files + 1 modified file，PWA Manifest + Service Worker（Cache-First Static / Network-First Pages / Offline Fallback）+ PWA Icons + Offline Page + Root Layout PWA Integration（viewport/manifest/AppleWebApp），apps/web build compiled successfully，零 API/Schema/Migration 变更。M21.5.3 Mobile Experience Optimization（537）COMPLETED——12 modified files，Workspace Mobile UX（Sidebar close button + 44px touch targets + responsive padding）+ Product Experience（ProductCard + Specifications responsive）+ Form Experience（Demand/RFQ Create 44px buttons）+ Touch Optimization（all buttons/pagination 40-44px），apps/web build exit 0，零 API/Schema/Migration 变更。M21.5 Mobile Experience — CLOSED（534-537 全部完成，Responsive Web + PWA + Mobile UX Optimization）。M21.6.0 Pre-Development Architecture Audit（538）COMPLETED——Audit PASS：Admin UI 19 pages，Admin API 11 endpoints（ADMIN-only），Analytics 8 event types（dashboard + statistics + events），Monitoring（Matching + System status），Audit（full trail + filter + export），Embedding（coverage status + manual trigger），Semantic Boundary PROTECTED，13 data sources READY，8 Gaps（0 P0 / 3 P1 / 5 P2），Overall Readiness B+。M21.6.1 Admin Operational Dashboard Enhancement（539）COMPLETED——8 modified files（4 backend + 4 frontend），1 new API endpoint（GET /admin/dashboard/trend）+ 2 enhanced API responses（stats + pending），Dashboard Enhancement：Platform KPIs（6 cards）+ Business KPIs（6 cards）+ Matching Intelligence（4 cards）+ Pending Items（5 cards）+ Real Trend（7-day ConversionEvent）+ Business Funnel（7-stage real data）+ Entity Comparison（10 entities），apps/admin + apps/api build exit 0，零 Schema/Migration 变更。M21.6.2 Admin Business Analytics Enhancement（540）COMPLETED——11 files（2 new backend + 3 new frontend + 6 modified），4 new API endpoints（GET /admin/analytics/business/{funnel,lifecycle,conversion,matching}，ADMIN-only），Business Analytics Page（4 tabs：Demand Funnel 6-stage + RFQ Lifecycle 5-stage + Business Conversion 9-stage pipeline + Matching Analysis 6-stage），apps/admin + apps/api build exit 0，零 Schema/Migration 变更。Next: M21.6.3_Admin_Monitoring_Enhancement。M21.6.3 Admin Monitoring Enhancement（541）COMPLETED——9 files（2 new backend + 3 new frontend + 4 modified），1 new API endpoint（GET /admin/monitoring/overview，ADMIN-only），Monitoring Page（5 sections：System Health + Business Risk + Matching Health + Embedding Coverage + Analytics Pipeline），10 code-level thresholds（NORMAL/WARNING/CRITICAL），apps/admin + apps/api build exit 0，零 Schema/Migration 变更。Next: M21.6.4_Admin_Audit_Intelligence_Enhancement。M21.6.4 Admin Audit Intelligence Enhancement（542）COMPLETED——9 files（2 new backend + 3 new frontend + 4 modified），1 new API endpoint（GET /admin/audit-intelligence/overview?days=7，ADMIN-only），Audit Intelligence Page（5 sections：Audit Overview + Audit Trend + Entity Distribution + Actor Activity + Risk Indicators），6 code-level risk indicators（DELETE/STATUS_CHANGE/Event Rate/Login Rate/Actor Activity/Actor Concentration），apps/admin + apps/api build exit 0，零 Schema/Migration 变更。M21.6 Admin Intelligence Closure Audit（543）COMPLETED——Audit Only：539-542 全能力验证 PASS + 架构边界 PROTECTED（Monitoring/Alert Engine/Audit/Security）+ Semantic Boundary PROTECTED + Database 零变更 + API 全部 ADMIN-only + 三端 Build PASS + 文档同步完成，M21.6 CLOSED。Next: M21.7 AI Agent Integration。`
 
 ## Current Phase Judgment
 
 VISNDT 已经完成基础建设、后端主域与 Admin 运营底座，也已完成 Buyer / Supplier 双侧 Workspace 主链。当前项目最准确的状态是：
 
-`M15 技术债治理已全面收口，M16 业务深化前稳定性审计已完成，M17 内容域建设完成，M18 内容运营成熟化完成（M18.5 阶段关闭），M19 产品体验架构演进完成（M19.1~M19.4 CLOSED），M19 COMPLETED，M20 Frontend Platformization 已启动（M20.0.0 架构规划前置审核通过，M20.1 Search Experience 阶段闭环（M20.1.1~M20.1.4 CLOSED），M20.2 Content Asset Planning（492）通过，M20.2.1 Architecture Design（493）通过，M20.2.2 Search Integration（494）完成，M20.2.3 Tagging Taxonomy Design（495）通过，M20.2.3 Tagging Taxonomy Development（496）完成，M20.2.4 Content Type & Business Asset Architecture Audit（497）通过，M20.2.4 Content Type & Business Asset Development（498）完成——PASS，6 files，M20.2.5 Content Discovery Enhancement Architecture Audit（499）通过，M20.2.5 Content Discovery Enhancement Development（500）完成——PASS，6 files，三端 build exit 0；M20.2.6 Content Asset Integration Closure Audit（501）通过——PASS，M20.2 CLOSED/FROZEN；M20.3 Commercial Conversion Architecture Audit（502）通过——PASS，AUTHORIZED，Frontend-only CTA，零 Schema/API 变更；M20.3.1 Commercial Conversion Development（503）完成——PASS，1 new component + 6 modified files，三端 build exit 0；M20.3.2 Commercial Conversion Closure Audit（504）通过——PASS，M20.3 CLOSED/FROZEN；M20.4.0 Admin Platform Professionalization Architecture Audit（505）通过——PASS，AUTHORIZED，19 域能力评估完成（Dashboard 60%、Product 75%、Content 90%、Import/Export 0%、Permission 30%）；M20.4.0.1 Admin Operation Center Experience Architecture Audit（506）通过——PASS，AUTHORIZED，Operation Center 体验架构评估完成（Desktop 75%、Tablet 10%、Mobile 5%），零 Schema/API 变更，P0 优先级 Layout + Table + Dashboard charts；M20.4.1 Admin Operation Center Foundation Upgrade（507）完成。M20.4.2 Admin Data Operation Enhancement（508）完成。M20.4.3 Admin Permission & Workflow Enhancement（509）完成。M20.4.4 Admin Professionalization Closure（510）完成——PASS，Admin Frontend Only，零 Schema/API/Migration 变更，BatchOperations→BatchActionBar 全量迁移（9 页完成），组件体系收敛（operation/ 10 组件 + permission/ 3 组件），三端 build 通过（Admin exit 0）。Code State = Documentation State。M20.4 CLOSED。下一步 M21 Planning。`
+`M15 技术债治理已全面收口，M16 业务深化前稳定性审计已完成，M17 内容域建设完成，M18 内容运营成熟化完成（M18.5 阶段关闭），M19 产品体验架构演进完成（M19.1~M19.4 CLOSED），M19 COMPLETED，M20 Frontend Platformization 全部闭环（M20.1~M20.4 CLOSED），M20 COMPLETED。M21.0-M21.4 CLOSED（AI 基础设施 + Semantic Layer + Unified Search）。M21.5 Mobile Experience CLOSED（534-537 全部完成：Responsive Web + PWA + Mobile UX Optimization）。M21.6 Admin Intelligence CLOSED（538 Audit + 539 Dashboard + 540 Business Analytics + 541 Monitoring + 542 Audit Intelligence + 543 Closure Audit 全部完成）。Next: M21.7 AI Agent Integration。`
 
 ## Completed Baseline
 
@@ -687,6 +687,126 @@ VISNDT 已经完成基础建设、后端主域与 Admin 运营底座，也已完
 - **Decision** ✅：**M20.1.3 Search Experience Optimization Architecture Design Audit — COMPLETED (489)**。Architecture Audit Only, Code Change = None。12 files audited (1 service + 10 components + 1 page)。17 gaps identified: 3 P0 (suggestion integration, zero-result sections, pagination) + 6 P1 (retry button, product images, tab caching, code dedup, partial errors, sticky search) + 8 P2 (deferred)。Architecture Decision: PROCEED。Backend/Schema/Migration/API = None。Next Step: 490_M20.1.3_Search_Experience_Optimization_Development。
 - **Decision** ✅：**M20.1.3 Search Experience Optimization Development — COMPLETED (490)**。3 P0 + 5 P1 items implemented。P0-1: SearchSuggestionDropdown integrated into GlobalSearchBar。P0-2: Zero-result sections hidden in "全部" mode。P0-3: Pagination / Load More with append logic。P1-1: Retry button on error state。P1-2: Product images skipped (Product API no media)。P1-3: Tab result caching via useRef。P1-4: Shared utilities extracted to search-utils.tsx。P1-5: Promise.allSettled partial error handling。P1-6: Sticky search bar on /search。apps/web build exit 0。Backend/Schema/Migration/API = None。Next Step: M20.1.4 or M20.2 Planning。
 - **Decision** ✅：**M20.1.4 Search Experience Final Audit — COMPLETED (491)**。Architecture Audit Only, Code Change = None。M20.1 Search Experience Phase: PASS。14 files verified (13 search + 1 layout)。17 resolved gaps, 9 deferred, 7 future candidates, 3 accepted limitations。Architecture: FROZEN。Backend/Schema/Migration/API/Infrastructure: ALL NONE。M20.1 → M20.2 Transition: AUTHORIZED。Next Step: M20.2 Content Asset Planning。
+
+## M21.0 Platform Next Phase Architecture Audit（511，M21 Architecture Audit）
+
+- **M21.0 Platform Next Phase Architecture Audit Started & Completed（511）**：基于 M20.4 全阶段闭环状态，执行 M21 平台下一阶段架构审计。**Code Change = None（Audit Only）**。
+- **Platform Capability Assessment** ✅：
+  - **Admin Operation Center**: 72%（用户运营 75%、供应商运营 45%、产品运营 75%、商业运营 75%、内容运营 85%、数据运营 50%、系统运营 70%）
+  - **Web Platform**: 80%（Public 18 页 + Buyer Workspace 4 页 + Supplier Workspace 3 页，Content→Product→Inquiry 商业转化路径完整）
+  - **Mobile Experience**: 35%（Desktop 75%、Tablet 40%、Mobile 25%，基础响应式，操作体验待优化）
+  - **Data Architecture**: 65%（25+ Prisma 模型、15 Enums，结构化数据完整，缺少时间序列/行为追踪/分析模型）
+  - **AI Readiness**: 15%（数据基础就绪，向量/Embedding/RAG 基础设施为零）
+- **M21 Direction Freeze** ✅：AI & Platform Enhancement。6 阶段路线图：M21.1 AI Readiness Foundation → M21.2 Data & Analytics Infrastructure → M21.3 Mobile Experience Enhancement → M21.4 Admin Intelligence Upgrade → M21.5 AI Agent Integration → M21.6 Supplier Product Model Re-evaluation。**⚠️ 路线已重校准（526.1）：M21.4 已从 Admin Intelligence 调整为 Semantic Intelligence Layer Preparation，Mobile 移至 M21.5，Admin Intelligence 移至 M21.6，AI Agent 移至 M21.7，Supplier 移至 M21.8。**
+- **Supplier Product Model** ✅：481 文档重新评估——触发条件未满足（无 Supplier 型号页面需求、无 RFQ 精准匹配需求、无 AI Matching 需求）。**Decision: KEEP FROZEN**。
+- **AI Agent Architecture** ✅：数据基础具备（结构化产品参数 + 内容标签体系），但基础设施缺失（向量数据库、Embedding pipeline、LLM 集成）。渐进路线：Infrastructure → Foundation → Intelligence。
+- **Risk Assessment** ✅：High Risk 3 项（AI 过度建设、数据质量不足、Schema 膨胀）；Medium Risk 3 项（移动端投入产出比、第三方服务依赖、性能退化）；Low Risk 2 项（路线偏离、文档不同步）。
+- **Schema/API Impact** ✅：**Schema Change = None / Migration = None / API Change = None**（Audit Only）。
+- **Decision** ✅：**M21.0 Platform Next Phase Architecture Audit — PASS**。VISNDT 平台具备进入 M21+ AI & Platform Enhancement 阶段的基础。M21 路线图冻结，6 阶段渐进路线获批。**M21 AUTHORIZED**。Next Step: 512_M21.1_AI_Readiness_Foundation_Architecture_Audit。
+
+## M21.1 AI Readiness Foundation Architecture Audit（512，M21.1 Architecture Audit）
+
+- **M21.1 AI Readiness Foundation Architecture Audit Started & Completed（512）**：基于 M21.0 平台审计基线，执行 AI/Data Readiness 基础能力审计。**Code Change = None（Audit Only）**。
+- **Data Quality Assessment** ✅：
+  - **Content Domain**: 85%（Full SEO + Tags + Revisions + Public Projection，最佳 AI 候选）
+  - **Business Domain**: 70%（Structured Matching + ScoringService + DemandMatch，可 AI 增强）
+  - **Product Domain**: 65%（Excellent Parameter System + Category Tree，但缺少 SEO/Slug 字段）
+- **Search Audit** ✅：当前搜索为 Prisma `contains` + `mode: 'insensitive'`（LIKE 风格），无 PostgreSQL full-text search（tsvector），无外部搜索引擎，无语义搜索。M20.1 Search FROZEN 维持。
+- **Matching Audit** ✅：ScoringService 为规则驱动加权评分（exact match + range match + enum match），可通过 AI embedding 增强但不需要替换。
+- **UserEvent Model Design** ✅：Proposed UserEvent 模型（userId, sessionId, eventType, entityType, entityId, metadata）——为未来推荐/个性化/转化漏斗分析提供基础。**Design Only，不实现**。
+- **Vector Architecture Evaluation** ✅：**Recommendation: PostgreSQL + pgvector（Option A）**。零额外基础设施，原生 SQL 集成，适合当前数据规模。**Embedding 模型推荐: bge-large-zh-v1.5**（中文优化，自托管，1024 维）。
+- **AI Capability Architecture** ✅：4 层架构确立：L1 Structured Data Layer（当前）→ L2 Semantic Layer（Embedding + Vector Search）→ L3 AI Capability Layer（LLM + RAG + AI Scoring）→ L4 Agent Layer（Admin AI Agent + Content AI Assistant）。
+- **Product SEO Gap** ✅：Product 模型缺少 SEO 字段（seoTitle, seoDescription, seoKeywords, slug）——M21.3 需要补充以支持 Product Semantic Search。
+- **Schema/API Impact** ✅：**Schema Change = None / Migration = None / API Change = None / AI SDK = None / Vector DB = None / LLM = None**（Audit Only）。
+- **Decision** ✅：**M21.1 AI Readiness Foundation Architecture Audit — PASS**。Content 85% AI-ready，Business 70% AI-ready，Product 65%（需 SEO 补充）。pgvector + bge-large-zh-v1.5 推荐。M21.2 Data & Analytics Infrastructure 获批（pgvector 启用 + Content Embedding + UserEvent 实现 + Semantic Search MVP）。**M21.2 AUTHORIZED**。Next Step: 513_M21.2_Data_Analytics_Infrastructure_Architecture_Audit。
+
+## M21 Roadmap Recalibration（512.1，M21 Transition Adjustment）
+
+- **M21 Roadmap Recalibration Audit Completed（512.1）**：基于 511 + 512 审计结论，重新校准 M21 路线。**Code Change = None（Audit + Documentation Only）**。
+- **Recalibration Reason** ✅：511 审计中 Web 80% 评分未反映 Discovery/SEO/Conversion/UX Architecture 缺口，且 Data Analytics 依赖 Web 平台行为数据，需先完善 Web 再建数据体系。路线校准原则：「用户可见层优先 → 数据层其次 → 智能层最后」。
+- **Old Roadmap（511）** ✅：M21.0 Audit → M21.1 AI Readiness → M21.2 Data Analytics → M21.3 Mobile → M21.4 Admin Intelligence → M21.5 AI Agent → M21.6 Supplier Model。
+- **New Roadmap（512.1）** ✅：M21.0 Audit (511) → M21.1 AI Readiness (512) → **M21.2 Web Platform Experience (513)** → **M21.3 Data & Analytics (514)** → M21.4 Mobile → M21.5 Admin Intelligence → M21.6 AI Agent → M21.7 Supplier。**⚠️ 路线已二次重校准（526.1）：M21.4 调整为 Semantic Intelligence Layer Preparation，Mobile 移至 M21.5，Admin Intelligence 移至 M21.6，AI Agent 移至 M21.7，Supplier 移至 M21.8。**
+- **Key Changes** ✅：
+  - **新增 M21.2 Web Platform Experience**（Public Web + Buyer/Supplier Workspace + Navigation + Discovery + SEO + Conversion + UX Architecture，Frontend Only）
+  - M21.2 Data → M21.3（依赖 Web 平台行为数据）
+  - M21.3 Mobile → M21.4（Web 体验成熟后适配）**⚠️ 已二次重校准：M21.4 = Semantic Intelligence Layer**
+  - M21.4 Admin → M21.5（需 Data 层支撑）**⚠️ 已二次重校准：M21.5 = Mobile Experience**
+  - M21.5 AI Agent → M21.6（需 Admin 智能化基础）
+  - M21.6 Supplier → M21.7（平台能力成熟后评估）
+- **Six Capability Tracks** ✅：Web（Exp. Platform）、Data（Analytics）、Mobile（Full Op.）、Admin（Intelligence）、AI（Agent）、Supplier（Cond. Eval.）。
+- **Capability Evolution Matrix** ✅：
+  | Capability | Current | Target |
+  |------------|---------|--------|
+  | Admin | Operation Center (72%) | Intelligence |
+  | Web | Discovery Platform (80%) | Experience Platform |
+  | Data | Structured Data (65%) | Analytics Layer |
+  | Mobile | Responsive (35%) | Full Operation |
+  | AI | Ready (15%) | Agent |
+  | Supplier | Offer Model (FROZEN) | Conditional Evolution |
+- **Frozen Modules** ✅：Product Global Catalog、M20.1 Search、Supplier Product Model、Content Schema、Matching Algorithm、RBAC 全部维持冻结。
+- **Constraints** ✅：M21.2 Web（Frontend Only, No Schema/API/Search）、M21.3 Data（Schema 需独立审核, No AI）、M21.4 Mobile（Frontend Only）、M21.5 Admin（Based on M21.3, No AI Agent）、M21.6 AI（Based on M21.3+M21.5, No Business Logic Replaced）、M21.7 Supplier（Condition Evaluation Only）。**⚠️ 已二次重校准（526.1）：M21.4 = Semantic Intelligence Layer（Database-Only→Backend→API→Admin），M21.5 = Mobile Experience（Frontend Only），M21.6 = Admin Intelligence，M21.7 = AI Agent，M21.8 = Supplier。**
+- **Schema/API Impact** ✅：**Schema Change = None / Migration = None / API Change = None / Search Change = None**（Audit + Documentation Only）。
+- **Decision** ✅：**512.1_M21_Roadmap_Recalibration_Audit — PASS**。M21 Revised Roadmap Authorized。六条能力路线冻结。**M21.2 AUTHORIZED**。Next Step: 513_M21.2_Web_Platform_Experience_Architecture_Audit。
+
+## M21.2 Web Platform Experience Architecture Audit（513，M21.2 Architecture Audit）
+
+- **M21.2 Web Platform Experience Architecture Audit Completed（513）**：对 VISNDT Web 平台进行完整体验架构审计。**Code Change = None（Audit Only）**。
+- **Route Inventory** ✅：17 条公开路由 100% 存在（/、/products、/products/[slug]、/categories、/search、/knowledge、/knowledge/[slug]、/solutions、/solutions/[slug]、/articles、/articles/[slug]、/insights、/insights/[slug]、/tags/[slug]、/suppliers/[id]、/business、/about）。
+- **Public Web Experience Score: 65%** ✅：Route 100%，SEO Metadata 100%，但 Loading States 0%、Error Boundaries 0%、OpenGraph 29%（仅 5/17 详情页）、JSON-LD 23%（仅 4/17 内容详情页）。
+- **Buyer Workspace Score: 80%** ✅：Content→Product→Inquiry→Demand→RFQ 完整闭环，Buyer 7 页路由完备。缺口：无引导流程、无首次用户引导、无通知中心、无多 Offer 比较工具。
+- **Supplier Workspace Score: 78%** ✅：Supplier = Capability Provider 定位完全合规，无 Store/Marketplace/Catalog。Display + RFQ 响应完整。缺口：Display 完整性指标可操作性弱、无公开预览、无能力分析。
+- **Conversion Architecture Score: 85%** ✅：ContentCommercialCTA 统一入口，InquiryForm + SupplierInquirySection 双入口，Demand→RFQ 路径完整。缺口：所有内容 CTA 指向同一 /products（无上下文链接）、无转化追踪、页面缺少 Demand 创建入口。
+- **SEO Architecture Score: 55%** ⚠️：Content 详情页 SEO 强（OpenGraph + JSON-LD），但 Product 页缺 JSON-LD（Product schema）、Homepage 缺 Organization/WebSite JSON-LD、列表页缺 OpenGraph、Product 模型缺 SEO 字段（seoTitle/seoDescription/seoKeywords/slug，Schema 层缺口）。
+- **Navigation Architecture Score: 71%** ✅：三层导航（Discovery/Business/Workspace）结构清晰，WorkspaceSidebar + Breadcrumb 完整。缺口：移动端导航仅 Hamburger（无 Bottom Nav）、Breadcrumb 不全、无搜索建议。
+- **Design System Score: 65%** ✅：40+ 组件按域组织良好，Tailwind 自定义主题。缺口：无 Design Token 系统、无组件文档（Storybook）、无共享 UI 原语库。
+- **Mobile Readiness: 35%** ⚠️：基础响应式，Workspace 桌面端设计，Dashboard 移动端差，RFQ 表单未适配。
+- **Gap Analysis** ✅：P0 缺口 5 项（Loading States、Error Boundaries、Product JSON-LD、Homepage JSON-LD、CTA 上下文链接）、P1 缺口 9 项（OpenGraph 列表页、Breadcrumb JSON-LD、Empty States、Design Token 等）、P2 缺口 7 项、Future 缺口 4 项（M21.3-M21.4）。
+- **Decision** ✅：**513_M21.2_Web_Platform_Experience_Architecture_Audit — PASS**。Web Platform Experience Score 68%/C+。推荐进入 M21.2.x Development Phase（Frontend Only，~20-30 文件，零 Schema/API/Search 变更）。Next: 513.x_M21.2.x_Web_Platform_Experience_Development 或 514_M21.3_Data_Analytics_Infrastructure。
+
+
+
+Current Major Stage:
+
+M21.4 Semantic Intelligence Layer
+
+
+Previous Route:
+
+M21.4 Mobile Experience Platformization
+
+
+Route Status:
+
+REPLACED
+
+
+Current Execution:
+
+533_M21.4.7_Unified_Search_Ranking_Foundation — COMPLETED
+
+M21.4 Semantic Intelligence Layer Preparation — CLOSED
+
+Next: M21.5 Mobile Experience
+
+---
+
+## M21.5 Mobile Experience
+
+### 534_M21.5_Pre_Development_Architecture_Audit — COMPLETED
+
+- **Status** ✅：**Audit PASS**。Architecture Audit Only，No Code Change。
+- **Audit Report** ✅：`docs/_review/534_M21.5_Pre_Development_Architecture_Audit_Report.md`。
+- **Key Findings** ✅：
+  - **API Ready**：13+ Public API + 6+ Workspace API 可直接被 Mobile 消费
+  - **Auth Ready**：JWT Bearer Token 原生支持 Mobile
+  - **Semantic Protected**：Semantic Layer 保持 Internal Capability，Mobile 不直接消费
+  - **BFF Deferred**：当前 API 足够 Mobile Phase 1，BFF 延后至 M21.5.x
+  - **No Blocking Risks**：无架构风险阻止 Mobile 开发
+- **Recommended Path** ✅：Responsive Web (P0) → PWA (P1) → Native App (P2)
+- **Impact** ✅：Schema Change = None / Migration = None / API Change = None / Frontend Change = None / Code Change = None（Audit Only）
+- **Next** ✅：535_M21.5.1_Responsive_Web_Foundation
+
+
 
 ## Future Architecture Candidates
 

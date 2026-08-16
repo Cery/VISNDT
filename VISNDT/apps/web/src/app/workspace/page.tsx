@@ -1,11 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useState } from 'react';
 import AuthGuard from '@/auth/AuthGuard';
 import { useAuth } from '@/auth/AuthProvider';
-import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
-import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
+import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
 import type { WorkspaceRole } from '@/services/auth.service';
 
 interface WorkspaceEntryLink {
@@ -63,54 +61,45 @@ const WORKSPACE_ENTRY_LINKS: Record<Exclude<WorkspaceRole, null>, WorkspaceEntry
 
 function WorkspaceContent() {
   const { user } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const toggleSidebar = useCallback(() => setSidebarOpen((value) => !value), []);
-  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   const workspaceRole = user?.workspaceRole ?? null;
   const entryLinks = workspaceRole ? WORKSPACE_ENTRY_LINKS[workspaceRole] : [];
 
   return (
-    <div className="flex min-h-screen">
-      <WorkspaceSidebar mobileOpen={sidebarOpen} onClose={closeSidebar} />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <WorkspaceHeader onMenuToggle={toggleSidebar} />
-        <div className="flex-1 bg-slate-50 p-6">
-          <div className="mx-auto max-w-[960px] space-y-6">
-            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h1 className="text-2xl font-bold text-slate-900">Workspace Entry</h1>
-              <p className="mt-2 text-sm text-slate-500">
-                这里仅保留工作区导航职责，不再承担 Dashboard 汇总或业务数据聚合。
-              </p>
-              <p className="mt-2 text-sm text-slate-500">
-                当前角色：{workspaceRole ?? '未配置'}
-              </p>
-            </div>
-
-            {workspaceRole ? (
-              <section className="grid gap-4 md:grid-cols-2">
-                {entryLinks.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-colors hover:border-slate-300"
-                  >
-                    <h2 className="text-lg font-semibold text-slate-900">{item.title}</h2>
-                    <p className="mt-2 text-sm text-slate-500">{item.description}</p>
-                  </Link>
-                ))}
-              </section>
-            ) : (
-              <section className="rounded-xl border border-amber-200 bg-amber-50 p-6">
-                <h2 className="text-lg font-semibold text-amber-900">未分配可用工作区角色</h2>
-                <p className="mt-2 text-sm text-amber-800">
-                  当前账号已登录，但尚未映射到 Buyer 或 Supplier 工作区。请联系管理员完成角色配置后再进入 Dashboard。
-                </p>
-              </section>
-            )}
-          </div>
+    <WorkspaceLayout>
+      <div className="mx-auto max-w-[960px] space-y-6">
+        <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Workspace Entry</h1>
+          <p className="mt-2 text-sm text-slate-500">
+            这里仅保留工作区导航职责，不再承担 Dashboard 汇总或业务数据聚合。
+          </p>
+          <p className="mt-2 text-sm text-slate-500">
+            当前角色：{workspaceRole ?? '未配置'}
+          </p>
         </div>
+
+        {workspaceRole ? (
+          <section className="grid gap-4 sm:grid-cols-2">
+            {entryLinks.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm transition-colors hover:border-slate-300"
+              >
+                <h2 className="text-base sm:text-lg font-semibold text-slate-900">{item.title}</h2>
+                <p className="mt-2 text-sm text-slate-500">{item.description}</p>
+              </Link>
+            ))}
+          </section>
+        ) : (
+          <section className="rounded-xl border border-amber-200 bg-amber-50 p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-semibold text-amber-900">未分配可用工作区角色</h2>
+            <p className="mt-2 text-sm text-amber-800">
+              当前账号已登录，但尚未映射到 Buyer 或 Supplier 工作区。请联系管理员完成角色配置后再进入 Dashboard。
+            </p>
+          </section>
+        )}
       </div>
-    </div>
+    </WorkspaceLayout>
   );
 }
 

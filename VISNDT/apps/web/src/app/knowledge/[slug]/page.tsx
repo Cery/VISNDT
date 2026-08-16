@@ -2,15 +2,18 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getContentBySlug } from '@/services/content.service';
+import TrackOnMount from '@/components/analytics/TrackOnMount';
 import {
   SITE_DESCRIPTION,
   absoluteUrl,
   contentImageUrl,
   buildContentJsonLd,
+  buildBreadcrumbListJsonLd,
+  JsonLdScript,
 } from '@/lib/seo';
 import MarkdownRenderer from '@/components/markdown/MarkdownRenderer';
 import MediaGallery from '@/components/content/MediaGallery';
-import ContentCommercialCTA from '@/components/content/ContentCommercialCTA';
+import ContentProductCTA from '@/components/common/ContentProductCTA';
 
 interface KnowledgeDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -95,30 +98,38 @@ export default async function KnowledgeDetailPage({
   });
 
   return (
-    <div className="max-w-[820px] mx-auto px-6 py-10">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    <div className="max-w-[820px] mx-auto px-4 sm:px-6 py-6 sm:py-10">
+      <TrackOnMount
+        event="content_view"
+        targetId={content.id}
+        source="/knowledge/[slug]"
+        metadata={{ contentType: content.type, contentTitle: content.title }}
       />
+      <JsonLdScript data={jsonLd} />
+      <JsonLdScript data={buildBreadcrumbListJsonLd([
+        { name: '首页', url: absoluteUrl('/') },
+        { name: '知识中心', url: absoluteUrl('/knowledge') },
+        { name: content.title, url: absoluteUrl(`/knowledge/${slug}`) },
+      ])} />
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-        <Link href="/" className="hover:text-primary transition-colors">
+      <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-4 sm:mb-6 overflow-x-auto">
+        <Link href="/" className="hover:text-primary transition-colors whitespace-nowrap">
           首页
         </Link>
         <span className="text-slate-300">/</span>
-        <Link href="/knowledge" className="hover:text-primary transition-colors">
+        <Link href="/knowledge" className="hover:text-primary transition-colors whitespace-nowrap">
           知识中心
         </Link>
         <span className="text-slate-300">/</span>
-        <span className="text-foreground truncate max-w-[240px]">{content.title}</span>
+        <span className="text-foreground truncate max-w-[160px] sm:max-w-[240px]">{content.title}</span>
       </nav>
 
       <article>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-4">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground mb-4">
           {content.title}
         </h1>
 
-        <div className="flex items-center gap-3 text-sm text-slate-400 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm text-slate-400 mb-6 sm:mb-8">
           {content.author?.name && <span>{content.author.name}</span>}
           {content.publishedAt && <span>发布于 {formatDate(content.publishedAt)}</span>}
         </div>
@@ -154,7 +165,7 @@ export default async function KnowledgeDetailPage({
 
       {/* Commercial CTA */}
       <div className="mt-8 mb-8">
-        <ContentCommercialCTA type="explore-products" />
+        <ContentProductCTA contextType="knowledge" />
       </div>
 
       {/* More from this type */}

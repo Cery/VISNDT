@@ -2,14 +2,17 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getContentBySlug } from '@/services/content.service';
+import TrackOnMount from '@/components/analytics/TrackOnMount';
 import {
   SITE_DESCRIPTION,
   absoluteUrl,
   contentImageUrl,
   buildContentJsonLd,
+  buildBreadcrumbListJsonLd,
+  JsonLdScript,
 } from '@/lib/seo';
 import MarkdownRenderer from '@/components/markdown/MarkdownRenderer';
-import ContentCommercialCTA from '@/components/content/ContentCommercialCTA';
+import ContentProductCTA from '@/components/common/ContentProductCTA';
 
 interface SolutionDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -95,10 +98,18 @@ export default async function SolutionDetailPage({
 
   return (
     <div className="max-w-[820px] mx-auto px-6 py-10">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      <TrackOnMount
+        event="content_view"
+        targetId={solution.id}
+        source="/solutions/[slug]"
+        metadata={{ contentType: solution.type, contentTitle: solution.title }}
       />
+      <JsonLdScript data={jsonLd} />
+      <JsonLdScript data={buildBreadcrumbListJsonLd([
+        { name: '首页', url: absoluteUrl('/') },
+        { name: '解决方案', url: absoluteUrl('/solutions') },
+        { name: solution.title, url: absoluteUrl(`/solutions/${slug}`) },
+      ])} />
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
         <Link href="/" className="hover:text-primary transition-colors">
@@ -151,7 +162,7 @@ export default async function SolutionDetailPage({
 
       {/* Commercial CTA */}
       <div className="mt-8 mb-8">
-        <ContentCommercialCTA type="submit-inquiry" />
+        <ContentProductCTA contextType="solution" />
       </div>
 
       {/* More from this type */}

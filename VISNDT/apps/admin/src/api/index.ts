@@ -19,3 +19,6 @@ export { fileAssetService } from './file-asset.service';
 export { auditLogService } from './audit-log.service';
 export { productParameterService } from './product-parameter.service';
 export { contentService } from './content.service';
+export { businessAnalyticsService } from './business-analytics.service';
+export { monitoringService } from './monitoring.service';
+export { auditIntelligenceService } from './audit-intelligence.service';

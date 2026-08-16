@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { RequireAuth } from '../auth';
 import AdminLayout from '../layouts/AdminLayout';
-import { DemandDetail, DemandEdit, DemandList, FileAssetOrphanList, Home, InquiryDetail, InquiryList, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ParameterDefinitionCreate, ParameterDefinitionDetail, ParameterDefinitionEdit, ParameterDefinitionList, ParameterGroupCreate, ParameterGroupDetail, ParameterGroupEdit, ParameterGroupList, ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList, ProductCreate, ProductDetail, ProductEdit, ProductList, ProductMediaCreate, ProductMediaEdit, ProductMediaList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, AuditLogList, UserCreate, UserDetail, UserEdit, UserList, ContentList, ContentCreate, ContentEdit, ContentTagList, ContentTagCreate, ContentTagEdit } from '../pages';
+import { DemandDetail, DemandEdit, DemandList, EmbeddingManagement, FileAssetOrphanList, Home, Analytics, BusinessAnalytics, Monitoring, AuditIntelligence, InquiryDetail, InquiryList, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ParameterDefinitionCreate, ParameterDefinitionDetail, ParameterDefinitionEdit, ParameterDefinitionList, ParameterGroupCreate, ParameterGroupDetail, ParameterGroupEdit, ParameterGroupList, ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList, ProductCreate, ProductDetail, ProductEdit, ProductList, ProductMediaCreate, ProductMediaEdit, ProductMediaList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, AuditLogList, UserCreate, UserDetail, UserEdit, UserList, ContentList, ContentCreate, ContentEdit, ContentTagList, ContentTagCreate, ContentTagEdit } from '../pages';
 
 const router = createBrowserRouter([
   {
@@ -18,6 +18,10 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/home" replace /> },
       { path: 'home', element: <Home /> },
+      { path: 'analytics', element: <Analytics /> },
+      { path: 'business-analytics', element: <BusinessAnalytics /> },
+      { path: 'monitoring', element: <Monitoring /> },
+      { path: 'audit-intelligence', element: <AuditIntelligence /> },
       { path: 'products', element: <ProductList /> },
       { path: 'products/create', element: <ProductCreate /> },
       { path: 'products/:id/edit', element: <ProductEdit /> },
@@ -67,6 +71,7 @@ const router = createBrowserRouter([
       { path: 'content/tags', element: <ContentTagList /> },
       { path: 'content/tags/create', element: <ContentTagCreate /> },
       { path: 'content/tags/:id/edit', element: <ContentTagEdit /> },
+      { path: 'embedding', element: <EmbeddingManagement /> },
     ],
   },
   {

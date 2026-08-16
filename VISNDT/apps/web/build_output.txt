@@ -1,0 +1,7 @@
+﻿node.exe : [low_level_alloc.cc : 554] RAW: Check new_pages != nullptr failed: VirtualAlloc failed
+所在位置 E:\Program\node\npm.ps1:15 字符: 14
++ $NPM_PREFIX=(& $NODE_EXE $NPM_PREFIX_JS)
++              ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([low_level_allo...ualAlloc failed:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 

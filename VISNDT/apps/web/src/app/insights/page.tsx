@@ -2,11 +2,19 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getContentList } from '@/services/content.service';
 import type { Content } from '@/types/content';
+import { SITE_URL } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: '行业洞察',
   description:
     '工业检测行业深度分析、参数解读、数据洞察与趋势研究。',
+  openGraph: {
+    title: '行业洞察',
+    description:
+      '工业检测行业深度分析、参数解读、数据洞察与趋势研究。',
+    type: 'website',
+    url: `${SITE_URL}/insights`,
+  },
 };
 
 function formatDate(value?: string | null): string {

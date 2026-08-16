@@ -4,11 +4,16 @@ import { useState } from 'react';
 import type { Offer } from '@/types/product';
 import SupplierCapabilityList from '@/components/products/SupplierCapabilityList';
 import InquiryForm from '@/components/inquiry/InquiryForm';
+import ProductInquiryContext from '@/components/common/ProductInquiryContext';
+import { trackEvent } from '@/lib/analytics/tracker';
+import { buildEvent } from '@/lib/analytics/events';
 
 interface SupplierInquirySectionProps {
   productId: string;
   productName: string;
   offers: Offer[];
+  productModel?: string | null;
+  productCategory?: string | null;
 }
 
 /**
@@ -25,11 +30,29 @@ export default function SupplierInquirySection({
   productId,
   productName,
   offers,
+  productModel,
+  productCategory,
 }: SupplierInquirySectionProps) {
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
 
   const handleSelect = (offer: Offer) => {
-    setSelectedOffer((prev) => (prev?.id === offer.id ? null : offer));
+    setSelectedOffer((prev) => {
+      const next = prev?.id === offer.id ? null : offer;
+      if (next) {
+        trackEvent(
+          buildEvent('inquiry_start', {
+            source: 'supplier_inquiry_section',
+            targetId: offer.id,
+            metadata: {
+              productId,
+              productName,
+              organizationName: offer.organization.name,
+            },
+          }),
+        );
+      }
+      return next;
+    });
   };
 
   const activeOffers = offers.filter(
@@ -45,7 +68,7 @@ export default function SupplierInquirySection({
         onSelect={handleSelect}
       />
 
-      {/* Selected Supplier Banner + Inquiry Form */}
+      {/* Product Inquiry Context + Inquiry Form */}
       {selectedOffer && (
         <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
           <div className="flex items-center justify-between mb-3">
@@ -64,7 +87,7 @@ export default function SupplierInquirySection({
                 />
               </svg>
               <p className="text-sm font-medium text-primary">
-                询价对象：{selectedOffer.organization.name}
+                已选择供应商：{selectedOffer.organization.name}
               </p>
             </div>
             <button
@@ -75,6 +98,12 @@ export default function SupplierInquirySection({
               切换供应商
             </button>
           </div>
+
+          <ProductInquiryContext
+            productName={productName}
+            model={productModel}
+            category={productCategory}
+          />
 
           <InquiryForm
             productId={productId}

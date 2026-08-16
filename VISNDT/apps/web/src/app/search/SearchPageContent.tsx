@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import type { SearchDomain } from '@/services/search.service';
 import { unifiedSearch } from '@/services/search.service';
 import type { UnifiedSearchResults } from '@/services/search.service';
+import { trackEvent, buildEvent } from '@/lib/analytics';
 import GlobalSearchBar from '@/components/search/GlobalSearchBar';
 import SearchTypeTabs from '@/components/search/SearchTypeTabs';
 import SearchResultSection from '@/components/search/SearchResultSection';
@@ -52,6 +53,14 @@ export default function SearchPageContent() {
 
       try {
         const data = await unifiedSearch({ q: query.trim(), type, page: currentPage, pageSize: PAGE_SIZE });
+
+        // Track search event (only on first page, not append)
+        if (!append) {
+          trackEvent(buildEvent('search', {
+            source: '/search',
+            metadata: { query: query.trim(), type, totalResults: data.products.total + data.knowledge.total + data.solutions.total + data.suppliers.total },
+          }));
+        }
 
         if (append && results) {
           // Append results for load more
@@ -165,7 +174,7 @@ export default function SearchPageContent() {
     <div className="min-h-screen bg-slate-50/50">
       {/* Search Header — sticky (P1-6) */}
       <div className="sticky top-0 z-40 bg-white border-b border-slate-200">
-        <div className="max-w-[1200px] mx-auto px-6 py-6">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <div className="max-w-2xl mx-auto">
             <GlobalSearchBar
               initialKeyword={query}
@@ -201,7 +210,7 @@ export default function SearchPageContent() {
       </div>
 
       {/* Search Content */}
-      <div className="max-w-[1200px] mx-auto px-6 py-8">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {!hasKeyword ? (
           <SearchEmptyState type="no-keyword" />
         ) : (

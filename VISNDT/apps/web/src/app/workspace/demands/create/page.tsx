@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
-import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
-import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
+import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
 import { createDemand } from '@/services/demand.service';
 
 export default function DemandCreatePage() {
@@ -21,9 +20,6 @@ export default function DemandCreatePage() {
 
 function DemandCreateContent() {
   const router = useRouter();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
-  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
 
   const [form, setForm] = useState({
     title: '',
@@ -87,23 +83,19 @@ function DemandCreateContent() {
   };
 
   return (
-    <div className="flex min-h-screen">
-      <WorkspaceSidebar mobileOpen={sidebarOpen} onClose={closeSidebar} />
-      <div className="flex-1 flex flex-col min-w-0">
-        <WorkspaceHeader onMenuToggle={toggleSidebar} />
-        <div className="flex-1 bg-slate-50 p-6">
-          <div className="max-w-[1200px] mx-auto space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-slate-900">创建需求</h2>
-              <p className="text-slate-500 text-sm mt-1">
-                描述您的检测设备需求。
-              </p>
-            </div>
+    <WorkspaceLayout>
+      <div className="max-w-[1200px] mx-auto space-y-6">
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">创建需求</h2>
+          <p className="text-slate-500 text-sm mt-1">
+            描述您的检测设备需求。
+          </p>
+        </div>
 
-            <form
-              onSubmit={handleSubmit}
-              className="bg-white rounded-lg border border-slate-200 p-6 space-y-5"
-            >
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-lg border border-slate-200 p-4 sm:p-6 space-y-5"
+        >
               {/* Title (required) */}
               <div>
                 <label
@@ -245,7 +237,7 @@ function DemandCreateContent() {
                 <button
                   type="submit"
                   disabled={mutation.isPending}
-                  className="inline-flex items-center gap-2 rounded-md bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="inline-flex items-center gap-2 rounded-md bg-slate-900 px-5 py-3 text-sm font-medium text-white hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {mutation.isPending ? (
                     <>
@@ -277,15 +269,13 @@ function DemandCreateContent() {
                 <button
                   type="button"
                   onClick={() => router.push('/workspace/demands')}
-                  className="rounded-md border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                  className="rounded-md border border-slate-300 px-5 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
                 >
                   取消
                 </button>
               </div>
             </form>
-          </div>
-        </div>
       </div>
-    </div>
+    </WorkspaceLayout>
   );
 }

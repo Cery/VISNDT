@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { translateCategoryName } from '@/lib/translate';
-import { SITE_DESCRIPTION } from '@/lib/seo';
+import { SITE_DESCRIPTION, absoluteUrl, buildProductJsonLd, buildBreadcrumbListJsonLd, JsonLdScript } from '@/lib/seo';
+import TrackOnMount from '@/components/analytics/TrackOnMount';
 
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -52,15 +53,52 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   // Load parameter groups for grouped display (public endpoint, no schema change)
   const parameterGroups = await getParameterGroups();
 
+  // Build structured data
+  const productUrl = absoluteUrl(`/products/${slug}`);
+  const productJsonLd = buildProductJsonLd({
+    name: product.name,
+    description: product.description,
+    url: productUrl,
+    image: product.media?.[0]?.fileAssetId
+      ? absoluteUrl(`/files/${product.media[0].fileAssetId}/download`)
+      : null,
+    brand: product.createdBy?.organization?.name ?? null,
+    category: product.category ? translateCategoryName(product.category.name) : null,
+    model: product.model ?? null,
+  });
+
+  const breadcrumbItems = [
+    { name: '首页', url: absoluteUrl('/') },
+    { name: '产品列表', url: absoluteUrl('/products') },
+  ];
+  if (product.category) {
+    breadcrumbItems.push({
+      name: translateCategoryName(product.category.name),
+      url: absoluteUrl(`/products?categoryId=${product.category.id}`),
+    });
+  }
+  breadcrumbItems.push({ name: product.name, url: productUrl });
+
   return (
-    <div className="max-w-[1200px] mx-auto px-6 py-8">
+    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-6 sm:py-8 lg:py-10">
+      <TrackOnMount
+        event="product_view"
+        targetId={product.id}
+        metadata={{
+          productName: product.name,
+          category: product.category?.name ?? null,
+          model: product.model ?? null,
+        }}
+      />
+      <JsonLdScript data={productJsonLd} />
+      <JsonLdScript data={buildBreadcrumbListJsonLd(breadcrumbItems)} />
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-        <Link href="/" className="hover:text-primary transition-colors">
+      <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-4 sm:mb-6 overflow-x-auto">
+        <Link href="/" className="hover:text-primary transition-colors whitespace-nowrap">
           首页
         </Link>
         <span className="text-slate-300">/</span>
-        <Link href="/products" className="hover:text-primary transition-colors">
+        <Link href="/products" className="hover:text-primary transition-colors whitespace-nowrap">
           产品列表
         </Link>
         {product.category && (
@@ -68,18 +106,18 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             <span className="text-slate-300">/</span>
             <Link
               href={`/products?categoryId=${product.category.id}`}
-              className="hover:text-primary transition-colors"
+              className="hover:text-primary transition-colors whitespace-nowrap"
             >
               {translateCategoryName(product.category.name)}
             </Link>
           </>
         )}
         <span className="text-slate-300">/</span>
-        <span className="text-foreground truncate max-w-[200px]">{product.name}</span>
+        <span className="text-foreground truncate max-w-[120px] sm:max-w-[200px]">{product.name}</span>
       </nav>
 
       {/* Two-column layout: Nav sidebar + Main content */}
-      <div className="flex gap-8">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         <ProductDetailNav />
 
         <div className="flex-1 min-w-0">

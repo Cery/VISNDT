@@ -21,6 +21,10 @@ import {
   PictureOutlined,
   HomeOutlined,
   MenuOutlined,
+  BarChartOutlined,
+  ThunderboltOutlined,
+  RiseOutlined,
+  MonitorOutlined,
 } from '@ant-design/icons';
 import { authStore } from '../stores/auth.store';
 
@@ -36,6 +40,10 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
     label: '核心运营',
     items: [
       { key: '/home', icon: <DashboardOutlined />, label: '仪表盘' },
+      { key: '/analytics', icon: <BarChartOutlined />, label: '数据分析' },
+      { key: '/business-analytics', icon: <RiseOutlined />, label: '业务分析' },
+      { key: '/monitoring', icon: <MonitorOutlined />, label: '运营监控' },
+      { key: '/audit-intelligence', icon: <AuditOutlined />, label: '审计智能' },
       { key: '/products', icon: <ShoppingOutlined />, label: '产品管理' },
       { key: '/content', icon: <FileTextOutlined />, label: '内容管理' },
       { key: '/content/tags', icon: <TagsOutlined />, label: '标签管理' },
@@ -69,6 +77,7 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
       },
       { key: '/notifications', icon: <BellOutlined />, label: '通知管理' },
       { key: '/audit-logs', icon: <AuditOutlined />, label: '审计日志' },
+      { key: '/embedding', icon: <ThunderboltOutlined />, label: 'AI 数据准备' },
     ],
   },
 };
@@ -76,6 +85,10 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
 // Breadcrumb route mapping
 const breadcrumbMap: Record<string, string> = {
   '/home': '仪表盘',
+  '/analytics': '数据分析',
+  '/business-analytics': '业务分析',
+  '/monitoring': '运营监控',
+  '/audit-intelligence': '审计智能',
   '/products': '产品管理',
   '/content': '内容管理',
   '/content/tags': '标签管理',
@@ -92,6 +105,7 @@ const breadcrumbMap: Record<string, string> = {
   '/notifications': '通知管理',
   '/audit-logs': '审计日志',
   '/media': '媒体中心',
+  '/embedding': 'AI 数据准备',
 };
 
 // Build flat menu items from groups

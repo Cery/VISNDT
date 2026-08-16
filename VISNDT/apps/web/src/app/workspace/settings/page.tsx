@@ -4,15 +4,11 @@ import { useState, useCallback } from 'react';
 import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
 import { useAuth } from '@/auth/AuthProvider';
-import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
-import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
+import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
 import { updateUserProfile } from '@/services/user.service';
 
 function SettingsContent() {
   const { user, logout } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
-  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   const hasOrganizationWorkspace = Boolean(
     user
     && user.organization
@@ -74,20 +70,16 @@ function SettingsContent() {
   }, [user, passwordValue]);
 
   return (
-    <div className="flex min-h-screen">
-      <WorkspaceSidebar mobileOpen={sidebarOpen} onClose={closeSidebar} />
-      <div className="flex-1 flex flex-col min-w-0">
-        <WorkspaceHeader onMenuToggle={toggleSidebar} />
-        <div className="flex-1 bg-slate-50 p-6">
-          <div className="max-w-[1200px] mx-auto space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-slate-900">
-                账户设置
-              </h2>
-              <p className="text-slate-500 text-sm mt-1">
-                管理您的账户信息。
-              </p>
-            </div>
+    <WorkspaceLayout>
+      <div className="max-w-[1200px] mx-auto space-y-6">
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">
+            账户设置
+          </h2>
+          <p className="text-slate-500 text-sm mt-1">
+            管理您的账户信息。
+          </p>
+        </div>
 
             {/* Success message */}
             {successMsg && (
@@ -241,10 +233,8 @@ function SettingsContent() {
                 退出登录
               </button>
             </div>
-          </div>
-        </div>
       </div>
-    </div>
+    </WorkspaceLayout>
   );
 }
 

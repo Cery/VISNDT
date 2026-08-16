@@ -2,11 +2,19 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getContentList } from '@/services/content.service';
 import type { Content } from '@/types/content';
+import { SITE_URL } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: '工业检测解决方案',
   description:
     '探索面向航空航天、汽车、管道、电子和制造领域的工业检测解决方案。',
+  openGraph: {
+    title: '工业检测解决方案',
+    description:
+      '探索面向航空航天、汽车、管道、电子和制造领域的工业检测解决方案。',
+    type: 'website',
+    url: `${SITE_URL}/solutions`,
+  },
 };
 
 function formatDate(value?: string | null): string {

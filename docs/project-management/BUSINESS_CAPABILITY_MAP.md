@@ -4,7 +4,16 @@
 
 VISNDT 当前支持的是：
 
-`工业检测设备信息展示 + 需求发布 + 平台撮合 + RFQ 响应协作`
+`工业检测能力发现平台 + 商业撮合平台 + AI 辅助知识平台`
+
+定位：
+- **Industrial Inspection Capability Discovery Platform**（工业检测能力发现）
+- **Commercial Matching Platform**（商业撮合）
+- **AI Assisted Knowledge Platform**（AI 辅助知识，M21.6+）
+- **AI Data Infrastructure**（AI 数据基础设施，M21.3.5：pgvector + Embedding + ContentChunk 数据准备基础层）
+- **Semantic Layer**（语义层，M21.4 CLOSED。M21.4.0：审计 CONDITIONAL PASS。M21.4.1：Vector Index Foundation。M21.4.2：Embedding Data Population——100% Coverage。M21.4.3：Semantic Module Foundation。M21.4.4：Semantic Search API Foundation + Query Contract Frozen。M21.4.5：Retrieval Enhancement——threshold + diagnostics + unified retrieve()。M21.4.6：Ranking Foundation——RankingService + RankingStrategy + Contract Frozen。M21.4.7：Unified Search Ranking Foundation——UnifiedSearchService + orchestration + contract。P0 3/3 + P1 4/4 GAPs 全部解决，M21.4 CLOSED）
+- **Mobile Experience**（移动端体验，M21.5 CLOSED。534：Pre-Development Architecture Audit PASS——API/Auth Ready，Semantic Protected，BFF Deferred。535：Responsive Web Foundation COMPLETED——2 new + 18 modified files，三端适配（Mobile/Tablet/Desktop）。536：Progressive Web App Foundation COMPLETED——6 new + 1 modified files，PWA Manifest + Service Worker + Offline Fallback。537：Mobile Experience Optimization COMPLETED——12 modified files，Workspace Mobile UX + Product Experience + Form Experience + Touch Optimization + PWA UX Enhancement。apps/web build exit 0，零 API/Schema/Migration 变更。Next: M21.6 Admin Intelligence）
+- **Admin Intelligence**（运营智能，M21.6 IN_PROGRESS。538：Pre-Development Architecture Audit PASS——Admin UI 19 pages（B+），Admin API 11 endpoints（ADMIN-only），Analytics 8 event types，Monitoring（Matching + System），Audit（full trail + filter + export），Embedding（coverage status），Semantic Boundary PROTECTED，13 data sources READY，8 Gaps（0 P0 / 3 P1 / 5 P2），Overall Readiness B+。539：Admin Operational Dashboard Enhancement COMPLETED——8 modified files，1 new API endpoint + 2 enhanced responses，Dashboard Enhancement：Platform KPIs + Business KPIs + Matching Intelligence + Real Trend + Business Funnel + Entity Comparison。540：Admin Business Analytics Enhancement COMPLETED——11 files（2 new backend + 3 new frontend + 6 modified），4 new API endpoints（GET /admin/analytics/business/{funnel,lifecycle,conversion,matching}，ADMIN-only），Business Analytics Page（4 tabs：Demand Funnel + RFQ Lifecycle + Business Conversion + Matching Analysis），apps/admin + apps/api build exit 0，零 Schema/Migration 变更。541：Admin Monitoring Enhancement COMPLETED——9 files（2 new backend + 3 new frontend + 4 modified），1 new API endpoint（GET /admin/monitoring/overview，ADMIN-only），Monitoring Page（5 sections：System Health + Business Risk + Matching Health + Embedding Coverage + Analytics Pipeline），10 code-level thresholds（NORMAL/WARNING/CRITICAL），apps/admin + apps/api build exit 0，零 Schema/Migration 变更。542：Admin Audit Intelligence Enhancement COMPLETED——9 files（2 new backend + 3 new frontend + 4 modified），1 new API endpoint（GET /admin/audit-intelligence/overview?days=7，ADMIN-only），Audit Intelligence Page（5 sections：Audit Overview + Audit Trend + Entity Distribution + Actor Activity + Risk Indicators），6 code-level risk indicators（DELETE/STATUS_CHANGE/Event Rate/Login Rate/Actor Activity/Actor Concentration），apps/admin + apps/api build exit 0，零 Schema/Migration 变更。Next: M21.6 Closure / Admin Intelligence Final Audit）
 
 它当前不支持：
 
@@ -86,6 +95,7 @@ VISNDT 当前支持的是：
 - **角色权限控制（M20.4.3：PermissionGuard 权限守卫 + PermissionButton 权限按钮 + RoleCapabilityCard 角色能力卡片 + usePermission Hook + AdminRole 4 级角色（SUPER_ADMIN/ADMIN/OPERATOR/VIEWER）+ 17 个权限点）**
 - **审计日志增强（M20.4.3：AdvancedFilterPanel + ExportButton + 操作者姓名+邮箱展示 + 实体类型下拉 + 操作者关键词搜索）**
 - **组件体系收敛（M20.4.4：BatchOperations→BatchActionBar 全量迁移 9 页，operation/ 10 组件 + permission/ 3 组件，零重复实现）**
+- **管理 AI 数据准备（M21.3.5：Embedding 管理页面——Content/Product Embedding 状态监控 + 批量生成触发 + Content Chunk 管理 + Provider 状态指示）**
 
 ## What The Platform Already Proves
 
@@ -382,9 +392,19 @@ M20.0  Architecture Planning        -- CLOSED
 M20.1  Search Experience            -- CLOSED (FROZEN)
 M20.2  Content Asset Integration    -- CLOSED (FROZEN)
 M20.3  Commercial Conversion        -- CLOSED (FROZEN)
-M20.4  Operation Readiness Upgrade   -- AUTHORIZED (audit complete)
+M20.4  Admin Professionalization     -- CLOSED (507-510 完成)
 M20.5  ContentProductRelation        -- FUTURE (pending)
-M21+   AI Enhancement                -- FUTURE (pending)
+M21    AI Enhancement                -- IN_PROGRESS (M21.0+M21.1+M21.1c 审计通过，M21.2 AUTHORIZED)
+M21.0  Platform Next Phase Arch Audit -- COMPLETED (511 审计通过，PASS)
+M21.1  AI Readiness Foundation        -- COMPLETED (512 审计通过，PASS)
+M21.1c M21 Roadmap Recalibration      -- COMPLETED (512.1 审计通过，PASS)
+M21.2  Web Platform Experience Evolution  -- CLOSED (513-519 全部完成：Runtime Hardening + SEO Foundation + Content CTA + Inquiry Optimization + Conversion Tracking，M21.2 CLOSED)
+M21.3  Data Intelligence Infrastructure  -- CLOSED (520-525 全部完成：Data Governance + Event Persistence + BI Foundation + Data-Driven Optimization + AI Data Preparation)
+M21.4  Semantic Intelligence Layer Preparation -- CLOSED (526.1 路线重校准完成；526 审计 CONDITIONAL PASS；527 Vector Index Foundation；528 Embedding Data Population；529 Semantic Module Foundation；530 Semantic Search API；531 Retrieval Enhancement；532 Ranking Foundation；533 Unified Search；M21.4 CLOSED——3/3 P0 + 4/4 P1 GAPs 全部解决)
+M21.5  Mobile Experience              -- CLOSED (534 架构审计；535 Responsive Web；536 PWA；537 Mobile UX Optimization；M21.5 CLOSED)
+M21.6  Admin Intelligence             -- CLOSED (538 Pre-Dev Audit；539 Dashboard；540 Business Analytics；541 Monitoring；542 Audit Intelligence；543 Closure Audit；M21.6 CLOSED)
+M21.7  AI Agent Integration           -- PENDING
+M21.8  Supplier Model Re-eval         -- PENDING
 ```
 
 ### M20.4.0 Admin Platform Professionalization Architecture Audit（505，Completed）
@@ -450,3 +470,107 @@ WorkflowEvent 已覆盖以下业务生命周期：
 | RFQ Response | CREATED, REVIEWED, ACCEPTED, REJECTED | ✅ 完整 |
 | Offer | SUBMITTED, ACCEPTED, REJECTED, WITHDRAWN | ✅ 状态变更事件完整 |
 | Content | CREATED, SUBMITTED, REVIEWED, OPENED, CLOSED | ✅ 完整（M18.4.1 修复可靠性：事件不再因组织约束被吞） |
+
+## Data Governance Capability（M21.3.1，521 Completed）
+
+> M21.3.1 Data Asset Governance Audit — Audit Only，零 Schema/API/Code 变更。
+
+### Data Asset Inventory
+
+| Domain | Model Count | Field Count | Enum Count | Quality Rating |
+|--------|------------|-------------|------------|---------------|
+| Content | 5 | 42 | 4 | **A-** |
+| Product | 8 | 50 | 1 | **B+** |
+| Buyer (Demand/RFQ) | 5 | 53 | 4 | **B+** |
+| System (Workflow/Audit) | 4 | 31 | 7 | **B+** |
+| Offer | 1 | 11 | 1 | **B** |
+| Inquiry | 1 | 9 | 1 | **B** |
+| Identity & Organization | 5 | 33 | 2 | **B-** |
+| **TOTAL** | **29** | **229** | **20** | **B** |
+
+### Governance Gap Priority
+
+| Priority | Count | Key Items |
+|----------|-------|-----------|
+| **P0** | 3 | ConversionEvent 持久化、Product.status Enum 化、Organization 字段扩展 |
+| **P1** | 6 | Product SEO 字段、AuditLog 类型统一、Demand MATCHED 状态、Inquiry 回复追踪、ContentTag Index、Organization.type Enum |
+| **P2** | 4 | Embedding 存储、Vector Index、Content language、Product 参数标准化 |
+
+### Data Maturity
+
+```
+Overall Data Maturity: B
+
+Strengths:
+  - 29 Model + 20 Enum + 229 字段 + 75 Index + 12 Unique
+  - Content 域 A-（SEO + Version + Tag + Audit 全覆盖）
+  - 三层事件体系（L1 Conversion + L2 Workflow + L3 Audit）
+  - 完整商业闭环数据链路（Content → Product → Offer → Inquiry + Demand → RFQ）
+
+Weaknesses:
+  - Organization 仅 5 字段（供应商画像不足）
+  - Product.status 为 String（非 Enum）
+  - AuditLog 与 WorkflowEvent 类型不一致（String vs Enum）
+```
+
+## Analytics Event Persistence Capability（M21.3.2，522 Development Completed）
+
+> M21.3.2 Analytics Event Persistence Foundation — 全栈实现（Database + Backend + Frontend）。
+
+### Architecture
+
+```
+Frontend (Browser)                    Backend (NestJS)                Database (PostgreSQL)
+┌─────────────────────┐    POST      ┌──────────────────┐   INSERT   ┌──────────────────┐
+│  ApiTrackingAdapter  │ ──────────→ │ AnalyticsModule  │ ────────→ │ conversion_event │
+│  (Batch + Beacon)    │  /api/      │ POST /events     │           │ (7 Indexes)      │
+│  PageViewTracker     │  analytics/ │ Batch Write      │           │                  │
+│  trackEvent()        │  events     │ (accept/reject)  │           │                  │
+└─────────────────────┘             └──────────────────┘           └──────────────────┘
+```
+
+### Database Layer
+
+| Component | Details |
+|-----------|---------|
+| **Enum** | `ConversionEventType` — 8 values: PAGE_VIEW, PRODUCT_VIEW, CONTENT_VIEW, SEARCH, PRODUCT_FILTER, CTA_CLICK, INQUIRY_START, INQUIRY_SUBMIT |
+| **Model** | `ConversionEvent` — 9 fields: id, event, userId(opt), organizationId(opt), sessionId(opt), entityType(opt), entityId(opt), source(opt), metadata(JsonB), createdAt |
+| **Migration** | `009_analytics_event` — 1 Enum + 1 Table + 7 Indexes |
+| **Indexes** | event, userId, organizationId, sessionId, (entityType, entityId), createdAt, (event, createdAt) |
+
+### Backend Layer
+
+| Component | Details |
+|-----------|---------|
+| **Module** | `AnalyticsModule` — Controller + Service |
+| **API** | `POST /api/analytics/events` — Batch Write Only |
+| **Auth** | Anonymous allowed (userId/orgId optional) |
+| **Response** | `{ accepted: N, rejected: N }` — 静默丢弃失败事件 |
+
+### Frontend Layer
+
+| Component | Details |
+|-----------|---------|
+| **Adapter** | `ApiTrackingAdapter` — 生产环境批量上报（maxBatchSize=20, flushInterval=3s, sendBeacon/fetch fallback） |
+| **Global Tracker** | `PageViewTracker` — 路由变化时触发 page_view 事件 |
+| **Event Integration** | 4 新事件类型：page_view（全局路由）、content_view（4 详情页）、search（搜索页）、product_filter（产品列表页） |
+| **Existing Events** | product_view、cta_click、inquiry_start、inquiry_submit（来自 M21.2.3.3，519） |
+
+### Responsibility Boundary
+
+```
+ConversionEvent = User Behavior Analytics (本 Phase)
+  ≠ WorkflowEvent (Business Workflow Events)
+  ≠ AuditLog (System Audit Trail)
+  ≠ Notification (User Notifications)
+```
+
+AI Capability Domain
+
+Current:
+
+Data Intelligence
+    ↓
+Semantic Layer
+    ↓
+AI Discovery Capability

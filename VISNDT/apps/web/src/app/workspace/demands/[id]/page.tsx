@@ -4,17 +4,13 @@ import { useEffect, useState, use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
-import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
-import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
+import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
 import DemandDetail from '@/components/demand/DemandDetail';
 import { getDemand, getDemandMatches, publishDemand, closeDemand } from '@/services/demand.service';
 import type { DemandDetailItem } from '@/lib/api/demands';
 
 function DemandDetailContent({ id }: { id: string }) {
   const router = useRouter();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
-  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   const [demand, setDemand] = useState<DemandDetailItem | null>(null);
   const [matchesCount, setMatchesCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -80,19 +76,15 @@ function DemandDetailContent({ id }: { id: string }) {
   const canClose = demand?.status === 'PUBLISHED' || demand?.status === 'PROCESSING';
 
   return (
-    <div className="flex min-h-screen">
-      <WorkspaceSidebar mobileOpen={sidebarOpen} onClose={closeSidebar} />
-      <div className="flex-1 flex flex-col min-w-0">
-        <WorkspaceHeader onMenuToggle={toggleSidebar} />
-        <div className="flex-1 bg-slate-50 p-6">
-          <div className="max-w-[1200px] mx-auto">
-            {/* Back button */}
-            <button
-              onClick={() => router.push('/workspace/demands')}
-              className="text-sm text-slate-500 hover:text-slate-700 mb-6 flex items-center gap-1 transition-colors"
-            >
-              ← 返回需求列表
-            </button>
+    <WorkspaceLayout>
+      <div className="max-w-[1200px] mx-auto">
+        {/* Back button */}
+        <button
+          onClick={() => router.push('/workspace/demands')}
+          className="text-sm text-slate-500 hover:text-slate-700 mb-6 flex items-center gap-1 transition-colors"
+        >
+          ← 返回需求列表
+        </button>
 
             {isLoading ? (
               <div className="space-y-4">
@@ -140,10 +132,8 @@ function DemandDetailContent({ id }: { id: string }) {
                 <DemandDetail demand={demand} matchesCount={matchesCount} />
               </>
             ) : null}
-          </div>
-        </div>
       </div>
-    </div>
+    </WorkspaceLayout>
   );
 }
 

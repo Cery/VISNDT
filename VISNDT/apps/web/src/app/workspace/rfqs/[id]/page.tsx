@@ -4,8 +4,7 @@ import { useEffect, useState, use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
-import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
-import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
+import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
 import RFQDetail from '@/components/rfq/RFQDetail';
 import RFQResponseList from '@/components/rfq/RFQResponseList';
 import {
@@ -76,9 +75,6 @@ function mapDecisionError(action: 'accept' | 'reject') {
 
 function RfqDetailContent({ id }: { id: string }) {
   const router = useRouter();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const toggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
-  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   const [rfq, setRfq] = useState<RfqDetailItem | null>(null);
   const [responses, setResponses] = useState<RfqResponseItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -179,19 +175,15 @@ function RfqDetailContent({ id }: { id: string }) {
   }, [updateResponseInState]);
 
   return (
-    <div className="flex min-h-screen">
-      <WorkspaceSidebar mobileOpen={sidebarOpen} onClose={closeSidebar} />
-      <div className="flex-1 flex flex-col min-w-0">
-        <WorkspaceHeader onMenuToggle={toggleSidebar} />
-        <div className="flex-1 bg-slate-50 p-6">
-          <div className="max-w-[1200px] mx-auto">
-            {/* Back button */}
-            <button
-              onClick={() => router.push('/workspace/rfqs')}
-              className="text-sm text-slate-500 hover:text-slate-700 mb-6 flex items-center gap-1 transition-colors"
-            >
-              ← 返回询价列表
-            </button>
+    <WorkspaceLayout>
+      <div className="max-w-[1200px] mx-auto">
+        {/* Back button */}
+        <button
+          onClick={() => router.push('/workspace/rfqs')}
+          className="text-sm text-slate-500 hover:text-slate-700 mb-6 flex items-center gap-1 transition-colors"
+        >
+          ← 返回询价列表
+        </button>
 
             {isLoading ? (
               <div className="space-y-4">
@@ -345,10 +337,8 @@ function RfqDetailContent({ id }: { id: string }) {
                 </div>
               </>
             ) : null}
-          </div>
-        </div>
       </div>
-    </div>
+    </WorkspaceLayout>
   );
 }
 

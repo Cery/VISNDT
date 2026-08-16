@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { DashboardStats, DashboardActivities, DashboardPending, DashboardStatus } from '../types/dashboard.types';
+import type { DashboardStats, DashboardActivities, DashboardPending, DashboardStatus, DashboardTrendItem } from '../types/dashboard.types';
 import type { MatchingStats } from '../types/match.types';
 
 interface DashboardStatsResponse {
@@ -26,6 +26,13 @@ interface DashboardPendingResponse {
 interface DashboardStatusResponse {
   success: boolean;
   data: DashboardStatus;
+  message: string;
+  timestamp: string;
+}
+
+interface DashboardTrendResponse {
+  success: boolean;
+  data: DashboardTrendItem[];
   message: string;
   timestamp: string;
 }
@@ -63,6 +70,13 @@ export const dashboardService = {
     const response = (await apiClient.get(
       '/admin/dashboard/status',
     )) as unknown as DashboardStatusResponse;
+    return response.data;
+  },
+
+  async getTrend(): Promise<DashboardTrendItem[]> {
+    const response = (await apiClient.get(
+      '/admin/dashboard/trend',
+    )) as unknown as DashboardTrendResponse;
     return response.data;
   },
 

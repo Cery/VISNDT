@@ -2,15 +2,18 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getContentBySlug } from '@/services/content.service';
+import TrackOnMount from '@/components/analytics/TrackOnMount';
 import {
   SITE_DESCRIPTION,
   absoluteUrl,
   contentImageUrl,
   buildContentJsonLd,
+  buildBreadcrumbListJsonLd,
+  JsonLdScript,
 } from '@/lib/seo';
 import MarkdownRenderer from '@/components/markdown/MarkdownRenderer';
 import MediaGallery from '@/components/content/MediaGallery';
-import ContentCommercialCTA from '@/components/content/ContentCommercialCTA';
+import ContentProductCTA from '@/components/common/ContentProductCTA';
 
 interface InsightDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -93,10 +96,18 @@ export default async function InsightDetailPage({
 
   return (
     <div className="max-w-[820px] mx-auto px-6 py-10">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      <TrackOnMount
+        event="content_view"
+        targetId={content.id}
+        source="/insights/[slug]"
+        metadata={{ contentType: content.type, contentTitle: content.title }}
       />
+      <JsonLdScript data={jsonLd} />
+      <JsonLdScript data={buildBreadcrumbListJsonLd([
+        { name: '首页', url: absoluteUrl('/') },
+        { name: '行业洞察', url: absoluteUrl('/insights') },
+        { name: content.title, url: absoluteUrl(`/insights/${slug}`) },
+      ])} />
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
         <Link href="/" className="hover:text-primary transition-colors">
@@ -151,7 +162,7 @@ export default async function InsightDetailPage({
 
       {/* Commercial CTA */}
       <div className="mt-8 mb-8">
-        <ContentCommercialCTA type="submit-inquiry" />
+        <ContentProductCTA contextType="insight" />
       </div>
 
       {/* More from this type */}

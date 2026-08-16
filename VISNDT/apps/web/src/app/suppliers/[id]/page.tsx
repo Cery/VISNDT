@@ -5,7 +5,7 @@ import SupplierOfferList from '@/components/supplier/SupplierOfferList';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { SITE_NAME, SITE_DESCRIPTION } from '@/lib/seo';
+import { SITE_NAME, SITE_DESCRIPTION, absoluteUrl, buildBreadcrumbListJsonLd, JsonLdScript } from '@/lib/seo';
 
 interface SupplierPageProps {
   params: Promise<{ id: string }>;
@@ -59,8 +59,15 @@ export default async function SupplierPage({ params }: SupplierPageProps) {
 
   const offers = offersResult.data ?? [];
 
+  const breadcrumbItems = [
+    { name: '首页', url: absoluteUrl('/') },
+    { name: '产品列表', url: absoluteUrl('/products') },
+    { name: organization.name, url: absoluteUrl(`/suppliers/${id}`) },
+  ];
+
   return (
     <div className="max-w-[1200px] mx-auto px-6 py-8">
+      <JsonLdScript data={buildBreadcrumbListJsonLd(breadcrumbItems)} />
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
         <Link href="/" className="hover:text-primary transition-colors">

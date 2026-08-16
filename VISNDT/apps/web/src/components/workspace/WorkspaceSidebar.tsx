@@ -71,13 +71,25 @@ export default function WorkspaceSidebar({ mobileOpen, onClose }: WorkspaceSideb
           ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="px-4 py-6">
-          <Link
-            href="/workspace"
-            className="block text-lg font-bold mb-6"
-            onClick={onClose}
-          >
-            工作区
-          </Link>
+          <div className="flex items-center justify-between mb-6">
+            <Link
+              href="/workspace"
+              className="block text-lg font-bold"
+              onClick={onClose}
+            >
+              工作区
+            </Link>
+            {/* Mobile close button */}
+            <button
+              onClick={onClose}
+              className="md:hidden flex items-center justify-center w-8 h-8 rounded-md text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+              aria-label="Close sidebar"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
           <nav className="space-y-1">
             {isLoading && <p className="px-3 py-2 text-sm text-slate-400">加载中...</p>}
             {!isLoading && !workspaceRole && (
@@ -90,7 +102,7 @@ export default function WorkspaceSidebar({ mobileOpen, onClose }: WorkspaceSideb
                   key={item.href}
                   href={item.href}
                   onClick={onClose}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+                  className={`flex items-center gap-3 px-3 py-3 rounded-md text-sm transition-colors ${
                     active
                       ? 'bg-slate-700 text-white'
                       : 'text-slate-300 hover:bg-slate-800 hover:text-white'

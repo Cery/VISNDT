@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { createInquiry } from '@/services/inquiry.service';
 import type { InquiryResponse } from '@/types/inquiry';
+import { trackEvent } from '@/lib/analytics/tracker';
+import { buildEvent } from '@/lib/analytics/events';
 
 interface InquiryFormProps {
   productId: string;
@@ -67,12 +69,24 @@ export default function InquiryForm({
       setResult(res);
       setStatus('success');
       setFormData(INITIAL_FORM);
+
+      trackEvent(
+        buildEvent('inquiry_submit', {
+          source: 'inquiry_form',
+          targetId: productId,
+          metadata: {
+            productName,
+            offerId,
+            organizationName,
+          },
+        }),
+      );
     } catch (err) {
       setStatus('error');
       setErrorMsg(
         err instanceof Error
           ? err.message
-          : '提交询价失败，请重试。',
+          : '提交咨询失败，请重试。',
       );
     }
   };
@@ -96,25 +110,36 @@ export default function InquiryForm({
             />
           </svg>
           <h3 className="font-semibold text-green-800">
-            感谢您的询价，已成功提交。
+            咨询已提交
           </h3>
         </div>
-        <p className="text-sm text-green-700">
-          我们的团队将尽快通过{' '}
+        <p className="text-sm text-green-700 mb-1">
+          您已成功提交关于 <span className="font-medium">{productName}</span> 的咨询。
+        </p>
+        <p className="text-xs text-green-600">
+          供应商将通过{' '}
           <span className="font-medium">
             {result?.inquiry.visitorEmail || formData.email}
           </span>
-          {' '}关于 {productName}.
+          {' '}与您联系，提供技术方案与报价建议。
         </p>
-        <button
-          onClick={() => {
-            setStatus('idle');
-            setResult(null);
-          }}
-          className="mt-4 text-sm text-green-700 hover:text-green-800 underline"
-        >
-          提交另一个询价
-        </button>
+        <div className="flex items-center gap-4 mt-4">
+          <button
+            onClick={() => {
+              setStatus('idle');
+              setResult(null);
+            }}
+            className="text-sm text-green-700 hover:text-green-800 underline"
+          >
+            继续咨询
+          </button>
+          <a
+            href={typeof window !== 'undefined' ? window.location.pathname : `/products/${productId}`}
+            className="text-sm text-green-700 hover:text-green-800 underline"
+          >
+            返回产品详情
+          </a>
+        </div>
       </div>
     );
   }
@@ -122,13 +147,10 @@ export default function InquiryForm({
   // === Idle / Submitting / Error State ===
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h3 className="font-semibold text-sm text-slate-900">
-        发送询价
-      </h3>
       <p className="text-xs text-slate-500">
         {organizationName
-          ? `向 ${organizationName} 询价 ${productName}。填写以下表单，我们将尽快回复。`
-          : `对 ${productName} 感兴趣？填写以下表单，我们将尽快回复。`}
+          ? `请填写以下信息，${organizationName} 将为您提供 ${productName} 的技术方案与报价建议。`
+          : `请填写以下信息，我们将为您提供 ${productName} 的技术方案与报价建议。`}
       </p>
 
       {/* Error Banner */}
@@ -227,7 +249,7 @@ export default function InquiryForm({
           rows={4}
           disabled={status === 'submitting'}
           className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 focus:border-slate-400 disabled:bg-slate-50 disabled:text-slate-400 transition-colors resize-y"
-          placeholder="我对该产品感兴趣，请提供更多详情。"
+          placeholder="请描述您的检测需求、应用场景或技术问题，以便我们提供更精准的方案。"
         />
       </div>
 
@@ -261,7 +283,7 @@ export default function InquiryForm({
             提交中...
           </span>
         ) : (
-          '提交询价'
+          '咨询此设备'
         )}
       </button>
     </form>

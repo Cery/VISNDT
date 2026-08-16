@@ -2,11 +2,19 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getContentList } from '@/services/content.service';
 import type { Content } from '@/types/content';
+import { SITE_URL } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: '文章中心',
   description:
     'VISNDT企业动态、行业新闻、技术趋势与公司资讯。',
+  openGraph: {
+    title: '文章中心',
+    description:
+      'VISNDT企业动态、行业新闻、技术趋势与公司资讯。',
+    type: 'website',
+    url: `${SITE_URL}/articles`,
+  },
 };
 
 function formatDate(value?: string | null): string {

@@ -130,7 +130,7 @@ export default function ProductDetailContent({
               <h2 className="text-2xl font-extrabold text-foreground mb-6">
                 技术参数
               </h2>
-              <div className="rounded-xl border border-slate-200/80 shadow-industrial-sm bg-white p-6">
+              <div className="rounded-xl border border-slate-200/80 shadow-industrial-sm bg-white p-4 sm:p-6">
                 {product.parameterValues.length > 0 ? (
                   <ProductParameters
                     parameters={product.parameterValues}
@@ -157,6 +157,8 @@ export default function ProductDetailContent({
                 productId={product.id}
                 productName={product.name}
                 offers={product.offers ?? []}
+                productModel={product.model ?? null}
+                productCategory={product.category ? translateCategoryName(product.category.name) : null}
               />
             </section>
           )}

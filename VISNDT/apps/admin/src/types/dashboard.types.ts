@@ -11,9 +11,25 @@ export interface DashboardProductStats {
   total: number;
 }
 
+export interface DashboardContentStats {
+  total: number;
+}
+
 export interface DashboardDemandStats {
   total: number;
   published: number;
+}
+
+export interface DashboardInquiryStats {
+  total: number;
+}
+
+export interface DashboardRfqStats {
+  total: number;
+}
+
+export interface DashboardOfferStats {
+  total: number;
 }
 
 export interface DashboardMatchingStats {
@@ -24,8 +40,22 @@ export interface DashboardStats {
   users: DashboardUserStats;
   organizations: DashboardOrganizationStats;
   products: DashboardProductStats;
+  content: DashboardContentStats;
   demands: DashboardDemandStats;
+  inquiries: DashboardInquiryStats;
+  rfqs: DashboardRfqStats;
+  offers: DashboardOfferStats;
   matching: DashboardMatchingStats;
+}
+
+export interface DashboardTrendItem {
+  date: string;
+  pageViews: number;
+  productViews: number;
+  contentViews: number;
+  searches: number;
+  inquiries: number;
+  ctaClicks: number;
 }
 
 export interface RecentUser {
@@ -67,6 +97,7 @@ export interface DashboardActivities {
 export interface DashboardPending {
   usersPending: number;
   demandsPending: number;
+  inquiriesPending: number;
   rfqPending: number;
   unreadNotifications: number;
 }

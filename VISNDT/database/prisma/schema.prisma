@@ -180,6 +180,17 @@ enum ContentMediaType {
   ATTACHMENT
 }
 
+enum ConversionEventType {
+  PAGE_VIEW
+  PRODUCT_VIEW
+  CONTENT_VIEW
+  SEARCH
+  PRODUCT_FILTER
+  CTA_CLICK
+  INQUIRY_START
+  INQUIRY_SUBMIT
+}
+
 // ===========================================
 // Migration 001: Identity & Organization Domain
 // ===========================================
@@ -323,6 +334,9 @@ model Product {
   description String?
   status      String  @default("DRAFT")
   createdById String? @map("created_by_id") @db.Uuid
+  slug        String? @unique
+  seoTitle    String? @map("seo_title")
+  embedding   Unsupported("vector(1536)")?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -774,6 +788,7 @@ model Content {
   seoTitle      String?       @map("seo_title")
   seoDescription String?      @map("seo_description")
   seoKeywords   String?       @map("seo_keywords")
+  embedding     Unsupported("vector(1536)")?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -783,6 +798,7 @@ model Content {
   media      ContentMedia[]
   revisions  ContentRevision[]
   tags       ContentTagRelation[]
+  chunks     ContentChunk[]
 
   @@index([type, status])
   @@index([authorId])
@@ -872,4 +888,50 @@ model ContentTagRelation {
   @@index([tagId])
   @@index([contentId])
   @@map("content_tag_relation")
+}
+
+// ===========================================
+// Migration 009: Analytics Event Domain
+// ===========================================
+
+model ConversionEvent {
+  id             String               @id @default(uuid()) @db.Uuid
+  event          ConversionEventType
+  userId         String?              @map("user_id") @db.Uuid
+  organizationId String?              @map("organization_id") @db.Uuid
+  sessionId      String?              @map("session_id")
+  entityType     String?              @map("entity_type")
+  entityId       String?              @map("entity_id") @db.Uuid
+  source         String?
+  metadata       Json?                @db.JsonB
+  createdAt      DateTime             @default(now()) @map("created_at")
+
+  @@index([event])
+  @@index([userId])
+  @@index([organizationId])
+  @@index([sessionId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@index([event, createdAt])
+  @@map("conversion_event")
+}
+
+// ===========================================
+// Migration 010: AI Data Preparation
+// ===========================================
+
+model ContentChunk {
+  id         String                      @id @default(uuid()) @db.Uuid
+  contentId  String                      @map("content_id") @db.Uuid
+  chunkIndex Int                         @map("chunk_index")
+  text       String
+  embedding  Unsupported("vector(1536)")?
+
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  content    Content  @relation(fields: [contentId], references: [id])
+
+  @@index([contentId])
+  @@map("content_chunk")
 }
