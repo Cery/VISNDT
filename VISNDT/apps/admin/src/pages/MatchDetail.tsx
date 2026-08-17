@@ -17,6 +17,7 @@ import {
 } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { matchService } from '../api';
+import KnowledgeContextPanel from './match/KnowledgeContextPanel';
 import type { MatchDetail } from '../types';
 
 const { Title, Text } = Typography;
@@ -400,7 +401,10 @@ export default function MatchDetailPage() {
         </Card>
       )}
 
-      {/* Card 4: Lifecycle Actions */}
+      {/* Card 4: Knowledge Context (M23.0) */}
+      <KnowledgeContextPanel matchId={match.id} />
+
+      {/* Card 5: Lifecycle Actions */}
       {(match.matchStatus === 'PENDING' || match.matchStatus === 'REVIEWED') && (
         <Card title="生命周期操作" style={{ marginBottom: 16 }}>
           {match.matchStatus === 'PENDING' && (

@@ -124,7 +124,12 @@ export default function ContentTagList() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <Title level={4} style={{ margin: 0 }}>内容标签管理</Title>
+        <div>
+          <Title level={4} style={{ margin: 0 }}>内容标签管理</Title>
+          <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+            标签用于对内容（文章、知识、解决方案等）进行多维分类，支持按主题、行业、应用、技术四个维度打标，便于前台检索和 SEO 优化
+          </Typography.Text>
+        </div>
         <Space>
           <Button icon={<ReloadOutlined />} onClick={fetchTags}>刷新</Button>
           <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/content/tags/create')}>

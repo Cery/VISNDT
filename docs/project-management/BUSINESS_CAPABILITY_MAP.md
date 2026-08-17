@@ -70,10 +70,22 @@ VISNDT 当前支持的是：
 - 提交 RFQ Response
 - 跟踪已提交 Response 的状态
 - 查看通知与基础设置
+- 查看和编辑组织基础信息（企业名称、企业类型）
+- 管理企业身份与公开资料一致性
+
+### Supplier Identity Self-Service Capability
+
+M22.1.4（563）完成后，Supplier 用户已具备组织信息自助维护能力：
+
+- **Profile 页面**：`/workspace/supplier/profile` 提供企业资料查看与编辑功能
+- **信息编辑**：支持修改企业名称和企业类型，实时保存并同步至公开展示
+- **权限控制**：仅允许组织成员编辑自身组织信息，禁止修改 status 等管理员字段
+- **数据一致性**：修改后自动同步至 Supplier Public Profile 展示
+- **导航集成**：Workspace Sidebar + Dashboard 快捷入口
 
 ### Boundary Note
 
-当前 Supplier 能力是“参与撮合响应”，不是“运营独立店铺”。
+当前 Supplier 能力是"参与撮合响应 + 组织信息自助维护"，不是"运营独立店铺"。
 
 ## Admin Can Do What
 
@@ -84,6 +96,7 @@ VISNDT 当前支持的是：
 - 管理 Inquiry / Notification
 - 管理 Content（内容列表/创建/编辑/生命周期操作，M17.3；**正文 Markdown 编辑+预览，类型/筛选支持 INSIGHT 参数百科，M18.1**）
 - 管理 Content Tags（**标签 CRUD + 内容标签关联，M20.2.3**）
+- 管理 Knowledge Classification（**知识领域 + 知识分类 CRUD，M22.3.2**）
 - 查看 Audit Log
 - 执行 FileAsset Orphan Cleanup
 - **使用运营驾驶舱（M20.4.1：recharts 趋势图/分布图/商业漏斗 + 分组菜单 + 面包屑 + 响应式三端适配）**
@@ -106,6 +119,11 @@ VISNDT 当前支持的是：
 - Admin 运营底座已经存在
 - Workflow / Notification / Audit 的治理基础已经存在
 - Business Lifecycle Event Tracking 能力已完善（Demand/RFQ/Match/Response 全生命周期事件覆盖）
+- Industrial Knowledge Classification Capability 已建立（**M22.3.2：KnowledgeDomain + KnowledgeCategory 分类基础层，6 大工业检测领域 + 三层分类体系，Admin 分类管理入口**）
+- Unified Industrial Discovery Capability 已建立（**M22.4.1：GET /search 统一搜索 API，5 实体适配器（Product + KnowledgeEntry + Content + Solution + Supplier），KnowledgeEntry 替换 Content(KNOWLEDGE) 作为主知识源，服务端聚合替代前端 Promise.allSettled，统一响应契约 UnifiedDiscoveryResponse**）
+- Unified Discovery Experience 已建立（**M22.4.2：Desktop 统一发现页（5 实体 Tab + 内容类型筛选 + 响应式 3 列网格），Mobile First-Class 发现体验（横向滚动 Tab + 可折叠筛选面板 + 单列卡片 + 触摸友好），Backend/API/Database 零变更**）
+- SEO Asset Architecture 已建立（**M22.4.3：Product SEO + Knowledge SEO + Content SEO + Sitemap 6 类动态路由，Backend/API/Database 零变更**）
+- Matching Knowledge Context Architecture 已设计（**M22.4.4 DESIGN ONLY：Knowledge Context Layer（Read-Side 伴生数据模式，ADR-016~022），Scenario Understanding 未来接口，M23+ 演进路线（M23.0-M23.4+），9 项能力边界矩阵，零代码变更**）
 
 ## What Is Still Missing
 
@@ -406,7 +424,10 @@ M21.5  Mobile Experience              -- CLOSED (534 架构审计；535 Responsi
 M21.6  Admin Intelligence             -- CLOSED (538 Pre-Dev Audit；539 Dashboard；540 Business Analytics；541 Monitoring；542 Audit Intelligence；543 Closure Audit；M21.6 CLOSED)
 M21.7  AI Agent Integration          -- CLOSED (544 Architecture Audit PASS；545 Gateway；546 Runtime；547 Tool Layer；548 Adapter；549 Assistant；550 RAG；551 Context；M21.7 CLOSED——7 层架构完整闭环)
 M21.8  Platform Readiness              -- CLOSED (553 Architecture Audit PASS + 554 Frontend Experience Upgrade COMPLETED + 555 Admin Experience Upgrade COMPLETED + 556 Demo Dataset COMPLETED + 557 Full Business Flow Validation COMPLETED + 558 Platform Closure Stabilization COMPLETED——P1-01 修复，P0=0 / P1=0 / P2=2 deferred，Readiness Score A-，M21.8 CLOSED)。Next: M22.1 Supplier Experience
-M22.1  Supplier Experience              -- IN_PROGRESS (559 Architecture Audit COMPLETED——9 模型复用 + 20+ API endpoints + 7 前端 routes，三边界 PASS，M22.1 Readiness = READY；560 Workspace Enhancement COMPLETED——5 文件修改，RFQ Detail + Response List + Dashboard + Navigation + API Client，三边界全 PASS，零 Schema/Migration/API Endpoint 变更)。Next: M22.1.2 Supplier Offer Management
+M22.1  Supplier Experience              -- CLOSED (559 Architecture Audit COMPLETED——9 模型复用 + 20+ API endpoints + 7 前端 routes，三边界 PASS，M22.1 Readiness = READY；560 Workspace Enhancement COMPLETED——5 文件修改，RFQ Detail + Response List + Dashboard + Navigation + API Client，三边界全 PASS，零 Schema/Migration/API Endpoint 变更；561 Offer Management COMPLETED——7 文件修改，3 新页面 + 2 增强 + 2 服务层，Offer 列表+Create+Edit+Submit+Withdraw，三边界全 PASS；562 Business Opportunity Center COMPLETED——4 文件修改，1 新页面 + 3 增强，商机中心三标签+机会时间线，三边界全 PASS；563 Self-Service Profile COMPLETED——7 文件修改，1 新页面 + 2 后端 + 2 服务层 + 2 增强，Profile 管理+组织信息编辑+权限控制+数据一致性，三边界全 PASS；564 Validation COMPLETED——Audit Only，全流程验证 PASS，三边界全 PASS，M22.1 CLOSED）。Next: M22.2 Content Center
+M22.2  Content Center                   -- CLOSED (Architecture Initialization COMPLETED——Audit Only，Content 模型 4 类型 + 4 状态 + 5 关联模型 + 10 API + Admin 3 页面 + Web 10 页面 + 搜索 + SEO + AI Embedding 就绪，三边界全 PASS；M22.2.1 Architecture Audit COMPLETED——Audit Only，6 边界审计全部 PASS；M22.2.2 Content Model Implementation COMPLETED——Migration 012 + estimatedReadTime + status/publishedAt index + QueryContentDto sort/order + Service 增强；M22.2.3 Content Management Enhancement COMPLETED——7 files，ContentList 4 新列 + sort + ContentForm 封面图上传 + 阅读时间 + ContentEdit 增强；M22.2.4 Web Content Experience COMPLETED——10 files，ContentCard 统一卡片组件 + 4 列表页改造 + 2 详情页增强 + 标签聚合页全类型支持；M22.2.5 SEO Validation COMPLETED——Audit Only，SEO 全量验证 B+，5 P2 Gap/0 P0/P1，零代码变更；M22.2.6 Content Center Final Validation COMPLETED——Audit Only，M22.2 阶段全量验证通过，M22.2 Content Center CLOSED）。Next Stage: M22.3 Knowledge Base
+M22.3  Knowledge Base                   -- CLOSED (572_M22.3.0_Knowledge_Base_Architecture_Initialization COMPLETED——Architecture / Audit / Design Validation，Knowledge Base 架构初始化完成：定位 Knowledge = Platform Knowledge Asset，四大架构锁全 PASS，Database Impact NONE；573_M22.3.1_Knowledge_Model_Design COMPLETED——Architecture / Data Model Design / Audit，5 模型 + 3 枚举 + 6 大领域 + 三层分类体系 + 5 种知识关系 + 3 种引用类型 + structuredBody JSON 设计，四大架构锁全 PASS，Database Impact NONE（FUTURE DESIGN ONLY），零代码变更；574_M22.3.2_Knowledge_Classification_Implementation COMPLETED——Development / Database / Admin，2 新表（knowledge_domain + knowledge_category）+ Migration 013 + 10 ADMIN API endpoints + 6 Admin 页面，四大架构锁全 PASS，Content/Web 零修改；575_M22.3.3_Knowledge_Association_Implementation COMPLETED——Development / Database / API / Admin，3 新表（knowledge_entry + knowledge_content_ref + knowledge_relation）+ 3 枚举 + Migration 014 + 20 ADMIN API endpoints + 3 Admin 页面（EntryList + EntryCreate + EntryEdit w/ 内容引用 & 知识关联），三端 build 全部 exit 0，四大架构锁全 PASS，Content/Web 零修改；576_M22.3.4_Knowledge_Retrieval_Foundation COMPLETED——Development / API / Web，Public Knowledge Query API 5 endpoints（PUBLIC）+ 3 Web 页面（/knowledge-base Home + Domain + Detail），三端 build 全部 exit 0，Database/Admin 零变更，四大架构锁全 PASS；577_M22.3.5_Knowledge_Base_Final_Validation COMPLETED——Audit / Validation，M22.3 全量验证通过：5 模型 + 3 枚举 + 22 Admin API + 5 Public API + 9 Admin 页面 + 3 Web 页面 + 三端 build 全部 exit 0 + 四大架构锁全 PASS + 完整能力链路（6/6），M22.3 Knowledge Base CLOSED）。Next Stage: M22.4 Search & Matching Enhancement)
+M22.4  Search & Matching Enhancement     -- ARCHITECTURE FROZEN (578_M22.4_Search_Matching_Architecture_Reassessment COMPLETED——Architecture Audit / Capability Reassessment，Search Architecture Proposal（Unified Industrial Retrieval Layer：Product + Knowledge + Content 统一检索），Matching Evolution（Knowledge Context 辅助匹配——REFERENCE only，不修改评分算法），SEO Growth Architecture（Knowledge Asset 作为 Topic Authority + Long Tail Search + Scenario Landing Page），AI Future Boundary（Knowledge Asset → AI Understanding Layer 预留接口），四大架构锁全 PASS，零代码变更，Database/API/Frontend/Admin/AI Impact 均 NONE；579_M22.4_Pre_Implementation_Architecture_Compatibility_Audit COMPLETED——Architecture Audit / Compatibility Review，基于本地 Repository 实际代码审查：Product/Parameter/Category 全 PASS（通用模型，无设备硬编码），Search NEED OPTIMIZATION（KnowledgeEntry 未集成搜索 + 无统一 API），Knowledge/Content PASS（边界清晰），Matching PASS（纯参数评分），SEO NEED OPTIMIZATION（sitemap 缺失），AI FROZEN 确认，总体 CONDITIONAL PASS；580_M22.4_Search_Discovery_Architecture_Finalization_V2 COMPLETED——Architecture Audit / ADR / Capability Boundary Freeze / Roadmap Synchronization，M22.4 架构冻结完成：Search = Unified Industrial Discovery Layer，Mobile = First-Class Discovery Experience，Entity Boundaries 冻结，15 ADR 记录，M22.4 实施路线确认（M22.4.1 IMPLEMENT + M22.4.2 IMPLEMENT + M22.4.3 IMPLEMENT + M22.4.4 DESIGN ONLY），零代码变更）。Next Task: 581_M22.4.1_Unified_Search_Foundation_Implementation)
 ```
 
 ### M20.4.0 Admin Platform Professionalization Architecture Audit（505，Completed）

@@ -30,6 +30,7 @@ const publicContentSelect = {
   summary: true,
   content: true,
   publishedAt: true,
+  estimatedReadTime: true,
   seoTitle: true,
   seoDescription: true,
   seoKeywords: true,
@@ -59,6 +60,16 @@ const publicContentSelect = {
   },
 } satisfies Prisma.ContentSelect;
 
+/** Estimate reading time in minutes from content body. Returns 1 as minimum. */
+function estimateReadTime(content: string): number {
+  // Chinese text: ~400 chars/min; English: ~200 words/min.
+  // Use a blended approach: count characters (Chinese-dominant) and words.
+  const charCount = content.replace(/\s/g, '').length;
+  const wordCount = content.split(/\s+/).filter(Boolean).length;
+  const minutes = Math.max(1, Math.ceil((charCount + wordCount) / 500));
+  return minutes;
+}
+
 @Injectable()
 export class ContentService {
   constructor(
@@ -69,7 +80,7 @@ export class ContentService {
   ) {}
 
   async findAll(query: QueryContentDto) {
-    const { page = 1, pageSize = 20, type, status, keyword, tag } = query;
+    const { page = 1, pageSize = 20, type, status, keyword, tag, sort = 'createdAt', order = 'desc' } = query;
     const skip = (page - 1) * pageSize;
 
     const where: Prisma.ContentWhereInput = {};
@@ -85,15 +96,24 @@ export class ContentService {
       where.tags = { some: { tag: { slug: tag } } };
     }
 
+    const orderBy: Prisma.ContentOrderByWithRelationInput = { [sort]: order };
+
     const [data, total] = await Promise.all([
       this.prisma.content.findMany({
         where,
         skip,
         take: pageSize,
-        orderBy: { createdAt: 'desc' },
+        orderBy,
         include: {
           author: { select: { id: true, email: true, name: true } },
           coverImage: { select: { id: true, fileName: true, storageKey: true, mimeType: true } },
+          tags: {
+            select: {
+              tag: {
+                select: { id: true, name: true, slug: true, type: true },
+              },
+            },
+          },
         },
       }),
       this.prisma.content.count({ where }),
@@ -107,7 +127,7 @@ export class ContentService {
    * Forces status = PUBLISHED at the DB level; only public fields are returned.
    */
   async findAllPublic(query: QueryContentDto) {
-    const { page = 1, pageSize = 20, type, keyword, tag } = query;
+    const { page = 1, pageSize = 20, type, keyword, tag, sort = 'publishedAt', order = 'desc' } = query;
     const skip = (page - 1) * pageSize;
 
     const where: Prisma.ContentWhereInput = {
@@ -124,12 +144,14 @@ export class ContentService {
       where.tags = { some: { tag: { slug: tag } } };
     }
 
+    const orderBy: Prisma.ContentOrderByWithRelationInput = { [sort]: order };
+
     const [data, total] = await Promise.all([
       this.prisma.content.findMany({
         where,
         skip,
         take: pageSize,
-        orderBy: { createdAt: 'desc' },
+        orderBy,
         select: publicContentSelect,
       }),
       this.prisma.content.count({ where }),
@@ -185,6 +207,7 @@ export class ContentService {
       slug: dto.slug,
       summary: dto.summary,
       content: dto.content,
+      estimatedReadTime: estimateReadTime(dto.content),
       coverImage: dto.coverImageId ? { connect: { id: dto.coverImageId } } : undefined,
       seoTitle: dto.seoTitle,
       seoDescription: dto.seoDescription,
@@ -234,6 +257,7 @@ export class ContentService {
       slug: dto.slug,
       summary: dto.summary,
       content: dto.content,
+      estimatedReadTime: dto.content !== undefined ? estimateReadTime(dto.content) : undefined,
       coverImage: dto.coverImageId
         ? { connect: { id: dto.coverImageId } }
         : dto.coverImageId === null

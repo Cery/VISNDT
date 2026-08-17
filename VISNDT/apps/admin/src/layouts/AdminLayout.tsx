@@ -28,6 +28,7 @@ import {
   SafetyOutlined,
   TeamOutlined,
   ExperimentOutlined,
+  BookOutlined,
 } from '@ant-design/icons';
 import { authStore } from '../stores/auth.store';
 
@@ -50,6 +51,8 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
       { key: '/products', icon: <AppstoreOutlined />, label: '产品管理' },
       { key: '/content', icon: <FileTextOutlined />, label: '内容管理' },
       { key: '/content/tags', icon: <TagsOutlined />, label: '标签管理' },
+      { key: '/knowledge/domains', icon: <BookOutlined />, label: '知识分类' },
+      { key: '/knowledge/entries', icon: <FileTextOutlined />, label: '知识条目' },
       { key: '/media', icon: <PictureOutlined />, label: '媒体中心' },
     ],
   },
@@ -109,6 +112,8 @@ const breadcrumbMap: Record<string, string> = {
   '/audit-logs': '审计日志',
   '/media': '媒体中心',
   '/embedding': 'AI 数据准备',
+  '/knowledge/domains': '知识分类',
+  '/knowledge/categories': '知识分类',
 };
 
 // Build flat menu items from groups

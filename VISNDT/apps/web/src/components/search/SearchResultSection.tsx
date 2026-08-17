@@ -18,12 +18,12 @@ export default function SearchResultSection({
   error = false,
 }: SearchResultSectionProps) {
   return (
-    <section className="mb-8">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+    <section className="mb-6 sm:mb-8">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <h2 className="text-base sm:text-lg font-bold text-foreground flex items-center gap-2">
           {title}
           {!loading && (
-            <span className="text-sm font-normal text-slate-400">
+            <span className="text-xs sm:text-sm font-normal text-slate-400">
               ({count} 条结果)
             </span>
           )}
@@ -31,7 +31,7 @@ export default function SearchResultSection({
       </div>
 
       {loading && (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
@@ -58,7 +58,9 @@ export default function SearchResultSection({
       )}
 
       {!loading && !error && count > 0 && (
-        <div className="space-y-4">{children}</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          {children}
+        </div>
       )}
     </section>
   );

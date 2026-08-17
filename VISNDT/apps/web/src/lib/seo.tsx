@@ -204,3 +204,52 @@ export function JsonLdScript({ data }: { data: Record<string, unknown> }) {
     />
   );
 }
+
+/**
+ * 构建 KnowledgeEntry JSON-LD（知识库条目详情页使用）。
+ * 基于 KnowledgeEntry 公开字段，映射为 Article schema。
+ */
+export interface KnowledgeEntryJsonLdInput {
+  title: string;
+  description?: string | null;
+  url: string;
+  datePublished?: string | null;
+  dateModified?: string | null;
+  authorName?: string | null;
+  domainName?: string | null;
+  categoryName?: string | null;
+}
+
+export function buildKnowledgeEntryJsonLd(input: KnowledgeEntryJsonLdInput): Record<string, unknown> {
+  const jsonLd: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: input.title,
+    url: input.url,
+  };
+
+  if (input.description) jsonLd.description = input.description;
+  if (input.datePublished) jsonLd.datePublished = input.datePublished;
+  if (input.dateModified) jsonLd.dateModified = input.dateModified;
+
+  if (input.authorName) {
+    jsonLd.author = {
+      '@type': 'Organization',
+      name: input.authorName,
+    };
+  }
+
+  jsonLd.publisher = {
+    '@type': 'Organization',
+    name: SITE_NAME,
+  };
+
+  // Add domain/category as articleSection for SEO
+  if (input.domainName && input.categoryName) {
+    jsonLd.articleSection = `${input.domainName} - ${input.categoryName}`;
+  } else if (input.domainName) {
+    jsonLd.articleSection = input.domainName;
+  }
+
+  return jsonLd;
+}

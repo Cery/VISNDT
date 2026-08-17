@@ -1,14 +1,21 @@
 /**
- * Search Service Layer
+ * Search Service Layer — M22.4.1 Unified Search Foundation
  *
- * Encapsulates parallel API calls for unified search across
- * Products, Knowledge, Solutions, and Supplier Capability.
- * All API combination logic stays here; components must not
- * call fetch/axios/apiClient directly.
+ * Calls the backend unified search API (GET /search) instead of
+ * client-side fan-out across 4 separate endpoints.
+ *
+ * Architecture: 580_ADR-001/002/003
+ *   - Single endpoint, unified response contract
+ *   - KnowledgeEntry replaces Content(KNOWLEDGE) as primary knowledge source
+ *   - Server-side aggregation (not client-side Promise.allSettled)
  */
-import { getProducts } from '@/services/product.service';
-import { getContentList } from '@/services/content.service';
-import { getOffers } from '@/services/offer.service';
+import { searchUnified } from '@/lib/api/search';
+import type {
+  ProductDiscoveryItem,
+  KnowledgeDiscoveryItem,
+  ContentDiscoveryItem,
+  SupplierDiscoveryItem,
+} from '@/lib/api/search';
 import type { Product } from '@/types/product';
 import type { Content } from '@/types/content';
 
@@ -27,7 +34,6 @@ export interface UnifiedSearchParams {
 export interface DomainSearchResult<T> {
   items: T[];
   total: number;
-  /** Whether this domain was searched */
   searched: boolean;
 }
 
@@ -51,183 +57,140 @@ export interface UnifiedSearchResults {
   suppliers: DomainSearchResult<SupplierSearchResult>;
 }
 
-/**
- * Search products by keyword.
- * GET /products?keyword=
- */
-async function searchProducts(
-  keyword: string,
-  page: number = 1,
-  pageSize: number = 20,
-): Promise<DomainSearchResult<Product>> {
-  try {
-    const result = await getProducts({
-      keyword,
-      status: 'ACTIVE',
-      page,
-      pageSize,
-    });
-    return {
-      items: result.data ?? [],
-      total: result.total,
-      searched: true,
-    };
-  } catch {
-    return { items: [], total: 0, searched: true };
-  }
+// ============================================
+// Response Mappers
+// ============================================
+
+/** Map backend ProductDiscoveryItem to frontend Product type */
+function mapProduct(item: ProductDiscoveryItem): Product {
+  return {
+    id: item.id,
+    categoryId: item.category?.id ?? '',
+    name: item.name,
+    model: item.model,
+    description: item.description,
+    status: 'ACTIVE',
+    createdAt: '',
+    updatedAt: '',
+    category: (item.category ?? { id: '', name: '', slug: '' }) as Product['category'],
+  };
 }
 
-/**
- * Search knowledge content by keyword.
- * GET /content/public?type=KNOWLEDGE&keyword=
- */
-async function searchKnowledge(
-  keyword: string,
-  page: number = 1,
-  pageSize: number = 20,
-): Promise<DomainSearchResult<Content>> {
-  try {
-    const result = await getContentList({
-      type: 'KNOWLEDGE',
-      keyword,
-      page,
-      pageSize,
-    });
-    return {
-      items: result.data ?? [],
-      total: result.total,
-      searched: true,
-    };
-  } catch {
-    return { items: [], total: 0, searched: true };
-  }
+/** Map backend KnowledgeDiscoveryItem to frontend Content type (for KnowledgeResultCard) */
+function mapKnowledgeToContent(item: KnowledgeDiscoveryItem): Content {
+  return {
+    id: item.id,
+    type: 'KNOWLEDGE' as Content['type'],
+    title: item.title,
+    slug: item.slug,
+    summary: item.summary,
+    publishedAt: item.publishedAt,
+    createdAt: '',
+    updatedAt: '',
+  } as Content;
 }
 
-/**
- * Search solution content by keyword.
- * GET /content/public?type=SOLUTION&keyword=
- */
-async function searchSolutions(
-  keyword: string,
-  page: number = 1,
-  pageSize: number = 20,
-): Promise<DomainSearchResult<Content>> {
-  try {
-    const result = await getContentList({
-      type: 'SOLUTION',
-      keyword,
-      page,
-      pageSize,
-    });
-    return {
-      items: result.data ?? [],
-      total: result.total,
-      searched: true,
-    };
-  } catch {
-    return { items: [], total: 0, searched: true };
-  }
+/** Map backend ContentDiscoveryItem to frontend Content type */
+function mapContent(item: ContentDiscoveryItem): Content {
+  return {
+    id: item.id,
+    type: item.type as Content['type'],
+    title: item.title,
+    slug: item.slug,
+    summary: item.summary,
+    publishedAt: item.publishedAt,
+    estimatedReadTime: item.estimatedReadTime,
+    coverImage: item.coverImage ? {
+      id: item.coverImage.id,
+      fileName: item.coverImage.fileName,
+      mimeType: item.coverImage.mimeType,
+    } : undefined,
+    author: item.author ? {
+      id: item.author.id,
+      name: item.author.name,
+    } : undefined,
+    tags: item.tags?.map(t => ({
+      tag: {
+        id: t.tag.id,
+        name: t.tag.name,
+        slug: t.tag.slug,
+        type: t.tag.type,
+      },
+    })),
+    createdAt: '',
+    updatedAt: '',
+  } as Content;
 }
 
-/**
- * Search supplier capability via offers.
- * GET /offers?keyword=
- * Aggregates offers by organizationId to build supplier-level results.
- */
-async function searchSuppliers(
-  keyword: string,
-  page: number = 1,
-  pageSize: number = 20,
-): Promise<DomainSearchResult<SupplierSearchResult>> {
-  try {
-    const result = await getOffers({
-      keyword,
-      pageSize: 50,
-    });
-    const offers = result.data ?? [];
-
-    // Aggregate by organizationId
-    const orgMap = new Map<string, SupplierSearchResult>();
-    for (const offer of offers) {
-      const orgId = offer.organizationId;
-      if (!orgMap.has(orgId)) {
-        orgMap.set(orgId, {
-          organizationId: orgId,
-          organizationName: offer.organization?.name ?? '未知供应商',
-          organizationType: offer.organization?.type ?? '',
-          offerCapabilities: [],
-          offerCount: 0,
-          matchingOfferIds: [],
-        });
-      }
-      const entry = orgMap.get(orgId)!;
-      if (offer.title && !entry.offerCapabilities.includes(offer.title)) {
-        entry.offerCapabilities.push(offer.title);
-      }
-      entry.offerCount++;
-      entry.matchingOfferIds.push(offer.id);
-    }
-
-    const suppliers = Array.from(orgMap.values());
-    const paginated = suppliers.slice((page - 1) * pageSize, page * pageSize);
-    return {
-      items: paginated,
-      total: suppliers.length,
-      searched: true,
-    };
-  } catch {
-    return { items: [], total: 0, searched: true };
-  }
+/** Map backend SupplierDiscoveryItem to frontend SupplierSearchResult */
+function mapSupplier(item: SupplierDiscoveryItem): SupplierSearchResult {
+  return {
+    organizationId: item.organizationId,
+    organizationName: item.organizationName,
+    organizationType: '',
+    offerCapabilities: item.offerTitles,
+    offerCount: item.offerCount,
+    matchingOfferIds: [],
+  };
 }
 
+/** Empty result helper */
+function emptyResult<T>(): DomainSearchResult<T> {
+  return { items: [], total: 0, searched: false };
+}
+
+// ============================================
+// Unified Search
+// ============================================
+
 /**
- * Execute unified search across all domains.
- * For type=all, searches all domains in parallel.
- * For a specific type, only searches that domain.
+ * Execute unified search via the backend unified discovery API.
+ * Replaces the old client-side fan-out approach.
  */
 export async function unifiedSearch(
   params: UnifiedSearchParams,
 ): Promise<UnifiedSearchResults> {
   const { q, type, page = 1, pageSize = 20 } = params;
 
-  const emptyResult = <T>(): DomainSearchResult<T> => ({
-    items: [],
-    total: 0,
-    searched: false,
-  });
+  const empty = emptyResult;
 
-  const shouldSearch = (domain: SearchDomain): boolean =>
-    type === 'all' || type === domain;
+  try {
+    const response = await searchUnified({ q, page, pageSize });
 
-  // Execute applicable searches in parallel with partial failure tolerance (P1-5)
-  const settled = await Promise.allSettled([
-    shouldSearch('product')
-      ? searchProducts(q, page, pageSize)
-      : Promise.resolve(emptyResult<Product>()),
-    shouldSearch('knowledge')
-      ? searchKnowledge(q, page, pageSize)
-      : Promise.resolve(emptyResult<Content>()),
-    shouldSearch('solution')
-      ? searchSolutions(q, page, pageSize)
-      : Promise.resolve(emptyResult<Content>()),
-    shouldSearch('supplier')
-      ? searchSuppliers(q, page, pageSize)
-      : Promise.resolve(emptyResult<SupplierSearchResult>()),
-  ]);
-
-  const products = settled[0].status === 'fulfilled' ? settled[0].value : { ...emptyResult<Product>(), searched: true };
-  const knowledge = settled[1].status === 'fulfilled' ? settled[1].value : { ...emptyResult<Content>(), searched: true };
-  const solutions = settled[2].status === 'fulfilled' ? settled[2].value : { ...emptyResult<Content>(), searched: true };
-  const suppliers = settled[3].status === 'fulfilled' ? settled[3].value : { ...emptyResult<SupplierSearchResult>(), searched: true };
-
-  return {
-    query: q,
-    activeType: type,
-    products,
-    knowledge,
-    solutions,
-    suppliers,
-  };
+    return {
+      query: response.query,
+      activeType: type,
+      products: {
+        items: response.products.items.map(mapProduct),
+        total: response.products.total,
+        searched: true,
+      },
+      knowledge: {
+        items: response.knowledge.items.map(mapKnowledgeToContent),
+        total: response.knowledge.total,
+        searched: true,
+      },
+      solutions: {
+        items: response.solutions.items.map(mapContent),
+        total: response.solutions.total,
+        searched: true,
+      },
+      suppliers: {
+        items: response.suppliers.items.map(mapSupplier),
+        total: response.suppliers.total,
+        searched: true,
+      },
+    };
+  } catch {
+    return {
+      query: q,
+      activeType: type,
+      products: empty<Product>(),
+      knowledge: empty<Content>(),
+      solutions: empty<Content>(),
+      suppliers: empty<SupplierSearchResult>(),
+    };
+  }
 }
 
 /**
@@ -237,13 +200,8 @@ export async function unifiedSearch(
 export async function getProductSuggestions(keyword: string): Promise<Product[]> {
   if (!keyword || keyword.length < 2) return [];
   try {
-    const result = await getProducts({
-      keyword,
-      status: 'ACTIVE',
-      page: 1,
-      pageSize: 5,
-    });
-    return result.data ?? [];
+    const response = await searchUnified({ q: keyword, page: 1, pageSize: 5 });
+    return response.products.items.map(mapProduct);
   } catch {
     return [];
   }

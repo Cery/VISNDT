@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Space, Spin, Alert, Button, Tag, Typography, Card, Row, Col, Statistic } from 'antd';
-import { FileTextOutlined, CheckCircleOutlined, EditOutlined, ClockCircleOutlined, StopOutlined } from '@ant-design/icons';
+import { Table, Space, Spin, Alert, Button, Tag, Tabs, Typography, Card, Row, Col, Statistic, Tooltip } from 'antd';
+import { FileTextOutlined, CheckCircleOutlined, EditOutlined, ClockCircleOutlined, StopOutlined, EyeOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { contentService } from '../../api';
 import type { Content, ContentType, ContentStatus } from '../../types';
@@ -19,6 +19,8 @@ interface QueryParams {
   keyword: string;
   type: ContentType | '';
   status: ContentStatus | '';
+  sort: 'createdAt' | 'updatedAt' | 'publishedAt' | 'title';
+  order: 'asc' | 'desc';
   page: number;
   pageSize: number;
 }
@@ -68,6 +70,22 @@ const TYPE_LABEL_MAP: Record<string, string> = {
   INSIGHT: '洞察',
 };
 
+/** SEO 完整度等级（非阻断提示）。 */
+type SeoLevel = 'complete' | 'partial' | 'missing';
+function getSeoLevel(content: Content): SeoLevel {
+  const hasTitle = !!content.seoTitle;
+  const hasDesc = !!content.seoDescription;
+  const hasKeywords = !!content.seoKeywords;
+  if (hasTitle && hasDesc && hasKeywords) return 'complete';
+  if (hasTitle || hasDesc || hasKeywords) return 'partial';
+  return 'missing';
+}
+const SEO_LEVEL_CONFIG: Record<SeoLevel, { color: string; label: string }> = {
+  complete: { color: 'green', label: '完整' },
+  partial: { color: 'orange', label: '部分' },
+  missing: { color: 'default', label: '未设置' },
+};
+
 const CONTENT_EXPORT_COLUMNS: ExportColumn<Content>[] = [
   { key: 'title', title: '标题' },
   { key: 'type', title: '类型', render: (item) => TYPE_LABEL_MAP[item.type] || item.type },
@@ -84,6 +102,8 @@ function ContentList() {
     keyword: '',
     type: '',
     status: '',
+    sort: 'createdAt',
+    order: 'desc',
     page: 1,
     pageSize: 20,
   });
@@ -94,6 +114,8 @@ function ContentList() {
       const result = await contentService.getList({
         page: query.page,
         pageSize: query.pageSize,
+        sort: query.sort,
+        order: query.order,
         ...(query.keyword ? { keyword: query.keyword } : {}),
         ...(query.type ? { type: query.type } : {}),
         ...(query.status ? { status: query.status } : {}),
@@ -140,7 +162,7 @@ function ContentList() {
   }, []);
 
   const handleReset = useCallback(() => {
-    setQuery({ keyword: '', type: '', status: '', page: 1, pageSize: 20 });
+    setQuery({ keyword: '', type: '', status: '', sort: 'createdAt', order: 'desc', page: 1, pageSize: 20 });
   }, []);
 
   const handleTableChange = useCallback((pagination: TablePaginationConfig) => {
@@ -203,6 +225,54 @@ function ContentList() {
       ),
     },
     {
+      title: 'SEO',
+      key: 'seo',
+      width: 100,
+      render: (_: unknown, record: Content) => {
+        const level = getSeoLevel(record);
+        const cfg = SEO_LEVEL_CONFIG[level];
+        return <Tag color={cfg.color}>{cfg.label}</Tag>;
+      },
+    },
+    {
+      title: '标签',
+      key: 'tags',
+      width: 200,
+      render: (_: unknown, record: Content) => {
+        const tags = record.tags;
+        if (!tags || tags.length === 0) return <Typography.Text type="secondary">-</Typography.Text>;
+        return (
+          <Space size={[0, 4]} wrap>
+            {tags.slice(0, 3).map((t) => (
+              <Tag key={t.tag.id} color="geekblue" style={{ margin: 0 }}>
+                {t.tag.name}
+              </Tag>
+            ))}
+            {tags.length > 3 && (
+              <Tooltip title={tags.slice(3).map((t) => t.tag.name).join(', ')}>
+                <Tag style={{ margin: 0 }}>+{tags.length - 3}</Tag>
+              </Tooltip>
+            )}
+          </Space>
+        );
+      },
+    },
+    {
+      title: '阅读',
+      key: 'estimatedReadTime',
+      width: 80,
+      align: 'center',
+      render: (_: unknown, record: Content) => {
+        if (!record.estimatedReadTime) return <Typography.Text type="secondary">-</Typography.Text>;
+        return (
+          <Tooltip title={`预计阅读时间 ${record.estimatedReadTime} 分钟`}>
+            <EyeOutlined style={{ marginRight: 4 }} />
+            {record.estimatedReadTime} 分钟
+          </Tooltip>
+        );
+      },
+    },
+    {
       title: '作者',
       key: 'author',
       width: 140,
@@ -210,6 +280,14 @@ function ContentList() {
         const name = record.author?.name || record.author?.email;
         return name || '-';
       },
+    },
+    {
+      title: '发布时间',
+      dataIndex: 'publishedAt',
+      key: 'publishedAt',
+      width: 160,
+      render: (date: string | null) =>
+        date ? new Date(date).toLocaleString() : <Typography.Text type="secondary">未发布</Typography.Text>,
     },
     {
       title: '创建时间',
@@ -285,6 +363,25 @@ function ContentList() {
         <Button type="primary" onClick={() => navigate('/content/create')}>
           创建内容
         </Button>
+
+        {/* Content Type Tabs */}
+        <Tabs
+          activeKey={query.type || 'ALL'}
+          onChange={(key) => {
+            setQuery((prev) => ({ ...prev, type: key === 'ALL' ? '' : (key as ContentType), page: 1 }));
+          }}
+          items={[
+            { key: 'ALL', label: '全部' },
+            { key: 'ARTICLE', label: '文章' },
+            { key: 'KNOWLEDGE', label: '知识' },
+            { key: 'SOLUTION', label: '解决方案' },
+            { key: 'INSIGHT', label: '参数百科' },
+          ]}
+          style={{ marginBottom: 0 }}
+        />
+      </Space>
+
+      <Space style={{ marginBottom: 16 }} wrap>
         <AdvancedFilterPanel
           fields={[
             { key: 'keyword', label: '内容', type: 'keyword', placeholder: '按标题搜索', width: 240 },

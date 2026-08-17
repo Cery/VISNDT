@@ -58,6 +58,11 @@ export async function generateMetadata({
         url: canonical,
         ...(image ? { images: [image] } : {}),
       },
+      twitter: {
+        card: 'summary',
+        title,
+        description,
+      },
     };
   } catch {
     return {
@@ -122,6 +127,17 @@ export default async function ArticleDetailPage({
       </nav>
 
       <article>
+        {/* Cover Image */}
+        {content.coverImage && (
+          <div className="mb-6 sm:mb-8 rounded-xl overflow-hidden">
+            <img
+              src={`/api/assets/${content.coverImage.id}/file`}
+              alt={content.coverImage.fileName ?? content.title}
+              className="w-full object-cover max-h-[400px]"
+            />
+          </div>
+        )}
+
         <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-4">
           {content.title}
         </h1>
@@ -129,6 +145,7 @@ export default async function ArticleDetailPage({
         <div className="flex items-center gap-3 text-sm text-slate-400 mb-8">
           {content.author?.name && <span>{content.author.name}</span>}
           {content.publishedAt && <span>发布于 {formatDate(content.publishedAt)}</span>}
+          {content.estimatedReadTime && <span>{content.estimatedReadTime} 分钟阅读</span>}
         </div>
 
         {content.summary && (

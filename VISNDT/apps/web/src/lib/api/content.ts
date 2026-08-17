@@ -21,6 +21,8 @@ export async function getPublicContents(
     type: params.type,
     keyword: params.keyword,
     tag: params.tag,
+    sort: params.sort,
+    order: params.order,
   };
 
   const res = await apiClient<ApiResponse<PaginatedResponse<Content>>>(

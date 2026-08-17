@@ -102,9 +102,45 @@ export class OrganizationsService {
     return this.prisma.organization.create({ data: dto });
   }
 
-  async update(id: string, dto: UpdateOrganizationDto) {
+  async update(id: string, dto: UpdateOrganizationDto, requestUser: RequestUser) {
     await this.prisma.organization.findUnique({ where: { id } });
+    await this.checkOrganizationAccess(id, requestUser);
     return this.prisma.organization.update({ where: { id }, data: dto });
+  }
+
+  /**
+   * Self-service update for organization members.
+   * Only allows name, type — explicitly excludes status and admin fields.
+   */
+  async updateSelf(
+    id: string,
+    dto: { name?: string; type?: string },
+    requestUser: RequestUser,
+  ) {
+    const org = await this.prisma.organization.findUnique({ where: { id } });
+    if (!org) throw new NotFoundException(`Organization ${id} not found`);
+
+    // Verify the user belongs to this organization
+    if (requestUser.organizationId !== id) {
+      throw new ForbiddenException('You can only update your own organization');
+    }
+
+    const updateData: any = {};
+    if (dto.name !== undefined) updateData.name = dto.name;
+    if (dto.type !== undefined) updateData.type = dto.type;
+
+    return this.prisma.organization.update({
+      where: { id },
+      data: updateData,
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   }
 
   async remove(id: string) {

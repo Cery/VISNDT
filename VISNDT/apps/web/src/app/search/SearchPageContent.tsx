@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import type { SearchDomain } from '@/services/search.service';
 import { unifiedSearch } from '@/services/search.service';
@@ -8,6 +8,8 @@ import type { UnifiedSearchResults } from '@/services/search.service';
 import { trackEvent, buildEvent } from '@/lib/analytics';
 import GlobalSearchBar from '@/components/search/GlobalSearchBar';
 import SearchTypeTabs from '@/components/search/SearchTypeTabs';
+import SearchFilter from '@/components/search/SearchFilter';
+import type { SearchFilterState, ContentTypeFilter } from '@/components/search/SearchFilter';
 import SearchResultSection from '@/components/search/SearchResultSection';
 import SearchEmptyState from '@/components/search/SearchEmptyState';
 import ProductResultCard from '@/components/search/ProductResultCard';
@@ -36,7 +38,10 @@ export default function SearchPageContent() {
   const [error, setError] = useState(false);
   const [page, setPage] = useState(1);
 
-  // Cache all-results for tab switching (P1-3)
+  // Filter state — client-side only
+  const [filter, setFilter] = useState<SearchFilterState>({ contentType: undefined, active: false });
+
+  // Cache all-results for tab switching
   const cachedAllResults = useRef<UnifiedSearchResults | null>(null);
   const lastQuery = useRef<string>('');
 
@@ -54,7 +59,6 @@ export default function SearchPageContent() {
       try {
         const data = await unifiedSearch({ q: query.trim(), type, page: currentPage, pageSize: PAGE_SIZE });
 
-        // Track search event (only on first page, not append)
         if (!append) {
           trackEvent(buildEvent('search', {
             source: '/search',
@@ -63,7 +67,6 @@ export default function SearchPageContent() {
         }
 
         if (append && results) {
-          // Append results for load more
           setResults({
             ...data,
             products: {
@@ -86,7 +89,6 @@ export default function SearchPageContent() {
         } else {
           setResults(data);
           setPage(currentPage);
-          // Cache all-results for tab switching
           if (type === 'all') {
             cachedAllResults.current = data;
             lastQuery.current = query.trim();
@@ -102,17 +104,16 @@ export default function SearchPageContent() {
     [query, type, results],
   );
 
-  // Reset and search when query or type changes
   useEffect(() => {
     if (!query.trim()) {
       setResults(null);
       setLoading(false);
       setError(false);
       setPage(1);
+      setFilter({ contentType: undefined, active: false });
       return;
     }
 
-    // If switching tabs and we have cached all-results for the same query (P1-3)
     if (type !== 'all' && cachedAllResults.current && lastQuery.current === query.trim()) {
       setResults({
         ...cachedAllResults.current,
@@ -138,6 +139,32 @@ export default function SearchPageContent() {
     executeSearch(1, false);
   }, [executeSearch]);
 
+  // Client-side filter logic
+  const filteredResults = useMemo(() => {
+    if (!results) return null;
+    if (!filter.active) return results;
+
+    const applyContentFilter = <T extends { type?: string }>(items: T[]): T[] => {
+      if (!filter.contentType) return items;
+      return items.filter(item => {
+        const itemType = item.type as ContentTypeFilter;
+        return itemType === filter.contentType;
+      });
+    };
+
+    return {
+      ...results,
+      knowledge: {
+        ...results.knowledge,
+        items: applyContentFilter(results.knowledge.items),
+      },
+      solutions: {
+        ...results.solutions,
+        items: applyContentFilter(results.solutions.items),
+      },
+    };
+  }, [results, filter]);
+
   const counts = results
     ? {
         product: results.products.total,
@@ -156,7 +183,6 @@ export default function SearchPageContent() {
 
   const hasKeyword = query.trim().length > 0;
 
-  // Check if there are more results to load (P0-3)
   const hasMore = results
     ? results.products.items.length < results.products.total ||
       results.knowledge.items.length < results.knowledge.total ||
@@ -164,26 +190,29 @@ export default function SearchPageContent() {
       results.suppliers.items.length < results.suppliers.total
     : false;
 
-  // Helper: should render a section (P0-2: hide zero-result sections in 'all' mode)
   const shouldRenderSection = (domainType: SearchDomain, count: number): boolean => {
     if (type === 'all') return count > 0;
     return type === domainType;
   };
 
+  const displayResults = filteredResults ?? results;
+
   return (
     <div className="min-h-screen bg-slate-50/50">
-      {/* Search Header — sticky (P1-6) */}
+      {/* Search Header — sticky */}
       <div className="sticky top-0 z-40 bg-white border-b border-slate-200">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
-          <div className="max-w-2xl mx-auto">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          {/* Mobile: compact search bar */}
+          <div className="md:max-w-2xl md:mx-auto">
             <GlobalSearchBar
               initialKeyword={query}
               initialType={type}
+              placeholder="搜索工业检测设备、知识、方案..."
             />
           </div>
 
           {hasKeyword && (
-            <div className="mt-4 text-sm text-slate-500 max-w-2xl mx-auto">
+            <div className="mt-2 sm:mt-3 text-xs sm:text-sm text-slate-500 md:max-w-2xl md:mx-auto">
               {loading ? (
                 <span className="inline-flex items-center gap-2">
                   <span className="w-3 h-3 border-2 border-slate-300 border-t-primary rounded-full animate-spin" />
@@ -210,18 +239,28 @@ export default function SearchPageContent() {
       </div>
 
       {/* Search Content */}
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
         {!hasKeyword ? (
           <SearchEmptyState type="no-keyword" />
         ) : (
           <>
-            <SearchTypeTabs
-              activeType={type}
-              query={query}
-              counts={counts}
-            />
+            {/* Tabs + Filter Area */}
+            <div className="space-y-3">
+              <SearchTypeTabs
+                activeType={type}
+                query={query}
+                counts={counts}
+              />
 
-            <div className="mt-6">
+              {/* Filter Bar — desktop beside tabs, mobile below */}
+              <SearchFilter
+                activeType={type}
+                filter={filter}
+                onChange={setFilter}
+              />
+            </div>
+
+            <div className="mt-4 sm:mt-6">
               {!loading && !error && results && !hasAnyResults && (
                 <SearchEmptyState type="no-results" keyword={query} />
               )}
@@ -237,7 +276,6 @@ export default function SearchPageContent() {
                   </div>
                   <h3 className="text-lg font-semibold text-slate-600 mb-2">搜索服务暂不可用</h3>
                   <p className="text-sm text-slate-400 mb-4">请稍后重试或浏览产品分类</p>
-                  {/* P1-1: Retry button */}
                   <button
                     onClick={handleRetry}
                     className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-primary to-industrial-cyan rounded-lg hover:opacity-90 transition-opacity"
@@ -250,15 +288,15 @@ export default function SearchPageContent() {
                 </div>
               )}
 
-              {/* P0-2: Only render sections with results in 'all' mode */}
+              {/* Product Section */}
               {shouldRenderSection('product', results?.products.total ?? 0) && (
                 <SearchResultSection
                   title="产品"
-                  count={results?.products.total ?? 0}
+                  count={displayResults?.products.total ?? 0}
                   loading={loading}
                   error={error}
                 >
-                  {results?.products.items.map((product) => (
+                  {displayResults?.products.items.map((product) => (
                     <ProductResultCard
                       key={product.id}
                       product={product}
@@ -268,14 +306,15 @@ export default function SearchPageContent() {
                 </SearchResultSection>
               )}
 
+              {/* Knowledge Section */}
               {shouldRenderSection('knowledge', results?.knowledge.total ?? 0) && (
                 <SearchResultSection
                   title="知识"
-                  count={results?.knowledge.total ?? 0}
+                  count={displayResults?.knowledge.total ?? 0}
                   loading={loading}
                   error={error}
                 >
-                  {results?.knowledge.items.map((content) => (
+                  {displayResults?.knowledge.items.map((content) => (
                     <KnowledgeResultCard
                       key={content.id}
                       content={content}
@@ -285,14 +324,15 @@ export default function SearchPageContent() {
                 </SearchResultSection>
               )}
 
+              {/* Solution Section */}
               {shouldRenderSection('solution', results?.solutions.total ?? 0) && (
                 <SearchResultSection
                   title="解决方案"
-                  count={results?.solutions.total ?? 0}
+                  count={displayResults?.solutions.total ?? 0}
                   loading={loading}
                   error={error}
                 >
-                  {results?.solutions.items.map((content) => (
+                  {displayResults?.solutions.items.map((content) => (
                     <SolutionResultCard
                       key={content.id}
                       content={content}
@@ -302,14 +342,15 @@ export default function SearchPageContent() {
                 </SearchResultSection>
               )}
 
+              {/* Supplier Section */}
               {shouldRenderSection('supplier', results?.suppliers.total ?? 0) && (
                 <SearchResultSection
                   title="供应商"
-                  count={results?.suppliers.total ?? 0}
+                  count={displayResults?.suppliers.total ?? 0}
                   loading={loading}
                   error={error}
                 >
-                  {results?.suppliers.items.map((supplier) => (
+                  {displayResults?.suppliers.items.map((supplier) => (
                     <SupplierResultCard
                       key={supplier.organizationId}
                       supplier={supplier}
@@ -327,7 +368,7 @@ export default function SearchPageContent() {
                 />
               )}
 
-              {/* P0-3: Load More button */}
+              {/* Load More */}
               {!loading && !loadingMore && !error && results && hasMore && (
                 <div className="text-center mt-8">
                   <button
@@ -339,7 +380,6 @@ export default function SearchPageContent() {
                 </div>
               )}
 
-              {/* Loading more indicator */}
               {loadingMore && (
                 <div className="text-center mt-8">
                   <span className="inline-flex items-center gap-2 text-sm text-slate-400">

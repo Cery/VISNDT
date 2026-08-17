@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Form, Input, Select, Button, Space, Card, message } from 'antd';
+import { Form, Input, Select, Button, Space, Card, message, Typography, Upload, Image } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, UploadOutlined, EyeOutlined } from '@ant-design/icons';
 import type { ContentFormData } from '../../types';
+import { fileAssetService } from '../../api/file-asset.service';
 import MarkdownEditor from './MarkdownEditor';
 
 const { TextArea } = Input;
+const { Text } = Typography;
 
 interface ContentFormProps {
   initialValues?: Partial<ContentFormData>;
@@ -23,10 +25,17 @@ export default function ContentForm({
   const navigate = useNavigate();
   const [form] = Form.useForm<ContentFormData>();
   const [submitting, setSubmitting] = useState(false);
+  const [coverUrl, setCoverUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialValues) {
       form.setFieldsValue(initialValues);
+      if (initialValues.coverImageId) {
+        fileAssetService
+          .getSignedUrl(initialValues.coverImageId)
+          .then(setCoverUrl)
+          .catch(() => setCoverUrl(null));
+      }
     }
   }, [initialValues, form]);
 
@@ -43,6 +52,12 @@ export default function ContentForm({
       setSubmitting(false);
     }
   };
+
+  /** Estimated read time from content body (live preview). */
+  const contentBody: string = Form.useWatch('content', form) || '';
+  const estimatedReadTime: number = contentBody
+    ? Math.max(1, Math.ceil((contentBody.replace(/\s/g, '').length + contentBody.split(/\s+/).filter(Boolean).length) / 500))
+    : 0;
 
   return (
     <div>
@@ -95,6 +110,37 @@ export default function ContentForm({
             <TextArea rows={2} placeholder="请输入摘要" />
           </Form.Item>
 
+          <Form.Item label="封面图" name="coverImageId">
+            <Space direction="vertical" style={{ width: '100%' }}>
+              <Upload
+                accept="image/*"
+                showUploadList={false}
+                customRequest={async ({ file, onSuccess, onError }) => {
+                  try {
+                    const uploaded = await fileAssetService.upload(file as File);
+                    form.setFieldValue('coverImageId', uploaded.id);
+                    const url = await fileAssetService.getSignedUrl(uploaded.id);
+                    setCoverUrl(url);
+                    (onSuccess as (body: unknown) => void)?.(uploaded);
+                  } catch (err) {
+                    (onError as (err: Error) => void)?.(err instanceof Error ? err : new Error('上传失败'));
+                  }
+                }}
+              >
+                <Button icon={<UploadOutlined />}>上传封面图</Button>
+              </Upload>
+              {coverUrl && (
+                <Image
+                  src={coverUrl}
+                  alt="封面图预览"
+                  width={200}
+                  style={{ objectFit: 'cover', borderRadius: 4 }}
+                  preview={false}
+                />
+              )}
+            </Space>
+          </Form.Item>
+
           <Form.Item
             label="正文"
             name="content"
@@ -102,6 +148,17 @@ export default function ContentForm({
           >
             <MarkdownEditor rows={10} />
           </Form.Item>
+
+          {estimatedReadTime > 0 && (
+            <div style={{ marginBottom: 16 }}>
+              <Space>
+                <EyeOutlined />
+                <Text type="secondary">
+                  预计阅读时间：<Text strong>{estimatedReadTime}</Text> 分钟
+                </Text>
+              </Space>
+            </div>
+          )}
         </Card>
 
         <Card title="SEO" style={{ marginBottom: 16 }}>

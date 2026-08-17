@@ -77,6 +77,10 @@ export type {
   MatchDetail,
   UpdateMatchStatusParams,
   MatchingStats,
+  KnowledgeContext,
+  KnowledgeEntryRef,
+  KnowledgeDomainRef,
+  KnowledgeCategoryRef,
 } from './match.types';
 export type {
   Offer,

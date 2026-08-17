@@ -5,6 +5,7 @@ import type {
   MatchDetail,
   UpdateMatchStatusParams,
   MatchingStats,
+  KnowledgeContext,
 } from '../types';
 
 interface ApiResponseWrapper<T> {
@@ -75,6 +76,19 @@ export const matchService = {
     const response = (await apiClient.get(
       '/admin/matching/stats',
     )) as unknown as ApiResponseWrapper<MatchingStats>;
+
+    return response.data;
+  },
+
+  /**
+   * Get Knowledge Context for a DemandMatch (M23.0).
+   * GET /matches/:id/knowledge-context
+   * Knowledge ≠ Score Input — read-side only.
+   */
+  async getKnowledgeContext(matchId: string): Promise<KnowledgeContext> {
+    const response = (await apiClient.get(
+      `/matches/${matchId}/knowledge-context`,
+    )) as unknown as ApiResponseWrapper<KnowledgeContext>;
 
     return response.data;
   },

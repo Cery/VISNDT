@@ -10,6 +10,7 @@ export default function ContentCreate() {
       slug: data.slug,
       summary: data.summary,
       content: data.content,
+      coverImageId: data.coverImageId,
       seoTitle: data.seoTitle,
       seoDescription: data.seoDescription,
       seoKeywords: data.seoKeywords,

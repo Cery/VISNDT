@@ -20,16 +20,25 @@ export async function generateMetadata({
   const { slug } = await params;
   try {
     const product = await getProduct(slug);
+    const productUrl = absoluteUrl(`/products/${slug}`);
     return {
       title: product.name,
       description:
         (product.description?.slice(0, 160) ?? '') ||
         `VISNDT产品详情：${product.name}`,
+      alternates: { canonical: productUrl },
       openGraph: {
         title: product.name,
         description:
           (product.description?.slice(0, 160) ?? '') || SITE_DESCRIPTION,
         type: 'website',
+        url: productUrl,
+      },
+      twitter: {
+        card: 'summary',
+        title: product.name,
+        description:
+          (product.description?.slice(0, 160) ?? '') || SITE_DESCRIPTION,
       },
     };
   } catch {

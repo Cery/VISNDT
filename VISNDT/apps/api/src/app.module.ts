@@ -34,6 +34,8 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { EmbeddingModule } from './embedding/embedding.module';
 import { SemanticModule } from './semantic/semantic.module';
 import { AIModule } from './ai/ai.module';
+import { KnowledgeModule } from './knowledge/knowledge.module';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -76,6 +78,8 @@ import { AIModule } from './ai/ai.module';
     EmbeddingModule,
     SemanticModule,
     AIModule,
+    KnowledgeModule,
+    SearchModule,
   ],
   providers: [
     {

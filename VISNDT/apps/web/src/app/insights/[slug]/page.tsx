@@ -58,6 +58,11 @@ export async function generateMetadata({
         url: canonical,
         ...(image ? { images: [image] } : {}),
       },
+      twitter: {
+        card: 'summary',
+        title,
+        description,
+      },
     };
   } catch {
     return {

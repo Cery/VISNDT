@@ -23,6 +23,16 @@ export class QueryContentDto {
   @IsString()
   tag?: string;
 
+  @ApiPropertyOptional({ description: 'Sort field', enum: ['createdAt', 'updatedAt', 'publishedAt', 'title'], default: 'createdAt' })
+  @IsOptional()
+  @IsIn(['createdAt', 'updatedAt', 'publishedAt', 'title'])
+  sort?: 'createdAt' | 'updatedAt' | 'publishedAt' | 'title';
+
+  @ApiPropertyOptional({ description: 'Sort order', enum: ['asc', 'desc'], default: 'desc' })
+  @IsOptional()
+  @IsIn(['asc', 'desc'])
+  order?: 'asc' | 'desc';
+
   @ApiPropertyOptional({ description: 'Page number (1-based)', default: 1 })
   @IsOptional()
   @Min(1)

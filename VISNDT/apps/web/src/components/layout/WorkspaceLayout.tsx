@@ -28,7 +28,9 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
       <div className="flex min-w-0 flex-1 flex-col">
         <WorkspaceHeader onMenuToggle={toggleSidebar} />
         <main className="flex-1 bg-slate-50 p-3 sm:p-4 md:p-6">
-          {children}
+          <div className="mx-auto w-full max-w-[1200px]">
+            {children}
+          </div>
         </main>
       </div>
     </div>

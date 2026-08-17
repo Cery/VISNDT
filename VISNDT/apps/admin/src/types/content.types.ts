@@ -13,6 +13,10 @@ export interface ContentTag {
   updatedAt: string;
 }
 
+export interface ContentTagRelation {
+  tag: ContentTag;
+}
+
 export interface ContentMediaFileAsset {
   id: string;
   fileName: string;
@@ -79,11 +83,13 @@ export interface Content {
   seoTitle?: string | null;
   seoDescription?: string | null;
   seoKeywords?: string | null;
+  estimatedReadTime?: number | null;
   createdAt: string;
   updatedAt: string;
   author?: ContentAuthor;
   coverImage?: ContentCoverImage | null;
   media?: ContentMedia[];
+  tags?: ContentTagRelation[];
 }
 
 export interface ContentListResponse {
@@ -97,6 +103,10 @@ export interface ContentListResponse {
 export interface QueryContentParams {
   type?: ContentType;
   status?: ContentStatus;
+  keyword?: string;
+  tag?: string;
+  sort?: 'createdAt' | 'updatedAt' | 'publishedAt' | 'title';
+  order?: 'asc' | 'desc';
   page?: number;
   pageSize?: number;
 }
@@ -132,6 +142,7 @@ export interface ContentFormData {
   slug: string;
   summary?: string;
   content: string;
+  coverImageId?: string;
   seoTitle?: string;
   seoDescription?: string;
   seoKeywords?: string;

@@ -50,6 +50,7 @@ export interface Content {
   seoTitle?: string | null;
   seoDescription?: string | null;
   seoKeywords?: string | null;
+  estimatedReadTime?: number | null;
   createdAt: string;
   updatedAt: string;
   author?: ContentAuthor;
@@ -62,6 +63,8 @@ export interface ContentListParams {
   type?: ContentType;
   keyword?: string;
   tag?: string;
+  sort?: 'createdAt' | 'updatedAt' | 'publishedAt' | 'title';
+  order?: 'asc' | 'desc';
   page?: number;
   pageSize?: number;
 }

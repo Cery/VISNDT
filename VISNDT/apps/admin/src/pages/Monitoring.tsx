@@ -258,6 +258,17 @@ function Monitoring() {
 
       <OverallBanner overview={overview} />
 
+      {/* Alert: Analytics pipeline may show critical when no events exist (normal in dev) */}
+      {overview.analytics.health === 'critical' && (
+        <Alert
+          type="info"
+          message="Analytics 管道状态说明"
+          description="当前 Analytics 管道显示为「严重」是因为尚未收集到任何事件数据。这是正常现象 — 当用户开始浏览产品、搜索内容、提交询价等操作后，事件数据会自动填充，管道状态将恢复正常。"
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+      )}
+
       {sections.map(({ key, result }) => (
         <MonitoringSection
           key={key}

@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { RequireAuth } from '../auth';
 import AdminLayout from '../layouts/AdminLayout';
-import { DemandDetail, DemandEdit, DemandList, EmbeddingManagement, FileAssetOrphanList, Home, Analytics, BusinessAnalytics, Monitoring, AuditIntelligence, InquiryDetail, InquiryList, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ParameterDefinitionCreate, ParameterDefinitionDetail, ParameterDefinitionEdit, ParameterDefinitionList, ParameterGroupCreate, ParameterGroupDetail, ParameterGroupEdit, ParameterGroupList, ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList, ProductCreate, ProductDetail, ProductEdit, ProductList, ProductMediaCreate, ProductMediaEdit, ProductMediaList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, AuditLogList, UserCreate, UserDetail, UserEdit, UserList, ContentList, ContentCreate, ContentEdit, ContentTagList, ContentTagCreate, ContentTagEdit } from '../pages';
+import { DemandDetail, DemandEdit, DemandList, EmbeddingManagement, FileAssetOrphanList, Home, Analytics, BusinessAnalytics, Monitoring, AuditIntelligence, InquiryDetail, InquiryList, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ParameterDefinitionCreate, ParameterDefinitionDetail, ParameterDefinitionEdit, ParameterDefinitionList, ParameterGroupCreate, ParameterGroupDetail, ParameterGroupEdit, ParameterGroupList, ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList, ProductCreate, ProductDetail, ProductEdit, ProductList, ProductMediaCreate, ProductMediaEdit, ProductMediaList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, AuditLogList, UserCreate, UserDetail, UserEdit, UserList, ContentList, ContentCreate, ContentEdit, ContentTagList, ContentTagCreate, ContentTagEdit, KnowledgeDomainList, KnowledgeDomainCreate, KnowledgeDomainEdit, KnowledgeCategoryList, KnowledgeCategoryCreate, KnowledgeCategoryEdit, KnowledgeEntryList, KnowledgeEntryCreate, KnowledgeEntryEdit, MediaList } from '../pages';
 
 const router = createBrowserRouter([
   {
@@ -72,6 +72,16 @@ const router = createBrowserRouter([
       { path: 'content/tags/create', element: <ContentTagCreate /> },
       { path: 'content/tags/:id/edit', element: <ContentTagEdit /> },
       { path: 'embedding', element: <EmbeddingManagement /> },
+      { path: 'knowledge/domains', element: <KnowledgeDomainList /> },
+      { path: 'knowledge/domains/create', element: <KnowledgeDomainCreate /> },
+      { path: 'knowledge/domains/:id/edit', element: <KnowledgeDomainEdit /> },
+      { path: 'knowledge/categories', element: <KnowledgeCategoryList /> },
+      { path: 'knowledge/categories/create', element: <KnowledgeCategoryCreate /> },
+      { path: 'knowledge/categories/:id/edit', element: <KnowledgeCategoryEdit /> },
+      { path: 'knowledge/entries', element: <KnowledgeEntryList /> },
+      { path: 'knowledge/entries/create', element: <KnowledgeEntryCreate /> },
+      { path: 'knowledge/entries/:id/edit', element: <KnowledgeEntryEdit /> },
+      { path: 'media', element: <MediaList /> },
     ],
   },
   {

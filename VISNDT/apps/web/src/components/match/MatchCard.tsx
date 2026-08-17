@@ -61,6 +61,16 @@ export default function MatchCard({ match, onStatusUpdate, onRematch }: MatchCar
         </span>
       </div>
 
+      {/* View detail link */}
+      <div className="mt-3 pt-3 border-t border-slate-100">
+        <Link
+          href={`/workspace/matches/${match.id}`}
+          className="text-xs text-slate-500 hover:text-slate-700 transition-colors"
+        >
+          查看详情 →
+        </Link>
+      </div>
+
       {/* Action buttons */}
       {(canAccept || canReject || canRematch) && (
         <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100">

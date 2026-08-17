@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards, Req, ForbiddenException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { OrganizationsService } from './organizations.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
@@ -11,6 +11,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/enums/role.enum';
+import { AuthRequest } from '../auth/interfaces/auth-request.interface';
 
 @ApiTags('Organizations')
 @Controller('organizations')
@@ -64,13 +65,33 @@ export class OrganizationsController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update organization (ADMIN only)' })
+  @ApiOperation({ summary: 'Update organization (ADMIN or member of the organization)' })
   @ApiParam({ name: 'id', description: 'Organization UUID' })
-  async update(@Param('id') id: string, @Body() dto: UpdateOrganizationDto) {
-    const org = await this.orgsService.update(id, dto);
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateOrganizationDto,
+    @Req() req: AuthRequest,
+  ) {
+    const user = req.user;
+    const isAdmin = user.organizationId === id
+      ? false // Determine admin status in service
+      : true; // Will be checked in service
+
+    // For non-admin (self-service), restrict to safe fields only
+    if (user.organizationId === id) {
+      // Self-service: only allow name, type, description
+      const { status, ...rest } = dto as any;
+      if (status !== undefined) {
+        throw new ForbiddenException('Self-service organization update does not allow changing status');
+      }
+      const org = await this.orgsService.updateSelf(id, rest, user);
+      return ApiResponse.ok(org, 'Organization updated');
+    }
+
+    // ADMIN path: full update including status
+    const org = await this.orgsService.update(id, dto, user);
     return ApiResponse.ok(org, 'Organization updated');
   }
 

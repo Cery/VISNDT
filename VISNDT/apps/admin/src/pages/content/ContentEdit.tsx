@@ -107,6 +107,7 @@ export default function ContentEdit() {
       slug: data.slug,
       summary: data.summary,
       content: data.content,
+      coverImageId: data.coverImageId,
       seoTitle: data.seoTitle,
       seoDescription: data.seoDescription,
       seoKeywords: data.seoKeywords,
@@ -191,6 +192,7 @@ export default function ContentEdit() {
     slug: content.slug,
     summary: content.summary || undefined,
     content: content.content,
+    coverImageId: content.coverImageId || undefined,
     seoTitle: content.seoTitle || undefined,
     seoDescription: content.seoDescription || undefined,
     seoKeywords: content.seoKeywords || undefined,
@@ -223,6 +225,12 @@ export default function ContentEdit() {
           <Descriptions.Item label="Slug">{content.slug}</Descriptions.Item>
           <Descriptions.Item label="作者">
             {content.author?.name || content.author?.email || '-'}
+          </Descriptions.Item>
+          <Descriptions.Item label="预计阅读">
+            {content.estimatedReadTime ? `${content.estimatedReadTime} 分钟` : '-'}
+          </Descriptions.Item>
+          <Descriptions.Item label="发布时间">
+            {content.publishedAt ? new Date(content.publishedAt).toLocaleString() : '未发布'}
           </Descriptions.Item>
           <Descriptions.Item label="创建时间">
             {new Date(content.createdAt).toLocaleString()}

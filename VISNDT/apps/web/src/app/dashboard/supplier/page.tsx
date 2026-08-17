@@ -17,6 +17,8 @@ import {
   getSupplierWorkspaceResponses,
   getSupplierWorkspaceRfqs,
 } from '@/services/workspace.service';
+import { getOffers } from '@/services/offer.service';
+import { getAvailableRfqs } from '@/services/rfq.service';
 
 function formatDateTime(value?: string | null) {
   if (!value) {
@@ -55,10 +57,28 @@ const DOMAIN_NAV_ITEMS = [
     icon: '📄',
   },
   {
+    title: '商机中心',
+    description: '发现公开 RFQ 机会、查看匹配机会和定向询价，把握业务先机。',
+    href: '/workspace/supplier/opportunities',
+    icon: '🎯',
+  },
+  {
     title: '我的响应',
     description: '查看已提交响应的状态跟踪与历史记录。',
     href: '/workspace/supplier/responses',
     icon: '📨',
+  },
+  {
+    title: '我的 Offer',
+    description: '查看和管理供应能力 Offer，创建新 Offer 并提交。',
+    href: '/workspace/supplier/offers',
+    icon: '📦',
+  },
+  {
+    title: '企业资料',
+    description: '查看和编辑组织基础信息，维护企业身份与公开资料。',
+    href: '/workspace/supplier/profile',
+    icon: '🏢',
   },
   {
     title: '展示管理',
@@ -100,6 +120,21 @@ function SupplierDashboardContent() {
   const responsesQuery = useQuery({
     queryKey: ['workspace', 'supplier', 'responses'],
     queryFn: getSupplierWorkspaceResponses,
+  });
+
+  const offersQuery = useQuery({
+    queryKey: ['offers', 'supplier', 'dashboard'],
+    queryFn: () =>
+      getOffers({
+        organizationId: user?.organizationId ?? undefined,
+        pageSize: 1,
+      }),
+    enabled: !!user?.organizationId,
+  });
+
+  const availableRfqsQuery = useQuery({
+    queryKey: ['rfqs', 'available', 'dashboard'],
+    queryFn: () => getAvailableRfqs({ pageSize: 1 }),
   });
 
   const visibleRfqs = (rfqsQuery.data ?? []).slice(0, 5);
@@ -163,7 +198,7 @@ function SupplierDashboardContent() {
               />
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-6">
               <StatCard
                 label="待处理 RFQ"
                 value={overviewQuery.data.rfqSummary.total}
@@ -183,6 +218,18 @@ function SupplierDashboardContent() {
                 icon="🔗"
               />
               <StatCard
+                label="公开 RFQ"
+                value={availableRfqsQuery.data?.total ?? 0}
+                description="可参与报价"
+                icon="🎯"
+              />
+              <StatCard
+                label="我的 Offer"
+                value={offersQuery.data?.total ?? 0}
+                description="供应能力 Offer"
+                icon="📦"
+              />
+              <StatCard
                 label="未读通知"
                 value={overviewQuery.data.notificationSummary.unreadCount}
                 description="条未读消息"
@@ -198,7 +245,7 @@ function SupplierDashboardContent() {
             <div className="w-1 h-5 bg-emerald-400 rounded-full" />
             <h2 className="text-lg font-semibold text-slate-900">快捷操作</h2>
           </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
             <Link
               href="/workspace/supplier/rfqs"
               className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 transition-all hover:border-primary/30 hover:bg-white hover:shadow-sm"
@@ -210,6 +257,16 @@ function SupplierDashboardContent() {
               </div>
             </Link>
             <Link
+              href="/workspace/supplier/opportunities"
+              className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 transition-all hover:border-primary/30 hover:bg-white hover:shadow-sm"
+            >
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 text-lg">🎯</span>
+              <div>
+                <p className="text-sm font-medium text-slate-900">商机中心</p>
+                <p className="text-xs text-slate-500">{availableRfqsQuery.data?.total ?? 0} 个公开 RFQ</p>
+              </div>
+            </Link>
+            <Link
               href="/workspace/supplier/responses"
               className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 transition-all hover:border-primary/30 hover:bg-white hover:shadow-sm"
             >
@@ -217,6 +274,26 @@ function SupplierDashboardContent() {
               <div>
                 <p className="text-sm font-medium text-slate-900">我的响应</p>
                 <p className="text-xs text-slate-500">{overviewQuery.data?.responseSummary.total ?? 0} 条记录</p>
+              </div>
+            </Link>
+            <Link
+              href="/workspace/supplier/offers"
+              className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 transition-all hover:border-primary/30 hover:bg-white hover:shadow-sm"
+            >
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-100 text-teal-600 text-lg">📦</span>
+              <div>
+                <p className="text-sm font-medium text-slate-900">我的 Offer</p>
+                <p className="text-xs text-slate-500">{offersQuery.data?.total ?? 0} 个 Offer</p>
+              </div>
+            </Link>
+            <Link
+              href="/workspace/supplier/profile"
+              className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 transition-all hover:border-primary/30 hover:bg-white hover:shadow-sm"
+            >
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-100 text-sky-600 text-lg">🏢</span>
+              <div>
+                <p className="text-sm font-medium text-slate-900">企业资料</p>
+                <p className="text-xs text-slate-500">管理组织信息</p>
               </div>
             </Link>
             <Link

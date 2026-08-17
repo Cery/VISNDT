@@ -70,3 +70,33 @@ export interface MatchingStats {
   hardFailCount: number;
   rematchCount: number;
 }
+
+// ===== Knowledge Context (M23.0) =====
+
+export interface KnowledgeEntryRef {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string | null;
+}
+
+export interface KnowledgeDomainRef {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface KnowledgeCategoryRef {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface KnowledgeContext {
+  domain: KnowledgeDomainRef | null;
+  category: KnowledgeCategoryRef | null;
+  relevantEntries: KnowledgeEntryRef[];
+  prerequisiteKnowledge: KnowledgeEntryRef[];
+  relatedKnowledge: KnowledgeEntryRef[];
+  followupKnowledge: KnowledgeEntryRef[];
+}

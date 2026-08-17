@@ -12,3 +12,22 @@ export async function getOrganization(id: string): Promise<Organization> {
   );
   return res.data;
 }
+
+/**
+ * Update organization information (self-service for members).
+ * PATCH /organizations/:id
+ * Only allows name, type for non-admin users.
+ */
+export async function updateOrganization(
+  id: string,
+  data: { name?: string; type?: string },
+): Promise<Organization> {
+  const res = await apiClient<ApiResponse<Organization>>(
+    `/organizations/${id}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    },
+  );
+  return res.data;
+}

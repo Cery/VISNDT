@@ -55,9 +55,14 @@ export async function generateMetadata({
       openGraph: {
         title,
         description,
-        type: 'website',
+        type: 'article',
         url: canonical,
         ...(image ? { images: [image] } : {}),
+      },
+      twitter: {
+        card: 'summary',
+        title,
+        description,
       },
     };
   } catch {
