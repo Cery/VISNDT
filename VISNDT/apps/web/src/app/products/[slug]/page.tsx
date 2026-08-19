@@ -1,4 +1,4 @@
-import { getProduct } from '@/services/product.service';
+import { getProduct, getProductRelatedKnowledge, getProductRelatedProducts } from '@/services/product.service';
 import { getParameterGroups } from '@/services/parameter-group.service';
 import ProductDetailContent from '@/components/products/ProductDetailContent';
 import ProductDetailNav from '@/components/products/ProductDetailNav';
@@ -8,6 +8,8 @@ import type { Metadata } from 'next';
 import { translateCategoryName } from '@/lib/translate';
 import { SITE_DESCRIPTION, absoluteUrl, buildProductJsonLd, buildBreadcrumbListJsonLd, JsonLdScript } from '@/lib/seo';
 import TrackOnMount from '@/components/analytics/TrackOnMount';
+import type { RelatedKnowledgeItem } from '@/types/knowledge-base';
+import type { Product } from '@/types/product';
 
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -61,6 +63,24 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
   // Load parameter groups for grouped display (public endpoint, no schema change)
   const parameterGroups = await getParameterGroups();
+
+  // Load related knowledge (deterministic mapping, graceful degradation on error)
+  let relatedKnowledge: RelatedKnowledgeItem[] = [];
+  try {
+    relatedKnowledge = await getProductRelatedKnowledge(slug);
+  } catch {
+    // Related knowledge failure must not block product detail — degrade to empty.
+    relatedKnowledge = [];
+  }
+
+  // Load related products (deterministic same-category discovery, graceful degradation)
+  let relatedProducts: Product[] = [];
+  try {
+    relatedProducts = await getProductRelatedProducts(slug);
+  } catch {
+    // Related products failure must not block product detail — degrade to empty.
+    relatedProducts = [];
+  }
 
   // Build structured data
   const productUrl = absoluteUrl(`/products/${slug}`);
@@ -133,6 +153,8 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
           <ProductDetailContent
             product={product}
             parameterGroups={parameterGroups}
+            relatedKnowledge={relatedKnowledge}
+            relatedProducts={relatedProducts}
           />
         </div>
       </div>

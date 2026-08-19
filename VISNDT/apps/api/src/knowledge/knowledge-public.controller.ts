@@ -54,6 +54,13 @@ export class KnowledgePublicController {
     }));
   }
 
+  @Get('entries/:slug/related-products')
+  @ApiOperation({ summary: 'Get related active products for a published knowledge entry (PUBLIC). Resolved via KnowledgeCategory → ProductCategoryKnowledgeMapping → ProductCategory → Product' })
+  @ApiParam({ name: 'slug', description: 'Entry slug' })
+  async getEntryRelatedProducts(@Param('slug') slug: string) {
+    return ApiResponse.ok(await this.service.findRelatedProducts(slug));
+  }
+
   @Get('entries/:slug')
   @ApiOperation({ summary: 'Get published knowledge entry by slug (PUBLIC)' })
   @ApiParam({ name: 'slug', description: 'Entry slug' })

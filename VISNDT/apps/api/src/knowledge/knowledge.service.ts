@@ -597,4 +597,97 @@ export class KnowledgeService {
     if (!entry) throw new NotFoundException('知识条目不存在');
     return entry;
   }
+
+  /**
+   * Knowledge → Related Products resolution (M24.1.7)
+   *
+   * Deterministic reverse mapping, no AI / keyword / random / similarity
+   * recommendation:
+   *   KnowledgeEntry → KnowledgeCategory → ProductCategoryKnowledgeMapping
+   *                   (isActive) → ProductCategory → Product (ACTIVE)
+   *
+   * The authoritative source of association is ProductCategoryKnowledgeMapping
+   * exclusively (ADR-M24-008 / 009 / 010). Knowledge Domain continues to be
+   * derived from KnowledgeCategory → KnowledgeDomain and is NOT stored in the
+   * mapping. Product visibility follows the repository-wide convention
+   * `status: 'ACTIVE'` (no new product state model is introduced).
+   */
+  async findRelatedProducts(slug: string) {
+    const entry = await this.prisma.knowledgeEntry.findFirst({
+      where: { slug, status: 'PUBLISHED' },
+      select: { id: true, categoryId: true },
+    });
+    if (!entry) throw new NotFoundException('知识条目不存在');
+
+    // 1. Resolve active product-category mappings for the entry's single
+    //    knowledge category, ordered by mapping sortOrder (stable ordering).
+    const mappings = await this.prisma.productCategoryKnowledgeMapping.findMany({
+      where: { knowledgeCategoryId: entry.categoryId, isActive: true },
+      orderBy: { sortOrder: 'asc' },
+      select: { productCategoryId: true, sortOrder: true },
+    });
+
+    if (mappings.length === 0) {
+      return [];
+    }
+
+    const categoryOrder = new Map<string, number>(
+      mappings.map((m) => [m.productCategoryId, m.sortOrder]),
+    );
+
+    // 2. Retrieve ACTIVE products across the mapped product categories.
+    //    Lightweight select only (no parameter values / full media / internal data).
+    const products = await this.prisma.product.findMany({
+      where: {
+        categoryId: { in: [...categoryOrder.keys()] },
+        status: 'ACTIVE',
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        model: true,
+        description: true,
+        categoryId: true,
+        createdAt: true,
+        category: { select: { id: true, name: true, slug: true } },
+        media: {
+          where: { isPrimary: true },
+          orderBy: { displayOrder: 'asc' },
+          take: 1,
+          select: { id: true, mediaType: true, title: true },
+        },
+      },
+    });
+
+    // 3. Deduplicate by Product.id (defensive; a product belongs to exactly one
+    //    category) and order deterministically:
+    //    mapping sortOrder (category) asc → createdAt desc → id asc.
+    const deduped = new Map<string, (typeof products)[number]>();
+    for (const product of products) {
+      if (!deduped.has(product.id)) {
+        deduped.set(product.id, product);
+      }
+    }
+
+    return [...deduped.values()]
+      .sort((a, b) => {
+        const ao = categoryOrder.get(a.categoryId) ?? 0;
+        const bo = categoryOrder.get(b.categoryId) ?? 0;
+        if (ao !== bo) return ao - bo;
+        const ta = new Date(a.createdAt).getTime();
+        const tb = new Date(b.createdAt).getTime();
+        if (ta !== tb) return tb - ta;
+        return a.id.localeCompare(b.id);
+      })
+      .map((p) => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        model: p.model,
+        description: p.description,
+        category: p.category,
+        primaryMedia: p.media[0] ?? null,
+      }));
+  }
 }

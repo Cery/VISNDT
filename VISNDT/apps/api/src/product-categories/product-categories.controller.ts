@@ -29,6 +29,13 @@ export class ProductCategoriesController {
     return ApiResponse.ok(await this.service.findOne(id));
   }
 
+  @Get(':id/parameters')
+  @ApiOperation({ summary: 'List relevant parameters actually used by ACTIVE products in this category (public, read-only)' })
+  @ApiParam({ name: 'id', description: 'Product Category UUID' })
+  async findParameters(@Param('id') id: string) {
+    return ApiResponse.ok(await this.service.findParameters(id));
+  }
+
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)

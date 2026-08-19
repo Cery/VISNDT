@@ -79,6 +79,7 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
           { key: '/parameter-groups', label: '参数组' },
           { key: '/parameter-definitions', label: '参数定义' },
           { key: '/product-categories', label: '分类管理' },
+          { key: '/product-category-knowledge-mappings', label: '知识分类映射' },
         ],
       },
       { key: '/notifications', icon: <BellOutlined />, label: '通知管理' },

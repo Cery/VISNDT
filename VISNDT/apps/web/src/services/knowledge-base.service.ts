@@ -9,6 +9,7 @@ import {
   getPublicCategories as fetchCategories,
   getPublicEntries as fetchEntries,
   getPublicEntryBySlug as fetchEntryBySlug,
+  getEntryRelatedProducts as fetchEntryRelatedProducts,
 } from '@/lib/api/knowledge-base';
 import type {
   KnowledgeDomain,
@@ -16,6 +17,7 @@ import type {
   KnowledgeCategory,
   KnowledgeEntryDetail,
   KnowledgeEntriesResult,
+  RelatedProductItem,
 } from '@/types/knowledge-base';
 
 export async function getDomains(): Promise<KnowledgeDomain[]> {
@@ -43,4 +45,8 @@ export async function getEntries(params: {
 
 export async function getEntryBySlug(slug: string): Promise<KnowledgeEntryDetail> {
   return fetchEntryBySlug(slug);
+}
+
+export async function getEntryRelatedProducts(slug: string): Promise<RelatedProductItem[]> {
+  return fetchEntryRelatedProducts(slug);
 }

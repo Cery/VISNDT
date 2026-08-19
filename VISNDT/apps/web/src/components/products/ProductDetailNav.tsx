@@ -8,6 +8,8 @@ const NAV_ITEMS: { id: ProductTab; label: string }[] = [
   { id: 'specifications', label: '技术参数' },
   { id: 'suppliers', label: '供应商' },
   { id: 'documents', label: '文档证书' },
+  { id: 'knowledge', label: '相关知识' },
+  { id: 'related', label: '相关产品' },
 ];
 
 const ANCHOR_MAP: Record<ProductTab, string> = {
@@ -15,6 +17,8 @@ const ANCHOR_MAP: Record<ProductTab, string> = {
   specifications: '#specifications',
   suppliers: '#suppliers',
   documents: '#documents',
+  knowledge: '#knowledge',
+  related: '#related',
 };
 
 export default function ProductDetailNav() {

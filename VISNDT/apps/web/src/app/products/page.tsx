@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { getProducts } from '@/services/product.service';
 import { getCategories } from '@/services/category.service';
-import { getFilterParameterDefinitions } from '@/services/parameter-definition.service';
+import { getFilterParameterDefinitions, getCategoryFilterParameterDefinitions } from '@/services/parameter-definition.service';
 import type { ProductParameterFilter } from '@/types/product';
 import { trackEvent, buildEvent } from '@/lib/analytics';
 import SearchBar from '@/components/products/SearchBar';
@@ -93,9 +93,16 @@ function ProductsPageContent() {
     queryFn: () => getCategories(1, 100),
   });
 
+  // 参数定义：有分类上下文时仅加载该分类 ACTIVE 产品实际使用的参数；
+  // 无分类时回退为全站参数定义（保持兼容）。
   const { data: parameterDefinitionsData } = useQuery({
-    queryKey: ['parameter-definitions'],
-    queryFn: () => getFilterParameterDefinitions(),
+    queryKey: categoryId
+      ? ['category-parameters', categoryId]
+      : ['parameter-definitions'],
+    queryFn: () =>
+      categoryId
+        ? getCategoryFilterParameterDefinitions(categoryId)
+        : getFilterParameterDefinitions(),
   });
 
   const {
@@ -135,11 +142,13 @@ function ProductsPageContent() {
   const handleCategoryChange = useCallback(
     (catId: string | undefined) => {
       setCategoryId(catId);
+      // 切换分类后参数筛选面板切换为「该分类上下文参数」，旧分类参数筛选失效，需清零避免误过滤
+      setParameterFilters([]);
       setPage(1);
-      syncURL(keyword, catId, sortBy, sortOrder, 1, parameterFilters);
+      syncURL(keyword, catId, sortBy, sortOrder, 1, []);
       trackEvent(buildEvent('product_filter', { source: '/products', metadata: { action: 'category', categoryId: catId } }));
     },
-    [keyword, sortBy, sortOrder, parameterFilters, syncURL],
+    [keyword, sortBy, sortOrder, syncURL],
   );
 
   const handleSortChange = useCallback(

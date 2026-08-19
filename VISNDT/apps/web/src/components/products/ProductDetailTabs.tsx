@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-export type ProductTab = 'overview' | 'specifications' | 'suppliers' | 'documents';
+export type ProductTab = 'overview' | 'specifications' | 'suppliers' | 'documents' | 'knowledge' | 'related';
 
 interface TabDefinition {
   id: ProductTab;
@@ -15,6 +15,8 @@ const TABS: TabDefinition[] = [
   { id: 'specifications', label: '技术参数', anchor: '#specifications' },
   { id: 'suppliers', label: '供应商', anchor: '#suppliers' },
   { id: 'documents', label: '文档证书', anchor: '#documents' },
+  { id: 'knowledge', label: '相关知识', anchor: '#knowledge' },
+  { id: 'related', label: '相关产品', anchor: '#related' },
 ];
 
 interface ProductDetailTabsProps {

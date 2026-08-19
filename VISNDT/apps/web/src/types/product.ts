@@ -61,6 +61,27 @@ export interface ProductParameterValue {
   parameterDefinition: ParameterDefinition;
 }
 
+/** Primary media for a product list card (single IMAGE, M24.2.4) */
+export interface ProductPrimaryMedia {
+  id: string;
+  fileAssetId: string | null;
+  mediaType: 'IMAGE' | 'DOCUMENT' | 'CERTIFICATE' | 'OTHER';
+  title: string | null;
+  isPrimary: boolean;
+  displayOrder: number;
+}
+
+/** Key parameter summary for a product list card (≤3 items, M24.2.4) */
+export interface ProductKeyParameter {
+  parameterDefinitionId: string;
+  name: string;
+  code: string;
+  dataType: 'STRING' | 'NUMBER' | 'BOOLEAN' | 'ENUM';
+  unit: string | null;
+  value: string;
+  valueNumber: number | null;
+}
+
 /** Product (list view - includes category) */
 export interface Product {
   id: string;
@@ -72,6 +93,10 @@ export interface Product {
   createdAt: string;
   updatedAt: string;
   category: ProductCategory;
+  /** 列表主图（单一 IMAGE，含 fileAssetId，用于 Capability Discovery Card） */
+  primaryMedia?: ProductPrimaryMedia | null;
+  /** 列表关键参数摘要（≤3 条，确定性排序） */
+  keyParameters?: ProductKeyParameter[];
 }
 
 /** Product detail (includes parameterValues, media, category) */

@@ -93,3 +93,33 @@ export interface KnowledgeEntriesResult {
   pageSize: number;
   totalPages: number;
 }
+
+/**
+ * Lightweight related-knowledge item returned by
+ * GET /products/:id/related-knowledge (M24.1.6).
+ * Resolved deterministically via ProductCategoryKnowledgeMapping.
+ */
+export interface RelatedKnowledgeItem {
+  id: string;
+  title: string;
+  slug: string;
+  summary?: string | null;
+  publishedAt?: string | null;
+  category?: { id: string; name: string; slug: string };
+  domain?: { id: string; name: string; slug: string };
+}
+
+/**
+ * Lightweight related-product item returned by
+ * GET /knowledge/public/entries/:slug/related-products (M24.1.7).
+ * Resolved deterministically via ProductCategoryKnowledgeMapping.
+ */
+export interface RelatedProductItem {
+  id: string;
+  name: string;
+  slug: string | null;
+  model: string | null;
+  description: string | null;
+  category?: { id: string; name: string; slug: string };
+  primaryMedia?: { id: string; mediaType: string; title: string | null } | null;
+}

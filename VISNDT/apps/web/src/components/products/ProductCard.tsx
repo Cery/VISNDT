@@ -1,7 +1,14 @@
 import Link from 'next/link';
 import type { Product } from '@/types/product';
 import { translateCategoryName } from '@/lib/translate';
+import { API_BASE_URL } from '@/lib/constants';
 import HighlightText from './HighlightText';
+
+/** Build the public download URL for a FileAsset-backed image. */
+function fileUrl(fileAssetId?: string | null): string | null {
+  if (!fileAssetId) return null;
+  return `${API_BASE_URL}/files/${fileAssetId}/download`;
+}
 
 interface ProductCardProps {
   product: Product;
@@ -19,6 +26,8 @@ export default function ProductCard({
   isCompared = false,
   onCompareToggle,
 }: ProductCardProps) {
+  const primaryImageUrl = fileUrl(product.primaryMedia?.fileAssetId);
+
   return (
     <div className="group block rounded-xl border border-slate-200/80 shadow-industrial-sm hover:shadow-industrial-lg hover:-translate-y-1 transition-all duration-300 bg-white p-4 relative">
       {/* Compare Checkbox */}
@@ -49,10 +58,20 @@ export default function ProductCard({
         </div>
       )}
       <Link href={`/products/${product.id}`} className="block">
-        {/* Placeholder image */}
-        <div className="aspect-video bg-gradient-to-br from-slate-100 to-industrial-slate rounded-md mb-3 flex items-center justify-center">
-          <span className="text-muted-foreground text-sm">暂无图片</span>
-        </div>
+        {/* Primary image (Capability Discovery Card) */}
+        {primaryImageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={primaryImageUrl}
+            alt={product.primaryMedia?.title || product.name}
+            className="aspect-video w-full object-cover rounded-md mb-3 bg-muted"
+            loading="lazy"
+          />
+        ) : (
+          <div className="aspect-video bg-gradient-to-br from-slate-100 to-industrial-slate rounded-md mb-3 flex items-center justify-center">
+            <span className="text-muted-foreground text-sm">暂无图片</span>
+          </div>
+        )}
 
         <div className="space-y-1.5">
           <h3 className="font-semibold text-sm group-hover:text-primary transition-colors line-clamp-2">
@@ -69,6 +88,30 @@ export default function ProductCard({
             <span className="inline-block bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
               {translateCategoryName(product.category.name)}
             </span>
+          )}
+
+          {/* Key parameters (Capability Discovery Card) */}
+          {Array.isArray(product.keyParameters) && (
+            <div className="mt-2">
+              {product.keyParameters.length > 0 ? (
+                <ul className="space-y-1">
+                  {product.keyParameters.map((kp) => (
+                    <li
+                      key={kp.parameterDefinitionId}
+                      className="flex items-baseline justify-between gap-2 text-xs"
+                    >
+                      <span className="text-muted-foreground shrink-0">{kp.name}</span>
+                      <span className="font-medium text-slate-700 text-right truncate">
+                        {kp.value}
+                        {kp.unit ? <span className="text-slate-400 ml-0.5">{kp.unit}</span> : null}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-xs text-muted-foreground">暂无参数信息</p>
+              )}
+            </div>
           )}
 
           {product.description && (

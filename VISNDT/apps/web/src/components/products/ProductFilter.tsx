@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo, useState } from 'react';
 import type { ProductCategory } from '@/types/category';
 import type { ProductParameterFilter } from '@/types/product';
 import type { FilterParameterDefinition } from '@/services/parameter-definition.service';
@@ -22,6 +23,44 @@ interface ProductFilterProps {
   onClearAll?: () => void;
 }
 
+/**
+ * 从扁平分类列表构建树形结构（按 parentId 重建 children，支持任意深度）。
+ * 后端 GET /product-categories 返回分页扁平列表，此处按 parentId 归组，
+ * parentId 为 null（或父节点不在当前列表）的节点视为根节点。
+ */
+function buildCategoryTree(categories: ProductCategory[]): ProductCategory[] {
+  const map = new Map<string, ProductCategory>();
+  for (const cat of categories) {
+    map.set(cat.id, { ...cat, children: [] });
+  }
+
+  const roots: ProductCategory[] = [];
+  for (const node of map.values()) {
+    const parent = node.parentId ? map.get(node.parentId) : undefined;
+    if (parent) {
+      parent.children = parent.children ?? [];
+      parent.children.push(node);
+    } else {
+      roots.push(node);
+    }
+  }
+  return roots;
+}
+
+/** 收集指定分类的全部祖先分类 id（用于选中时自动展开路径） */
+function collectAncestorIds(categories: ProductCategory[], targetId: string): string[] {
+  const map = new Map(categories.map((cat) => [cat.id, cat]));
+  const ancestors: string[] = [];
+  let current = map.get(targetId);
+  while (current?.parentId) {
+    const parent = map.get(current.parentId);
+    if (!parent) break;
+    ancestors.push(parent.id);
+    current = parent;
+  }
+  return ancestors;
+}
+
 export default function ProductFilter({
   categories,
   selectedCategoryId,
@@ -35,6 +74,109 @@ export default function ProductFilter({
   hasActiveFilters,
   onClearAll,
 }: ProductFilterProps) {
+  const tree = useMemo(() => buildCategoryTree(categories), [categories]);
+
+  // 默认展开一级分类（根节点）；更深的节点默认收起
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(
+    () => new Set(tree.map((c) => c.id)),
+  );
+
+  // 选中分类时自动展开其祖先路径（含 URL 刷新恢复场景）
+  const ancestorIds = useMemo(
+    () => (selectedCategoryId ? collectAncestorIds(categories, selectedCategoryId) : []),
+    [categories, selectedCategoryId],
+  );
+
+  const effectiveExpanded = useMemo(() => {
+    const set = new Set(expandedIds);
+    for (const id of ancestorIds) set.add(id);
+    return set;
+  }, [expandedIds, ancestorIds]);
+
+  const toggleExpand = (id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const selectCategory = (id: string) => {
+    onCategoryChange(id);
+    // 选中后展开该节点及其祖先路径，便于继续下钻
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      for (const ancestor of collectAncestorIds(categories, id)) {
+        next.add(ancestor);
+      }
+      next.add(id);
+      return next;
+    });
+  };
+
+  const renderNode = (cat: ProductCategory, depth: number) => {
+    const children = cat.children ?? [];
+    const hasChildren = children.length > 0;
+    const isSelected = selectedCategoryId === cat.id;
+    const isExpanded = effectiveExpanded.has(cat.id);
+
+    return (
+      <div key={cat.id}>
+        <div
+          className="flex items-center rounded-lg"
+          style={{ paddingLeft: `${depth * 12}px` }}
+        >
+          {hasChildren ? (
+            <button
+              type="button"
+              onClick={() => toggleExpand(cat.id)}
+              aria-label={`${isExpanded ? '收起' : '展开'} ${translateCategoryName(cat.name)}`}
+              aria-expanded={isExpanded}
+              className="flex-shrink-0 w-4 h-4 inline-flex items-center justify-center text-muted-foreground hover:text-foreground"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                aria-hidden="true"
+                className={`transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+              >
+                <path
+                  d="M4 2l4 4-4 4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          ) : (
+            <span className="flex-shrink-0 w-4" aria-hidden="true" />
+          )}
+          <button
+            type="button"
+            onClick={() => selectCategory(cat.id)}
+            className={`flex-1 text-left px-2 py-1.5 text-sm rounded-lg transition-colors ${
+              isSelected
+                ? 'bg-primary/5 text-primary border-l-2 border-primary font-medium'
+                : 'text-foreground hover:bg-muted'
+            }`}
+          >
+            {translateCategoryName(cat.name)}
+          </button>
+        </div>
+        {hasChildren && isExpanded && (
+          <div>{children.map((child) => renderNode(child, depth + 1))}</div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       {/* Active Filters Header */}
@@ -50,10 +192,11 @@ export default function ProductFilter({
           </button>
         </div>
       )}
-      {/* Category Filter */}
+      {/* Category Tree Filter */}
       <div>
         <h3 className="font-semibold text-sm mb-3">分类</h3>
         <div className="space-y-1">
+          {/* Root Node：全部产品 */}
           <button
             onClick={() => onCategoryChange(undefined)}
             className={`block w-full text-left px-3 py-1.5 text-sm rounded-lg transition-colors ${
@@ -62,21 +205,9 @@ export default function ProductFilter({
                 : 'text-muted-foreground hover:bg-muted'
             }`}
           >
-            全部分类
+            全部产品
           </button>
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => onCategoryChange(cat.id)}
-              className={`block w-full text-left px-3 py-1.5 text-sm rounded-lg transition-colors ${
-                selectedCategoryId === cat.id
-                  ? 'bg-primary/5 text-primary border-l-2 border-primary font-medium'
-                  : 'text-muted-foreground hover:bg-muted'
-              }`}
-            >
-              {translateCategoryName(cat.name)}
-            </button>
-          ))}
+          {tree.map((cat) => renderNode(cat, 0))}
         </div>
       </div>
 

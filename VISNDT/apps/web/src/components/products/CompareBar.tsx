@@ -1,11 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import type { Product } from '@/types/product';
 
 interface CompareBarProps {
   compareIds: string[];
-  products: Product[];
+  products: { id: string; name: string }[];
   onRemove: (id: string) => void;
   onClear: () => void;
 }
@@ -20,7 +19,7 @@ export default function CompareBar({
 
   const selectedProducts = compareIds
     .map((id) => products.find((p) => p.id === id))
-    .filter(Boolean) as Product[];
+    .filter(Boolean) as { id: string; name: string }[];
 
   const compareUrl = `/products/compare?ids=${compareIds.join(',')}`;
 

@@ -59,8 +59,10 @@ function safetyGate(): void {
 // ============================================
 
 function demoId(seed: string): string {
-  // Generate deterministic UUIDs from seed (32 hex chars, no dashes — Prisma @db.Uuid simple format)
-  return crypto.createHash('sha256').update(`VISNDT_DEMO_${seed}`).digest('hex').substring(0, 32);
+  // Generate deterministic RFC 4122 UUID v4 from seed (32 hex chars, no dashes — Prisma @db.Uuid simple format).
+  // Fix: force version bits (index 12) to '4' and variant bits (index 16) to '8' so @IsUUID() accepts the value.
+  const hex = crypto.createHash('sha256').update(`VISNDT_DEMO_${seed}`).digest('hex').substring(0, 32);
+  return `${hex.slice(0, 12)}4${hex.slice(13, 16)}8${hex.slice(17)}`;
 }
 
 function daysAgo(days: number): Date {

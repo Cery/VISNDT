@@ -42,6 +42,20 @@ export class ProductsController {
     return ApiResponse.ok(await this.service.batchStatus(dto.ids, dto.status), 'Batch status updated');
   }
 
+  @Get(':id/related-knowledge')
+  @ApiOperation({ summary: 'Get related published knowledge for a product (public). Resolved via ProductCategory → ProductCategoryKnowledgeMapping → KnowledgeCategory → KnowledgeEntry' })
+  @ApiParam({ name: 'id', description: 'Product UUID or slug' })
+  async findRelatedKnowledge(@Param('id') id: string) {
+    return ApiResponse.ok(await this.service.findRelatedKnowledge(id));
+  }
+
+  @Get(':id/related-products')
+  @ApiOperation({ summary: 'Get related active products for a product (public). Resolved via same ProductCategory, excluding the current product' })
+  @ApiParam({ name: 'id', description: 'Product UUID or slug' })
+  async findRelatedProducts(@Param('id') id: string) {
+    return ApiResponse.ok(await this.service.findRelatedProducts(id));
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get product by ID or slug (public)' })
   @ApiParam({ name: 'id', description: 'Product UUID or slug' })

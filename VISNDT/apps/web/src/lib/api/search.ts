@@ -1,5 +1,4 @@
 import { apiClient } from '../api-client';
-import type { ApiResponse } from '@/types/api';
 
 // ============================================
 // Unified Search API Types — M22.4.1
@@ -66,27 +65,105 @@ export interface UnifiedDiscoveryResponse {
 }
 
 // ============================================
+// Search Context API Types — M24.1.3
+// ============================================
+
+/** A single available value for a parameter facet */
+export interface FacetValue {
+  value: string;
+  label: string;
+  count: number;
+}
+
+/** Facet metadata for a parameter definition */
+export interface ParameterFacet {
+  parameterId: string;
+  parameterName: string;
+  parameterKey: string;
+  parameterType: string;
+  unit: string | null;
+  sortOrder: number;
+  availableValues: FacetValue[];
+}
+
+/** A product category relevant to the search query */
+export interface RelevantCategoryContext {
+  id: string;
+  name: string;
+  slug: string;
+  productCount: number;
+}
+
+/** Search context response from backend */
+export interface SearchContextResponse {
+  query: string;
+  candidateCount: number;
+  relevantCategories: RelevantCategoryContext[];
+  commonFilters: ParameterFacet[];
+  categorySpecificFilters: Record<string, ParameterFacet[]>;
+}
+
+// ============================================
 // API Client
 // ============================================
 
 /**
  * Execute unified search via GET /search.
  * Single endpoint replaces client-side fan-out across 4 separate APIs.
+ *
+ * M24.1.4 — minimal filter contract:
+ *   - `category`: selected ProductCategory id (selectedCategoryTab).
+ *   - `filters`: merged parameter filters (parameterId → values[]).
+ *     Serialized as `parameterId:value1,value2;parameterId2:value3`.
+ *     Same parameter = OR, different parameters = AND (server-side).
  */
 export async function searchUnified(params: {
   q: string;
   page?: number;
   pageSize?: number;
+  category?: string;
+  filters?: Record<string, string[]>;
 }): Promise<UnifiedDiscoveryResponse> {
   const queryParams: Record<string, string | number | undefined> = {
     q: params.q,
     page: params.page,
     pageSize: params.pageSize,
+    category: params.category || undefined,
+    filters: encodeProductFilters(params.filters),
   };
 
-  const res = await apiClient<ApiResponse<UnifiedDiscoveryResponse>>('/search', {
+  // Backend returns the unified discovery payload directly (no `{ data }` wrapper),
+  // unlike the generic ApiResponse<T> used by other endpoints.
+  return apiClient<UnifiedDiscoveryResponse>('/search', {
     params: queryParams,
   });
+}
 
-  return res.data;
+/**
+ * Encode merged filter map into the wire format:
+ *   `parameterId:value1,value2;parameterId2:value3`
+ */
+export function encodeProductFilters(
+  filters?: Record<string, string[]>,
+): string | undefined {
+  if (!filters) return undefined;
+
+  const parts = Object.entries(filters)
+    .filter(([, values]) => values.length > 0)
+    .map(([parameterId, values]) => `${parameterId}:${values.join(',')}`);
+
+  return parts.length > 0 ? parts.join(';') : undefined;
+}
+
+/**
+ * Get search context via GET /search/context.
+ * Pagination-independent query-level context for categories and parameter facets.
+ *
+ * M24.1.3 — ADR-M24-009
+ */
+export async function getSearchContext(q: string): Promise<SearchContextResponse> {
+  // Backend returns the search context payload directly (no `{ data }` wrapper).
+  return apiClient<SearchContextResponse>('/search/context', {
+    params: { q },
+  });
 }

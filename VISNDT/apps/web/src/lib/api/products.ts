@@ -1,6 +1,7 @@
 import { apiClient } from '../api-client';
 import type { ApiResponse, PaginatedResponse } from '@/types/api';
 import type { Product, ProductDetail, ProductSearchParams } from '@/types/product';
+import type { RelatedKnowledgeItem } from '@/types/knowledge-base';
 
 /**
  * Build a GET /products query string.
@@ -56,5 +57,35 @@ export async function getProducts(
  */
 export async function getProduct(id: string): Promise<ProductDetail> {
   const res = await apiClient<ApiResponse<ProductDetail>>(`/products/${id}`);
+  return res.data;
+}
+
+/**
+ * Get related published knowledge for a product.
+ * GET /products/:id/related-knowledge
+ * Deterministic mapping: Product → Category → ProductCategoryKnowledgeMapping
+ * → KnowledgeCategory → KnowledgeEntry (PUBLISHED only).
+ */
+export async function getProductRelatedKnowledge(
+  id: string,
+): Promise<RelatedKnowledgeItem[]> {
+  const res = await apiClient<ApiResponse<RelatedKnowledgeItem[]>>(
+    `/products/${id}/related-knowledge`,
+  );
+  return res.data;
+}
+
+/**
+ * Get related active products for a product.
+ * GET /products/:id/related-products
+ * Deterministic: same ProductCategory, ACTIVE only, excluding the current product.
+ * Returns public product-card fields only (no supplier / organization leakage).
+ */
+export async function getProductRelatedProducts(
+  id: string,
+): Promise<Product[]> {
+  const res = await apiClient<ApiResponse<Product[]>>(
+    `/products/${id}/related-products`,
+  );
   return res.data;
 }

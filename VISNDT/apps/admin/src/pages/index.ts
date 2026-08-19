@@ -66,3 +66,6 @@ export { default as KnowledgeEntryList } from './knowledge/KnowledgeEntryList';
 export { default as KnowledgeEntryCreate } from './knowledge/KnowledgeEntryCreate';
 export { default as KnowledgeEntryEdit } from './knowledge/KnowledgeEntryEdit';
 export { default as MediaList } from './MediaList';
+export { default as ProductCategoryKnowledgeMappingList } from './ProductCategoryKnowledgeMappingList';
+export { default as ProductCategoryKnowledgeMappingCreate } from './ProductCategoryKnowledgeMappingCreate';
+export { default as ProductCategoryKnowledgeMappingEdit } from './ProductCategoryKnowledgeMappingEdit';

@@ -44,6 +44,44 @@ export class ProductCategoriesService {
     return cat;
   }
 
+  /**
+   * Product Center → Category Context Relevant Parameters (M24.2.3)
+   *
+   * Deterministic, non-AI resolution of the parameters actually used by ACTIVE
+   * products within a given category:
+   *   ProductCategory → ACTIVE Products → ProductParameterValue → ParameterDefinition
+   *
+   * No search-context / matching / AI is involved. Definitions are deduplicated
+   * by parameterDefinitionId (distinct) and ordered stably by `name`.
+   *
+   * NOTE on ordering: ParameterDefinition has no global `displayOrder` column
+   * (the per-product ProductParameterDefinition.displayOrder cannot serve as a
+   * cross-product ordering key for a de-duplicated category aggregate), so the
+   * stable, explainable ordering used here is `name` ascending. ENUM options are
+   * returned with their own `sortOrder` applied.
+   */
+  async findParameters(categoryId: string) {
+    const cat = await this.prisma.productCategory.findUnique({
+      where: { id: categoryId },
+    });
+    if (!cat) throw new NotFoundException(`产品分类 ${categoryId} 未找到`);
+
+    const values = await this.prisma.productParameterValue.findMany({
+      where: { product: { categoryId, status: 'ACTIVE' } },
+      distinct: ['parameterDefinitionId'],
+      select: { parameterDefinitionId: true },
+    });
+
+    const definitionIds = values.map((v) => v.parameterDefinitionId);
+    if (definitionIds.length === 0) return [];
+
+    return this.prisma.parameterDefinition.findMany({
+      where: { id: { in: definitionIds } },
+      orderBy: { name: 'asc' },
+      include: { options: { orderBy: { sortOrder: 'asc' } } },
+    });
+  }
+
   async create(dto: CreateProductCategoryDto) {
     return this.prisma.productCategory.create({ data: dto });
   }

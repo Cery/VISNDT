@@ -28,6 +28,8 @@ export interface UnifiedSearchParams {
   type: SearchDomain;
   page?: number;
   pageSize?: number;
+  category?: string;
+  filters?: Record<string, string[]>;
 }
 
 /** Search result for a single domain */
@@ -134,11 +136,6 @@ function mapSupplier(item: SupplierDiscoveryItem): SupplierSearchResult {
   };
 }
 
-/** Empty result helper */
-function emptyResult<T>(): DomainSearchResult<T> {
-  return { items: [], total: 0, searched: false };
-}
-
 // ============================================
 // Unified Search
 // ============================================
@@ -150,47 +147,37 @@ function emptyResult<T>(): DomainSearchResult<T> {
 export async function unifiedSearch(
   params: UnifiedSearchParams,
 ): Promise<UnifiedSearchResults> {
-  const { q, type, page = 1, pageSize = 20 } = params;
+  const { q, type, page = 1, pageSize = 20, category, filters } = params;
 
-  const empty = emptyResult;
+  // M24.1.5 — do NOT swallow search errors here. Rethrowing lets the caller
+  // (SearchPageContent.executeSearch) surface the error UI + retry instead of
+  // silently rendering an empty result set (defect in error state handling).
+  const response = await searchUnified({ q, page, pageSize, category, filters });
 
-  try {
-    const response = await searchUnified({ q, page, pageSize });
-
-    return {
-      query: response.query,
-      activeType: type,
-      products: {
-        items: response.products.items.map(mapProduct),
-        total: response.products.total,
-        searched: true,
-      },
-      knowledge: {
-        items: response.knowledge.items.map(mapKnowledgeToContent),
-        total: response.knowledge.total,
-        searched: true,
-      },
-      solutions: {
-        items: response.solutions.items.map(mapContent),
-        total: response.solutions.total,
-        searched: true,
-      },
-      suppliers: {
-        items: response.suppliers.items.map(mapSupplier),
-        total: response.suppliers.total,
-        searched: true,
-      },
-    };
-  } catch {
-    return {
-      query: q,
-      activeType: type,
-      products: empty<Product>(),
-      knowledge: empty<Content>(),
-      solutions: empty<Content>(),
-      suppliers: empty<SupplierSearchResult>(),
-    };
-  }
+  return {
+    query: response.query,
+    activeType: type,
+    products: {
+      items: response.products.items.map(mapProduct),
+      total: response.products.total,
+      searched: true,
+    },
+    knowledge: {
+      items: response.knowledge.items.map(mapKnowledgeToContent),
+      total: response.knowledge.total,
+      searched: true,
+    },
+    solutions: {
+      items: response.solutions.items.map(mapContent),
+      total: response.solutions.total,
+      searched: true,
+    },
+    suppliers: {
+      items: response.suppliers.items.map(mapSupplier),
+      total: response.suppliers.total,
+      searched: true,
+    },
+  };
 }
 
 /**

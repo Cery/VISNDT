@@ -16,6 +16,10 @@ import ProductResultCard from '@/components/search/ProductResultCard';
 import KnowledgeResultCard from '@/components/search/KnowledgeResultCard';
 import SolutionResultCard from '@/components/search/SolutionResultCard';
 import SupplierResultCard from '@/components/search/SupplierResultCard';
+import { useSearchContext } from '@/hooks/useSearchContext';
+import { useFacetFilterState } from '@/hooks/useFacetFilterState';
+import type { FilterValues, FacetFilterState } from '@/hooks/useFacetFilterState';
+import ParameterFacet from '@/components/search/ParameterFacet';
 
 const VALID_TYPES: SearchDomain[] = ['all', 'product', 'knowledge', 'solution', 'supplier'];
 const PAGE_SIZE = 20;
@@ -26,6 +30,60 @@ function parseType(raw: string | null): SearchDomain {
   }
   return 'all';
 }
+
+// ============================================
+// M24.1.4 — URL Filter Encoding
+// ============================================
+
+/** Encode filter values to URL-safe string: paramId:val1,val2;paramId2:val3 */
+function encodeFilterValues(fv: FilterValues): string {
+  return Object.entries(fv)
+    .filter(([, values]) => values.size > 0)
+    .map(([key, values]) => `${key}:${Array.from(values).sort().join(',')}`)
+    .join(';');
+}
+
+/** Decode URL filter string back to FilterValues */
+function decodeFilterValues(encoded: string): FilterValues {
+  if (!encoded) return {};
+  const result: FilterValues = {};
+  encoded.split(';').forEach((part) => {
+    const colonIdx = part.indexOf(':');
+    if (colonIdx === -1) return;
+    const key = part.slice(0, colonIdx);
+    const vals = part.slice(colonIdx + 1);
+    if (key && vals) {
+      result[key] = new Set(vals.split(',').filter(Boolean));
+    }
+  });
+  return result;
+}
+
+/** Build initial facet state from URL params (used for lazy state init on mount). */
+function buildInitialFacetState(searchParams: URLSearchParams): FacetFilterState {
+  const urlCategory = searchParams.get('category') ?? undefined;
+  const fcEncoded = searchParams.get('fc');
+  const common = fcEncoded ? decodeFilterValues(fcEncoded) : {};
+  const categorySpecific: Record<string, FilterValues> = {};
+  searchParams.forEach((value, key) => {
+    if (key.startsWith('f_')) {
+      const categoryId = key.slice(2);
+      const decoded = decodeFilterValues(value);
+      if (Object.keys(decoded).length > 0) {
+        categorySpecific[categoryId] = decoded;
+      }
+    }
+  });
+  return {
+    selectedCategoryTab: urlCategory,
+    commonFilterValues: common,
+    categorySpecificFilterValues: categorySpecific,
+  };
+}
+
+// ============================================
+// SearchPageContent — M24.1.4 Integrated
+// ============================================
 
 export default function SearchPageContent() {
   const searchParams = useSearchParams();
@@ -45,6 +103,104 @@ export default function SearchPageContent() {
   const cachedAllResults = useRef<UnifiedSearchResults | null>(null);
   const lastQuery = useRef<string>('');
 
+  // ─── M24.1.4: Search Context + Facet Filter State ───
+
+  const { context, loading: contextLoading } = useSearchContext(query);
+
+  const {
+    state: filterState,
+    getActiveFilters,
+    selectCategoryTab,
+    toggleFilter,
+    clearCategorySpecificFilters,
+    clearAllFilters,
+    resetAll,
+  } = useFacetFilterState(buildInitialFacetState(searchParams));
+
+  // Reset facet state when query changes
+  const searchKey = query.trim();
+  const filtersVersion = useRef(searchKey);
+  useEffect(() => {
+    if (filtersVersion.current !== searchKey) {
+      filtersVersion.current = searchKey;
+      resetAll();
+    }
+  }, [searchKey, resetAll]);
+
+  // Derived active facet contract for the current query.
+  // Zeroed until the filter state has been reset for the current query key
+  // (prevents the previous query's filters from leaking into a new search).
+  const activeFacet = useMemo<{ category: string | undefined; filters: Record<string, string[]> }>(() => {
+    if (filtersVersion.current !== searchKey) {
+      return { category: undefined, filters: {} };
+    }
+    const category = filterState.selectedCategoryTab;
+    const merged = getActiveFilters(filterState);
+    const filters: Record<string, string[]> = {};
+    for (const [paramId, values] of Object.entries(merged)) {
+      filters[paramId] = Array.from(values);
+    }
+    return { category, filters };
+  }, [searchKey, filterState, getActiveFilters]);
+
+  const hasActiveFacetFilter =
+    activeFacet.category !== undefined || Object.keys(activeFacet.filters).length > 0;
+
+  // Stable string key of the active facet. Used as the search effect dependency
+  // instead of the `activeFacet` object so a *semantic* filter change triggers a
+  // re-search, while identity churn (e.g. resetAll producing a fresh empty state
+  // on query change) does NOT fire a duplicate search request.
+  const facetKey = useMemo(() => {
+    const filterStr = Object.entries(activeFacet.filters)
+      .map(([pid, vals]) => `${pid}:${[...vals].sort().join(',')}`)
+      .sort()
+      .join(';');
+    return `${activeFacet.category ?? ''}|${filterStr}`;
+  }, [activeFacet]);
+
+  // Sync facet filter state to URL (no React re-render)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    // Preserve q and type
+    if (query) params.set('q', query);
+    if (type !== 'all') params.set('type', type);
+    else params.delete('type');
+
+    // Category
+    if (filterState.selectedCategoryTab) {
+      params.set('category', filterState.selectedCategoryTab);
+    } else {
+      params.delete('category');
+    }
+
+    // Common filters
+    const fcEncoded = encodeFilterValues(filterState.commonFilterValues);
+    if (fcEncoded) {
+      params.set('fc', fcEncoded);
+    } else {
+      params.delete('fc');
+    }
+
+    // Category-specific filters: f_<categoryId>
+    // Remove all existing f_ params first
+    Array.from(params.keys()).forEach((key) => {
+      if (key.startsWith('f_')) params.delete(key);
+    });
+    Object.entries(filterState.categorySpecificFilterValues).forEach(([catId, fv]) => {
+      const encoded = encodeFilterValues(fv);
+      if (encoded) {
+        params.set(`f_${catId}`, encoded);
+      }
+    });
+
+    const newSearch = params.toString();
+    const newUrl = `/search${newSearch ? `?${newSearch}` : ''}`;
+    if (newUrl !== `${window.location.pathname}${window.location.search}`) {
+      window.history.replaceState(null, '', newUrl);
+    }
+  }, [filterState, query, type]);
+
   const executeSearch = useCallback(
     async (currentPage: number, append: boolean = false) => {
       if (!query.trim()) return;
@@ -57,7 +213,14 @@ export default function SearchPageContent() {
       setError(false);
 
       try {
-        const data = await unifiedSearch({ q: query.trim(), type, page: currentPage, pageSize: PAGE_SIZE });
+        const data = await unifiedSearch({
+          q: query.trim(),
+          type,
+          page: currentPage,
+          pageSize: PAGE_SIZE,
+          category: activeFacet.category,
+          filters: activeFacet.filters,
+        });
 
         if (!append) {
           trackEvent(buildEvent('search', {
@@ -89,7 +252,7 @@ export default function SearchPageContent() {
         } else {
           setResults(data);
           setPage(currentPage);
-          if (type === 'all') {
+          if (type === 'all' && !hasActiveFacetFilter) {
             cachedAllResults.current = data;
             lastQuery.current = query.trim();
           }
@@ -101,7 +264,7 @@ export default function SearchPageContent() {
         setLoadingMore(false);
       }
     },
-    [query, type, results],
+    [query, type, results, activeFacet, hasActiveFacetFilter],
   );
 
   useEffect(() => {
@@ -114,7 +277,7 @@ export default function SearchPageContent() {
       return;
     }
 
-    if (type !== 'all' && cachedAllResults.current && lastQuery.current === query.trim()) {
+    if (!hasActiveFacetFilter && type !== 'all' && cachedAllResults.current && lastQuery.current === query.trim()) {
       setResults({
         ...cachedAllResults.current,
         activeType: type,
@@ -125,7 +288,7 @@ export default function SearchPageContent() {
     }
 
     executeSearch(1, false);
-  }, [query, type]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [query, type, facetKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleLoadMore = useCallback(() => {
     const nextPage = page + 1;
@@ -139,7 +302,7 @@ export default function SearchPageContent() {
     executeSearch(1, false);
   }, [executeSearch]);
 
-  // Client-side filter logic
+  // Client-side content type filter logic
   const filteredResults = useMemo(() => {
     if (!results) return null;
     if (!filter.active) return results;
@@ -196,6 +359,9 @@ export default function SearchPageContent() {
   };
 
   const displayResults = filteredResults ?? results;
+
+  // M24.1.4: Show facet when product results are visible and context is available
+  const showFacet = hasKeyword && (type === 'product' || type === 'all') && !error;
 
   return (
     <div className="min-h-screen bg-slate-50/50">
@@ -260,134 +426,155 @@ export default function SearchPageContent() {
               />
             </div>
 
-            <div className="mt-4 sm:mt-6">
-              {!loading && !error && results && !hasAnyResults && (
-                <SearchEmptyState type="no-results" keyword={query} />
-              )}
-
-              {error && (
-                <div className="text-center py-16">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-50 flex items-center justify-center">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-red-400">
-                      <circle cx="12" cy="12" r="10" />
-                      <line x1="12" y1="8" x2="12" y2="12" />
-                      <line x1="12" y1="16" x2="12.01" y2="16" />
-                    </svg>
+            {/* M24.1.4: Two-column layout — Facet Sidebar + Results */}
+            <div className={`mt-4 sm:mt-6 ${showFacet ? 'lg:flex lg:gap-6' : ''}`}>
+              {/* Parameter Facet Sidebar */}
+              {showFacet && (
+                <div className="lg:w-64 lg:flex-shrink-0 mb-4 lg:mb-0">
+                  <div className="lg:sticky lg:top-36">
+                    <ParameterFacet
+                      context={context}
+                      loading={contextLoading}
+                      filterState={filterState}
+                      onSelectCategoryTab={selectCategoryTab}
+                      onToggleFilter={toggleFilter}
+                      onClearCategorySpecific={clearCategorySpecificFilters}
+                      onClearAll={clearAllFilters}
+                    />
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-600 mb-2">搜索服务暂不可用</h3>
-                  <p className="text-sm text-slate-400 mb-4">请稍后重试或浏览产品分类</p>
-                  <button
-                    onClick={handleRetry}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-primary to-industrial-cyan rounded-lg hover:opacity-90 transition-opacity"
+                </div>
+              )}
+
+              {/* Results Area */}
+              <div className={showFacet ? 'lg:flex-1 lg:min-w-0' : ''}>
+                {!loading && !error && results && !hasAnyResults && (
+                  <SearchEmptyState type="no-results" keyword={query} />
+                )}
+
+                {error && (
+                  <div className="text-center py-16">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-50 flex items-center justify-center">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-red-400">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-semibold text-slate-600 mb-2">搜索服务暂不可用</h3>
+                    <p className="text-sm text-slate-400 mb-4">请稍后重试或浏览产品分类</p>
+                    <button
+                      onClick={handleRetry}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-primary to-industrial-cyan rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
+                      </svg>
+                      重新搜索
+                    </button>
+                  </div>
+                )}
+
+                {/* Product Section */}
+                {shouldRenderSection('product', results?.products.total ?? 0) && (
+                  <SearchResultSection
+                    title="产品"
+                    count={displayResults?.products.total ?? 0}
+                    loading={loading}
+                    error={error}
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
-                    </svg>
-                    重新搜索
-                  </button>
-                </div>
-              )}
+                    {displayResults?.products.items.map((product) => (
+                      <ProductResultCard
+                        key={product.id}
+                        product={product}
+                        highlight={query}
+                      />
+                    ))}
+                  </SearchResultSection>
+                )}
 
-              {/* Product Section */}
-              {shouldRenderSection('product', results?.products.total ?? 0) && (
-                <SearchResultSection
-                  title="产品"
-                  count={displayResults?.products.total ?? 0}
-                  loading={loading}
-                  error={error}
-                >
-                  {displayResults?.products.items.map((product) => (
-                    <ProductResultCard
-                      key={product.id}
-                      product={product}
-                      highlight={query}
-                    />
-                  ))}
-                </SearchResultSection>
-              )}
-
-              {/* Knowledge Section */}
-              {shouldRenderSection('knowledge', results?.knowledge.total ?? 0) && (
-                <SearchResultSection
-                  title="知识"
-                  count={displayResults?.knowledge.total ?? 0}
-                  loading={loading}
-                  error={error}
-                >
-                  {displayResults?.knowledge.items.map((content) => (
-                    <KnowledgeResultCard
-                      key={content.id}
-                      content={content}
-                      highlight={query}
-                    />
-                  ))}
-                </SearchResultSection>
-              )}
-
-              {/* Solution Section */}
-              {shouldRenderSection('solution', results?.solutions.total ?? 0) && (
-                <SearchResultSection
-                  title="解决方案"
-                  count={displayResults?.solutions.total ?? 0}
-                  loading={loading}
-                  error={error}
-                >
-                  {displayResults?.solutions.items.map((content) => (
-                    <SolutionResultCard
-                      key={content.id}
-                      content={content}
-                      highlight={query}
-                    />
-                  ))}
-                </SearchResultSection>
-              )}
-
-              {/* Supplier Section */}
-              {shouldRenderSection('supplier', results?.suppliers.total ?? 0) && (
-                <SearchResultSection
-                  title="供应商"
-                  count={displayResults?.suppliers.total ?? 0}
-                  loading={loading}
-                  error={error}
-                >
-                  {displayResults?.suppliers.items.map((supplier) => (
-                    <SupplierResultCard
-                      key={supplier.organizationId}
-                      supplier={supplier}
-                      highlight={query}
-                    />
-                  ))}
-                </SearchResultSection>
-              )}
-
-              {!loading && !error && results && !hasAnyResults && type !== 'all' && (
-                <SearchEmptyState
-                  type="no-results-type"
-                  keyword={query}
-                  domain={type}
-                />
-              )}
-
-              {/* Load More */}
-              {!loading && !loadingMore && !error && results && hasMore && (
-                <div className="text-center mt-8">
-                  <button
-                    onClick={handleLoadMore}
-                    className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-industrial-sm transition-all"
+                {/* Knowledge Section */}
+                {shouldRenderSection('knowledge', results?.knowledge.total ?? 0) && (
+                  <SearchResultSection
+                    title="知识"
+                    count={displayResults?.knowledge.total ?? 0}
+                    loading={loading}
+                    error={error}
                   >
-                    加载更多结果
-                  </button>
-                </div>
-              )}
+                    {displayResults?.knowledge.items.map((content) => (
+                      <KnowledgeResultCard
+                        key={content.id}
+                        content={content}
+                        highlight={query}
+                      />
+                    ))}
+                  </SearchResultSection>
+                )}
 
-              {loadingMore && (
-                <div className="text-center mt-8">
-                  <span className="inline-flex items-center gap-2 text-sm text-slate-400">
-                    <span className="w-3 h-3 border-2 border-slate-300 border-t-primary rounded-full animate-spin" />
-                    加载中...
-                  </span>
-                </div>
-              )}
+                {/* Solution Section */}
+                {shouldRenderSection('solution', results?.solutions.total ?? 0) && (
+                  <SearchResultSection
+                    title="解决方案"
+                    count={displayResults?.solutions.total ?? 0}
+                    loading={loading}
+                    error={error}
+                  >
+                    {displayResults?.solutions.items.map((content) => (
+                      <SolutionResultCard
+                        key={content.id}
+                        content={content}
+                        highlight={query}
+                      />
+                    ))}
+                  </SearchResultSection>
+                )}
+
+                {/* Supplier Section */}
+                {shouldRenderSection('supplier', results?.suppliers.total ?? 0) && (
+                  <SearchResultSection
+                    title="供应商"
+                    count={displayResults?.suppliers.total ?? 0}
+                    loading={loading}
+                    error={error}
+                  >
+                    {displayResults?.suppliers.items.map((supplier) => (
+                      <SupplierResultCard
+                        key={supplier.organizationId}
+                        supplier={supplier}
+                        highlight={query}
+                      />
+                    ))}
+                  </SearchResultSection>
+                )}
+
+                {!loading && !error && results && !hasAnyResults && type !== 'all' && (
+                  <SearchEmptyState
+                    type="no-results-type"
+                    keyword={query}
+                    domain={type}
+                  />
+                )}
+
+                {/* Load More */}
+                {!loading && !loadingMore && !error && results && hasMore && (
+                  <div className="text-center mt-8">
+                    <button
+                      onClick={handleLoadMore}
+                      className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:border-slate-300 hover:shadow-industrial-sm transition-all"
+                    >
+                      加载更多结果
+                    </button>
+                  </div>
+                )}
+
+                {loadingMore && (
+                  <div className="text-center mt-8">
+                    <span className="inline-flex items-center gap-2 text-sm text-slate-400">
+                      <span className="w-3 h-3 border-2 border-slate-300 border-t-primary rounded-full animate-spin" />
+                      加载中...
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </>
         )}

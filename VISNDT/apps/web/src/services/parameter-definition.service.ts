@@ -9,6 +9,7 @@
 import {
   getParameterDefinitions as fetchDefinitions,
   getParameterDefinition as fetchDefinition,
+  getCategoryParameters as fetchCategoryParameters,
 } from '@/lib/api/parameter-definitions';
 import type { ParameterDefinition, ParameterOption } from '@/types/product';
 
@@ -37,4 +38,17 @@ export async function getFilterParameterDefinitions(): Promise<FilterParameterDe
   }
 
   return defs.map((d) => ({ ...d, options: optionsMap.get(d.id) ?? [] }));
+}
+
+/**
+ * Load the parameters actually used by ACTIVE products in a specific category,
+ * for the category-context parameter filter panel. The category endpoint already
+ * returns ENUM options inline (with sortOrder applied), so no extra detail calls
+ * are needed.
+ */
+export async function getCategoryFilterParameterDefinitions(
+  categoryId: string,
+): Promise<FilterParameterDefinition[]> {
+  const defs = await fetchCategoryParameters(categoryId);
+  return defs.map((d) => ({ ...d, options: d.options ?? [] }));
 }

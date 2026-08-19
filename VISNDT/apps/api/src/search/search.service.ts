@@ -78,6 +78,12 @@ export interface UnifiedDiscoveryResponse {
   suppliers: EntitySearchGroup<SupplierDiscoveryItem>;
 }
 
+/** A single parsed product filter: parameter + accepted values */
+export interface ProductFilter {
+  parameterId: string;
+  values: string[];
+}
+
 @Injectable()
 export class SearchService {
   private readonly logger = new Logger(SearchService.name);
@@ -87,12 +93,22 @@ export class SearchService {
   /**
    * Execute unified discovery across all entity types.
    * All queries execute in parallel, then results are merged.
+   *
+   * M24.1.4 — filters only apply to the Product population (server-side,
+   * filter-before-pagination). Knowledge/Content/Solution/Supplier are unchanged.
    */
-  async search(query: string, page: number = 1, pageSize: number = 10): Promise<UnifiedDiscoveryResponse> {
+  async search(
+    query: string,
+    page: number = 1,
+    pageSize: number = 10,
+    category?: string,
+    filters?: string,
+  ): Promise<UnifiedDiscoveryResponse> {
     const skip = (page - 1) * pageSize;
+    const productFilters = this.parseFilters(filters);
 
     const [products, knowledge, content, solutions, suppliers] = await Promise.all([
-      this.searchProducts(query, skip, pageSize),
+      this.searchProducts(query, skip, pageSize, category, productFilters),
       this.searchKnowledgeEntries(query, skip, pageSize),
       this.searchContent(query, [ContentType.ARTICLE, ContentType.INSIGHT], skip, pageSize),
       this.searchContent(query, [ContentType.SOLUTION], skip, pageSize),
@@ -107,20 +123,69 @@ export class SearchService {
   }
 
   // ============================================
+  // Filter Contract Parsing
+  // ============================================
+
+  /**
+   * Parse the minimal filter wire format:
+   *   `parameterId:value1,value2;parameterId2:value3`
+   *
+   * Semantics:
+   *   - Same parameterId → values joined with OR
+   *   - Different parameterId → joined with AND (handled by where.AND)
+   */
+  private parseFilters(raw?: string): ProductFilter[] {
+    if (!raw) return [];
+
+    const filters: ProductFilter[] = [];
+    for (const part of raw.split(';')) {
+      const colonIdx = part.indexOf(':');
+      if (colonIdx === -1) continue;
+
+      const parameterId = part.slice(0, colonIdx).trim();
+      const values = part
+        .slice(colonIdx + 1)
+        .split(',')
+        .map((v) => v.trim())
+        .filter(Boolean);
+
+      if (parameterId && values.length > 0) {
+        filters.push({ parameterId, values });
+      }
+    }
+    return filters;
+  }
+
+  // ============================================
   // Product Search Adapter
   // ============================================
   private async searchProducts(
     keyword: string,
     skip: number,
     take: number,
+    category?: string,
+    filters: ProductFilter[] = [],
   ): Promise<EntitySearchGroup<ProductDiscoveryItem>> {
+    // Filter-before-pagination: category + parameter filters are applied to
+    // the WHERE clause so the filtered candidate population drives pagination.
+    const parameterAnds = filters.map((f) => ({
+      parameterValues: {
+        some: {
+          parameterDefinitionId: f.parameterId,
+          value: { in: f.values },
+        },
+      },
+    }));
+
     const where = {
       status: 'ACTIVE' as const,
+      ...(category ? { categoryId: category } : {}),
       OR: [
         { name: { contains: keyword, mode: 'insensitive' as const } },
         { model: { contains: keyword, mode: 'insensitive' as const } },
         { description: { contains: keyword, mode: 'insensitive' as const } },
       ],
+      ...(parameterAnds.length > 0 ? { AND: parameterAnds } : {}),
     };
 
     const [items, total] = await Promise.all([

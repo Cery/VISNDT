@@ -6,6 +6,7 @@ import type {
   KnowledgeCategory,
   KnowledgeEntryDetail,
   KnowledgeEntriesResult,
+  RelatedProductItem,
 } from '@/types/knowledge-base';
 
 /**
@@ -60,5 +61,18 @@ export async function getPublicEntries(params: {
 /** Get a single published knowledge entry by slug */
 export async function getPublicEntryBySlug(slug: string): Promise<KnowledgeEntryDetail> {
   const res = await apiClient<ApiResponse<KnowledgeEntryDetail>>(`/knowledge/public/entries/${slug}`);
+  return res.data;
+}
+
+/**
+ * Get related active products for a published knowledge entry.
+ * GET /knowledge/public/entries/:slug/related-products
+ * Deterministic mapping: KnowledgeEntry → KnowledgeCategory
+ * → ProductCategoryKnowledgeMapping → ProductCategory → Product (ACTIVE only).
+ */
+export async function getEntryRelatedProducts(slug: string): Promise<RelatedProductItem[]> {
+  const res = await apiClient<ApiResponse<RelatedProductItem[]>>(
+    `/knowledge/public/entries/${slug}/related-products`,
+  );
   return res.data;
 }

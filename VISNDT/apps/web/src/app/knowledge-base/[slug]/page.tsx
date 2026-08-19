@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getEntryBySlug } from '@/services/knowledge-base.service';
-import type { KnowledgeEntryDetail } from '@/types/knowledge-base';
+import { getEntryBySlug, getEntryRelatedProducts } from '@/services/knowledge-base.service';
+import type { KnowledgeEntryDetail, RelatedProductItem } from '@/types/knowledge-base';
+import RelatedProducts from '@/components/products/RelatedProducts';
 import { SITE_URL, absoluteUrl, buildKnowledgeEntryJsonLd, buildBreadcrumbListJsonLd, JsonLdScript } from '@/lib/seo';
 
 interface EntryDetailPageProps {
@@ -79,6 +80,13 @@ export default async function KnowledgeEntryDetailPage({ params }: EntryDetailPa
     entry = await getEntryBySlug(slug);
   } catch {
     notFound();
+  }
+
+  let relatedProducts: RelatedProductItem[] = [];
+  try {
+    relatedProducts = await getEntryRelatedProducts(slug);
+  } catch {
+    relatedProducts = [];
   }
 
   const allRelations = [
@@ -298,6 +306,12 @@ export default async function KnowledgeEntryDetailPage({ params }: EntryDetailPa
           </section>
         )}
       </article>
+
+      {/* Related Products — Knowledge → Product discovery (M24.1.7) */}
+      <section className="mt-10 pt-8 border-t border-slate-200">
+        <h2 className="text-lg font-bold text-foreground mb-4">相关产品</h2>
+        <RelatedProducts items={relatedProducts} />
+      </section>
 
       {/* Back to Knowledge Base */}
       <div className="mt-12 pt-8 border-t border-slate-200">

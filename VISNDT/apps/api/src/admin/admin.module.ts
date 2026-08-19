@@ -17,6 +17,8 @@ import { AdminMonitoringController } from './admin-monitoring.controller';
 import { AdminMonitoringService } from './admin-monitoring.service';
 import { AdminAuditIntelligenceController } from './admin-audit-intelligence.controller';
 import { AdminAuditIntelligenceService } from './admin-audit-intelligence.service';
+import { AdminProductCategoryKnowledgeMappingController } from './admin-product-category-knowledge-mapping.controller';
+import { AdminProductCategoryKnowledgeMappingService } from './admin-product-category-knowledge-mapping.service';
 
 @Module({
   imports: [AuthModule, EmbeddingModule],
@@ -29,6 +31,7 @@ import { AdminAuditIntelligenceService } from './admin-audit-intelligence.servic
     AdminAnalyticsController,
     AdminMonitoringController,
     AdminAuditIntelligenceController,
+    AdminProductCategoryKnowledgeMappingController,
   ],
   providers: [
     AdminService,
@@ -39,6 +42,7 @@ import { AdminAuditIntelligenceService } from './admin-audit-intelligence.servic
     AdminAnalyticsService,
     AdminMonitoringService,
     AdminAuditIntelligenceService,
+    AdminProductCategoryKnowledgeMappingService,
   ],
 })
 export class AdminModule {}

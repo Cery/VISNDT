@@ -1,0 +1,1 @@
+SELECT id, name, slug FROM product_category LIMIT 5;

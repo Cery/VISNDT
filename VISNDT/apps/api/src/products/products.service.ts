@@ -111,7 +111,106 @@ export class ProductsService {
       this.prisma.product.count({ where }),
     ]);
 
-    return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
+    // M24.2.4 (603) — Capability Discovery Card enrichment (read-only).
+    const enriched = await this.enrichWithCardFields(data);
+
+    return { data: enriched, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
+  }
+
+  /**
+   * M24.2.4 (603) — attach presentation-only list fields for the Capability
+   * Discovery Card. No new models, no schema change, no AI / search / matching:
+   *   - primaryMedia: the single primary IMAGE media (isPrimary → displayOrder),
+   *     exposing only fileAssetId (frontend builds the public /files/:id/download
+   *     URL) — never a full media list.
+   *   - keyParameters: up to 3 core parameters actually assigned to the product,
+   *     resolved via ProductParameterValue → ParameterDefinition and ordered
+   *     deterministically by ProductParameterDefinition.displayOrder (per-product
+   *     curated order), falling back to name asc → id asc.
+   */
+  private async enrichWithCardFields<T extends { id: string }>(products: T[]) {
+    if (products.length === 0) return products;
+
+    const ids = products.map((p) => p.id);
+
+    const [mediaRecords, values, associations] = await Promise.all([
+      this.prisma.productMedia.findMany({
+        where: { productId: { in: ids }, mediaType: 'IMAGE' },
+        orderBy: [{ isPrimary: 'desc' }, { displayOrder: 'asc' }],
+        select: {
+          id: true,
+          productId: true,
+          fileAssetId: true,
+          mediaType: true,
+          title: true,
+          isPrimary: true,
+          displayOrder: true,
+        },
+      }),
+      this.prisma.productParameterValue.findMany({
+        where: { productId: { in: ids } },
+        select: {
+          productId: true,
+          parameterDefinitionId: true,
+          value: true,
+          valueNumber: true,
+          parameterDefinition: {
+            select: { id: true, name: true, code: true, dataType: true, unit: true },
+          },
+        },
+      }),
+      this.prisma.productParameterDefinition.findMany({
+        where: { productId: { in: ids } },
+        select: { productId: true, parameterDefinitionId: true, displayOrder: true },
+      }),
+    ]);
+
+    // One primary image per product (first after isPrimary → displayOrder).
+    const primaryMediaByProduct = new Map<string, (typeof mediaRecords)[number]>();
+    for (const m of mediaRecords) {
+      if (!primaryMediaByProduct.has(m.productId)) {
+        primaryMediaByProduct.set(m.productId, m);
+      }
+    }
+
+    // Per-product curated parameter order (ProductParameterDefinition.displayOrder).
+    const orderMap = new Map<string, number>();
+    for (const a of associations) {
+      orderMap.set(`${a.productId}:${a.parameterDefinitionId}`, a.displayOrder);
+    }
+
+    const valuesByProduct = new Map<string, (typeof values)>();
+    for (const v of values) {
+      const list = valuesByProduct.get(v.productId) ?? [];
+      list.push(v);
+      valuesByProduct.set(v.productId, list);
+    }
+
+    return products.map((p) => {
+      const primaryMedia = primaryMediaByProduct.get(p.id) ?? null;
+
+      const list = valuesByProduct.get(p.id) ?? [];
+      list.sort((a, b) => {
+        const ao = orderMap.get(`${a.productId}:${a.parameterDefinitionId}`) ?? Number.MAX_SAFE_INTEGER;
+        const bo = orderMap.get(`${b.productId}:${b.parameterDefinitionId}`) ?? Number.MAX_SAFE_INTEGER;
+        if (ao !== bo) return ao - bo;
+        const nameCmp = a.parameterDefinition.name.localeCompare(b.parameterDefinition.name);
+        if (nameCmp !== 0) return nameCmp;
+        return a.parameterDefinitionId.localeCompare(b.parameterDefinitionId);
+      });
+
+      const keyParameters = list.slice(0, 3).map((v) => ({
+        parameterDefinitionId: v.parameterDefinitionId,
+        name: v.parameterDefinition.name,
+        code: v.parameterDefinition.code,
+        dataType: v.parameterDefinition.dataType,
+        unit: v.parameterDefinition.unit,
+        value: v.value,
+        valueNumber: v.valueNumber,
+      }));
+
+      return { ...p, primaryMedia, keyParameters };
+    });
   }
 
   // UUID format regex: 8-4-4-4-12 hex digits (lenient — supports demo deterministic IDs)
@@ -135,6 +234,129 @@ export class ProductsService {
     });
     if (!product) throw new NotFoundException(`产品 ${idOrSlug} 未找到`);
     return product;
+  }
+
+  /**
+   * Product → Related Knowledge resolution (M24.1.6)
+   *
+   * Deterministic mapping chain, no AI / keyword / random recommendation:
+   *   Product → ProductCategory → ProductCategoryKnowledgeMapping (isActive)
+   *           → KnowledgeCategory → KnowledgeEntry (PUBLISHED)
+   *
+   * The authoritative source of association is ProductCategoryKnowledgeMapping
+   * exclusively (ADR-M24-008 / 009 / 010). Knowledge Domain is derived from
+   * KnowledgeCategory → KnowledgeDomain and is NOT stored in the mapping.
+   */
+  async findRelatedKnowledge(idOrSlug: string) {
+    const isUuid = ProductsService.UUID_REGEX.test(idOrSlug);
+
+    const product = await this.prisma.product.findUnique({
+      where: isUuid ? { id: idOrSlug } : { slug: idOrSlug },
+      select: { id: true, categoryId: true },
+    });
+    if (!product) throw new NotFoundException(`产品 ${idOrSlug} 未找到`);
+
+    // 1. Resolve active knowledge-category mappings for the product's category,
+    //    ordered by mapping sortOrder (stable, explainable ordering).
+    const mappings = await this.prisma.productCategoryKnowledgeMapping.findMany({
+      where: { productCategoryId: product.categoryId, isActive: true },
+      orderBy: { sortOrder: 'asc' },
+      select: { knowledgeCategoryId: true, sortOrder: true },
+    });
+
+    if (mappings.length === 0) {
+      return [];
+    }
+
+    const categoryOrder = new Map<string, number>(
+      mappings.map((m) => [m.knowledgeCategoryId, m.sortOrder]),
+    );
+
+    // 2. Retrieve PUBLISHED knowledge entries across the mapped categories.
+    const entries = await this.prisma.knowledgeEntry.findMany({
+      where: {
+        categoryId: { in: [...categoryOrder.keys()] },
+        status: 'PUBLISHED',
+      },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        summary: true,
+        publishedAt: true,
+        categoryId: true,
+        category: { select: { id: true, name: true, slug: true } },
+        domain: { select: { id: true, name: true, slug: true } },
+      },
+    });
+
+    // 3. Deduplicate by KnowledgeEntry id (defensive; an entry belongs to one
+    //    category) and order deterministically:
+    //    mapping sortOrder (category) asc → publishedAt desc → id asc.
+    const deduped = new Map<string, (typeof entries)[number]>();
+    for (const entry of entries) {
+      if (!deduped.has(entry.id)) {
+        deduped.set(entry.id, entry);
+      }
+    }
+
+    return [...deduped.values()].sort((a, b) => {
+      const ao = categoryOrder.get(a.categoryId) ?? 0;
+      const bo = categoryOrder.get(b.categoryId) ?? 0;
+      if (ao !== bo) return ao - bo;
+      const ta = new Date(a.publishedAt ?? 0).getTime();
+      const tb = new Date(b.publishedAt ?? 0).getTime();
+      if (ta !== tb) return tb - ta;
+      return a.id.localeCompare(b.id);
+    });
+  }
+
+  /**
+   * Product → Related Products resolution (M24.1.8)
+   *
+   * Deterministic, non-AI discovery: other ACTIVE products within the SAME
+   * ProductCategory as the current product. The current product is excluded.
+   * Ordering is stable and explainable: createdAt desc → id asc.
+   *
+   * No supplier / organization / offer / matching / search-ranking data is used,
+   * and none is returned — only public product-card fields. Compare is purposely
+   * not part of this resolver: it is user-selected via the existing
+   * /products/compare?ids= flow.
+   */
+  async findRelatedProducts(idOrSlug: string) {
+    const isUuid = ProductsService.UUID_REGEX.test(idOrSlug);
+
+    const product = await this.prisma.product.findUnique({
+      where: isUuid ? { id: idOrSlug } : { slug: idOrSlug },
+      select: { id: true, categoryId: true },
+    });
+    if (!product) throw new NotFoundException(`产品 ${idOrSlug} 未找到`);
+
+    // No category → deterministically zero related products (never fall back to
+    // the whole catalog).
+    if (!product.categoryId) {
+      return [];
+    }
+
+    return this.prisma.product.findMany({
+      where: {
+        categoryId: product.categoryId,
+        status: 'ACTIVE',
+        id: { not: product.id },
+      },
+      orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+      select: {
+        id: true,
+        categoryId: true,
+        name: true,
+        model: true,
+        description: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+        category: true,
+      },
+    });
   }
 
   async create(dto: CreateProductDto, createdById?: string) {

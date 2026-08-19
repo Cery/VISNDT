@@ -34,3 +34,18 @@ export async function getParameterDefinition(
   );
   return res.data;
 }
+
+/**
+ * Get relevant parameter definitions actually used by ACTIVE products in a
+ * category (public, read-only). Deterministic: ProductCategory → ACTIVE
+ * Products → ProductParameterValue → ParameterDefinition (dedup, name-ordered).
+ * GET /product-categories/:id/parameters
+ */
+export async function getCategoryParameters(
+  categoryId: string,
+): Promise<ParameterDefinition[]> {
+  const res = await apiClient<ApiResponse<ParameterDefinition[]>>(
+    `/product-categories/${categoryId}/parameters`,
+  );
+  return res.data;
+}

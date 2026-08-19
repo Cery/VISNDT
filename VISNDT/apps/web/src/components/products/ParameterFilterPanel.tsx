@@ -66,7 +66,14 @@ export default function ParameterFilterPanel({
     buildDraft(definitions, filters),
   );
 
-  if (definitions.length === 0) return null;
+  if (definitions.length === 0) {
+    return (
+      <div>
+        <h3 className="font-semibold text-sm mb-3">参数筛选</h3>
+        <p className="text-xs text-muted-foreground">当前分类暂无可用筛选参数</p>
+      </div>
+    );
+  }
 
   const handleChange = (id: string, patch: Partial<Draft>) => {
     const next = {

@@ -1,24 +1,30 @@
 'use client';
 
 import { useState } from 'react';
-import type { ProductDetail } from '@/types/product';
-import type { ParameterGroup } from '@/types/product';
+import type { Product, ProductDetail, ParameterGroup } from '@/types/product';
+import type { RelatedKnowledgeItem } from '@/types/knowledge-base';
 import ProductGallery from './ProductGallery';
 import ProductParameters from './ProductParameters';
 import ManufacturerInfo from './ManufacturerInfo';
 import SupplierInquirySection from '@/components/inquiry/SupplierInquirySection';
 import ProductDetailTabs from './ProductDetailTabs';
+import RelatedKnowledge from './RelatedKnowledge';
+import RelatedProductsSection from './RelatedProductsSection';
 import EmptyState from '@/components/common/EmptyState';
 import { translateCategoryName } from '@/lib/translate';
 
 interface ProductDetailContentProps {
   product: ProductDetail;
   parameterGroups: ParameterGroup[];
+  relatedKnowledge?: RelatedKnowledgeItem[];
+  relatedProducts?: Product[];
 }
 
 export default function ProductDetailContent({
   product,
   parameterGroups,
+  relatedKnowledge = [],
+  relatedProducts = [],
 }: ProductDetailContentProps) {
   const [descExpanded, setDescExpanded] = useState(false);
   const descShouldTruncate = (product.description?.length ?? 0) > 200;
@@ -203,6 +209,30 @@ export default function ProductDetailContent({
                   description="该产品尚未上传相关文档或证书。"
                 />
               )}
+            </section>
+          )}
+
+          {/* Related Knowledge Tab */}
+          {activeTab === 'knowledge' && (
+            <section id="knowledge">
+              <h2 className="text-2xl font-extrabold text-foreground mb-6">
+                相关知识
+              </h2>
+              <RelatedKnowledge items={relatedKnowledge} />
+            </section>
+          )}
+
+          {/* Related Products Tab — deterministic same-category discovery + Compare Entry */}
+          {activeTab === 'related' && (
+            <section id="related">
+              <h2 className="text-2xl font-extrabold text-foreground mb-6">
+                相关产品
+              </h2>
+              <RelatedProductsSection
+                currentProductId={product.id}
+                currentProductName={product.name}
+                products={relatedProducts}
+              />
             </section>
           )}
         </>
