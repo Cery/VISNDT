@@ -1,10 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Spin, Alert, Button, Space } from 'antd';
+import { Spin, Alert, Button, Space, Typography } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { userService } from '../api';
 import { UserForm } from '../components/user';
 import type { User, UserFormData } from '../types';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+
+const { Title, Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -76,10 +79,21 @@ export default function UserEdit() {
   };
 
   return (
-    <UserForm
-      mode="edit"
-      initialValues={initialValues}
-      onSubmit={handleSubmit}
-    />
+    <div>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>Edit User</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          Update user information and roles
+        </Text>
+      </div>
+      <UserForm
+        mode="edit"
+        initialValues={initialValues}
+        onSubmit={handleSubmit}
+      />
+    </div>
   );
 }

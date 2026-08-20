@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { getCategories } from '@/services/category.service';
 import { translateCategoryName } from '@/lib/translate';
+import SectionHeader from '@/components/brand/SectionHeader';
 
 export default function CategorySection() {
   const { data, isLoading, isError } = useQuery({
@@ -16,17 +17,12 @@ export default function CategorySection() {
   return (
     <section className="py-20 bg-white">
       <div className="max-w-[1200px] mx-auto px-6">
-        <div className="text-center mb-14 animate-slide-up">
-          <p className="text-sm font-semibold text-primary tracking-widest uppercase mb-3">
-            产品分类
-          </p>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-4">
-            按标准化分类浏览
-          </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto text-base">
-            涵盖工业内窥镜、测量系统、检测相机等专业设备分类
-          </p>
-        </div>
+        <SectionHeader
+          eyebrow="产品分类"
+          title="按标准化分类浏览"
+          subtitle="涵盖工业内窥镜、测量系统、检测相机等专业设备分类"
+          className="mb-14 animate-slide-up"
+        />
 
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">

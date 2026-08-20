@@ -15,23 +15,15 @@ import {
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { offerService } from '../api';
 import type { Offer } from '../types';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { StatusTag } from '../components/design-system';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
   | { status: 'success'; data: Offer };
-
-const STATUS_COLOR: Record<string, string> = {
-  DRAFT: 'default',
-  SUBMITTED: 'processing',
-  ACCEPTED: 'success',
-  REJECTED: 'error',
-  WITHDRAWN: 'warning',
-  ACTIVE: 'blue',
-  INACTIVE: 'default',
-};
 
 export default function OfferDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -173,16 +165,22 @@ export default function OfferDetailPage() {
         </Button>
       </Space>
 
-      <Title level={3}>报价详情</Title>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>Offer Details</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          View supplier capability offering details
+        </Text>
+      </div>
 
       {/* Card 1: Offer Summary */}
       <Card title="报价摘要" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
           <Descriptions.Item label="报价编号">{offer.id}</Descriptions.Item>
           <Descriptions.Item label="状态">
-            <Tag color={STATUS_COLOR[offer.status] || 'default'}>
-              {offer.status}
-            </Tag>
+            <StatusTag status={offer.status} />
           </Descriptions.Item>
           <Descriptions.Item label="标题">{offer.title}</Descriptions.Item>
           <Descriptions.Item label="报价金额">

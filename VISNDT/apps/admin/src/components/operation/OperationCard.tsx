@@ -1,5 +1,6 @@
 import { Card, Statistic, Skeleton, Space } from 'antd';
 import type { ReactNode } from 'react';
+import { VISNDT_COLORS } from '../design-system/tokens';
 
 interface OperationCardProps {
   title: string;
@@ -36,7 +37,7 @@ export default function OperationCard({
     >
       <Space>
         {icon && (
-          <span style={{ fontSize: 24, color: color || '#2563eb' }}>{icon}</span>
+          <span style={{ fontSize: 24, color: color || VISNDT_COLORS.primary }}>{icon}</span>
         )}
         <Statistic
           title={title}

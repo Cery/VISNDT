@@ -3,6 +3,7 @@ import { getContentList } from '@/services/content.service';
 import type { Content } from '@/types/content';
 import { SITE_URL } from '@/lib/seo';
 import ContentCard from '@/components/content/ContentCard';
+import EmptyState from '@/components/common/EmptyState';
 
 export const metadata: Metadata = {
   title: '工业检测解决方案',
@@ -50,15 +51,12 @@ export default async function SolutionsPage() {
       {/* Solution Cards */}
       <section className="max-w-[1200px] mx-auto px-6 py-16">
         {contents.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="w-20 h-20 mx-auto mb-4 bg-slate-100 rounded-full flex items-center justify-center">
-              <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-            </div>
-            <h2 className="text-lg font-semibold text-slate-700 mb-2">暂无已发布的解决方案</h2>
-            <p className="text-sm text-slate-400">解决方案内容正在筹备中，敬请期待。</p>
-          </div>
+          <EmptyState
+            icon="package"
+            title="暂无已发布的解决方案"
+            message="解决方案内容正在筹备中"
+            description="面向航空航天、汽车、能源等关键工业领域的检测方案将陆续上线。"
+          />
         ) : (
           <>
             <div className="mb-6 sm:mb-8">

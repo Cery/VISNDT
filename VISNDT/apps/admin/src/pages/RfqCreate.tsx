@@ -15,8 +15,9 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import { rfqService } from '../api';
 import { demandService } from '../api';
 import type { Demand } from '../types';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -96,7 +97,15 @@ function RfqCreate() {
         </Button>
       </Space>
 
-      <Title level={3}>创建询价单</Title>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>Create RFQ</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          Create a new RFQ from demand matching results
+        </Text>
+      </div>
 
       <Card style={{ maxWidth: 600 }}>
         <Form form={form} layout="vertical" onFinish={handleSubmit}>

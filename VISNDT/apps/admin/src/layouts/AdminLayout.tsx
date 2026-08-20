@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Layout, Menu, Button, Breadcrumb, Dropdown, Avatar, Badge, Space, Drawer } from 'antd';
+import { Layout, Menu, Button, Breadcrumb, Dropdown, Avatar, Badge, Space, Drawer, Tag } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   DashboardOutlined,
@@ -134,6 +134,7 @@ function AdminLayout() {
   const location = useLocation();
   const user = authStore((s) => s.user);
   const clearAuth = authStore((s) => s.clearAuth);
+  const isProd = import.meta.env.PROD;
 
   // Responsive detection
   useEffect(() => {
@@ -338,6 +339,13 @@ function AdminLayout() {
             <span className="admin-header-title" style={{ fontSize: 12, color: '#999', marginLeft: 8, borderLeft: '1px solid #e8e8e8', paddingLeft: 8 }}>
               工业检测能力发现平台
             </span>
+            <Tag
+              className="admin-header-title"
+              color={isProd ? 'success' : 'processing'}
+              style={{ marginLeft: 8, fontSize: 12 }}
+            >
+              {isProd ? '生产环境' : '开发环境'}
+            </Tag>
           </div>
 
           <Space size={16}>

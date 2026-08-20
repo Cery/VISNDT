@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card,
   Descriptions,
-  Tag,
   Spin,
   Alert,
   Button,
@@ -13,25 +12,15 @@ import {
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { notificationService } from '../api';
 import type { Notification } from '../types';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { StatusTag } from '../components/design-system';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
   | { status: 'success'; data: Notification };
-
-const TYPE_COLOR: Record<string, string> = {
-  SYSTEM: 'blue',
-  DEMAND_UPDATE: 'cyan',
-  RFQ_UPDATE: 'geekblue',
-  RESPONSE_UPDATE: 'purple',
-};
-
-const STATUS_COLOR: Record<string, string> = {
-  UNREAD: 'blue',
-  READ: 'default',
-};
 
 const formatDate = (date: string | undefined) =>
   date ? new Date(date).toLocaleString() : '-';
@@ -114,20 +103,24 @@ export default function NotificationDetailPage() {
         </Button>
       </Space>
 
-      <Title level={3}>通知详情</Title>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>Notification Details</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          View notification content, recipients and delivery status
+        </Text>
+      </div>
 
       <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
           <Descriptions.Item label="ID">{notification.id}</Descriptions.Item>
           <Descriptions.Item label="类型">
-            <Tag color={TYPE_COLOR[notification.type] || 'default'}>
-              {notification.type}
-            </Tag>
+            <StatusTag status={notification.type} />
           </Descriptions.Item>
           <Descriptions.Item label="状态">
-            <Tag color={STATUS_COLOR[notification.status] || 'default'}>
-              {notification.status}
-            </Tag>
+            <StatusTag status={notification.status} />
           </Descriptions.Item>
           <Descriptions.Item label="创建时间">
             {formatDate(notification.createdAt)}

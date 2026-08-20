@@ -3,6 +3,7 @@ import { getContentList } from '@/services/content.service';
 import type { Content } from '@/types/content';
 import { SITE_URL } from '@/lib/seo';
 import ContentCard from '@/components/content/ContentCard';
+import EmptyState from '@/components/common/EmptyState';
 
 export const metadata: Metadata = {
   title: '知识中心',
@@ -47,9 +48,12 @@ export default async function KnowledgePage() {
       {/* Content List */}
       <section className="max-w-[1100px] mx-auto px-4 sm:px-6 py-10 sm:py-16">
         {contents.length === 0 ? (
-          <div className="text-center py-20 text-slate-400">
-            <p className="text-lg">暂无已发布的知识内容，敬请期待。</p>
-          </div>
+          <EmptyState
+            icon="document"
+            title="知识中心"
+            message="暂无已发布的知识内容"
+            description="技术文章、检测指南与应用案例正在筹备中，敬请期待。"
+          />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {contents.map((item) => (

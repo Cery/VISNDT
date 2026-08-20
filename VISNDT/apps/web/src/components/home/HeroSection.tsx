@@ -1,8 +1,15 @@
 import Link from 'next/link';
+import IndustrialBadge from '@/components/brand/IndustrialBadge';
+
+const CORE_CAPABILITIES = [
+  { key: 'discovery', label: '能力发现', hint: '标准化产品目录' },
+  { key: 'connection', label: '技术连接', hint: '需求与方案匹配' },
+  { key: 'matching', label: '需求匹配', hint: '确定性 RFQ 撮合' },
+];
 
 export default function HeroSection() {
   return (
-    <section className="relative bg-industrial-dark py-24 md:py-36 lg:py-40 overflow-hidden">
+    <section className="relative bg-industrial-dark py-24 md:py-32 lg:py-36 overflow-hidden">
       {/* Grid pattern overlay */}
       <div className="absolute inset-0 bg-grid-pattern bg-grid-md opacity-40" />
       {/* Top-left glow */}
@@ -12,15 +19,42 @@ export default function HeroSection() {
       {/* Bottom glow */}
       <div className="absolute left-1/3 -bottom-20 w-80 h-80 bg-primary/10 rounded-full blur-[100px]" />
 
+      {/* Capability network visual — nodes & connections (Industrial Technology Sense) */}
+      <svg
+        className="absolute inset-0 w-full h-full opacity-[0.16] pointer-events-none"
+        viewBox="0 0 1200 600"
+        fill="none"
+        aria-hidden="true"
+      >
+        <g stroke="currentColor" className="text-industrial-cyan/70">
+          <line x1="180" y1="120" x2="360" y2="240" strokeWidth="1" />
+          <line x1="360" y1="240" x2="620" y2="180" strokeWidth="1" />
+          <line x1="620" y1="180" x2="880" y2="300" strokeWidth="1" />
+          <line x1="360" y1="240" x2="540" y2="420" strokeWidth="1" />
+          <line x1="620" y1="180" x2="760" y2="430" strokeWidth="1" />
+          <line x1="880" y1="300" x2="1040" y2="200" strokeWidth="1" />
+          <line x1="540" y1="420" x2="760" y2="430" strokeWidth="1" />
+          <line x1="880" y1="300" x2="540" y2="420" strokeWidth="1" />
+        </g>
+        <g fill="currentColor" className="text-industrial-cyan">
+          <circle cx="180" cy="120" r="4" />
+          <circle cx="360" cy="240" r="6" />
+          <circle cx="620" cy="180" r="5" />
+          <circle cx="880" cy="300" r="6" />
+          <circle cx="540" cy="420" r="4" />
+          <circle cx="760" cy="430" r="5" />
+          <circle cx="1040" cy="200" r="4" />
+        </g>
+        <g fill="currentColor" className="text-primary/80">
+          <circle cx="820" cy="140" r="3" />
+          <circle cx="240" cy="380" r="3" />
+          <circle cx="980" cy="420" r="3" />
+        </g>
+      </svg>
+
       <div className="relative z-10 max-w-[1200px] mx-auto px-6 text-center">
-        {/* Platform Badge */}
-        <div className="inline-flex items-center gap-2 mb-6 animate-fade-in">
-          <span className="inline-block w-8 h-px bg-industrial-cyan/60" />
-          <span className="text-sm font-medium text-industrial-cyan tracking-widest uppercase">
-            工业检测解决方案平台
-          </span>
-          <span className="inline-block w-8 h-px bg-industrial-cyan/60" />
-        </div>
+        {/* Platform Badge (VISNDT Visual Language v1) */}
+        <IndustrialBadge label="工业检测能力发现平台" className="mb-6 animate-fade-in" />
 
         {/* Main Heading */}
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-5 leading-tight animate-slide-up">
@@ -32,10 +66,24 @@ export default function HeroSection() {
           {' '}一站式平台
         </h1>
 
-        <p className="text-slate-400 text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed animate-slide-up">
+        <p className="text-slate-400 text-base md:text-lg max-w-2xl mx-auto mb-8 leading-relaxed animate-slide-up">
           连接工业检测需求方与能力提供商——发现高精度内窥镜、检测相机、测量系统，
           获取面向航空航天、汽车、管道、制造等行业的专业检测解决方案。
         </p>
+
+        {/* Core capability value strip */}
+        <div className="flex flex-wrap justify-center gap-3 mb-10 animate-slide-up">
+          {CORE_CAPABILITIES.map((c) => (
+            <div
+              key={c.key}
+              className="group inline-flex items-center gap-2.5 rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 backdrop-blur-sm transition-all duration-300 hover:border-industrial-cyan/30 hover:bg-white/10"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-industrial-cyan group-hover:bg-primary transition-colors" />
+              <span className="text-sm font-medium text-slate-200">{c.label}</span>
+              <span className="text-xs text-slate-500">{c.hint}</span>
+            </div>
+          ))}
+        </div>
 
         {/* Primary CTAs */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-14 animate-slide-up">

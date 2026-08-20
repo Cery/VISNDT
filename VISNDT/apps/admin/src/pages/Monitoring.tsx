@@ -15,6 +15,7 @@ import {
 } from '@ant-design/icons';
 import { monitoringService } from '../api';
 import type { MonitoringOverview, MonitoringResult, HealthStatus } from '../types';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
 
 const { Title, Text } = Typography;
 
@@ -22,9 +23,9 @@ const { Title, Text } = Typography;
 // Status Colors & Icons
 // ============================================
 const STATUS_CONFIG: Record<HealthStatus, { color: string; icon: React.ReactNode; text: string }> = {
-  healthy: { color: '#52c41a', icon: <CheckCircleOutlined />, text: '正常' },
-  warning: { color: '#faad14', icon: <WarningOutlined />, text: '警告' },
-  critical: { color: '#ff4d4f', icon: <CloseCircleOutlined />, text: '严重' },
+  healthy: { color: VISNDT_COLORS.success, icon: <CheckCircleOutlined />, text: '正常' },
+  warning: { color: VISNDT_COLORS.warning, icon: <WarningOutlined />, text: '警告' },
+  critical: { color: VISNDT_COLORS.error, icon: <CloseCircleOutlined />, text: '严重' },
 };
 
 const SECTION_ICONS: Record<string, React.ReactNode> = {
@@ -160,7 +161,7 @@ function OverallBanner({ overview }: { overview: MonitoringOverview }) {
               <Statistic
                 title="正常"
                 value={healthyCount}
-                valueStyle={{ color: '#52c41a', fontSize: 20 }}
+                valueStyle={{ color: VISNDT_COLORS.success, fontSize: 20 }}
                 suffix="/ 5"
               />
             </Col>

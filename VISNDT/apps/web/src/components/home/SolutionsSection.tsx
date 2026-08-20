@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import SectionHeader from '@/components/brand/SectionHeader';
 
 /** Industrial application solutions — NOT supplier solutions */
 const SOLUTIONS = [
@@ -81,17 +82,12 @@ export default function SolutionsSection() {
   return (
     <section className="py-20 bg-white">
       <div className="max-w-[1200px] mx-auto px-6">
-        <div className="text-center mb-12 animate-slide-up">
-          <p className="text-sm font-semibold text-primary tracking-widest uppercase mb-3">
-            行业应用
-          </p>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-4">
-            工业检测解决方案
-          </h2>
-          <p className="text-slate-500 max-w-xl mx-auto">
-            为航空航天、汽车、能源、制造等关键行业量身定制的专业检测方案
-          </p>
-        </div>
+        <SectionHeader
+          eyebrow="行业应用"
+          title="工业检测解决方案"
+          subtitle="为航空航天、汽车、能源、制造等关键行业量身定制的专业检测方案"
+          className="mb-12 animate-slide-up"
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl mx-auto">
           {SOLUTIONS.map((sol) => (

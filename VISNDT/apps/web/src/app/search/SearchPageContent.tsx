@@ -12,6 +12,7 @@ import SearchFilter from '@/components/search/SearchFilter';
 import type { SearchFilterState, ContentTypeFilter } from '@/components/search/SearchFilter';
 import SearchResultSection from '@/components/search/SearchResultSection';
 import SearchEmptyState from '@/components/search/SearchEmptyState';
+import ErrorState from '@/components/common/ErrorState';
 import ProductResultCard from '@/components/search/ProductResultCard';
 import KnowledgeResultCard from '@/components/search/KnowledgeResultCard';
 import SolutionResultCard from '@/components/search/SolutionResultCard';
@@ -452,26 +453,11 @@ export default function SearchPageContent() {
                 )}
 
                 {error && (
-                  <div className="text-center py-16">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-50 flex items-center justify-center">
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-red-400">
-                        <circle cx="12" cy="12" r="10" />
-                        <line x1="12" y1="8" x2="12" y2="12" />
-                        <line x1="12" y1="16" x2="12.01" y2="16" />
-                      </svg>
-                    </div>
-                    <h3 className="text-lg font-semibold text-slate-600 mb-2">搜索服务暂不可用</h3>
-                    <p className="text-sm text-slate-400 mb-4">请稍后重试或浏览产品分类</p>
-                    <button
-                      onClick={handleRetry}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-primary to-industrial-cyan rounded-lg hover:opacity-90 transition-opacity"
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
-                      </svg>
-                      重新搜索
-                    </button>
-                  </div>
+                  <ErrorState
+                    message="搜索服务暂不可用，请稍后重试。"
+                    onRetry={handleRetry}
+                    action={{ label: '浏览产品分类', href: '/products' }}
+                  />
                 )}
 
                 {/* Product Section */}

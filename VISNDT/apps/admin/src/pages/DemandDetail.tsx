@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card,
   Descriptions,
-  Tag,
   Spin,
   Alert,
   Button,
@@ -17,6 +16,8 @@ import {
 import { ArrowLeftOutlined, ReloadOutlined } from '@ant-design/icons';
 import { demandService, rfqService } from '../api';
 import type { Demand, DemandParameter, DemandMatch } from '../types';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { StatusTag } from '../components/design-system';
 
 const { Title } = Typography;
 
@@ -24,15 +25,6 @@ type PageState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
   | { status: 'success'; data: Demand };
-
-const STATUS_COLOR: Record<string, string> = {
-  DRAFT: 'orange',
-  PUBLISHED: 'green',
-  SUBMITTED: 'cyan',
-  PROCESSING: 'blue',
-  CLOSED: 'default',
-  CANCELLED: 'red',
-};
 
 const STATUS_LABEL_MAP: Record<string, string> = {
   DRAFT: '草稿',
@@ -43,14 +35,6 @@ const STATUS_LABEL_MAP: Record<string, string> = {
   CANCELLED: '已取消',
 };
 
-const RFQ_STATUS_COLOR: Record<string, string> = {
-  DRAFT: 'orange',
-  OPEN: 'green',
-  RESPONDING: 'blue',
-  CLOSED: 'default',
-  CANCELLED: 'red',
-};
-
 const RFQ_STATUS_LABEL_MAP: Record<string, string> = {
   DRAFT: '草稿',
   OPEN: '开放',
@@ -59,19 +43,10 @@ const RFQ_STATUS_LABEL_MAP: Record<string, string> = {
   CANCELLED: '已取消',
 };
 
-const MATCH_STATUS_COLOR: Record<string, string> = {
-  PENDING: 'orange',
-  MATCHED: 'blue',
-  REVIEWED: 'cyan',
-  ACCEPTED: 'green',
-  REJECTED: 'red',
-  EXPIRED: 'default',
-};
-
 const MATCH_SCORE_COLOR = (score: number): string => {
-  if (score >= 80) return '#52c41a';
-  if (score >= 60) return '#faad14';
-  return '#ff4d4f';
+  if (score >= 80) return VISNDT_COLORS.success;
+  if (score >= 60) return VISNDT_COLORS.warning;
+  return VISNDT_COLORS.error;
 };
 
 const PARAM_COLUMNS = [
@@ -263,7 +238,7 @@ export default function DemandDetailPage() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <Tag color={MATCH_STATUS_COLOR[status] || 'default'}>{status}</Tag>
+        <StatusTag status={status} />
       ),
     },
     {
@@ -313,7 +288,7 @@ export default function DemandDetailPage() {
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
           <Descriptions.Item label="标题">{demand.title}</Descriptions.Item>
           <Descriptions.Item label="状态">
-            <Tag color={STATUS_COLOR[demand.status] || 'default'}>{STATUS_LABEL_MAP[demand.status] || demand.status}</Tag>
+            <StatusTag status={demand.status} label={STATUS_LABEL_MAP[demand.status] || demand.status} />
           </Descriptions.Item>
           <Descriptions.Item label="分类">
             {demand.category?.name || '-'}
@@ -409,9 +384,7 @@ export default function DemandDetailPage() {
         {demand.rfq ? (
           <Descriptions bordered column={{ xs: 1, sm: 2 }}>
             <Descriptions.Item label="RFQ状态">
-              <Tag color={RFQ_STATUS_COLOR[demand.rfq.status] || 'default'}>
-                {RFQ_STATUS_LABEL_MAP[demand.rfq.status] || demand.rfq.status}
-              </Tag>
+              <StatusTag status={demand.rfq.status} label={RFQ_STATUS_LABEL_MAP[demand.rfq.status] || demand.rfq.status} />
             </Descriptions.Item>
             <Descriptions.Item label="创建时间">
               {formatDate(demand.rfq.createdAt)}

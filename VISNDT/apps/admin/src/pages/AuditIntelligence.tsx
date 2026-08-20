@@ -25,6 +25,7 @@ import {
 } from 'recharts';
 import { auditIntelligenceService } from '../api';
 import type { AuditIntelligenceOverview, ActorActivity, RiskLevel } from '../types';
+import { VISNDT_COLORS, CHART_PALETTE } from '../components/design-system/tokens';
 
 const { Title, Text } = Typography;
 
@@ -32,9 +33,9 @@ const { Title, Text } = Typography;
 // Colors
 // ============================================
 const RISK_COLORS: Record<RiskLevel, string> = {
-  NORMAL: '#52c41a',
-  WARNING: '#faad14',
-  CRITICAL: '#ff4d4f',
+  NORMAL: VISNDT_COLORS.success,
+  WARNING: VISNDT_COLORS.warning,
+  CRITICAL: VISNDT_COLORS.error,
 };
 
 const RISK_ICONS: Record<RiskLevel, React.ReactNode> = {
@@ -50,14 +51,14 @@ const RISK_LABELS: Record<RiskLevel, string> = {
 };
 
 const ACTION_COLORS: Record<string, string> = {
-  create: '#52c41a',
+  create: VISNDT_COLORS.success,
   update: '#2563eb',
-  delete: '#ff4d4f',
-  statusChange: '#faad14',
+  delete: VISNDT_COLORS.error,
+  statusChange: VISNDT_COLORS.warning,
   login: '#722ed1',
 };
 
-const PIE_COLORS = ['#2563eb', '#52c41a', '#faad14', '#ff4d4f', '#722ed1', '#13c2c2', '#eb2f96', '#fa8c16', '#2f54eb', '#a0d911'];
+const PIE_COLORS = CHART_PALETTE;
 
 const TIME_RANGES = [
   { label: '7天', value: 7 },
@@ -178,7 +179,7 @@ function AuditIntelligence() {
                 title="创建"
                 value={data.overview.createCount}
                 prefix={<PlusCircleOutlined />}
-                valueStyle={{ color: '#52c41a' }}
+                valueStyle={{ color: VISNDT_COLORS.success }}
               />
             </Card>
           </Col>
@@ -198,7 +199,7 @@ function AuditIntelligence() {
                 title="删除"
                 value={data.overview.deleteCount}
                 prefix={<DeleteOutlined />}
-                valueStyle={{ color: '#ff4d4f' }}
+                valueStyle={{ color: VISNDT_COLORS.error }}
               />
             </Card>
           </Col>
@@ -208,7 +209,7 @@ function AuditIntelligence() {
                 title="状态变更"
                 value={data.overview.statusChangeCount}
                 prefix={<SwapOutlined />}
-                valueStyle={{ color: '#faad14' }}
+                valueStyle={{ color: VISNDT_COLORS.warning }}
               />
             </Card>
           </Col>
@@ -375,7 +376,7 @@ function AuditIntelligence() {
                         title: '创建',
                         dataIndex: 'createCount',
                         key: 'create',
-                        render: (v: number) => <span style={{ color: '#52c41a' }}>{v}</span>,
+                        render: (v: number) => <span style={{ color: VISNDT_COLORS.success }}>{v}</span>,
                       },
                       {
                         title: '更新',
@@ -388,7 +389,7 @@ function AuditIntelligence() {
                         dataIndex: 'deleteCount',
                         key: 'delete',
                         render: (v: number) => (
-                          <span style={{ color: v > 0 ? '#ff4d4f' : undefined, fontWeight: v > 0 ? 600 : 400 }}>
+                          <span style={{ color: v > 0 ? VISNDT_COLORS.error : undefined, fontWeight: v > 0 ? 600 : 400 }}>
                             {v}
                           </span>
                         ),
@@ -397,7 +398,7 @@ function AuditIntelligence() {
                         title: '状态变更',
                         dataIndex: 'statusChangeCount',
                         key: 'statusChange',
-                        render: (v: number) => <span style={{ color: '#faad14' }}>{v}</span>,
+                        render: (v: number) => <span style={{ color: VISNDT_COLORS.warning }}>{v}</span>,
                       },
                       {
                         title: '登录',

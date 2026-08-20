@@ -28,6 +28,7 @@ import {
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { productMediaService } from '../../api/product-media.service';
 import { fileAssetService } from '../../api/file-asset.service';
+import { VISNDT_COLORS } from '../../components/design-system/tokens';
 import type { ProductMediaItem, MediaType } from '../../types/product-media.types';
 import { getFileTypeIcon, formatFileSize } from '../../utils/file-utils';
 
@@ -353,7 +354,7 @@ function ProductMediaList() {
           </Col>
           <Col xs={12} sm={6}>
             <Card size="small">
-              <Statistic title="文档" value={mediaStats.documents} prefix={<FileTextOutlined />} valueStyle={{ color: '#52c41a' }} />
+              <Statistic title="文档" value={mediaStats.documents} prefix={<FileTextOutlined />} valueStyle={{ color: VISNDT_COLORS.success }} />
             </Card>
           </Col>
           <Col xs={12} sm={6}>

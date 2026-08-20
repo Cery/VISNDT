@@ -1,20 +1,15 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Table, Spin, Alert, Button, Tag, Typography, Select, Input, Space, message, Modal } from 'antd';
+import { Table, Spin, Alert, Button, Typography, Select, Input, Space, message, Modal } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import { inquiryService } from '../api';
 import type { Inquiry } from '../types';
 import { BatchActionBar } from '../components/operation';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { StatusTag } from '../components/design-system';
 
-const { Title } = Typography;
-
-const STATUS_COLOR: Record<string, string> = {
-  NEW: 'blue',
-  PROCESSING: 'orange',
-  REPLIED: 'green',
-  CLOSED: 'default',
-};
+const { Title, Text } = Typography;
 
 const INQUIRY_STATUS_LABEL_MAP: Record<string, string> = {
   NEW: '新建',
@@ -195,9 +190,15 @@ function InquiryList() {
   if (pageState.status === 'empty') {
     return (
       <div>
-        <Title level={4} style={{ marginBottom: 16 }}>
-          询价管理
-        </Title>
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+            <Title level={4} style={{ margin: 0 }}>Inquiry Operations</Title>
+          </div>
+          <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+            Manage buyer inquiries, supplier selection and conversion
+          </Text>
+        </div>
         <Space style={{ marginBottom: 16 }} wrap>
           <Input.Search
             placeholder="搜索联系人/邮箱..."
@@ -258,7 +259,7 @@ function InquiryList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <Tag color={STATUS_COLOR[status] || 'default'}>{INQUIRY_STATUS_LABEL_MAP[status] || status}</Tag>
+        <StatusTag status={status} label={INQUIRY_STATUS_LABEL_MAP[status] || status} />
       ),
     },
     {
@@ -294,12 +295,15 @@ function InquiryList() {
 
   return (
     <div>
-      <Title level={4} style={{ marginBottom: 4 }}>
-        询价管理
-      </Title>
-      <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16, fontSize: 13 }}>
-        管理前台访客提交的产品询价记录，询价与RFQ是不同的业务概念
-      </Typography.Text>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>Inquiry Operations</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          Manage buyer inquiries, supplier selection and conversion
+        </Text>
+      </div>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search

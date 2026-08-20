@@ -1,4 +1,5 @@
 import type { ProductParameterValue, ParameterGroup } from '@/types/product';
+import ParameterHighlight from '@/components/capability/ParameterHighlight';
 
 interface ProductParametersProps {
   parameters: ProductParameterValue[];
@@ -44,13 +45,20 @@ export default function ProductParameters({
           <span className="text-xs ml-1">({pv.parameterDefinition.unit})</span>
         )}
       </td>
-      <td className="py-2 px-3 font-medium">
-        {pv.value}
-        {pv.valueNumber !== null && (
-          <span className="text-xs text-muted-foreground ml-1">
-            ({pv.valueNumber})
-          </span>
-        )}
+      <td className="py-2 px-3">
+        <div className="font-medium">
+          {pv.value}
+          {pv.valueNumber !== null && (
+            <span className="text-xs text-muted-foreground ml-1">
+              ({pv.valueNumber})
+            </span>
+          )}
+        </div>
+        <ParameterHighlight
+          name={pv.parameterDefinition.name}
+          code={pv.parameterDefinition.code}
+          className="mt-1"
+        />
       </td>
     </tr>
   );

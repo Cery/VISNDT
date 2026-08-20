@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { getProducts } from '@/services/product.service';
 import ProductCard from '@/components/products/ProductCard';
+import SectionHeader from '@/components/brand/SectionHeader';
 
 export default function FeaturedProductsSection() {
   const { data, isLoading, isError } = useQuery({
@@ -17,14 +18,12 @@ export default function FeaturedProductsSection() {
     <section className="py-20 bg-industrial-slate">
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="flex items-end justify-between mb-10">
-          <div className="animate-slide-up">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-3">
-              推荐产品
-            </h2>
-            <p className="text-slate-500">
-              探索我们的工业检测设备精选
-            </p>
-          </div>
+          <SectionHeader
+            title="推荐产品"
+            subtitle="探索我们的工业检测设备精选"
+            align="left"
+            className="animate-slide-up"
+          />
           <Link
             href="/products"
             className="hidden sm:inline-flex text-sm font-medium text-primary hover:text-primary/80 transition-colors"

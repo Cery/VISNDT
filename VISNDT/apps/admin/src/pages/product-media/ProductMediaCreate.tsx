@@ -4,6 +4,7 @@ import { Form, Input, InputNumber, Button, Card, Select, Switch, Upload, Typogra
 import { InboxOutlined } from '@ant-design/icons';
 import { productMediaService } from '../../api/product-media.service';
 import type { CreateProductMediaDto, MediaType } from '../../types/product-media.types';
+import { VISNDT_COLORS } from '../../components/design-system/tokens';
 import type { UploadFile } from 'antd/es/upload/interface';
 
 const { Title } = Typography;
@@ -118,7 +119,7 @@ function ProductMediaCreate() {
               </p>
               {selectedFileName.current ? (
                 <>
-                  <p className="ant-upload-text" style={{ color: '#52c41a' }}>
+                  <p className="ant-upload-text" style={{ color: VISNDT_COLORS.success }}>
                     ✅ {selectedFileName.current}
                   </p>
                   <p className="ant-upload-hint">

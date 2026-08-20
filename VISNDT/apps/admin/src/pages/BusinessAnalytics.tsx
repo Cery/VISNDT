@@ -20,12 +20,13 @@ import { businessAnalyticsService } from '../api';
 import type {
   BusinessFunnel, BusinessLifecycle, BusinessConversion, BusinessMatching,
 } from '../types';
+import { VISNDT_COLORS, CHART_PALETTE } from '../components/design-system/tokens';
 
 const { Title, Text } = Typography;
 
-const PIE_COLORS = ['#2563eb', '#52c41a', '#faad14', '#ff4d4f', '#722ed1', '#13c2c2', '#eb2f96'];
-const FUNNEL_COLORS = ['#2563eb', '#52c41a', '#faad14', '#ff4d4f', '#722ed1', '#13c2c2'];
-const MATCH_COLORS = ['#2563eb', '#52c41a', '#faad14', '#ff4d4f', '#722ed1', '#eb2f96'];
+const PIE_COLORS = CHART_PALETTE.slice(0, 8);
+const FUNNEL_COLORS = CHART_PALETTE.slice(0, 6);
+const MATCH_COLORS = CHART_PALETTE.slice(0, 6);
 
 type PageState =
   | { status: 'loading' }
@@ -95,8 +96,8 @@ function BusinessAnalytics() {
   const demandFunnelData = funnel.demandFunnel.filter((d) => d.count > 0);
   const pipelineData = [
     { name: '询价', value: funnel.pipeline.totalInquiries, fill: '#2563eb' },
-    { name: '需求', value: funnel.pipeline.totalDemands, fill: '#52c41a' },
-    { name: 'RFQ', value: funnel.pipeline.totalRfqs, fill: '#faad14' },
+    { name: '需求', value: funnel.pipeline.totalDemands, fill: VISNDT_COLORS.success },
+    { name: 'RFQ', value: funnel.pipeline.totalRfqs, fill: VISNDT_COLORS.warning },
     { name: '报价', value: funnel.pipeline.totalOffers, fill: '#722ed1' },
     { name: '匹配', value: funnel.pipeline.totalMatches, fill: '#13c2c2' },
   ];
@@ -116,9 +117,9 @@ function BusinessAnalytics() {
   // Full pipeline stages for conversion
   const conversionPipelineData = [
     { name: '询价', value: conversion.pipeline.inquiries, fill: '#2563eb' },
-    { name: '需求', value: conversion.pipeline.demands, fill: '#52c41a' },
-    { name: 'RFQ', value: conversion.pipeline.rfqs, fill: '#faad14' },
-    { name: '活跃RFQ', value: conversion.pipeline.activeRfqs, fill: '#ff4d4f' },
+    { name: '需求', value: conversion.pipeline.demands, fill: VISNDT_COLORS.success },
+    { name: 'RFQ', value: conversion.pipeline.rfqs, fill: VISNDT_COLORS.warning },
+    { name: '活跃RFQ', value: conversion.pipeline.activeRfqs, fill: VISNDT_COLORS.error },
     { name: '响应', value: conversion.pipeline.responses, fill: '#722ed1' },
     { name: '报价', value: conversion.pipeline.offers, fill: '#13c2c2' },
     { name: '已接受报价', value: conversion.pipeline.acceptedOffers, fill: '#eb2f96' },
@@ -156,7 +157,7 @@ function BusinessAnalytics() {
                   title="需求"
                   value={funnel.pipeline.totalDemands}
                   prefix={<BarChartOutlined />}
-                  valueStyle={{ color: '#52c41a' }}
+                  valueStyle={{ color: VISNDT_COLORS.success }}
                 />
               </Card>
             </Col>
@@ -166,7 +167,7 @@ function BusinessAnalytics() {
                   title="RFQ"
                   value={funnel.pipeline.totalRfqs}
                   prefix={<SwapOutlined />}
-                  valueStyle={{ color: '#faad14' }}
+                  valueStyle={{ color: VISNDT_COLORS.warning }}
                 />
               </Card>
             </Col>
@@ -219,7 +220,7 @@ function BusinessAnalytics() {
                 <Progress
                   percent={funnel.conversionRates.demandToRfq}
                   showInfo={false}
-                  strokeColor="#52c41a"
+                  strokeColor="VISNDT_COLORS.success"
                   size="small"
                 />
               </Card>
@@ -234,7 +235,7 @@ function BusinessAnalytics() {
                 <Progress
                   percent={funnel.conversionRates.rfqToOffer}
                   showInfo={false}
-                  strokeColor="#faad14"
+                  strokeColor="VISNDT_COLORS.warning"
                   size="small"
                 />
               </Card>
@@ -320,7 +321,7 @@ function BusinessAnalytics() {
                   title="完成率"
                   value={lifecycle.metrics.rfqCompletionRate}
                   suffix="%"
-                  valueStyle={{ color: lifecycle.metrics.rfqCompletionRate >= 50 ? '#52c41a' : '#faad14' }}
+                  valueStyle={{ color: lifecycle.metrics.rfqCompletionRate >= 50 ? VISNDT_COLORS.success : VISNDT_COLORS.warning }}
                 />
                 <Progress
                   percent={lifecycle.metrics.rfqCompletionRate}
@@ -335,12 +336,12 @@ function BusinessAnalytics() {
                   title="响应接受率"
                   value={lifecycle.metrics.responseAcceptRate}
                   suffix="%"
-                  valueStyle={{ color: lifecycle.metrics.responseAcceptRate >= 50 ? '#52c41a' : '#faad14' }}
+                  valueStyle={{ color: lifecycle.metrics.responseAcceptRate >= 50 ? VISNDT_COLORS.success : VISNDT_COLORS.warning }}
                 />
                 <Progress
                   percent={lifecycle.metrics.responseAcceptRate}
                   showInfo={false}
-                  strokeColor={lifecycle.metrics.responseAcceptRate >= 50 ? '#52c41a' : '#faad14'}
+                  strokeColor={lifecycle.metrics.responseAcceptRate >= 50 ? VISNDT_COLORS.success : VISNDT_COLORS.warning}
                   size="small"
                 />
               </Card>
@@ -399,7 +400,7 @@ function BusinessAnalytics() {
                         {responseDistData.map((_, index) => (
                           <Cell
                             key={`cell-${index}`}
-                            fill={['#2563eb', '#faad14', '#52c41a', '#ff4d4f'][index] || '#ccc'}
+                            fill={[VISNDT_COLORS.primary, VISNDT_COLORS.warning, VISNDT_COLORS.success, VISNDT_COLORS.error][index] || '#ccc'}
                           />
                         ))}
                       </Bar>
@@ -438,9 +439,9 @@ function BusinessAnalytics() {
                   title="需求→RFQ"
                   value={conversion.conversionRates.demandToRfq}
                   suffix="%"
-                  valueStyle={{ color: '#52c41a' }}
+                  valueStyle={{ color: VISNDT_COLORS.success }}
                 />
-                <Progress percent={conversion.conversionRates.demandToRfq} showInfo={false} strokeColor="#52c41a" size="small" />
+                <Progress percent={conversion.conversionRates.demandToRfq} showInfo={false} strokeColor="VISNDT_COLORS.success" size="small" />
               </Card>
             </Col>
             <Col xs={12} sm={6} lg={4}>
@@ -449,9 +450,9 @@ function BusinessAnalytics() {
                   title="RFQ→响应"
                   value={conversion.conversionRates.rfqToResponse}
                   suffix="%"
-                  valueStyle={{ color: '#faad14' }}
+                  valueStyle={{ color: VISNDT_COLORS.warning }}
                 />
-                <Progress percent={conversion.conversionRates.rfqToResponse} showInfo={false} strokeColor="#faad14" size="small" />
+                <Progress percent={conversion.conversionRates.rfqToResponse} showInfo={false} strokeColor="VISNDT_COLORS.warning" size="small" />
               </Card>
             </Col>
             <Col xs={12} sm={6} lg={4}>
@@ -518,7 +519,7 @@ function BusinessAnalytics() {
                       <YAxis />
                       <Tooltip />
                       <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                        <Cell fill="#52c41a" />
+                        <Cell fill="VISNDT_COLORS.success" />
                         <Cell fill="#2563eb" />
                       </Bar>
                     </BarChart>
@@ -584,12 +585,12 @@ function BusinessAnalytics() {
                   value={matching.metrics.averageScore}
                   suffix="%"
                   prefix={<RiseOutlined />}
-                  valueStyle={{ color: matching.metrics.averageScore >= 50 ? '#52c41a' : '#faad14' }}
+                  valueStyle={{ color: matching.metrics.averageScore >= 50 ? VISNDT_COLORS.success : VISNDT_COLORS.warning }}
                 />
                 <Progress
                   percent={matching.metrics.averageScore}
                   showInfo={false}
-                  strokeColor={matching.metrics.averageScore >= 50 ? '#52c41a' : '#faad14'}
+                  strokeColor={matching.metrics.averageScore >= 50 ? VISNDT_COLORS.success : VISNDT_COLORS.warning}
                   size="small"
                 />
               </Card>
@@ -601,12 +602,12 @@ function BusinessAnalytics() {
                   value={matching.metrics.acceptRate}
                   suffix="%"
                   prefix={<CheckCircleOutlined />}
-                  valueStyle={{ color: '#52c41a' }}
+                  valueStyle={{ color: VISNDT_COLORS.success }}
                 />
                 <Progress
                   percent={matching.metrics.acceptRate}
                   showInfo={false}
-                  strokeColor="#52c41a"
+                  strokeColor="VISNDT_COLORS.success"
                   size="small"
                 />
               </Card>
@@ -618,12 +619,12 @@ function BusinessAnalytics() {
                   value={matching.metrics.rejectRate}
                   suffix="%"
                   prefix={<CloseCircleOutlined />}
-                  valueStyle={{ color: matching.metrics.rejectRate > 20 ? '#ff4d4f' : '#999' }}
+                  valueStyle={{ color: matching.metrics.rejectRate > 20 ? VISNDT_COLORS.error : '#999' }}
                 />
                 <Progress
                   percent={matching.metrics.rejectRate}
                   showInfo={false}
-                  strokeColor={matching.metrics.rejectRate > 20 ? '#ff4d4f' : '#52c41a'}
+                  strokeColor={matching.metrics.rejectRate > 20 ? VISNDT_COLORS.error : VISNDT_COLORS.success}
                   size="small"
                 />
               </Card>
@@ -670,9 +671,9 @@ function BusinessAnalytics() {
                       <YAxis />
                       <Tooltip />
                       <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                        <Cell fill="#52c41a" />
-                        <Cell fill="#faad14" />
-                        <Cell fill="#ff4d4f" />
+                        <Cell fill="VISNDT_COLORS.success" />
+                        <Cell fill="VISNDT_COLORS.warning" />
+                        <Cell fill="VISNDT_COLORS.error" />
                       </Bar>
                     </BarChart>
                   </ResponsiveContainer>

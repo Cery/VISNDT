@@ -1,13 +1,15 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Select, Space, Spin, Alert, Button, Tag, Typography, message, Input } from 'antd';
+import { Table, Select, Space, Spin, Alert, Button, Typography, message, Input } from 'antd';
 import { ReloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { notificationService } from '../api';
 import type { Notification, NotificationQueryParams } from '../types';
 import { BatchActionBar } from '../components/operation';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { StatusTag } from '../components/design-system';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -35,18 +37,6 @@ const TYPE_OPTIONS = [
   { value: 'RFQ_UPDATE', label: '询价更新' },
   { value: 'RESPONSE_UPDATE', label: '响应更新' },
 ];
-
-const TYPE_COLOR_MAP: Record<string, string> = {
-  SYSTEM: 'blue',
-  DEMAND_UPDATE: 'cyan',
-  RFQ_UPDATE: 'geekblue',
-  RESPONSE_UPDATE: 'purple',
-};
-
-const STATUS_COLOR_MAP: Record<string, string> = {
-  UNREAD: 'blue',
-  READ: 'default',
-};
 
 const STATUS_LABEL_MAP: Record<string, string> = {
   UNREAD: '未读',
@@ -206,7 +196,7 @@ function NotificationList() {
       key: 'type',
       width: 150,
       render: (type: string) => (
-        <Tag color={TYPE_COLOR_MAP[type] || 'default'}>{type}</Tag>
+        <StatusTag status={type} />
       ),
     },
     {
@@ -215,7 +205,7 @@ function NotificationList() {
       key: 'status',
       width: 100,
       render: (status: string) => (
-        <Tag color={STATUS_COLOR_MAP[status] || 'default'}>{STATUS_LABEL_MAP[status] || status}</Tag>
+        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || status} />
       ),
     },
     {
@@ -250,9 +240,15 @@ function NotificationList() {
 
   return (
     <div>
-      <Title level={4} style={{ marginBottom: 16 }}>
-        通知中心
-      </Title>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>Notification Operations</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          Manage platform notifications, delivery status and templates
+        </Text>
+      </div>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search

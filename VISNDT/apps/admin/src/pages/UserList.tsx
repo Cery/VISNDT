@@ -1,14 +1,16 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Space, Spin, Alert, Button, Tag, Typography, message, Modal } from 'antd';
+import { Table, Space, Spin, Alert, Button, Typography, message, Modal } from 'antd';
 import { EyeOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { userService } from '../api';
 import type { User, SearchUserParams } from '../types';
 import { ExportButton, BatchActionBar, AdvancedFilterPanel } from '../components/operation';
 import type { ExportColumn } from '../utils/export';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { StatusTag } from '../components/design-system';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -34,12 +36,6 @@ const BATCH_STATUS_OPTIONS = [
   { label: '停用', value: 'INACTIVE' },
   { label: '冻结', value: 'SUSPENDED' },
 ];
-
-const STATUS_COLOR_MAP: Record<string, string> = {
-  ACTIVE: 'green',
-  INACTIVE: 'orange',
-  SUSPENDED: 'red',
-};
 
 const STATUS_LABEL_MAP: Record<string, string> = {
   ACTIVE: '活跃',
@@ -217,7 +213,7 @@ function UserList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <Tag color={STATUS_COLOR_MAP[status] || 'default'}>{STATUS_LABEL_MAP[status] || status}</Tag>
+        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || status} />
       ),
     },
     {
@@ -261,12 +257,15 @@ function UserList() {
 
   return (
     <div>
-      <Title level={4} style={{ marginBottom: 4 }}>
-        用户管理
-      </Title>
-      <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16, fontSize: 13 }}>
-        管理平台用户账户，用户可关联组织并分配角色
-      </Typography.Text>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>User & Identity Operations</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          Manage platform users, roles and account status
+        </Text>
+      </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
         <Button

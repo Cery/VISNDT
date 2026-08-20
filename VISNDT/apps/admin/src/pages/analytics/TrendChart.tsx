@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import type { DashboardResponse } from '../../types/analytics.types';
+import { VISNDT_COLORS } from '../../components/design-system/tokens';
 
 interface Props {
   data: DashboardResponse['trend'];
@@ -17,7 +18,7 @@ interface Props {
 
 const COLORS: Record<string, string> = {
   pageViews: '#2563eb',
-  productViews: '#52c41a',
+  productViews: VISNDT_COLORS.success,
   contentViews: '#fa8c16',
   searches: '#722ed1',
   inquiries: '#eb2f96',

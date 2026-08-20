@@ -1,29 +1,21 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Table, Spin, Alert, Button, Tag, Typography, Select, Input, Space, message, Modal } from 'antd';
+import { Table, Spin, Alert, Button, Typography, Select, Input, Space, message, Modal } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import { offerService } from '../api';
 import type { Offer } from '../types';
 import { BatchActionBar } from '../components/operation';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { StatusTag } from '../components/design-system';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
   | { status: 'empty' }
   | { status: 'success'; data: Offer[]; total: number };
-
-const STATUS_COLOR: Record<string, string> = {
-  DRAFT: 'default',
-  SUBMITTED: 'processing',
-  ACCEPTED: 'success',
-  REJECTED: 'error',
-  WITHDRAWN: 'warning',
-  ACTIVE: 'blue',
-  INACTIVE: 'default',
-};
 
 const STATUS_LABEL_MAP: Record<string, string> = {
   DRAFT: '草稿',
@@ -197,9 +189,15 @@ function OfferList() {
   if (pageState.status === 'empty') {
     return (
       <div>
-        <Title level={4} style={{ marginBottom: 16 }}>
-          报价管理
-        </Title>
+        <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>Offer Operations</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          Manage supplier capability offerings and status
+        </Text>
+      </div>
         <Space style={{ marginBottom: 16 }} wrap>
           <Input.Search
             placeholder="搜索产品/描述..."
@@ -273,7 +271,7 @@ function OfferList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <Tag color={STATUS_COLOR[status] || 'default'}>{STATUS_LABEL_MAP[status] || status}</Tag>
+        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || status} />
       ),
     },
     {
@@ -309,12 +307,15 @@ function OfferList() {
 
   return (
     <div>
-      <Title level={4} style={{ marginBottom: 4 }}>
-        报价管理
-      </Title>
-      <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16, fontSize: 13 }}>
-        管理供应商提交的报价，报价关联具体产品和供应商组织
-      </Typography.Text>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>Offer Operations</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          Manage supplier capability offerings and status
+        </Text>
+      </div>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search

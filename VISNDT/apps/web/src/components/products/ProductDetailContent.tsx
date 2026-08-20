@@ -12,6 +12,10 @@ import RelatedKnowledge from './RelatedKnowledge';
 import RelatedProductsSection from './RelatedProductsSection';
 import EmptyState from '@/components/common/EmptyState';
 import { translateCategoryName } from '@/lib/translate';
+import CapabilitySection from '@/components/capability/CapabilitySection';
+import ApplicationScenario from '@/components/capability/ApplicationScenario';
+import CapabilitySummary from '@/components/capability/CapabilitySummary';
+import CapabilityBadge from '@/components/capability/CapabilityBadge';
 
 interface ProductDetailContentProps {
   product: ProductDetail;
@@ -90,9 +94,11 @@ export default function ProductDetailContent({
                       </p>
                     )}
                     {product.category && (
-                      <span className="inline-block mt-3 text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full font-medium">
-                        {translateCategoryName(product.category.name)}
-                      </span>
+                      <CapabilityBadge
+                        label={translateCategoryName(product.category.name)}
+                        tone="cyan"
+                        className="mt-3"
+                      />
                     )}
                     {product.updatedAt && (
                       <p className="text-xs text-slate-400 mt-2">
@@ -127,6 +133,19 @@ export default function ProductDetailContent({
                   />
                 </div>
               </div>
+
+              {/* Capability Profile — deterministic capability interpretation */}
+              <CapabilitySection
+                eyebrow="Capability Profile"
+                title="能力档案"
+                subtitle="基于检测分类与核心技术参数的确定性能力解读"
+                className="mt-8"
+              >
+                <div className="space-y-4">
+                  <ApplicationScenario categoryName={product.category?.name} />
+                  <CapabilitySummary parameters={product.parameterValues} />
+                </div>
+              </CapabilitySection>
             </section>
           )}
 

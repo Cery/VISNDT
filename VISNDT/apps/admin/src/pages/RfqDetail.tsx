@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card,
   Descriptions,
-  Tag,
   Spin,
   Alert,
   Button,
@@ -18,8 +17,10 @@ import {
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { rfqService, rfqResponseService } from '../api';
 import type { Rfq, RfqResponse } from '../types';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { StatusTag } from '../components/design-system';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -31,27 +32,12 @@ type ResponseState =
   | { status: 'error'; message: string }
   | { status: 'success'; data: RfqResponse[] };
 
-const STATUS_COLOR: Record<string, string> = {
-  DRAFT: 'orange',
-  OPEN: 'blue',
-  RESPONDING: 'cyan',
-  CLOSED: 'default',
-  CANCELLED: 'red',
-};
-
 const RFQ_STATUS_LABEL_MAP: Record<string, string> = {
   DRAFT: '草稿',
   OPEN: '开放',
   RESPONDING: '响应中',
   CLOSED: '已关闭',
   CANCELLED: '已取消',
-};
-
-const RESPONSE_STATUS_COLOR: Record<string, string> = {
-  SUBMITTED: 'blue',
-  VIEWED: 'cyan',
-  ACCEPTED: 'green',
-  REJECTED: 'red',
 };
 
 const RFQ_TRANSITIONS: Record<string, string[]> = {
@@ -205,7 +191,7 @@ export default function RfqDetailPage() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <Tag color={RESPONSE_STATUS_COLOR[status] || 'default'}>{status}</Tag>
+        <StatusTag status={status} />
       ),
     },
     {
@@ -244,13 +230,21 @@ export default function RfqDetailPage() {
         </Button>
       </Space>
 
-      <Title level={3}>RFQ详情</Title>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>RFQ Analysis</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          View RFQ details, responses and matching results
+        </Text>
+      </div>
 
       <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
           <Descriptions.Item label="ID">{rfq.id}</Descriptions.Item>
           <Descriptions.Item label="状态">
-            <Tag color={STATUS_COLOR[rfq.status] || 'default'}>{RFQ_STATUS_LABEL_MAP[rfq.status] || rfq.status}</Tag>
+            <StatusTag status={rfq.status} label={RFQ_STATUS_LABEL_MAP[rfq.status] || rfq.status} />
           </Descriptions.Item>
           <Descriptions.Item label="需求">
             {rfq.demand?.title || '-'}

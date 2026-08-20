@@ -7,6 +7,7 @@ import { contentService } from '../../api';
 import type { Content, ContentType, ContentStatus } from '../../types';
 import { ExportButton, AdvancedFilterPanel } from '../../components/operation';
 import type { ExportColumn } from '../../utils/export';
+import { VISNDT_COLORS } from '../../components/design-system/tokens';
 
 const { Title } = Typography;
 
@@ -319,7 +320,7 @@ function ContentList() {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-        <div style={{ width: 4, height: 20, borderRadius: 2, background: '#52c41a' }} />
+        <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.success }} />
         <Title level={4} style={{ margin: 0 }}>
           内容管理
         </Title>
@@ -338,12 +339,12 @@ function ContentList() {
           </Col>
           <Col xs={12} sm={6} md={4}>
             <Card size="small">
-              <Statistic title="已发布" value={governanceStats.published} valueStyle={{ color: '#52c41a' }} prefix={<CheckCircleOutlined />} />
+              <Statistic title="已发布" value={governanceStats.published} valueStyle={{ color: VISNDT_COLORS.success }} prefix={<CheckCircleOutlined />} />
             </Card>
           </Col>
           <Col xs={12} sm={6} md={4}>
             <Card size="small">
-              <Statistic title="草稿" value={governanceStats.draft} valueStyle={{ color: '#faad14' }} prefix={<EditOutlined />} />
+              <Statistic title="草稿" value={governanceStats.draft} valueStyle={{ color: VISNDT_COLORS.warning }} prefix={<EditOutlined />} />
             </Card>
           </Col>
           <Col xs={12} sm={6} md={4}>
@@ -353,7 +354,7 @@ function ContentList() {
           </Col>
           <Col xs={12} sm={6} md={4}>
             <Card size="small">
-              <Statistic title="已归档" value={governanceStats.archived} valueStyle={{ color: '#ff4d4f' }} prefix={<StopOutlined />} />
+              <Statistic title="已归档" value={governanceStats.archived} valueStyle={{ color: VISNDT_COLORS.error }} prefix={<StopOutlined />} />
             </Card>
           </Col>
         </Row>

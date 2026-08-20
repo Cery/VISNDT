@@ -18,6 +18,7 @@ import { ExclamationCircleOutlined, ReloadOutlined, SearchOutlined } from '@ant-
 import { fileAssetService } from '../api';
 import type { FileAsset } from '../types';
 import { getFileTypeIcon, formatFileSize } from '../utils/file-utils';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { BatchActionBar } from '../components/operation';
 
 const { Title } = Typography;
@@ -98,7 +99,7 @@ function FileAssetOrphanList() {
           <p>
             您即将删除 <strong>{ids.length}</strong> 个孤立文件。
           </p>
-          <p style={{ color: '#ff4d4f' }}>
+          <p style={{ color: VISNDT_COLORS.error }}>
             此操作将永久从数据库和存储中删除文件，且不可撤销。
           </p>
         </div>

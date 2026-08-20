@@ -16,19 +16,15 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { organizationService } from '../api';
 import type { Organization, OrganizationMember } from '../types';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { StatusTag } from '../components/design-system';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
   | { status: 'success'; data: Organization };
-
-const STATUS_COLOR: Record<string, string> = {
-  ACTIVE: 'green',
-  INACTIVE: 'orange',
-  SUSPENDED: 'red',
-};
 
 const ROLE_LABEL_MAP: Record<string, string> = {
   ADMIN: '管理员',
@@ -141,7 +137,15 @@ export default function OrganizationDetailPage() {
         </Button>
       </Space>
 
-      <Title level={3}>组织详情</Title>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>Organization Profile</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          View organization details, members and activity
+        </Text>
+      </div>
 
       <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
@@ -149,9 +153,7 @@ export default function OrganizationDetailPage() {
           <Descriptions.Item label="名称">{org.name}</Descriptions.Item>
           <Descriptions.Item label="类型">{org.type || '-'}</Descriptions.Item>
           <Descriptions.Item label="状态">
-            <Tag color={STATUS_COLOR[org.status] || 'default'}>
-              {STATUS_LABEL_MAP[org.status] || org.status}
-            </Tag>
+            <StatusTag status={org.status} label={STATUS_LABEL_MAP[org.status] || org.status} />
           </Descriptions.Item>
         </Descriptions>
       </Card>

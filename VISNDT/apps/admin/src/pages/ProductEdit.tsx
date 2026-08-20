@@ -1,10 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Spin, Alert, Button, Space } from 'antd';
+import { Spin, Alert, Button, Space, Typography } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { productService } from '../api';
 import type { ProductDetail, ProductFormData } from '../types';
 import { ProductForm } from '../components/product';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+
+const { Title, Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -80,12 +83,23 @@ export default function ProductEdit() {
   };
 
   return (
-    <ProductForm
-      initialValues={initialValues}
-      onSubmit={handleSubmit}
-      submitLabel="更新产品"
-      title="编辑产品"
-      productId={id}
-    />
+    <div>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>Edit Capability</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          Update product capability information and parameters
+        </Text>
+      </div>
+      <ProductForm
+        initialValues={initialValues}
+        onSubmit={handleSubmit}
+        submitLabel="更新产品"
+        title="编辑产品"
+        productId={id}
+      />
+    </div>
   );
 }

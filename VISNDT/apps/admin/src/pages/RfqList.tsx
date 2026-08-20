@@ -1,13 +1,15 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Table, Select, Space, Spin, Alert, Button, Tag, Typography, Input, message, Modal } from 'antd';
+import { Table, Select, Space, Spin, Alert, Button, Typography, Input, message, Modal } from 'antd';
 import { ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import { rfqService } from '../api';
 import type { Rfq } from '../types';
 import { BatchActionBar } from '../components/operation';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { StatusTag } from '../components/design-system';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -29,14 +31,6 @@ const BATCH_STATUS_OPTIONS = [
   { label: '开放', value: 'OPEN' },
   { label: '已关闭', value: 'CLOSED' },
 ];
-
-const STATUS_COLOR_MAP: Record<string, string> = {
-  DRAFT: 'orange',
-  OPEN: 'blue',
-  RESPONDING: 'cyan',
-  CLOSED: 'default',
-  CANCELLED: 'red',
-};
 
 const RFQ_STATUS_LABEL_MAP: Record<string, string> = {
   DRAFT: '草稿',
@@ -208,7 +202,7 @@ function RfqList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <Tag color={STATUS_COLOR_MAP[status] || 'default'}>{RFQ_STATUS_LABEL_MAP[status] || status}</Tag>
+        <StatusTag status={status} label={RFQ_STATUS_LABEL_MAP[status] || status} />
       ),
     },
     {
@@ -270,12 +264,15 @@ function RfqList() {
 
   return (
     <div>
-      <Title level={4} style={{ marginBottom: 4 }}>
-        RFQ管理
-      </Title>
-      <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16, fontSize: 13 }}>
-        管理报价请求（Request for Quotation），RFQ基于需求生成，用于向供应商征求报价
-      </Typography.Text>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>RFQ Operations</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          Manage RFQ lifecycle, status and supplier responses
+        </Text>
+      </div>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search

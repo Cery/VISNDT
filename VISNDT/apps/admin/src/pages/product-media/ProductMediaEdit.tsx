@@ -27,6 +27,7 @@ import { fileAssetService } from '../../api/file-asset.service';
 import type { UpdateProductMediaDto, MediaType } from '../../types/product-media.types';
 import type { FileAsset } from '../../types/file-asset.types';
 import { getFileTypeIcon, formatFileSize } from '../../utils/file-utils';
+import { VISNDT_COLORS } from '../../components/design-system/tokens';
 
 const { Title, Text } = Typography;
 const { Dragger } = Upload;
@@ -281,7 +282,7 @@ function ProductMediaEdit() {
           </p>
           {uploadedFileName ? (
             <>
-              <p className="ant-upload-text" style={{ color: '#52c41a' }}>
+              <p className="ant-upload-text" style={{ color: VISNDT_COLORS.success }}>
                 ✅ {uploadedFileName}
               </p>
               <p className="ant-upload-hint">

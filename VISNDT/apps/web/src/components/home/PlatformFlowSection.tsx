@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import SectionHeader from '@/components/brand/SectionHeader';
 
 const FLOW_STEPS = [
   {
@@ -51,17 +52,12 @@ export default function PlatformFlowSection() {
   return (
     <section className="py-20 bg-industrial-slate">
       <div className="max-w-[1200px] mx-auto px-6">
-        <div className="text-center mb-14">
-          <p className="text-sm font-semibold text-primary tracking-widest uppercase mb-3">
-            平台流程
-          </p>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-4">
-            从产品到报价，一站式完成
-          </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto text-base">
-            VISNDT 平台遵循 Product → Solution → Demand → RFQ 的业务闭环，帮助您高效完成工业检测设备采购。
-          </p>
-        </div>
+        <SectionHeader
+          eyebrow="平台流程"
+          title="从产品到报价，一站式完成"
+          subtitle="VISNDT 平台遵循 Product → Solution → Demand → RFQ 的业务闭环，帮助您高效完成工业检测设备采购。"
+          className="mb-14"
+        />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {FLOW_STEPS.map((step, idx) => (

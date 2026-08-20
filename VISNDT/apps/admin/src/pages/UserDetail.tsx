@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card,
   Descriptions,
-  Tag,
   Spin,
   Alert,
   Button,
@@ -13,19 +12,15 @@ import {
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { userService } from '../api';
 import type { User } from '../types';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { StatusTag } from '../components/design-system';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
   | { status: 'success'; data: User };
-
-const STATUS_COLOR: Record<string, string> = {
-  ACTIVE: 'green',
-  INACTIVE: 'orange',
-  SUSPENDED: 'red',
-};
 
 const STATUS_LABEL_MAP: Record<string, string> = {
   ACTIVE: '活跃',
@@ -94,7 +89,15 @@ export default function UserDetailPage() {
         </Button>
       </Space>
 
-      <Title level={3}>用户详情</Title>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>User Profile</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          View user details, roles and activity
+        </Text>
+      </div>
 
       <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
@@ -102,9 +105,7 @@ export default function UserDetailPage() {
           <Descriptions.Item label="邮箱">{user.email}</Descriptions.Item>
           <Descriptions.Item label="姓名">{user.name || '-'}</Descriptions.Item>
           <Descriptions.Item label="状态">
-            <Tag color={STATUS_COLOR[user.status] || 'default'}>
-              {STATUS_LABEL_MAP[user.status] || user.status}
-            </Tag>
+            <StatusTag status={user.status} label={STATUS_LABEL_MAP[user.status] || user.status} />
           </Descriptions.Item>
         </Descriptions>
       </Card>

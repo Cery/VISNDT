@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import SectionHeader from '@/components/brand/SectionHeader';
 
 /**
  * Knowledge Center entry — surfaces the industrial inspection knowledge
@@ -66,17 +67,12 @@ export default function KnowledgeCenterSection() {
   return (
     <section className="py-20 bg-white">
       <div className="max-w-[1200px] mx-auto px-6">
-        <div className="text-center mb-12 animate-slide-up">
-          <p className="text-sm font-semibold text-primary tracking-widest uppercase mb-3">
-            知识中心
-          </p>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-4">
-            工业检测知识体系
-          </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto text-base">
-            结构化的检测知识，帮助需求方理解检测能力边界，辅助能力提供商规范展示。
-          </p>
-        </div>
+        <SectionHeader
+          eyebrow="知识中心"
+          title="工业检测知识体系"
+          subtitle="结构化的检测知识，帮助需求方理解检测能力边界，辅助能力提供商规范展示。"
+          className="mb-12 animate-slide-up"
+        />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {KNOWLEDGE_DOMAINS.map((d) => (

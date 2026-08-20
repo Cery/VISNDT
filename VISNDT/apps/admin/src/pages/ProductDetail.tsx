@@ -36,6 +36,8 @@ import {
 } from '@ant-design/icons';
 import { productService } from '../api';
 import type { ProductDetail, ProductParameterValue } from '../types';
+import { VISNDT_COLORS, resolveStatusTone, TONE_TO_HEX } from '../components/design-system/tokens';
+import { StatusTag } from '../components/design-system';
 
 const { Title, Text } = Typography;
 
@@ -77,12 +79,6 @@ type PageState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
   | { status: 'success'; data: ProductDetail };
-
-const STATUS_COLOR: Record<string, string> = {
-  ACTIVE: 'green',
-  DRAFT: 'orange',
-  INACTIVE: 'red',
-};
 
 const STATUS_LABEL_MAP: Record<string, string> = {
   ACTIVE: '已上架',
@@ -192,30 +188,34 @@ export default function ProductDetailPage() {
         <Breadcrumb.Item>{product.name}</Breadcrumb.Item>
       </Breadcrumb>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
-          <div style={{ width: 4, height: 24, borderRadius: 2, background: '#2563eb', flexShrink: 0 }} />
-          <Title level={3} style={{ margin: 0 }}>{product.name}</Title>
-          <Tag color={STATUS_COLOR[product.status] || 'default'}>{STATUS_LABEL_MAP[product.status] || product.status}</Tag>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>Product Capability Profile</Title>
+          <StatusTag status={product.status} label={STATUS_LABEL_MAP[product.status] || product.status} />
         </div>
-        <Space>
-          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/products')}>
-            返回列表
-          </Button>
-          <Button
-            icon={<EditOutlined />}
-            type="primary"
-            onClick={() => navigate(`/products/${id}/edit`)}
-          >
-            编辑产品
-          </Button>
-          <Button
-            icon={<PictureOutlined />}
-            onClick={() => navigate(`/products/${id}/media`)}
-          >
-            管理媒体
-          </Button>
-        </Space>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          View capability details, parameters and media
+        </Text>
+      </div>
+
+      <div style={{ marginBottom: 16, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/products')}>
+          返回列表
+        </Button>
+        <Button
+          icon={<EditOutlined />}
+          type="primary"
+          onClick={() => navigate(`/products/${id}/edit`)}
+        >
+          编辑产品
+        </Button>
+        <Button
+          icon={<PictureOutlined />}
+          onClick={() => navigate(`/products/${id}/media`)}
+        >
+          管理媒体
+        </Button>
       </div>
 
       {/* Governance Stats */}
@@ -238,7 +238,7 @@ export default function ProductDetailPage() {
         <Col xs={12} sm={6}>
           <Card size="small">
             <Tooltip title="产品治理状态">
-              <Statistic title="治理状态" value={STATUS_LABEL_MAP[product.status] || product.status} prefix={<AppstoreOutlined />} valueStyle={{ color: STATUS_COLOR[product.status] === 'green' ? '#52c41a' : STATUS_COLOR[product.status] === 'orange' ? '#faad14' : '#ff4d4f' }} />
+              <Statistic title="治理状态" value={STATUS_LABEL_MAP[product.status] || product.status} prefix={<AppstoreOutlined />} valueStyle={{ color: TONE_TO_HEX[resolveStatusTone(product.status)] }} />
             </Tooltip>
           </Card>
         </Col>
@@ -252,7 +252,7 @@ export default function ProductDetailPage() {
             {product.category?.name || '-'}
           </Descriptions.Item>
           <Descriptions.Item label="状态">
-            <Tag color={STATUS_COLOR[product.status] || 'default'}>{STATUS_LABEL_MAP[product.status] || product.status}</Tag>
+            <StatusTag status={product.status} label={STATUS_LABEL_MAP[product.status] || product.status} />
           </Descriptions.Item>
           <Descriptions.Item label="创建时间">
             {new Date(product.createdAt).toLocaleString()}

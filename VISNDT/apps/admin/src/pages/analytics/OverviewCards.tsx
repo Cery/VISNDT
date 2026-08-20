@@ -7,6 +7,7 @@ import {
   MailOutlined,
 } from '@ant-design/icons';
 import type { DashboardResponse } from '../../types/analytics.types';
+import { VISNDT_COLORS } from '../../components/design-system/tokens';
 
 interface Props {
   data: DashboardResponse['summary'];
@@ -24,7 +25,7 @@ export default function OverviewCards({ data }: Props) {
       title: '产品浏览量',
       value: data.totalProductViews,
       icon: <ShoppingOutlined />,
-      color: '#52c41a',
+      color: VISNDT_COLORS.success,
     },
     {
       title: '内容浏览量',

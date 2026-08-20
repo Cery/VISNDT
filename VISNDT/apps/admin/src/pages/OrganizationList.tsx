@@ -1,14 +1,16 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Space, Spin, Alert, Button, Tag, Typography, message, Modal } from 'antd';
+import { Table, Space, Spin, Alert, Button, Typography, message, Modal } from 'antd';
 import { EyeOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { organizationService } from '../api';
 import type { Organization, SearchOrganizationParams } from '../types';
 import { ExportButton, BatchActionBar, AdvancedFilterPanel } from '../components/operation';
 import type { ExportColumn } from '../utils/export';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { StatusTag } from '../components/design-system';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -34,12 +36,6 @@ const BATCH_STATUS_OPTIONS = [
   { label: '停用', value: 'INACTIVE' },
   { label: '冻结', value: 'SUSPENDED' },
 ];
-
-const STATUS_COLOR_MAP: Record<string, string> = {
-  ACTIVE: 'green',
-  INACTIVE: 'orange',
-  SUSPENDED: 'red',
-};
 
 const STATUS_LABEL_MAP: Record<string, string> = {
   ACTIVE: '活跃',
@@ -215,7 +211,7 @@ function OrganizationList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <Tag color={STATUS_COLOR_MAP[status] || 'default'}>{STATUS_LABEL_MAP[status] || status}</Tag>
+        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || status} />
       ),
     },
     {
@@ -265,14 +261,15 @@ function OrganizationList() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
         <div>
-          <Title level={4} style={{ margin: 0 }}>
-            组织管理
-          </Title>
-          <Typography.Text type="secondary" style={{ fontSize: 13 }}>
-            管理平台组织（采购方/供应商），组织包含多个成员用户
-          </Typography.Text>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+            <Title level={4} style={{ margin: 0 }}>Organization & Identity Operations</Title>
+          </div>
+          <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+            Manage platform organizations, status and members
+          </Text>
         </div>
         <Button
           type="primary"

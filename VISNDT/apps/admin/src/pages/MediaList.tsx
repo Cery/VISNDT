@@ -5,6 +5,7 @@ import {
   FileTextOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -19,14 +20,14 @@ const MEDIA_ENTRIES = [
   {
     title: '内容媒体',
     description: '文章、知识、解决方案等内容中嵌入的图片和附件',
-    icon: <FileTextOutlined style={{ fontSize: 32, color: '#52c41a' }} />,
+    icon: <FileTextOutlined style={{ fontSize: 32, color: VISNDT_COLORS.success }} />,
     path: '/content',
     hint: '进入内容管理 → 编辑内容 → 上传媒体',
   },
   {
     title: '孤立文件清理',
     description: '查看和清理没有关联到任何产品/内容的孤立文件，释放存储空间',
-    icon: <WarningOutlined style={{ fontSize: 32, color: '#faad14' }} />,
+    icon: <WarningOutlined style={{ fontSize: 32, color: VISNDT_COLORS.warning }} />,
     path: '/files/orphans',
     hint: '进入孤立文件管理 → 批量清理',
   },

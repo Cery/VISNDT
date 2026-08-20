@@ -1,6 +1,9 @@
 import Link from 'next/link';
 import type { Product } from '@/types/product';
 import { highlightText } from '@/lib/search-utils';
+import { translateCategoryName } from '@/lib/translate';
+import MediaImage from '@/components/common/MediaImage';
+import CapabilityBadge from '@/components/capability/CapabilityBadge';
 
 interface ProductResultCardProps {
   product: Product;
@@ -15,6 +18,14 @@ export default function ProductResultCard({ product, highlight }: ProductResultC
       className="block rounded-xl border border-slate-200/80 shadow-industrial-sm p-5 hover:shadow-industrial-md hover:-translate-y-1 transition-all duration-300 group"
     >
       <div className="flex items-start gap-4">
+        {/* Capability discovery thumbnail — unified MediaImage fallback */}
+        <MediaImage
+          fileAssetId={product.primaryMedia?.fileAssetId}
+          alt={product.primaryMedia?.title || product.name}
+          seed={product.id}
+          className="w-24 h-24 rounded-lg object-cover bg-muted flex-shrink-0"
+        />
+
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors line-clamp-1">
             {highlight ? highlightText(product.name, highlight) : product.name}
@@ -33,12 +44,10 @@ export default function ProductResultCard({ product, highlight }: ProductResultC
           )}
           <div className="flex items-center gap-3 text-xs text-slate-400">
             {product.category && (
-              <span className="inline-flex items-center gap-1">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" />
-                </svg>
-                {product.category.name}
-              </span>
+              <CapabilityBadge
+                label={translateCategoryName(product.category.name)}
+                tone="cyan"
+              />
             )}
             <span>{product.status}</span>
           </div>

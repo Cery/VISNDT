@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Table, Input, Select, Space, Spin, Alert, Button, Tag, Typography, message, Modal } from 'antd';
+import { Table, Input, Select, Space, Spin, Alert, Button, Typography, message, Modal } from 'antd';
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { SorterResult } from 'antd/es/table/interface';
@@ -7,8 +7,10 @@ import { useNavigate } from 'react-router-dom';
 import { demandService } from '../api';
 import type { Demand, SearchDemandParams } from '../types';
 import { BatchActionBar } from '../components/operation';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { StatusTag } from '../components/design-system';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -38,15 +40,6 @@ const BATCH_STATUS_OPTIONS = [
   { label: '已发布', value: 'PUBLISHED' },
   { label: '已关闭', value: 'CLOSED' },
 ];
-
-const STATUS_COLOR_MAP: Record<string, string> = {
-  DRAFT: 'orange',
-  PUBLISHED: 'green',
-  SUBMITTED: 'cyan',
-  PROCESSING: 'blue',
-  CLOSED: 'default',
-  CANCELLED: 'red',
-};
 
 const STATUS_LABEL_MAP: Record<string, string> = {
   DRAFT: '草稿',
@@ -259,7 +252,7 @@ function DemandList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <Tag color={STATUS_COLOR_MAP[status] || 'default'}>{STATUS_LABEL_MAP[status] || status}</Tag>
+        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || status} />
       ),
     },
     {
@@ -310,12 +303,15 @@ function DemandList() {
 
   return (
     <div>
-      <Title level={4} style={{ marginBottom: 4 }}>
-        需求管理
-      </Title>
-      <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16, fontSize: 13 }}>
-        管理采购方发布的产品需求，需求可生成RFQ向供应商询价
-      </Typography.Text>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>Demand Operations</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          Manage buyer demand submissions, status and lifecycle
+        </Text>
+      </div>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search

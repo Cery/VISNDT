@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card,
   Descriptions,
-  Tag,
   Spin,
   Alert,
   Button,
@@ -19,6 +18,8 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import { matchService } from '../api';
 import KnowledgeContextPanel from './match/KnowledgeContextPanel';
 import type { MatchDetail } from '../types';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { StatusTag } from '../components/design-system';
 
 const { Title, Text } = Typography;
 
@@ -27,19 +28,10 @@ type PageState =
   | { status: 'error'; message: string }
   | { status: 'success'; data: MatchDetail };
 
-const STATUS_COLOR: Record<string, string> = {
-  PENDING: 'processing',
-  MATCHED: 'blue',
-  REVIEWED: 'blue',
-  ACCEPTED: 'success',
-  REJECTED: 'error',
-  EXPIRED: 'default',
-};
-
 const SCORE_COLOR = (score: number): string => {
-  if (score >= 80) return '#52c41a';
-  if (score >= 60) return '#faad14';
-  return '#ff4d4f';
+  if (score >= 80) return VISNDT_COLORS.success;
+  if (score >= 60) return VISNDT_COLORS.warning;
+  return VISNDT_COLORS.error;
 };
 
 interface ExplanationFactor {
@@ -253,7 +245,15 @@ export default function MatchDetailPage() {
         </Button>
       </Space>
 
-      <Title level={3}>匹配详情</Title>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>Match Analysis</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          View match scores, parameter comparison and knowledge context
+        </Text>
+      </div>
 
       {/* Card 1: Match Summary */}
       <Card title="匹配摘要" style={{ marginBottom: 16 }}>
@@ -262,9 +262,7 @@ export default function MatchDetailPage() {
             {match.product?.name || '-'}
           </Descriptions.Item>
           <Descriptions.Item label="状态">
-            <Tag color={STATUS_COLOR[match.matchStatus] || 'default'}>
-              {match.matchStatus}
-            </Tag>
+            <StatusTag status={match.matchStatus} />
           </Descriptions.Item>
           <Descriptions.Item label="匹配度">
             <Text
@@ -421,7 +419,7 @@ export default function MatchDetailPage() {
             <Space>
               <Button
                 type="primary"
-                style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+                style={{ backgroundColor: VISNDT_COLORS.success, borderColor: VISNDT_COLORS.success }}
                 loading={reviewing}
                 onClick={() => handleAcceptReject('ACCEPTED')}
               >

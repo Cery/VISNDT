@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import SectionHeader from '@/components/brand/SectionHeader';
 
 /**
  * Capability Provider section — presents suppliers strictly as industrial
@@ -48,17 +49,12 @@ export default function CapabilityProviderSection() {
   return (
     <section className="py-20 bg-industrial-slate">
       <div className="max-w-[1200px] mx-auto px-6">
-        <div className="text-center mb-12 animate-slide-up">
-          <p className="text-sm font-semibold text-primary tracking-widest uppercase mb-3">
-            能力提供商
-          </p>
-          <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-4">
-            面向检测需求的能力提供
-          </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto text-base">
-            VISNDT 以「能力提供商」连接检测需求方，围绕设备、方案与响应能力开展确定性撮合。
-          </p>
-        </div>
+        <SectionHeader
+          eyebrow="能力提供商"
+          title="面向检测需求的能力提供"
+          subtitle="VISNDT 以「能力提供商」连接检测需求方，围绕设备、方案与响应能力开展确定性撮合。"
+          className="mb-12 animate-slide-up"
+        />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {CAPABILITY_POINTS.map((p) => (

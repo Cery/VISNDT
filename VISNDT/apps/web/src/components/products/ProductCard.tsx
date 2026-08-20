@@ -1,7 +1,10 @@
 import Link from 'next/link';
 import type { Product } from '@/types/product';
 import { translateCategoryName } from '@/lib/translate';
+import { getCategoryScenario, getParameterCapabilityHint } from '@/lib/capability-glossary';
 import MediaImage from '@/components/common/MediaImage';
+import CapabilityBadge from '@/components/capability/CapabilityBadge';
+import ApplicationScenario from '@/components/capability/ApplicationScenario';
 import HighlightText from './HighlightText';
 
 interface ProductCardProps {
@@ -20,6 +23,15 @@ export default function ProductCard({
   isCompared = false,
   onCompareToggle,
 }: ProductCardProps) {
+  const scenario = product.category ? getCategoryScenario(product.category.name) : null;
+  const capabilityHints = Array.isArray(product.keyParameters)
+    ? product.keyParameters
+        .map((kp) => getParameterCapabilityHint(kp.name, kp.code))
+        .filter((h): h is string => Boolean(h))
+        .filter((h, i, arr) => arr.indexOf(h) === i)
+        .slice(0, 2)
+    : [];
+
   return (
     <div className="group block rounded-xl border border-slate-200/80 shadow-industrial-sm hover:shadow-industrial-lg hover:-translate-y-1 transition-all duration-300 bg-white p-4 relative">
       {/* Compare Checkbox */}
@@ -58,7 +70,17 @@ export default function ProductCard({
           className="aspect-video w-full object-cover rounded-md mb-3 bg-muted"
         />
 
-        <div className="space-y-1.5">
+        <div className="space-y-2">
+          {/* Capability identity — category label */}
+          {product.category && (
+            <CapabilityBadge
+              label={translateCategoryName(product.category.name)}
+              tone="cyan"
+              hint={scenario ?? undefined}
+            />
+          )}
+
+          {/* Product identity */}
           <h3 className="font-semibold text-sm group-hover:text-primary transition-colors line-clamp-2">
             <HighlightText text={product.name} keyword={searchKeyword ?? ''} />
           </h3>
@@ -69,13 +91,12 @@ export default function ProductCard({
             </p>
           )}
 
-          {product.category && (
-            <span className="inline-block bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
-              {translateCategoryName(product.category.name)}
-            </span>
+          {/* Detection scenario */}
+          {scenario && (
+            <ApplicationScenario categoryName={product.category?.name} compact />
           )}
 
-          {/* Key parameters (Capability Discovery Card) */}
+          {/* Core parameter summary */}
           {Array.isArray(product.keyParameters) && (
             <div className="mt-2">
               {product.keyParameters.length > 0 ? (
@@ -99,6 +120,15 @@ export default function ProductCard({
             </div>
           )}
 
+          {/* Capability tags */}
+          {capabilityHints.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-1.5">
+              {capabilityHints.map((h) => (
+                <CapabilityBadge key={h} label={h} tone="primary" />
+              ))}
+            </div>
+          )}
+
           {product.description && (
             <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
               <HighlightText text={product.description} keyword={searchKeyword ?? ''} />
@@ -107,7 +137,7 @@ export default function ProductCard({
         </div>
       </Link>
 
-      {/* Supplier Discovery Entry — links to product detail (supplier section via #suppliers anchor) */}
+      {/* Inquiry Entry — links to product detail (supplier section via #suppliers anchor) */}
       <div className="pt-2 mt-2 border-t border-slate-100">
         <Link
           href={`/products/${product.id}#suppliers`}

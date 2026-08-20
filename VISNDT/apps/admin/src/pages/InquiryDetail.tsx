@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card,
   Descriptions,
-  Tag,
   Spin,
   Alert,
   Button,
@@ -15,15 +14,10 @@ import {
 import { ArrowLeftOutlined, SaveOutlined } from '@ant-design/icons';
 import { inquiryService } from '../api';
 import type { Inquiry, InquiryStatus } from '../types';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { StatusTag } from '../components/design-system';
 
-const { Title, Paragraph } = Typography;
-
-const STATUS_COLOR: Record<string, string> = {
-  NEW: 'blue',
-  PROCESSING: 'orange',
-  REPLIED: 'green',
-  CLOSED: 'default',
-};
+const { Title, Text, Paragraph } = Typography;
 
 const STATUS_OPTIONS: { label: string; value: InquiryStatus }[] = [
   { label: '新建', value: 'NEW' },
@@ -124,16 +118,22 @@ export default function InquiryDetailPage() {
         </Button>
       </Space>
 
-      <Title level={3}>询价详情</Title>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>Inquiry Details</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          View inquiry details, supplier responses and status
+        </Text>
+      </div>
 
       {/* Card 1: Inquiry Summary */}
       <Card title="询价摘要" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
           <Descriptions.Item label="询价编号">{inquiry.id}</Descriptions.Item>
           <Descriptions.Item label="状态">
-            <Tag color={STATUS_COLOR[inquiry.status] || 'default'}>
-              {inquiry.status}
-            </Tag>
+            <StatusTag status={inquiry.status} />
           </Descriptions.Item>
           <Descriptions.Item label="创建时间">
             {formatDate(inquiry.createdAt)}

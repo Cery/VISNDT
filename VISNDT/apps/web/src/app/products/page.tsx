@@ -8,6 +8,8 @@ import { getCategories } from '@/services/category.service';
 import { getFilterParameterDefinitions, getCategoryFilterParameterDefinitions } from '@/services/parameter-definition.service';
 import type { ProductParameterFilter } from '@/types/product';
 import { trackEvent, buildEvent } from '@/lib/analytics';
+import { translateCategoryName } from '@/lib/translate';
+import IndustrialBadge from '@/components/brand/IndustrialBadge';
 import SearchBar from '@/components/products/SearchBar';
 import ProductFilter from '@/components/products/ProductFilter';
 import ProductGrid from '@/components/products/ProductGrid';
@@ -224,22 +226,38 @@ function ProductsPageContent() {
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
-      <div className="mb-6 sm:mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground">
-              产品中心
-            </h1>
-            <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-              浏览工业无损检测设备，按分类、参数快速筛选
-            </p>
-          </div>
-          {productsData?.total !== undefined && !isLoading && (
-            <span className="text-sm text-muted-foreground flex-shrink-0">
-              共 <span className="font-semibold text-foreground">{productsData.total}</span> 款产品
-            </span>
-          )}
+      <div className="mb-6 sm:mb-8 rounded-2xl border border-slate-200/80 shadow-industrial-sm bg-white px-6 py-7 sm:px-8 sm:py-9">
+        <IndustrialBadge label="Industrial Capability Discovery" tone="cyan" />
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground mt-4">
+          工业检测能力目录
+        </h1>
+        <p className="text-muted-foreground mt-2 text-sm sm:text-base max-w-2xl">
+          面向工业无损检测的能力发现平台。围绕检测场景与核心参数，快速定位具备目标检测能力的设备与方案。
+        </p>
+        <div className="mt-4 text-sm text-muted-foreground">
+          共{' '}
+          <span className="font-semibold text-foreground">{productsData?.total ?? '—'}</span>{' '}
+          项检测能力
         </div>
+        {categories.length > 0 && (
+          <div className="mt-5 flex flex-wrap gap-2">
+            {categories.slice(0, 8).map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => handleCategoryChange(c.id)}
+                className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium transition-colors ${
+                  categoryId === c.id
+                    ? 'bg-primary/10 text-primary border-primary/30'
+                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/40 hover:text-primary'
+                }`}
+              >
+                <span className="w-1 h-1 rotate-45 bg-current" aria-hidden="true" />
+                {translateCategoryName(c.name)}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Search */}

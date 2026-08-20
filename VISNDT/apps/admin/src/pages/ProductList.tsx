@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Space, Spin, Alert, Button, Tag, Typography, message, Modal, Checkbox, Card, Row, Col, Statistic } from 'antd';
+import { Table, Space, Spin, Alert, Button, Typography, message, Modal, Checkbox, Card, Row, Col, Statistic } from 'antd';
 import { AppstoreOutlined, CheckCircleOutlined, EditOutlined, StopOutlined, TagsOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { SorterResult } from 'antd/es/table/interface';
@@ -9,8 +9,10 @@ import type { Product, SearchProductParams } from '../types';
 import type { ProductCategory } from '../types/category.types';
 import { ExportButton, BatchActionBar, AdvancedFilterPanel } from '../components/operation';
 import type { ExportColumn } from '../utils/export';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { StatusTag } from '../components/design-system';
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -47,12 +49,6 @@ const BATCH_STATUS_OPTIONS = [
   { label: '草稿', value: 'DRAFT' },
   { label: '下架', value: 'INACTIVE' },
 ];
-
-const STATUS_COLOR_MAP: Record<string, string> = {
-  ACTIVE: 'green',
-  DRAFT: 'default',
-  INACTIVE: 'red',
-};
 
 const STATUS_LABEL_MAP: Record<string, string> = {
   ACTIVE: '已上架',
@@ -329,7 +325,7 @@ function ProductList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <Tag color={STATUS_COLOR_MAP[status] || 'default'}>{STATUS_LABEL_MAP[status] || status}</Tag>
+        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || status} />
       ),
     },
     {
@@ -378,15 +374,15 @@ function ProductList() {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-        <div style={{ width: 4, height: 20, borderRadius: 2, background: '#2563eb' }} />
-        <Title level={4} style={{ margin: 0 }}>
-          产品管理
-        </Title>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
+          <Title level={4} style={{ margin: 0 }}>Product Capability Operations</Title>
+        </div>
+        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
+          Manage industrial inspection product capabilities, status and categories
+        </Text>
       </div>
-      <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 16, marginLeft: 12, fontSize: 13 }}>
-        管理平台产品目录，包括产品信息、分类、参数和媒体资源
-      </Typography.Text>
 
       {/* Governance Statistics Dashboard */}
       {(governanceStats.total > 0) && (
@@ -408,7 +404,7 @@ function ProductList() {
           </Col>
           <Col xs={12} sm={6} md={4}>
             <Card size="small">
-              <Statistic title="已下架" value={governanceStats.inactive} valueStyle={{ color: '#ff4d4f' }} prefix={<StopOutlined />} />
+              <Statistic title="已下架" value={governanceStats.inactive} valueStyle={{ color: VISNDT_COLORS.error }} prefix={<StopOutlined />} />
             </Card>
           </Col>
           <Col xs={12} sm={6} md={4}>
