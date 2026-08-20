@@ -12,7 +12,7 @@ const MEDIA_ENTRIES = [
   {
     title: '产品媒体',
     description: '管理产品图片、证书、文档等附件，是产品详情展示的核心媒体资源',
-    icon: <PictureOutlined style={{ fontSize: 32, color: '#1677ff' }} />,
+    icon: <PictureOutlined style={{ fontSize: 32, color: '#2563eb' }} />,
     path: '/products',
     hint: '进入产品管理 → 选择产品 → 媒体管理',
   },
@@ -38,7 +38,7 @@ export default function MediaList() {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-        <div style={{ width: 4, height: 20, borderRadius: 2, background: '#1677ff' }} />
+        <div style={{ width: 4, height: 20, borderRadius: 2, background: '#2563eb' }} />
         <Title level={4} style={{ margin: 0 }}>
           媒体中心
         </Title>

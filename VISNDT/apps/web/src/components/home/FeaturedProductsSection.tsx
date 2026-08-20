@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { getProducts } from '@/services/product.service';
-import ProductCard from '@/components/product/ProductCard';
+import ProductCard from '@/components/products/ProductCard';
 
 export default function FeaturedProductsSection() {
   const { data, isLoading, isError } = useQuery({

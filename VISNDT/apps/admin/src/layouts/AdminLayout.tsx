@@ -264,7 +264,7 @@ function AdminLayout() {
               fontWeight: 800,
               fontFamily: 'ui-monospace, monospace',
               letterSpacing: '0.02em',
-              background: 'linear-gradient(135deg, #1677ff, #36cfc9)',
+              background: 'linear-gradient(135deg, #2563eb, #0891b2)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}>
@@ -272,7 +272,7 @@ function AdminLayout() {
             </span>
             {!collapsed && (
               <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
-                运营中心
+                工业运营中心
               </span>
             )}
           </div>
@@ -333,10 +333,10 @@ function AdminLayout() {
               />
             )}
             <span className="admin-header-title" style={{ fontSize: 16, fontWeight: 600, whiteSpace: 'nowrap' }}>
-              VISNDT 运营中心
+              VISNDT 工业运营中心
             </span>
             <span className="admin-header-title" style={{ fontSize: 12, color: '#999', marginLeft: 8, borderLeft: '1px solid #e8e8e8', paddingLeft: 8 }}>
-              工业检测平台
+              工业检测能力发现平台
             </span>
           </div>
 
@@ -353,7 +353,7 @@ function AdminLayout() {
                 <Avatar
                   size="small"
                   icon={<UserOutlined />}
-                  style={{ backgroundColor: '#1677ff' }}
+                  style={{ backgroundColor: '#2563eb' }}
                 />
                 <span className="admin-header-title" style={{ fontSize: 14 }}>
                   {user?.name || user?.email || '管理员'}

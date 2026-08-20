@@ -207,6 +207,6 @@ body {
   overflow: auto;
 }
 .markdown-preview pre code { background: transparent; padding: 0; }
-.markdown-preview a { color: #1677ff; }
+.markdown-preview a { color: #2563eb; }
 .markdown-preview img { max-width: 100%; }
 .markdown-preview hr { margin: 1.2em 0; border: none; border-top: 1px solid #e5e7eb; }

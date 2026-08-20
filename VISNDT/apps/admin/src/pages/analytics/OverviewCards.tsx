@@ -18,7 +18,7 @@ export default function OverviewCards({ data }: Props) {
       title: '页面浏览量',
       value: data.totalPageViews,
       icon: <EyeOutlined />,
-      color: '#1677ff',
+      color: '#2563eb',
     },
     {
       title: '产品浏览量',

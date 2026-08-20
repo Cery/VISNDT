@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { ProductMedia } from '@/types/product';
+import MediaImage from '@/components/common/MediaImage';
 
 interface ProductGalleryProps {
   media: ProductMedia[];
@@ -20,11 +21,15 @@ export default function ProductGallery({ media, productName }: ProductGalleryPro
     return a.displayOrder - b.displayOrder;
   });
 
+  // No image asset: render media fallback (dev placeholder / prod empty state).
   if (sortedImages.length === 0) {
     return (
-      <div className="aspect-square bg-muted rounded-lg flex items-center justify-center">
-        <span className="text-muted-foreground text-sm">暂无图片</span>
-      </div>
+      <MediaImage
+        fileAssetId={null}
+        alt={productName}
+        seed={productName}
+        className="aspect-square w-full object-cover rounded-lg bg-muted"
+      />
     );
   }
 
@@ -33,10 +38,13 @@ export default function ProductGallery({ media, productName }: ProductGalleryPro
   return (
     <div className="space-y-3">
       {/* Main Image */}
-      <div className="aspect-square bg-muted rounded-lg flex items-center justify-center overflow-hidden">
-        <div className="text-muted-foreground text-sm">
-          {currentImage.title || productName}
-        </div>
+      <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+        <MediaImage
+          fileAssetId={currentImage.fileAssetId}
+          alt={currentImage.title || productName}
+          seed={currentImage.id}
+          className="w-full h-full object-cover"
+        />
       </div>
 
       {/* Thumbnails */}
@@ -45,18 +53,21 @@ export default function ProductGallery({ media, productName }: ProductGalleryPro
           {sortedImages.map((img, idx) => (
             <button
               key={img.id}
+              type="button"
               onClick={() => setSelectedIndex(idx)}
               className={`flex-shrink-0 w-16 h-16 rounded-md border-2 overflow-hidden transition-colors ${
                 idx === selectedIndex
                   ? 'border-primary'
                   : 'border-transparent hover:border-muted-foreground'
               }`}
+              aria-label={`查看图片 ${idx + 1}`}
             >
-              <div className="w-full h-full bg-muted flex items-center justify-center">
-                <span className="text-xs text-muted-foreground">
-                  {idx + 1}
-                </span>
-              </div>
+              <MediaImage
+                fileAssetId={img.fileAssetId}
+                alt={img.title || `${productName} ${idx + 1}`}
+                seed={img.id}
+                className="w-full h-full object-cover"
+              />
             </button>
           ))}
         </div>

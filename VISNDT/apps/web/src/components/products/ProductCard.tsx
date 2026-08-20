@@ -1,14 +1,8 @@
 import Link from 'next/link';
 import type { Product } from '@/types/product';
 import { translateCategoryName } from '@/lib/translate';
-import { API_BASE_URL } from '@/lib/constants';
+import MediaImage from '@/components/common/MediaImage';
 import HighlightText from './HighlightText';
-
-/** Build the public download URL for a FileAsset-backed image. */
-function fileUrl(fileAssetId?: string | null): string | null {
-  if (!fileAssetId) return null;
-  return `${API_BASE_URL}/files/${fileAssetId}/download`;
-}
 
 interface ProductCardProps {
   product: Product;
@@ -26,8 +20,6 @@ export default function ProductCard({
   isCompared = false,
   onCompareToggle,
 }: ProductCardProps) {
-  const primaryImageUrl = fileUrl(product.primaryMedia?.fileAssetId);
-
   return (
     <div className="group block rounded-xl border border-slate-200/80 shadow-industrial-sm hover:shadow-industrial-lg hover:-translate-y-1 transition-all duration-300 bg-white p-4 relative">
       {/* Compare Checkbox */}
@@ -58,20 +50,13 @@ export default function ProductCard({
         </div>
       )}
       <Link href={`/products/${product.id}`} className="block">
-        {/* Primary image (Capability Discovery Card) */}
-        {primaryImageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={primaryImageUrl}
-            alt={product.primaryMedia?.title || product.name}
-            className="aspect-video w-full object-cover rounded-md mb-3 bg-muted"
-            loading="lazy"
-          />
-        ) : (
-          <div className="aspect-video bg-gradient-to-br from-slate-100 to-industrial-slate rounded-md mb-3 flex items-center justify-center">
-            <span className="text-muted-foreground text-sm">暂无图片</span>
-          </div>
-        )}
+        {/* Primary image (Capability Discovery Card, media fallback) */}
+        <MediaImage
+          fileAssetId={product.primaryMedia?.fileAssetId}
+          alt={product.primaryMedia?.title || product.name}
+          seed={product.id}
+          className="aspect-video w-full object-cover rounded-md mb-3 bg-muted"
+        />
 
         <div className="space-y-1.5">
           <h3 className="font-semibold text-sm group-hover:text-primary transition-colors line-clamp-2">

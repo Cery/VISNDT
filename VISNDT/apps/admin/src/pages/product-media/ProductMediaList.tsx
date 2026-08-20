@@ -348,7 +348,7 @@ function ProductMediaList() {
           </Col>
           <Col xs={12} sm={6}>
             <Card size="small">
-              <Statistic title="图片" value={mediaStats.images} prefix={<FileImageOutlined />} valueStyle={{ color: '#1890ff' }} />
+              <Statistic title="图片" value={mediaStats.images} prefix={<FileImageOutlined />} valueStyle={{ color: '#2563eb' }} />
             </Card>
           </Col>
           <Col xs={12} sm={6}>

@@ -379,7 +379,7 @@ function ProductList() {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-        <div style={{ width: 4, height: 20, borderRadius: 2, background: '#1677ff' }} />
+        <div style={{ width: 4, height: 20, borderRadius: 2, background: '#2563eb' }} />
         <Title level={4} style={{ margin: 0 }}>
           产品管理
         </Title>

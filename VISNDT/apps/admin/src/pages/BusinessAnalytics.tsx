@@ -23,9 +23,9 @@ import type {
 
 const { Title, Text } = Typography;
 
-const PIE_COLORS = ['#1677ff', '#52c41a', '#faad14', '#ff4d4f', '#722ed1', '#13c2c2', '#eb2f96'];
-const FUNNEL_COLORS = ['#1677ff', '#52c41a', '#faad14', '#ff4d4f', '#722ed1', '#13c2c2'];
-const MATCH_COLORS = ['#1677ff', '#52c41a', '#faad14', '#ff4d4f', '#722ed1', '#eb2f96'];
+const PIE_COLORS = ['#2563eb', '#52c41a', '#faad14', '#ff4d4f', '#722ed1', '#13c2c2', '#eb2f96'];
+const FUNNEL_COLORS = ['#2563eb', '#52c41a', '#faad14', '#ff4d4f', '#722ed1', '#13c2c2'];
+const MATCH_COLORS = ['#2563eb', '#52c41a', '#faad14', '#ff4d4f', '#722ed1', '#eb2f96'];
 
 type PageState =
   | { status: 'loading' }
@@ -94,7 +94,7 @@ function BusinessAnalytics() {
   // ============================================
   const demandFunnelData = funnel.demandFunnel.filter((d) => d.count > 0);
   const pipelineData = [
-    { name: '询价', value: funnel.pipeline.totalInquiries, fill: '#1677ff' },
+    { name: '询价', value: funnel.pipeline.totalInquiries, fill: '#2563eb' },
     { name: '需求', value: funnel.pipeline.totalDemands, fill: '#52c41a' },
     { name: 'RFQ', value: funnel.pipeline.totalRfqs, fill: '#faad14' },
     { name: '报价', value: funnel.pipeline.totalOffers, fill: '#722ed1' },
@@ -115,7 +115,7 @@ function BusinessAnalytics() {
 
   // Full pipeline stages for conversion
   const conversionPipelineData = [
-    { name: '询价', value: conversion.pipeline.inquiries, fill: '#1677ff' },
+    { name: '询价', value: conversion.pipeline.inquiries, fill: '#2563eb' },
     { name: '需求', value: conversion.pipeline.demands, fill: '#52c41a' },
     { name: 'RFQ', value: conversion.pipeline.rfqs, fill: '#faad14' },
     { name: '活跃RFQ', value: conversion.pipeline.activeRfqs, fill: '#ff4d4f' },
@@ -146,7 +146,7 @@ function BusinessAnalytics() {
                   title="询价"
                   value={funnel.pipeline.totalInquiries}
                   prefix={<RiseOutlined />}
-                  valueStyle={{ color: '#1677ff' }}
+                  valueStyle={{ color: '#2563eb' }}
                 />
               </Card>
             </Col>
@@ -204,7 +204,7 @@ function BusinessAnalytics() {
                 <Progress
                   percent={funnel.conversionRates.inquiryToDemand}
                   showInfo={false}
-                  strokeColor="#1677ff"
+                  strokeColor="#2563eb"
                   size="small"
                 />
               </Card>
@@ -399,7 +399,7 @@ function BusinessAnalytics() {
                         {responseDistData.map((_, index) => (
                           <Cell
                             key={`cell-${index}`}
-                            fill={['#1677ff', '#faad14', '#52c41a', '#ff4d4f'][index] || '#ccc'}
+                            fill={['#2563eb', '#faad14', '#52c41a', '#ff4d4f'][index] || '#ccc'}
                           />
                         ))}
                       </Bar>
@@ -427,7 +427,7 @@ function BusinessAnalytics() {
                   title="询价→需求"
                   value={conversion.conversionRates.inquiryToDemand}
                   suffix="%"
-                  valueStyle={{ color: '#1677ff' }}
+                  valueStyle={{ color: '#2563eb' }}
                 />
                 <Progress percent={conversion.conversionRates.inquiryToDemand} showInfo={false} size="small" />
               </Card>
@@ -519,7 +519,7 @@ function BusinessAnalytics() {
                       <Tooltip />
                       <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                         <Cell fill="#52c41a" />
-                        <Cell fill="#1677ff" />
+                        <Cell fill="#2563eb" />
                       </Bar>
                     </BarChart>
                   </ResponsiveContainer>
@@ -573,7 +573,7 @@ function BusinessAnalytics() {
                   title="总匹配数"
                   value={matching.metrics.totalMatches}
                   prefix={<SwapOutlined />}
-                  valueStyle={{ color: '#1677ff' }}
+                  valueStyle={{ color: '#2563eb' }}
                 />
               </Card>
             </Col>
@@ -707,7 +707,7 @@ function BusinessAnalytics() {
         </div>
         <ReloadOutlined
           onClick={fetchData}
-          style={{ cursor: 'pointer', fontSize: 18, color: '#1677ff' }}
+          style={{ cursor: 'pointer', fontSize: 18, color: '#2563eb' }}
         />
       </div>
 

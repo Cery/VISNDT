@@ -25,6 +25,7 @@ import {
   ReloadOutlined,
   RiseOutlined,
   BarChartOutlined,
+  SettingOutlined,
   CloseCircleOutlined,
   SyncOutlined,
   ExperimentOutlined,
@@ -34,7 +35,7 @@ import {
   Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
   FunnelChart, Funnel, LabelList, Legend,
 } from 'recharts';
-import { dashboardService, notificationService, categoriesService } from '../api';
+import { dashboardService, notificationService, categoriesService, parameterDefinitionService } from '../api';
 import type {
   DashboardStats, DashboardTrendItem, DashboardActivities,
   DashboardPending, DashboardStatus, MatchingStats,
@@ -65,7 +66,7 @@ const NOTIFICATION_TYPE_COLOR: Record<string, string> = {
   RESPONSE_UPDATE: 'cyan',
 };
 
-const PIE_COLORS = ['#1677ff', '#52c41a', '#faad14', '#ff4d4f', '#722ed1', '#13c2c2', '#eb2f96', '#a0d911'];
+const PIE_COLORS = ['#2563eb', '#52c41a', '#faad14', '#ff4d4f', '#722ed1', '#13c2c2', '#eb2f96', '#a0d911'];
 
 type PageState =
   | { status: 'loading' }
@@ -80,6 +81,7 @@ type PageState =
       pending: DashboardPending;
       systemStatus: DashboardStatus;
       categoryCount: number;
+      parameterCount: number;
     };
 
 function Home() {
@@ -90,7 +92,7 @@ function Home() {
   const fetchData = useCallback(async () => {
     setPageState({ status: 'loading' });
     try {
-      const [stats, trend, matchingStats, unread, activities, pending, systemStatus, cats] =
+      const [stats, trend, matchingStats, unread, activities, pending, systemStatus, cats, params] =
         await Promise.all([
           dashboardService.getStats(),
           dashboardService.getTrend().catch(() => [] as DashboardTrendItem[]),
@@ -100,6 +102,7 @@ function Home() {
           dashboardService.getPending(),
           dashboardService.getStatus(),
           categoriesService.getList().catch(() => []),
+          parameterDefinitionService.getList({ page: 1, pageSize: 1 }).catch(() => ({ data: [], total: 0, page: 1, pageSize: 1, totalPages: 0 })),
         ]);
       setPageState({
         status: 'success',
@@ -111,6 +114,7 @@ function Home() {
         pending,
         systemStatus,
         categoryCount: cats.length,
+        parameterCount: params.total,
       });
     } catch (err) {
       const message =
@@ -149,7 +153,7 @@ function Home() {
     );
   }
 
-  const { stats, trend, matchingStats, unreadCount, activities, pending, systemStatus, categoryCount } = pageState;
+  const { stats, trend, matchingStats, unreadCount, activities, pending, systemStatus, categoryCount, parameterCount } = pageState;
 
   const formatDate = (date: string) => {
     const d = new Date(date);
@@ -187,7 +191,7 @@ function Home() {
 
   // Business funnel data - real data from stats
   const funnelData = [
-    { name: '产品库', value: stats.products.total, fill: '#1677ff' },
+    { name: '产品库', value: stats.products.total, fill: '#2563eb' },
     { name: '内容', value: stats.content.total, fill: '#52c41a' },
     { name: '询价', value: stats.inquiries.total, fill: '#faad14' },
     { name: '需求', value: stats.demands.total, fill: '#722ed1' },
@@ -236,9 +240,9 @@ function Home() {
         <div>
           {/* ===== Platform KPIs ===== */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <div style={{ width: 4, height: 18, borderRadius: 2, background: '#1677ff' }} />
+            <div style={{ width: 4, height: 18, borderRadius: 2, background: '#2563eb' }} />
             <Title level={5} style={{ margin: 0 }}>
-              平台统计
+              能力总览
             </Title>
           </div>
           <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
@@ -293,6 +297,15 @@ function Home() {
               </Card>
             </Col>
             <Col xs={12} sm={8} lg={4}>
+              <Card hoverable onClick={() => navigate('/parameter-definitions')} style={{ cursor: 'pointer' }}>
+                <Statistic
+                  title="参数"
+                  value={parameterCount}
+                  prefix={<SettingOutlined />}
+                />
+              </Card>
+            </Col>
+            <Col xs={12} sm={8} lg={4}>
               <Card hoverable onClick={() => navigate('/notifications')} style={{ cursor: 'pointer' }}>
                 <Statistic
                   title="通知"
@@ -317,7 +330,7 @@ function Home() {
             <div style={{ width: 4, height: 18, borderRadius: 2, background: '#52c41a' }} />
             <Title level={5} style={{ margin: 0 }}>
               <BarChartOutlined style={{ marginRight: 6 }} />
-              商业运营
+              业务流转
             </Title>
           </div>
           <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
@@ -338,7 +351,7 @@ function Home() {
                   value={stats.demands.total}
                   prefix={<FileSearchOutlined />}
                   suffix={
-                    <span style={{ fontSize: 12, color: '#1890ff' }}>
+                    <span style={{ fontSize: 12, color: '#2563eb' }}>
                       {stats.demands.published} 已发布
                     </span>
                   }
@@ -407,7 +420,7 @@ function Home() {
                   title="总匹配数"
                   value={matchingStats.totalMatches}
                   prefix={<LinkOutlined />}
-                  valueStyle={{ color: '#1677ff' }}
+                  valueStyle={{ color: '#2563eb' }}
                 />
               </Card>
             </Col>
@@ -547,8 +560,8 @@ function Home() {
                 <AreaChart data={trendChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorPageViews" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#1677ff" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#1677ff" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="colorProductViews" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#52c41a" stopOpacity={0.3} />
@@ -572,7 +585,7 @@ function Home() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Area type="monotone" name="页面浏览" dataKey="pageViews" stroke="#1677ff" fill="url(#colorPageViews)" />
+                  <Area type="monotone" name="页面浏览" dataKey="pageViews" stroke="#2563eb" fill="url(#colorPageViews)" />
                   <Area type="monotone" name="产品浏览" dataKey="productViews" stroke="#52c41a" fill="url(#colorProductViews)" />
                   <Area type="monotone" name="内容浏览" dataKey="contentViews" stroke="#722ed1" fill="url(#colorContentViews)" />
                   <Area type="monotone" name="搜索" dataKey="searches" stroke="#faad14" fill="url(#colorSearches)" />
@@ -653,7 +666,7 @@ function Home() {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="count" fill="#1677ff" radius={[4, 4, 0, 0]}>
+                <Bar dataKey="count" fill="#2563eb" radius={[4, 4, 0, 0]}>
                   {entityBarData.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                   ))}
@@ -814,10 +827,10 @@ function Home() {
       >
         <div>
           <Title level={4} style={{ marginBottom: 4 }}>
-            运营驾驶舱
+            平台运营总览
           </Title>
           <Text type="secondary" style={{ fontSize: 13 }}>
-            VISNDT 工业检测平台运营中心 · 实时掌握平台运营状态与业务趋势
+            VISNDT 工业检测能力发现平台 · 工业运营中心 · 实时掌握平台运营状态与业务流转
           </Text>
         </div>
         <Space>

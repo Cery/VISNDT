@@ -15,8 +15,8 @@ interface WorkspaceEntryLink {
 const WORKSPACE_ENTRY_LINKS: Record<Exclude<WorkspaceRole, null>, WorkspaceEntryLink[]> = {
   BUYER: [
     {
-      title: 'Buyer Dashboard',
-      description: '进入 Buyer 角色的仪表盘总览。',
+      title: 'Buyer 工作台',
+      description: '进入 Buyer 工作台，查看需求、询价与匹配结果总览。',
       href: '/dashboard/buyer',
     },
     {
@@ -37,13 +37,13 @@ const WORKSPACE_ENTRY_LINKS: Record<Exclude<WorkspaceRole, null>, WorkspaceEntry
   ],
   SUPPLIER: [
     {
-      title: 'Supplier Business Workbench',
+      title: 'Supplier 工作台',
       description: '进入 Supplier 正式业务工作台，查看业务状态与导航入口。',
       href: '/dashboard/supplier',
     },
     {
-      title: '供应商兼容入口',
-      description: '保留历史路由兼容壳页，仅用于兼容访问，不承担正式业务工作台职责。',
+      title: 'Supplier 兼容入口',
+      description: '历史路由兼容壳页，仅用于兼容访问，不承担正式业务工作台职责。',
       href: '/workspace/supplier',
     },
     {
@@ -68,9 +68,9 @@ function WorkspaceContent() {
     <WorkspaceLayout>
       <div className="mx-auto max-w-[960px] space-y-6">
         <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Workspace Entry</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">工作区入口</h1>
           <p className="mt-2 text-sm text-slate-500">
-            这里仅保留工作区导航职责，不再承担 Dashboard 汇总或业务数据聚合。
+            这里是 VISNDT 平台的统一业务入口，按 Buyer / Supplier 角色提供导航，不承担数据汇总职责。
           </p>
           <p className="mt-2 text-sm text-slate-500">
             当前角色：{workspaceRole ?? '未配置'}

@@ -120,7 +120,7 @@ function MatchingMonitor() {
         styles={{ body: { padding: '16px 24px' } }}
       >
         <Paragraph style={{ marginBottom: 8 }}>
-          <InfoCircleOutlined style={{ marginRight: 8, color: '#1890ff' }} />
+          <InfoCircleOutlined style={{ marginRight: 8, color: '#2563eb' }} />
           匹配引擎已与需求工作流集成。
         </Paragraph>
         <Paragraph type="secondary" style={{ marginBottom: 12 }}>

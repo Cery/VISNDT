@@ -252,7 +252,7 @@ function Monitoring() {
         </div>
         <ReloadOutlined
           onClick={fetchData}
-          style={{ cursor: 'pointer', fontSize: 18, color: '#1677ff' }}
+          style={{ cursor: 'pointer', fontSize: 18, color: '#2563eb' }}
         />
       </div>
 

@@ -51,13 +51,13 @@ const RISK_LABELS: Record<RiskLevel, string> = {
 
 const ACTION_COLORS: Record<string, string> = {
   create: '#52c41a',
-  update: '#1677ff',
+  update: '#2563eb',
   delete: '#ff4d4f',
   statusChange: '#faad14',
   login: '#722ed1',
 };
 
-const PIE_COLORS = ['#1677ff', '#52c41a', '#faad14', '#ff4d4f', '#722ed1', '#13c2c2', '#eb2f96', '#fa8c16', '#2f54eb', '#a0d911'];
+const PIE_COLORS = ['#2563eb', '#52c41a', '#faad14', '#ff4d4f', '#722ed1', '#13c2c2', '#eb2f96', '#fa8c16', '#2f54eb', '#a0d911'];
 
 const TIME_RANGES = [
   { label: '7天', value: 7 },
@@ -152,7 +152,7 @@ function AuditIntelligence() {
           />
           <ReloadOutlined
             onClick={fetchData}
-            style={{ cursor: 'pointer', fontSize: 18, color: '#1677ff' }}
+            style={{ cursor: 'pointer', fontSize: 18, color: '#2563eb' }}
           />
         </div>
       </div>
@@ -168,7 +168,7 @@ function AuditIntelligence() {
                 title="总事件"
                 value={data.overview.totalEvents}
                 prefix={<AuditOutlined />}
-                valueStyle={{ color: '#1677ff' }}
+                valueStyle={{ color: '#2563eb' }}
               />
             </Card>
           </Col>
@@ -188,7 +188,7 @@ function AuditIntelligence() {
                 title="更新"
                 value={data.overview.updateCount}
                 prefix={<EditOutlined />}
-                valueStyle={{ color: '#1677ff' }}
+                valueStyle={{ color: '#2563eb' }}
               />
             </Card>
           </Col>
@@ -245,7 +245,7 @@ function AuditIntelligence() {
                           <XAxis dataKey="date" fontSize={11} />
                           <YAxis fontSize={11} />
                           <RechartsTooltip />
-                          <Area type="monotone" dataKey="total" stroke="#1677ff" fill="#1677ff" fillOpacity={0.15} />
+                          <Area type="monotone" dataKey="total" stroke="#2563eb" fill="#2563eb" fillOpacity={0.15} />
                         </AreaChart>
                       </ResponsiveContainer>
                     ) : (
@@ -381,7 +381,7 @@ function AuditIntelligence() {
                         title: '更新',
                         dataIndex: 'updateCount',
                         key: 'update',
-                        render: (v: number) => <span style={{ color: '#1677ff' }}>{v}</span>,
+                        render: (v: number) => <span style={{ color: '#2563eb' }}>{v}</span>,
                       },
                       {
                         title: '删除',

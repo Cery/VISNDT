@@ -16,7 +16,7 @@ interface Props {
 }
 
 const COLORS: Record<string, string> = {
-  pageViews: '#1677ff',
+  pageViews: '#2563eb',
   productViews: '#52c41a',
   contentViews: '#fa8c16',
   searches: '#722ed1',

@@ -36,7 +36,7 @@ export default function OperationCard({
     >
       <Space>
         {icon && (
-          <span style={{ fontSize: 24, color: color || '#1677ff' }}>{icon}</span>
+          <span style={{ fontSize: 24, color: color || '#2563eb' }}>{icon}</span>
         )}
         <Statistic
           title={title}

@@ -194,7 +194,7 @@ export default function ProductDetailPage() {
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0 }}>
-          <div style={{ width: 4, height: 24, borderRadius: 2, background: '#1677ff', flexShrink: 0 }} />
+          <div style={{ width: 4, height: 24, borderRadius: 2, background: '#2563eb', flexShrink: 0 }} />
           <Title level={3} style={{ margin: 0 }}>{product.name}</Title>
           <Tag color={STATUS_COLOR[product.status] || 'default'}>{STATUS_LABEL_MAP[product.status] || product.status}</Tag>
         </div>

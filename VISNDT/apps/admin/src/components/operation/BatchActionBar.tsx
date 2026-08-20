@@ -87,7 +87,7 @@ export default function BatchActionBar({
         gap: 8,
       }}
     >
-      <span style={{ color: '#1677ff', fontWeight: 500, fontSize: 13 }}>
+      <span style={{ color: '#2563eb', fontWeight: 500, fontSize: 13 }}>
         已选择 {count} 项
       </span>
       <Space wrap>

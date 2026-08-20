@@ -116,7 +116,7 @@ export default function GlobalSearchBar({
             <button
               type="button"
               onClick={() => setTypeMenuOpen(!typeMenuOpen)}
-              className="flex items-center gap-1 h-9 px-2.5 text-xs font-medium text-slate-600 bg-slate-50 border border-r-0 border-slate-200 rounded-l-lg hover:bg-slate-100 transition-colors"
+              className="flex items-center gap-1 h-11 px-3 text-sm font-medium text-slate-600 bg-slate-50 border border-r-0 border-slate-200 rounded-l-lg hover:bg-slate-100 transition-colors"
             >
               <span className="truncate max-w-[48px]">{currentTypeLabel}</span>
               <svg
@@ -163,7 +163,7 @@ export default function GlobalSearchBar({
             onChange={handleInputChange}
             onFocus={handleInputFocus}
             placeholder={placeholder}
-            className={`w-full h-9 px-3 text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors ${
+            className={`w-full h-11 px-3.5 text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors ${
               showTypeSelector ? 'rounded-r-lg' : 'rounded-lg'
             }`}
           />
@@ -195,7 +195,7 @@ export default function GlobalSearchBar({
       {/* Submit Button */}
       <button
         type="submit"
-        className="flex-shrink-0 h-9 px-4 ml-2 bg-gradient-to-r from-primary to-industrial-cyan text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-1.5"
+        className="flex-shrink-0 h-11 px-5 ml-2 bg-gradient-to-r from-primary to-industrial-cyan text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-1.5 shadow-industrial-sm"
       >
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="11" cy="11" r="8" />

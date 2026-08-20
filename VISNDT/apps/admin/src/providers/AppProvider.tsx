@@ -27,7 +27,50 @@ function AppProvider({ children }: AppProviderProps) {
     initCsrfToken();
   }, []);
 
-  return <ConfigProvider locale={zhCN}>{children}</ConfigProvider>;
+  return (
+    <ConfigProvider
+      locale={zhCN}
+      theme={{
+        token: {
+          colorPrimary: '#2563eb',
+          colorInfo: '#0891b2',
+          colorLink: '#2563eb',
+          colorSuccess: '#16a34a',
+          colorWarning: '#d97706',
+          colorError: '#dc2626',
+          borderRadius: 8,
+          colorBgLayout: '#f5f7fa',
+          fontSize: 14,
+        },
+        components: {
+          Layout: {
+            headerBg: '#ffffff',
+            headerHeight: 56,
+            headerPadding: '0 24px',
+            bodyBg: '#f5f7fa',
+            siderBg: '#0f172a',
+          },
+          Menu: {
+            darkItemBg: '#0f172a',
+            darkSubMenuItemBg: '#0b1220',
+            darkItemColor: 'rgba(255, 255, 255, 0.72)',
+            darkItemHoverBg: 'rgba(37, 99, 235, 0.16)',
+            darkItemSelectedBg: '#2563eb',
+            darkItemSelectedColor: '#ffffff',
+          },
+          Table: {
+            headerBg: '#f8fafc',
+            headerColor: '#334155',
+          },
+          Card: {
+            borderRadiusLG: 10,
+          },
+        },
+      }}
+    >
+      {children}
+    </ConfigProvider>
+  );
 }
 
 export default AppProvider;
