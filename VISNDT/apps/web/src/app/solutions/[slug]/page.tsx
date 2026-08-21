@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getContentBySlug } from '@/services/content.service';
+import { getContentBySlug, getContentList } from '@/services/content.service';
+import { getProducts } from '@/services/product.service';
 import TrackOnMount from '@/components/analytics/TrackOnMount';
 import {
   SITE_DESCRIPTION,
@@ -13,6 +14,12 @@ import {
 } from '@/lib/seo';
 import MarkdownRenderer from '@/components/markdown/MarkdownRenderer';
 import ContentProductCTA from '@/components/common/ContentProductCTA';
+import DemandCTA from '@/components/conversion/DemandCTA';
+import RelatedProducts from '@/components/relation/RelatedProducts';
+import RelatedKnowledge from '@/components/relation/RelatedKnowledge';
+import RelatedSolutions from '@/components/relation/RelatedSolutions';
+import type { Content } from '@/types/content';
+import type { Product } from '@/types/product';
 
 interface SolutionDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -83,6 +90,32 @@ export default async function SolutionDetailPage({
     solution = await getContentBySlug(slug);
   } catch {
     notFound();
+  }
+
+  // Commercial relation feeds — deterministic, existing public APIs only.
+  // All failures degrade gracefully and must never block the detail page.
+  let relatedProducts: Product[] = [];
+  try {
+    const res = await getProducts({ pageSize: 6, sortBy: 'createdAt', sortOrder: 'desc' });
+    relatedProducts = res.data;
+  } catch {
+    relatedProducts = [];
+  }
+
+  let relatedKnowledge: Content[] = [];
+  try {
+    const res = await getContentList({ type: 'KNOWLEDGE', pageSize: 6, sort: 'publishedAt', order: 'desc' });
+    relatedKnowledge = res.data;
+  } catch {
+    relatedKnowledge = [];
+  }
+
+  let otherSolutions: Content[] = [];
+  try {
+    const res = await getContentList({ type: 'SOLUTION', pageSize: 8, sort: 'publishedAt', order: 'desc' });
+    otherSolutions = res.data.filter((s) => s.slug !== slug).slice(0, 3);
+  } catch {
+    otherSolutions = [];
   }
 
   // JSON-LD Structured Data（TechArticle；无敏感字段，无内部 ID）
@@ -165,9 +198,15 @@ export default async function SolutionDetailPage({
         </div>
       </article>
 
-      {/* Commercial CTA */}
-      <div className="mt-8 mb-8">
+      {/* Commercial relation feeds — deterministic product / knowledge / solution discovery */}
+      <RelatedProducts items={relatedProducts} className="mt-12" />
+      <RelatedKnowledge items={relatedKnowledge} className="mt-2" />
+      <RelatedSolutions items={otherSolutions} className="mt-2" />
+
+      {/* Commercial conversion */}
+      <div className="mt-12 mb-8 space-y-4">
         <ContentProductCTA contextType="solution" />
+        <DemandCTA contextType="solution" targetLabel={solution.title} />
       </div>
 
       {/* More from this type */}

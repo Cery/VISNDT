@@ -69,3 +69,4 @@ export { default as MediaList } from './MediaList';
 export { default as ProductCategoryKnowledgeMappingList } from './ProductCategoryKnowledgeMappingList';
 export { default as ProductCategoryKnowledgeMappingCreate } from './ProductCategoryKnowledgeMappingCreate';
 export { default as ProductCategoryKnowledgeMappingEdit } from './ProductCategoryKnowledgeMappingEdit';
+export { default as OperationCenter } from './OperationCenter';

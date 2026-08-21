@@ -2,6 +2,7 @@ import { getOrganization } from '@/services/organization.service';
 import { getOffers } from '@/services/offer.service';
 import SupplierPublicProfile from '@/components/supplier/SupplierPublicProfile';
 import SupplierOfferList from '@/components/supplier/SupplierOfferList';
+import SupplierCapability from '@/components/commercial/SupplierCapability';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -87,6 +88,9 @@ export default async function SupplierPage({ params }: SupplierPageProps) {
       <section className="mb-8">
         <SupplierPublicProfile organization={organization} />
       </section>
+
+      {/* Supplier Capability Image — tags + related products + inquiry entry */}
+      <SupplierCapability organization={organization} offers={offers} />
 
       {/* Supplier Offer List */}
       <section>

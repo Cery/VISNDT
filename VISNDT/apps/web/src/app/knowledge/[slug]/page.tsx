@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getContentBySlug } from '@/services/content.service';
+import { getContentBySlug, getContentList } from '@/services/content.service';
+import { getProducts } from '@/services/product.service';
 import TrackOnMount from '@/components/analytics/TrackOnMount';
 import {
   SITE_DESCRIPTION,
@@ -14,6 +15,11 @@ import {
 import MarkdownRenderer from '@/components/markdown/MarkdownRenderer';
 import MediaGallery from '@/components/content/MediaGallery';
 import ContentProductCTA from '@/components/common/ContentProductCTA';
+import DemandCTA from '@/components/conversion/DemandCTA';
+import RelatedProducts from '@/components/relation/RelatedProducts';
+import RelatedSolutions from '@/components/relation/RelatedSolutions';
+import type { Content } from '@/types/content';
+import type { Product } from '@/types/product';
 
 interface KnowledgeDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -84,6 +90,24 @@ export default async function KnowledgeDetailPage({
     content = await getContentBySlug(slug);
   } catch {
     notFound();
+  }
+
+  // Commercial relation feeds — deterministic, existing public APIs only.
+  // All failures degrade gracefully and must never block the detail page.
+  let relatedProducts: Product[] = [];
+  try {
+    const res = await getProducts({ pageSize: 6, sortBy: 'createdAt', sortOrder: 'desc' });
+    relatedProducts = res.data;
+  } catch {
+    relatedProducts = [];
+  }
+
+  let relatedSolutions: Content[] = [];
+  try {
+    const res = await getContentList({ type: 'SOLUTION', pageSize: 6, sort: 'publishedAt', order: 'desc' });
+    relatedSolutions = res.data;
+  } catch {
+    relatedSolutions = [];
   }
 
   // JSON-LD Structured Data（Article；无敏感字段，无内部 ID）
@@ -180,9 +204,14 @@ export default async function KnowledgeDetailPage({
         <MediaGallery media={content.media} />
       </article>
 
-      {/* Commercial CTA */}
-      <div className="mt-8 mb-8">
+      {/* Commercial relation feeds — deterministic product / solution discovery */}
+      <RelatedProducts items={relatedProducts} className="mt-12" />
+      <RelatedSolutions items={relatedSolutions} className="mt-2" />
+
+      {/* Commercial conversion — application / demand entry */}
+      <div className="mt-12 mb-8 space-y-4">
         <ContentProductCTA contextType="knowledge" />
+        <DemandCTA contextType="knowledge" targetLabel={content.title} />
       </div>
 
       {/* More from this type */}

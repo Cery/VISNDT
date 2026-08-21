@@ -179,3 +179,13 @@ export type {
   RiskIndicator,
   RiskLevel,
 } from './audit-intelligence.types';
+export type {
+  OperationCenterOverview,
+  StatusGroupItem,
+  OperationQueueItem,
+  OperationStatusResult,
+  ProductOperationData,
+  ContentOperationData,
+  SupplierOperationData,
+  BusinessOperationData,
+} from './operation-center.types';

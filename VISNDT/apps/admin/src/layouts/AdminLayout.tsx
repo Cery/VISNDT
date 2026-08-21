@@ -29,6 +29,7 @@ import {
   TeamOutlined,
   ExperimentOutlined,
   BookOutlined,
+  FundOutlined,
 } from '@ant-design/icons';
 import { authStore } from '../stores/auth.store';
 
@@ -44,6 +45,7 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
     label: '核心运营',
     items: [
       { key: '/home', icon: <DashboardOutlined />, label: '运营仪表盘' },
+      { key: '/operation-center', icon: <FundOutlined />, label: '运营中心' },
       { key: '/analytics', icon: <BarChartOutlined />, label: '数据分析' },
       { key: '/business-analytics', icon: <RiseOutlined />, label: '业务分析' },
       { key: '/monitoring', icon: <MonitorOutlined />, label: '运营监控' },
@@ -92,6 +94,7 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
 // Breadcrumb route mapping
 const breadcrumbMap: Record<string, string> = {
   '/home': '运营仪表盘',
+  '/operation-center': '运营中心',
   '/analytics': '数据分析',
   '/business-analytics': '业务分析',
   '/monitoring': '运营监控',

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { Product, ProductDetail, ParameterGroup } from '@/types/product';
 import type { RelatedKnowledgeItem } from '@/types/knowledge-base';
+import type { Content } from '@/types/content';
 import ProductGallery from './ProductGallery';
 import ProductParameters from './ProductParameters';
 import ManufacturerInfo from './ManufacturerInfo';
@@ -10,6 +11,8 @@ import SupplierInquirySection from '@/components/inquiry/SupplierInquirySection'
 import ProductDetailTabs from './ProductDetailTabs';
 import RelatedKnowledge from './RelatedKnowledge';
 import RelatedProductsSection from './RelatedProductsSection';
+import RelatedSolutions from '@/components/relation/RelatedSolutions';
+import DemandCTA from '@/components/conversion/DemandCTA';
 import EmptyState from '@/components/common/EmptyState';
 import { translateCategoryName } from '@/lib/translate';
 import CapabilitySection from '@/components/capability/CapabilitySection';
@@ -22,6 +25,8 @@ interface ProductDetailContentProps {
   parameterGroups: ParameterGroup[];
   relatedKnowledge?: RelatedKnowledgeItem[];
   relatedProducts?: Product[];
+  /** Related solutions feed (deterministic public Content API, type=SOLUTION) */
+  relatedSolutions?: Content[];
 }
 
 export default function ProductDetailContent({
@@ -29,6 +34,7 @@ export default function ProductDetailContent({
   parameterGroups,
   relatedKnowledge = [],
   relatedProducts = [],
+  relatedSolutions = [],
 }: ProductDetailContentProps) {
   const [descExpanded, setDescExpanded] = useState(false);
   const descShouldTruncate = (product.description?.length ?? 0) > 200;
@@ -254,6 +260,17 @@ export default function ProductDetailContent({
               />
             </section>
           )}
+
+          {/* Commercial foundation — cross-content relation + conversion (always visible) */}
+          {relatedSolutions.length > 0 && (
+            <RelatedSolutions items={relatedSolutions} className="mt-12" />
+          )}
+          <DemandCTA
+            contextType="product"
+            targetLabel={product.name}
+            productId={product.id}
+            className="mt-12"
+          />
         </>
       )}
     </ProductDetailTabs>

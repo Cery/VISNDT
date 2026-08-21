@@ -1,4 +1,5 @@
 import { getProduct, getProductRelatedKnowledge, getProductRelatedProducts } from '@/services/product.service';
+import { getContentList } from '@/services/content.service';
 import { getParameterGroups } from '@/services/parameter-group.service';
 import ProductDetailContent from '@/components/products/ProductDetailContent';
 import ProductDetailNav from '@/components/products/ProductDetailNav';
@@ -10,6 +11,7 @@ import { SITE_DESCRIPTION, absoluteUrl, buildProductJsonLd, buildBreadcrumbListJ
 import TrackOnMount from '@/components/analytics/TrackOnMount';
 import type { RelatedKnowledgeItem } from '@/types/knowledge-base';
 import type { Product } from '@/types/product';
+import type { Content } from '@/types/content';
 
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -80,6 +82,21 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   } catch {
     // Related products failure must not block product detail — degrade to empty.
     relatedProducts = [];
+  }
+
+  // Load related solutions (deterministic published SOLUTION feed, newest-first)
+  let relatedSolutions: Content[] = [];
+  try {
+    const solutions = await getContentList({
+      type: 'SOLUTION',
+      pageSize: 6,
+      sort: 'publishedAt',
+      order: 'desc',
+    });
+    relatedSolutions = solutions.data;
+  } catch {
+    // Related solutions failure must not block product detail — degrade to empty.
+    relatedSolutions = [];
   }
 
   // Build structured data
@@ -155,6 +172,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             parameterGroups={parameterGroups}
             relatedKnowledge={relatedKnowledge}
             relatedProducts={relatedProducts}
+            relatedSolutions={relatedSolutions}
           />
         </div>
       </div>

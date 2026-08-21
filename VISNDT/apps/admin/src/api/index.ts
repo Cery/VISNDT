@@ -23,3 +23,4 @@ export { businessAnalyticsService } from './business-analytics.service';
 export { monitoringService } from './monitoring.service';
 export { auditIntelligenceService } from './audit-intelligence.service';
 export { productCategoryKnowledgeMappingService } from './product-category-knowledge-mapping.service';
+export { operationService } from './operation.service';
