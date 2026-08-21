@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { UploadResponse, FileAsset, OrphanListResponse, CleanupOrphansResponse } from '../types/file-asset.types';
+import type { UploadResponse, FileAsset, OrphanListResponse, CleanupOrphansResponse, FileAssetListParams, FileAssetListResponse } from '../types/file-asset.types';
 
 interface ApiResponseWrapper<T> {
   data: T;
@@ -10,6 +10,17 @@ interface ApiResponseWrapper<T> {
 const FILES_BASE = '/files';
 
 export const fileAssetService = {
+  /**
+   * List all FileAssets (read-only, ADMIN only) for the unified media center.
+   * Supports filter/pagination via query params.
+   */
+  async getFiles(params: FileAssetListParams = {}): Promise<FileAssetListResponse> {
+    const response = (await apiClient.get(`${FILES_BASE}`, {
+      params,
+    })) as unknown as ApiResponseWrapper<FileAssetListResponse>;
+    return response.data;
+  },
+
   /**
    * Upload a file to S3/MinIO and create a FileAsset record.
    * @param file - File object from file input or drag-and-drop

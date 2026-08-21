@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
-import { ContentStatus, FileEntityType, FileType } from '@prisma/client';
+import { ContentStatus, FileAssetStatus, FileEntityType, FileType, Prisma } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { Express } from 'express';
 
@@ -24,6 +24,16 @@ const ALLOWED_MIME_TYPES = [
 
 /** Maximum file size: 10MB */
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+/** Query params for the read-only unified file list endpoint (ADMIN only). */
+export interface ListFilesQuery {
+  page?: string;
+  pageSize?: string;
+  fileType?: string;
+  entityType?: string;
+  organizationId?: string;
+  search?: string;
+}
 
 @Injectable()
 export class FileAssetService {
@@ -69,6 +79,7 @@ export class FileAssetService {
     file: Express.Multer.File,
     userId: string,
     entityType: FileEntityType = FileEntityType.PRODUCT,
+    fileType?: FileType,
   ) {
     this.validateFile(file);
 
@@ -80,6 +91,12 @@ export class FileAssetService {
       `Uploading file: ${file.originalname} (${file.mimetype}, ${file.size} bytes)`,
     );
 
+    // Resolve the uploader's organization for supplier-level isolation.
+    const uploader = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { organizationId: true },
+    });
+
     // Upload to S3/MinIO
     await this.storage.upload(file.buffer, storageKey, file.mimetype);
 
@@ -88,12 +105,14 @@ export class FileAssetService {
       data: {
         entityType,
         entityId: '00000000-0000-0000-0000-000000000000', // Placeholder — will be linked via owning entity media
-        fileType: this.mapMimeTypeToFileType(file.mimetype),
+        fileType: fileType ?? this.mapMimeTypeToFileType(file.mimetype),
         fileName: file.originalname,
         storageKey,
         mimeType: file.mimetype,
         fileSize: file.size,
         uploadedBy: userId,
+        organizationId: uploader?.organizationId ?? null,
+        status: FileAssetStatus.ACTIVE,
       },
     });
 
@@ -274,5 +293,88 @@ export class FileAssetService {
     });
     this.logger.log(`Batch deleted ${result.count} FileAssets`);
     return { deletedCount: result.count };
+  }
+
+  /**
+   * List all FileAssets (read-only, ADMIN only) for the unified media center.
+   *
+   * Supports pagination (page/pageSize) and optional filters:
+   * - fileType     : IMAGE / DOCUMENT / CERTIFICATE / SPEC_SHEET / ILLUSTRATION / OTHER
+   * - entityType   : PRODUCT / ORGANIZATION / DEMAND / RFQ / RFQ_RESPONSE / CONTENT
+   * - organizationId : direct supplier isolation (FileAsset.organizationId)
+   * - search       : case-insensitive fileName match
+   *
+   * Soft-deleted records (deletedAt != null) are excluded by default.
+   */
+  async findAll(query: ListFilesQuery) {
+    const page = Math.max(1, parseInt(query.page ?? '1', 10) || 1);
+    const pageSize = Math.min(
+      100,
+      Math.max(1, parseInt(query.pageSize ?? '20', 10) || 20),
+    );
+
+    const where: Prisma.FileAssetWhereInput = { deletedAt: null };
+
+    if (query.fileType) {
+      where.fileType = query.fileType as FileType;
+    }
+    if (query.entityType) {
+      where.entityType = query.entityType as FileEntityType;
+    }
+    if (query.organizationId) {
+      where.organizationId = query.organizationId;
+    }
+    if (query.search) {
+      where.fileName = { contains: query.search, mode: 'insensitive' };
+    }
+
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.fileAsset.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        include: {
+          uploader: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+            },
+          },
+          organization: { select: { id: true, name: true, type: true } },
+          _count: { select: { media: true, contentMedia: true } },
+        },
+      }),
+      this.prisma.fileAsset.count({ where }),
+    ]);
+
+    return {
+      items: items.map((f) => ({
+        id: f.id,
+        entityType: f.entityType,
+        entityId: f.entityId,
+        fileType: f.fileType,
+        fileName: f.fileName,
+        storageKey: f.storageKey,
+        mimeType: f.mimeType,
+        fileSize: f.fileSize,
+        status: f.status,
+        deletedAt: f.deletedAt,
+        createdAt: f.createdAt,
+        updatedAt: f.updatedAt,
+        uploaderName: f.uploader.name ?? null,
+        uploaderEmail: f.uploader.email,
+        organizationId: f.organizationId,
+        organizationName: f.organization?.name ?? null,
+        organizationType: f.organization?.type ?? null,
+        productMediaCount: f._count.media,
+        contentMediaCount: f._count.contentMedia,
+      })),
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
   }
 }

@@ -120,7 +120,15 @@ enum FileType {
   IMAGE
   DOCUMENT
   CERTIFICATE
+  SPEC_SHEET
+  ILLUSTRATION
   OTHER
+}
+
+enum FileAssetStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
 }
 
 enum AuditAction {
@@ -265,6 +273,7 @@ model Organization {
   rfqResponses RFQResponse[]
   invitations  UserInvitation[]
   inquiries    Inquiry[]
+  fileAssets   FileAsset[]
 
   @@index([status])
   @@map("organization")
@@ -700,26 +709,33 @@ model Notification {
 // ===========================================
 
 model FileAsset {
-  id         String         @id @default(uuid()) @db.Uuid
-  entityType FileEntityType @map("entity_type")
-  entityId   String         @map("entity_id") @db.Uuid
-  fileType   FileType       @map("file_type")
-  fileName   String         @map("file_name")
-  storageKey String         @map("storage_key")
-  mimeType   String         @map("mime_type")
-  fileSize   Int            @map("file_size")
-  uploadedBy String         @map("uploaded_by") @db.Uuid
+  id             String         @id @default(uuid()) @db.Uuid
+  entityType     FileEntityType @map("entity_type")
+  entityId       String         @map("entity_id") @db.Uuid
+  fileType       FileType       @map("file_type")
+  fileName       String         @map("file_name")
+  storageKey     String         @map("storage_key")
+  mimeType       String         @map("mime_type")
+  fileSize       Int            @map("file_size")
+  uploadedBy     String         @map("uploaded_by") @db.Uuid
+  organizationId String?        @map("organization_id") @db.Uuid
+  status         FileAssetStatus @default(ACTIVE) @map("status")
+  deletedAt      DateTime?       @map("deleted_at")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  uploader User @relation(fields: [uploadedBy], references: [id])
-  media    ProductMedia[]
+  uploader     User          @relation(fields: [uploadedBy], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  media        ProductMedia[]
   contentCoverImages Content[]
   contentMedia        ContentMedia[]
 
   @@index([entityType, entityId])
   @@index([uploadedBy])
+  @@index([organizationId])
+  @@index([status])
+  @@index([deletedAt])
   @@map("file_asset")
 }
 

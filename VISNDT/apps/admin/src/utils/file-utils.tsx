@@ -3,9 +3,17 @@ import {
   FileTextOutlined,
   FileProtectOutlined,
   FileUnknownOutlined,
+  PictureOutlined,
+  FileSearchOutlined,
 } from '@ant-design/icons';
 
-export type FileType = 'IMAGE' | 'DOCUMENT' | 'CERTIFICATE' | 'OTHER';
+export type FileType =
+  | 'IMAGE'
+  | 'DOCUMENT'
+  | 'CERTIFICATE'
+  | 'SPEC_SHEET'
+  | 'ILLUSTRATION'
+  | 'OTHER';
 
 /**
  * Get appropriate icon element for a file type.
@@ -20,6 +28,10 @@ export function getFileTypeIcon(fileType: FileType): React.ReactNode {
       return <FileTextOutlined style={iconStyle} />;
     case 'CERTIFICATE':
       return <FileProtectOutlined style={iconStyle} />;
+    case 'SPEC_SHEET':
+      return <FileSearchOutlined style={iconStyle} />;
+    case 'ILLUSTRATION':
+      return <PictureOutlined style={iconStyle} />;
     default:
       return <FileUnknownOutlined style={iconStyle} />;
   }

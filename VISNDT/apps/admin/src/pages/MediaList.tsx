@@ -1,99 +1,433 @@
-import { Typography, Card, Row, Col, Space, Alert } from 'antd';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  PictureOutlined,
-  FileTextOutlined,
-  WarningOutlined,
+  Table,
+  Button,
+  Alert,
+  Tag,
+  Typography,
+  Space,
+  Select,
+  Input,
+  message,
+} from 'antd';
+import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
+import {
+  SearchOutlined,
+  ReloadOutlined,
+  DownloadOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
+import { fileAssetService } from '../api/file-asset.service';
+import { organizationService } from '../api/organization.service';
+import type { FileAssetListItem } from '../types/file-asset.types';
+import type { Organization } from '../types/organization.types';
+import { getFileTypeIcon, formatFileSize } from '../utils/file-utils';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
-const MEDIA_ENTRIES = [
-  {
-    title: '产品媒体',
-    description: '管理产品图片、证书、文档等附件，是产品详情展示的核心媒体资源',
-    icon: <PictureOutlined style={{ fontSize: 32, color: '#2563eb' }} />,
-    path: '/products',
-    hint: '进入产品管理 → 选择产品 → 媒体管理',
-  },
-  {
-    title: '内容媒体',
-    description: '文章、知识、解决方案等内容中嵌入的图片和附件',
-    icon: <FileTextOutlined style={{ fontSize: 32, color: VISNDT_COLORS.success }} />,
-    path: '/content',
-    hint: '进入内容管理 → 编辑内容 → 上传媒体',
-  },
-  {
-    title: '孤立文件清理',
-    description: '查看和清理没有关联到任何产品/内容的孤立文件，释放存储空间',
-    icon: <WarningOutlined style={{ fontSize: 32, color: VISNDT_COLORS.warning }} />,
-    path: '/files/orphans',
-    hint: '进入孤立文件管理 → 批量清理',
-  },
+const FILE_TYPE_COLOR: Record<string, string> = {
+  IMAGE: 'blue',
+  DOCUMENT: 'green',
+  CERTIFICATE: 'gold',
+  SPEC_SHEET: 'purple',
+  ILLUSTRATION: 'cyan',
+  OTHER: 'default',
+};
+
+const FILE_TYPE_LABEL: Record<string, string> = {
+  IMAGE: '图片',
+  DOCUMENT: '文档',
+  CERTIFICATE: '资质证书',
+  SPEC_SHEET: '规格书',
+  ILLUSTRATION: '插图',
+  OTHER: '其他',
+};
+
+const FILE_STATUS_LABEL: Record<string, string> = {
+  DRAFT: '草稿',
+  ACTIVE: '在用',
+  ARCHIVED: '已归档',
+};
+
+const FILE_STATUS_COLOR: Record<string, string> = {
+  DRAFT: 'orange',
+  ACTIVE: 'green',
+  ARCHIVED: 'default',
+};
+
+const ENTITY_TYPE_LABEL: Record<string, string> = {
+  PRODUCT: '产品',
+  ORGANIZATION: '组织',
+  DEMAND: '需求',
+  RFQ: 'RFQ',
+  RFQ_RESPONSE: 'RFQ 应答',
+  CONTENT: '内容',
+};
+
+const FILE_TYPE_OPTIONS = [
+  { value: '', label: '全部类型' },
+  { value: 'IMAGE', label: '图片' },
+  { value: 'DOCUMENT', label: '文档' },
+  { value: 'CERTIFICATE', label: '资质证书' },
+  { value: 'SPEC_SHEET', label: '规格书' },
+  { value: 'ILLUSTRATION', label: '插图' },
+  { value: 'OTHER', label: '其他' },
 ];
 
-export default function MediaList() {
+const ENTITY_TYPE_OPTIONS = [
+  { value: '', label: '全部实体' },
+  { value: 'PRODUCT', label: '产品' },
+  { value: 'ORGANIZATION', label: '组织' },
+  { value: 'DEMAND', label: '需求' },
+  { value: 'RFQ', label: 'RFQ' },
+  { value: 'RFQ_RESPONSE', label: 'RFQ 应答' },
+  { value: 'CONTENT', label: '内容' },
+];
+
+interface QueryParams {
+  page: number;
+  pageSize: number;
+  fileType?: string;
+  entityType?: string;
+  organizationId?: string;
+  search?: string;
+}
+
+function MediaList() {
   const navigate = useNavigate();
+  const [query, setQuery] = useState<QueryParams>({ page: 1, pageSize: 20 });
+  const [items, setItems] = useState<FileAssetListItem[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+
+  const orgOptions = useMemo(
+    () => [
+      { value: '', label: '全部组织' },
+      ...organizations.map((o) => ({ value: o.id, label: o.name })),
+    ],
+    [organizations],
+  );
+
+  const loadOrganizations = useCallback(async () => {
+    try {
+      const result = await organizationService.getList({ page: 1, pageSize: 1000 });
+      setOrganizations(result.data ?? []);
+    } catch {
+      // 组织下拉加载失败不影响主列表
+    }
+  }, []);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await fileAssetService.getFiles({
+        page: query.page,
+        pageSize: query.pageSize,
+        fileType: query.fileType || undefined,
+        entityType: query.entityType || undefined,
+        organizationId: query.organizationId || undefined,
+        search: query.search || undefined,
+      });
+      setItems(result.items ?? []);
+      setTotal(result.total ?? 0);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '加载媒体列表失败');
+    } finally {
+      setLoading(false);
+    }
+  }, [query]);
+
+  useEffect(() => {
+    loadOrganizations();
+  }, [loadOrganizations]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleTableChange = (pagination: TablePaginationConfig) => {
+    setQuery((prev) => ({
+      ...prev,
+      page: pagination.current ?? 1,
+      pageSize: pagination.pageSize ?? 20,
+    }));
+  };
+
+  const handleReset = () => {
+    setQuery({ page: 1, pageSize: query.pageSize });
+  };
+
+  const handleDownload = async (record: FileAssetListItem) => {
+    try {
+      const url = await fileAssetService.getSignedUrl(record.id);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = record.fileName;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch {
+      message.error('文件下载失败');
+    }
+  };
+
+  const columns: ColumnsType<FileAssetListItem> = [
+    {
+      title: '文件',
+      dataIndex: 'fileName',
+      key: 'fileName',
+      width: 260,
+      fixed: 'left',
+      render: (name: string, record: FileAssetListItem) => (
+        <Space>
+          {getFileTypeIcon(record.fileType)}
+          <Text style={{ wordBreak: 'break-all' }}>{name}</Text>
+        </Space>
+      ),
+    },
+    {
+      title: '类型',
+      dataIndex: 'fileType',
+      key: 'fileType',
+      width: 110,
+      render: (type: string) => (
+        <Tag color={FILE_TYPE_COLOR[type] || 'default'}>
+          {FILE_TYPE_LABEL[type] || type}
+        </Tag>
+      ),
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      key: 'status',
+      width: 100,
+      render: (status: string) => (
+        <Tag color={FILE_STATUS_COLOR[status] || 'default'}>
+          {FILE_STATUS_LABEL[status] || status}
+        </Tag>
+      ),
+    },
+    {
+      title: '所属实体',
+      dataIndex: 'entityType',
+      key: 'entityType',
+      width: 110,
+      render: (type: string) => ENTITY_TYPE_LABEL[type] || type,
+    },
+    {
+      title: '所属组织',
+      dataIndex: 'organizationName',
+      key: 'organizationName',
+      width: 180,
+      ellipsis: true,
+      render: (name: string | null) =>
+        name ? (
+          name
+        ) : (
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            未分配
+          </Text>
+        ),
+    },
+    {
+      title: '上传者',
+      dataIndex: 'uploaderName',
+      key: 'uploaderName',
+      width: 150,
+      ellipsis: true,
+      render: (name: string | null, record: FileAssetListItem) =>
+        name || record.uploaderEmail,
+    },
+    {
+      title: '引用',
+      key: 'usage',
+      width: 140,
+      render: (_: unknown, record: FileAssetListItem) => {
+        const product = record.productMediaCount ?? 0;
+        const content = record.contentMediaCount ?? 0;
+        if (product === 0 && content === 0) {
+          return <Text type="secondary">无引用</Text>;
+        }
+        const parts: string[] = [];
+        if (product > 0) parts.push(`产品 ${product}`);
+        if (content > 0) parts.push(`内容 ${content}`);
+        return parts.join(' / ');
+      },
+    },
+    {
+      title: '大小',
+      dataIndex: 'fileSize',
+      key: 'fileSize',
+      width: 100,
+      render: (size: number) => formatFileSize(size),
+    },
+    {
+      title: '文件 ID',
+      dataIndex: 'id',
+      key: 'id',
+      width: 180,
+      render: (id: string) => (
+        <Typography.Text copyable={{ text: id }} style={{ fontSize: 12 }}>
+          {id.slice(0, 8)}…
+        </Typography.Text>
+      ),
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      width: 170,
+      render: (date: string) => new Date(date).toLocaleString(),
+    },
+    {
+      title: '操作',
+      key: 'action',
+      width: 100,
+      fixed: 'right',
+      render: (_: unknown, record: FileAssetListItem) => (
+        <Button
+          type="link"
+          size="small"
+          icon={<DownloadOutlined />}
+          onClick={() => handleDownload(record)}
+        >
+          下载
+        </Button>
+      ),
+    },
+  ];
+
+  if (error) {
+    return (
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary }} />
+          <Title level={4} style={{ margin: 0 }}>
+            媒体中心
+          </Title>
+        </div>
+        <Alert
+          type="error"
+          message="加载媒体列表失败"
+          description={error}
+          showIcon
+          action={
+            <Button type="primary" onClick={fetchData}>
+              重试
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-        <div style={{ width: 4, height: 20, borderRadius: 2, background: '#2563eb' }} />
-        <Title level={4} style={{ margin: 0 }}>
-          媒体中心
-        </Title>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 12,
+          marginBottom: 16,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary }} />
+          <Title level={4} style={{ margin: 0 }}>
+            媒体中心
+          </Title>
+          <Text type="secondary" style={{ fontSize: 13 }}>
+            统一管理平台所有上传的文件资产，按类型 / 实体 / 组织分开浏览
+          </Text>
+        </div>
+        <Button icon={<DeleteOutlined />} onClick={() => navigate('/files/orphans')}>
+          孤立文件清理
+        </Button>
       </div>
-      <Text type="secondary" style={{ display: 'block', marginBottom: 16, marginLeft: 12, fontSize: 13 }}>
-        统一管理平台所有上传的媒体文件。媒体文件按所属实体（产品、内容等）分散管理，请通过下方入口进入对应模块
-      </Text>
 
-      <Alert
-        type="info"
-        message="媒体中心说明"
-        description="平台媒体文件采用分散管理模式 — 产品图片归属于产品管理模块，内容插图归属于内容管理模块。媒体中心提供统一的入口导航，方便快速定位。"
-        showIcon
-        style={{ marginBottom: 24 }}
+      <Space
+        wrap
+        style={{ marginBottom: 16 }}
+        size={12}
+      >
+        <Input.Search
+          placeholder="搜索文件名..."
+          allowClear
+          value={query.search}
+          onChange={(e) =>
+            setQuery((prev) => ({ ...prev, search: e.target.value, page: 1 }))
+          }
+          onSearch={(value) =>
+            setQuery((prev) => ({ ...prev, search: value, page: 1 }))
+          }
+          prefix={<SearchOutlined />}
+          style={{ width: 220 }}
+        />
+        <Select
+          placeholder="文件类型"
+          allowClear
+          value={query.fileType || undefined}
+          onChange={(value) =>
+            setQuery((prev) => ({ ...prev, fileType: value || undefined, page: 1 }))
+          }
+          options={FILE_TYPE_OPTIONS}
+          style={{ width: 140 }}
+        />
+        <Select
+          placeholder="所属实体"
+          allowClear
+          value={query.entityType || undefined}
+          onChange={(value) =>
+            setQuery((prev) => ({ ...prev, entityType: value || undefined, page: 1 }))
+          }
+          options={ENTITY_TYPE_OPTIONS}
+          style={{ width: 140 }}
+        />
+        <Select
+          placeholder="所属组织"
+          allowClear
+          showSearch
+          optionFilterProp="label"
+          value={query.organizationId || undefined}
+          onChange={(value) =>
+            setQuery((prev) => ({ ...prev, organizationId: value || undefined, page: 1 }))
+          }
+          options={orgOptions}
+          style={{ width: 200 }}
+        />
+        <Button icon={<ReloadOutlined />} onClick={handleReset}>
+          重置
+        </Button>
+        <Button onClick={fetchData}>刷新</Button>
+      </Space>
+
+      <Table<FileAssetListItem>
+        rowKey="id"
+        columns={columns}
+        dataSource={items}
+        loading={loading}
+        onChange={handleTableChange}
+        pagination={{
+          current: query.page,
+          pageSize: query.pageSize,
+          total,
+          showSizeChanger: true,
+          showTotal: (t) => `共 ${t} 个文件`,
+        }}
+        scroll={{ x: 'max-content' }}
+        locale={{ emptyText: '暂无媒体文件' }}
       />
-
-      <Row gutter={[16, 16]}>
-        {MEDIA_ENTRIES.map((entry) => (
-          <Col key={entry.path} xs={24} sm={12} lg={8}>
-            <Card
-              hoverable
-              onClick={() => navigate(entry.path)}
-              style={{ height: '100%', cursor: 'pointer' }}
-            >
-              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                <div style={{ textAlign: 'center' }}>{entry.icon}</div>
-                <div>
-                  <Title level={5} style={{ margin: 0, textAlign: 'center' }}>
-                    {entry.title}
-                  </Title>
-                  <Paragraph
-                    type="secondary"
-                    style={{ textAlign: 'center', margin: '8px 0 0', fontSize: 13 }}
-                  >
-                    {entry.description}
-                  </Paragraph>
-                  <Text
-                    type="secondary"
-                    style={{
-                      display: 'block',
-                      textAlign: 'center',
-                      marginTop: 8,
-                      fontSize: 12,
-                      fontStyle: 'italic',
-                    }}
-                  >
-                    {entry.hint}
-                  </Text>
-                </div>
-              </Space>
-            </Card>
-          </Col>
-        ))}
-      </Row>
     </div>
   );
 }
+
+export default MediaList;

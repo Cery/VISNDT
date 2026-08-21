@@ -6,6 +6,7 @@ import {
   Param,
   Req,
   Body,
+  Query,
   UseGuards,
   UseInterceptors,
   UploadedFile,
@@ -15,7 +16,9 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { Response } from 'express';
+import { FileType } from '@prisma/client';
 import { FileAssetService } from './file-asset.service';
+import type { ListFilesQuery } from './file-asset.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -31,6 +34,22 @@ export class FileAssetController {
   constructor(private readonly service: FileAssetService) {}
 
   /**
+   * List all FileAssets (read-only, ADMIN only) for the unified media center.
+   * Supports: fileType / entityType / organizationId / search / page / pageSize.
+   */
+  @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      'List all file assets (ADMIN only). Supports fileType, entityType, organizationId, search, page, pageSize',
+  })
+  async findAll(@Query() query: ListFilesQuery) {
+    return ApiResponse.ok(await this.service.findAll(query));
+  }
+
+  /**
    * Upload a file to S3/MinIO and create a FileAsset record.
    * ADMIN only.
    */
@@ -39,14 +58,29 @@ export class FileAssetController {
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Upload a file (ADMIN only, max 10MB)' })
+  @ApiOperation({
+    summary:
+      'Upload a file (ADMIN only, max 10MB). Optional fileType: IMAGE/DOCUMENT/CERTIFICATE/SPEC_SHEET/ILLUSTRATION/OTHER',
+  })
   @UseInterceptors(FileInterceptor('file'))
   async upload(
     @UploadedFile() file: Express.Multer.File,
     @Req() req: AuthRequest,
+    @Query('fileType') fileType?: string,
   ) {
-    const fileAsset = await this.service.upload(file, req.user.id);
+    const fileAsset = await this.service.upload(
+      file,
+      req.user.id,
+      undefined,
+      this.resolveFileType(fileType),
+    );
     return ApiResponse.ok(fileAsset, 'File uploaded');
+  }
+
+  private resolveFileType(fileType?: string): FileType | undefined {
+    if (!fileType) return undefined;
+    const upper = fileType.toUpperCase() as FileType;
+    return Object.values(FileType).includes(upper) ? upper : undefined;
   }
 
   /**

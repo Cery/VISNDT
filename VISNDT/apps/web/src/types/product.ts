@@ -1,12 +1,18 @@
 import type { ProductCategory } from './category';
 import type { Organization } from './organization';
 
-/** Product media (image, document, etc.) */
+/** Product media (image, document, spec sheet, illustration, certificate, etc.) */
 export interface ProductMedia {
   id: string;
   productId: string;
   fileAssetId: string | null;
-  mediaType: 'IMAGE' | 'DOCUMENT' | 'CERTIFICATE' | 'OTHER';
+  mediaType:
+    | 'IMAGE'
+    | 'DOCUMENT'
+    | 'CERTIFICATE'
+    | 'SPEC_SHEET'
+    | 'ILLUSTRATION'
+    | 'OTHER';
   title: string | null;
   description: string | null;
   isPrimary: boolean;
@@ -65,7 +71,13 @@ export interface ProductParameterValue {
 export interface ProductPrimaryMedia {
   id: string;
   fileAssetId: string | null;
-  mediaType: 'IMAGE' | 'DOCUMENT' | 'CERTIFICATE' | 'OTHER';
+  mediaType:
+    | 'IMAGE'
+    | 'DOCUMENT'
+    | 'CERTIFICATE'
+    | 'SPEC_SHEET'
+    | 'ILLUSTRATION'
+    | 'OTHER';
   title: string | null;
   isPrimary: boolean;
   displayOrder: number;

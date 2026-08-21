@@ -211,7 +211,13 @@ export default function ProductDetailContent({
                       >
                         <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
                           <span className="text-xs text-primary font-medium">
-                            {doc.mediaType === 'CERTIFICATE' ? '证书' : '文档'}
+                            {doc.mediaType === 'CERTIFICATE'
+                              ? '证书'
+                              : doc.mediaType === 'SPEC_SHEET'
+                                ? '规格书'
+                                : doc.mediaType === 'ILLUSTRATION'
+                                  ? '插图'
+                                  : '文档'}
                           </span>
                         </div>
                         <div className="min-w-0">
