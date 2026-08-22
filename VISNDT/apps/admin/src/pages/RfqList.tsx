@@ -3,11 +3,12 @@ import { Table, Select, Space, Spin, Alert, Button, Typography, Input, message, 
 import { ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
-import { rfqService } from '../api';
+import { rfqService, organizationService } from '../api';
 import type { Rfq } from '../types';
 import { BatchActionBar } from '../components/operation';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
+import { BusinessIdentityBadge } from '@visndt/design-system';
 
 const { Title, Text } = Typography;
 
@@ -52,12 +53,32 @@ function RfqList() {
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [batchLoading, setBatchLoading] = useState(false);
+  const [orgNameMap, setOrgNameMap] = useState<Map<string, string>>(new Map());
   const [query, setQuery] = useState<QueryParams>({
     page: 1,
     pageSize: 20,
     keyword: '',
     status: '',
   });
+
+  // Load organization name mapping for targetOrganization display (reuse existing API)
+  useEffect(() => {
+    const loadOrgNames = async () => {
+      try {
+        const result = await organizationService.getList({ page: 1, pageSize: 10000 });
+        const map = new Map<string, string>();
+        for (const org of result.data) {
+          if (org.id && org.name) {
+            map.set(org.id, org.name);
+          }
+        }
+        setOrgNameMap(map);
+      } catch {
+        // Non-critical
+      }
+    };
+    loadOrgNames();
+  }, []);
 
   const fetchRfqs = useCallback(async () => {
     setPageState({ status: 'loading' });
@@ -79,7 +100,7 @@ function RfqList() {
       }
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : '加载询价失败';
+        err instanceof Error ? err.message : '加载 RFQ 失败';
       setPageState({ status: 'error', message });
     }
   }, [query]);
@@ -188,13 +209,46 @@ function RfqList() {
     );
   }
 
+  // Group RFQs by demand.id for UI aggregation (sort + rowSpan)
+  const groupedData: Rfq[] = pageState.status === 'success'
+    ? [...pageState.data].sort((a, b) => {
+        const da = a.demand?.id ?? '';
+        const db = b.demand?.id ?? '';
+        if (da === db) return 0;
+        return da < db ? -1 : 1;
+      })
+    : [];
+
+  // Compute rowSpan map for demand column (first row of each demand group gets count, others get 0)
+  const demandRowSpanMap = new Map<string, number>();
+  if (groupedData.length > 0) {
+    const demandCounts = new Map<string, number>();
+    for (const rfq of groupedData) {
+      const demandId = rfq.demand?.id ?? rfq.demandId ?? '';
+      demandCounts.set(demandId, (demandCounts.get(demandId) ?? 0) + 1);
+    }
+    let prevDemandId: string | null = null;
+    for (const rfq of groupedData) {
+      const demandId = rfq.demand?.id ?? rfq.demandId ?? '';
+      const rfqKey = rfq.id;
+      if (demandId !== prevDemandId) {
+        demandRowSpanMap.set(rfqKey, demandCounts.get(demandId) ?? 1);
+        prevDemandId = demandId;
+      } else {
+        demandRowSpanMap.set(rfqKey, 0);
+      }
+    }
+  }
+
   const columns: ColumnsType<Rfq> = [
     {
-      title: '编号',
+      title: 'RFQ 编号',
       dataIndex: 'id',
       key: 'id',
-      width: 100,
-      render: (id: string) => id.slice(0, 8) + '...',
+      width: 180,
+      render: (_: unknown, record: Rfq) => (
+        <BusinessIdentityBadge type="RFQ" id={record.id} createdAt={record.createdAt} variant="plain" />
+      ),
     },
     {
       title: '状态',
@@ -209,7 +263,35 @@ function RfqList() {
       title: '需求',
       dataIndex: 'demand',
       key: 'demand',
-      render: (demand: Rfq['demand']) => demand?.title || '-',
+      render: (demand: Rfq['demand'], record: Rfq) => {
+        const rowSpan = demandRowSpanMap.get(record.id) ?? 1;
+        const demandId = demand?.id ?? record.demandId;
+        return {
+          children: (
+            <div>
+              <div style={{ fontWeight: 500 }}>{demand?.title || '-'}</div>
+              {demandId && (
+                <div style={{ marginTop: 4 }}>
+                  <BusinessIdentityBadge type="DEMAND" id={demandId} variant="plain" />
+                </div>
+              )}
+            </div>
+          ),
+          props: { rowSpan },
+        };
+      },
+    },
+    {
+      title: '目标供应商',
+      key: 'targetOrganization',
+      width: 160,
+      render: (_: unknown, record: Rfq) => {
+        if (!record.targetOrganizationId) {
+          return <span style={{ color: VISNDT_COLORS.neutral }}>公开</span>;
+        }
+        const orgName = orgNameMap.get(record.targetOrganizationId);
+        return orgName || record.targetOrganizationId.slice(0, 8) + '...';
+      },
     },
     {
       title: '创建者',
@@ -267,10 +349,10 @@ function RfqList() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>RFQ Operations</Title>
+          <Title level={4} style={{ margin: 0 }}>RFQ 管理</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          Manage RFQ lifecycle, status and supplier responses
+          管理 RFQ 生命周期、状态与供应商响应
         </Text>
       </div>
 
@@ -297,7 +379,7 @@ function RfqList() {
           icon={<PlusOutlined />}
           onClick={() => navigate('/rfqs/create')}
         >
-          创建询价
+          创建 RFQ
         </Button>
       </Space>
 
@@ -326,13 +408,13 @@ function RfqList() {
       {pageState.status === 'empty' ? (
         <Alert
           type="info"
-          message="暂无询价"
+          message="暂无 RFQ"
           showIcon
         />
       ) : (
         <Table<Rfq>
           columns={columns}
-          dataSource={pageState.data}
+          dataSource={groupedData}
           rowKey="id"
           scroll={{ x: 'max-content' }}
           rowSelection={{

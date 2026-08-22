@@ -17,6 +17,7 @@ import { offerService } from '../api';
 import type { Offer } from '../types';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
+import { BusinessIdentityBadge } from '@visndt/design-system';
 
 const { Title, Text } = Typography;
 
@@ -178,7 +179,9 @@ export default function OfferDetailPage() {
       {/* Card 1: Offer Summary */}
       <Card title="报价摘要" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="报价编号">{offer.id}</Descriptions.Item>
+          <Descriptions.Item label="报价编号">
+            <BusinessIdentityBadge type="OFFER" id={offer.id} createdAt={offer.createdAt} />
+          </Descriptions.Item>
           <Descriptions.Item label="状态">
             <StatusTag status={offer.status} />
           </Descriptions.Item>

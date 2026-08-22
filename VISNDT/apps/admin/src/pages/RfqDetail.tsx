@@ -19,6 +19,7 @@ import { rfqService, rfqResponseService } from '../api';
 import type { Rfq, RfqResponse } from '../types';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
+import { BusinessIdentityBadge, WorkflowTimeline, buildRfqTimeline } from '@visndt/design-system';
 
 const { Title, Text } = Typography;
 
@@ -242,7 +243,9 @@ export default function RfqDetailPage() {
 
       <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="ID">{rfq.id}</Descriptions.Item>
+          <Descriptions.Item label="RFQ 编号">
+            <BusinessIdentityBadge type="RFQ" id={rfq.id} createdAt={rfq.createdAt} />
+          </Descriptions.Item>
           <Descriptions.Item label="状态">
             <StatusTag status={rfq.status} label={RFQ_STATUS_LABEL_MAP[rfq.status] || rfq.status} />
           </Descriptions.Item>
@@ -327,7 +330,19 @@ export default function RfqDetailPage() {
       </Card>
 
       <Card title="时间线" style={{ marginBottom: 16 }}>
-        <Descriptions bordered column={{ xs: 1, sm: 2 }}>
+        <WorkflowTimeline
+          title="业务流转"
+          steps={buildRfqTimeline(rfq.status, {
+            createdAt: rfq.createdAt,
+            publishedAt: rfq.publishedAt,
+            closedAt: rfq.closedAt,
+          })}
+        />
+        <Descriptions
+          bordered
+          column={{ xs: 1, sm: 2 }}
+          style={{ marginTop: 16 }}
+        >
           <Descriptions.Item label="创建时间">
             {formatDate(rfq.createdAt)}
           </Descriptions.Item>

@@ -35,7 +35,9 @@ function ProfileContent() {
   const updateMutation = useMutation({
     mutationFn: (data: { name?: string; type?: string }) =>
       updateOrganization(organizationId!, data),
-    onSuccess: () => {
+    onSuccess: (updated) => {
+      // Reflect the returned data immediately so the page does not depend on a manual refresh.
+      queryClient.setQueryData(['organization', organizationId], updated);
       queryClient.invalidateQueries({ queryKey: ['organization', organizationId] });
       setIsEditing(false);
       setSaveError(null);

@@ -12,6 +12,8 @@ import RFQResponseStatusBadge from '@/components/rfq/RFQResponseStatusBadge';
 import RFQStatusBadge from '@/components/rfq/RFQStatusBadge';
 import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
 import StatCard from '@/components/workspace/StatCard';
+import UiIcon from '@/lib/ui-icon';
+import { BusinessIdentityBadge } from '@visndt/design-system';
 import {
   getSupplierWorkspaceOverview,
   getSupplierWorkspaceResponses,
@@ -19,6 +21,22 @@ import {
 } from '@/services/workspace.service';
 import { getOffers } from '@/services/offer.service';
 import { getAvailableRfqs } from '@/services/rfq.service';
+
+const STATUS_LABEL_MAP: Record<string, string> = {
+  DRAFT: '草稿',
+  PUBLISHED: '已发布',
+  SUBMITTED: '已提交',
+  PROCESSING: '处理中',
+  OPEN: '开放',
+  RESPONDING: '响应中',
+  CLOSED: '已关闭',
+  CANCELLED: '已取消',
+  ACCEPTED: '已接受',
+  REJECTED: '已拒绝',
+  VIEWED: '已查看',
+  PENDING: '待处理',
+  MATCHED: '已匹配',
+};
 
 function formatDateTime(value?: string | null) {
   if (!value) {
@@ -37,7 +55,7 @@ function formatStatusCounts(statusCounts?: Record<string, number>) {
 
   return entries
     .slice(0, 3)
-    .map(([status, count]) => `${status} ${count}`)
+    .map(([status, count]) => `${STATUS_LABEL_MAP[status] || status} ${count}`)
     .join(' / ');
 }
 
@@ -54,49 +72,49 @@ const DOMAIN_NAV_ITEMS = [
     title: 'RFQ机会',
     description: '进入定向 RFQ 列表，查看当前可跟进的询价机会。',
     href: '/workspace/supplier/rfqs',
-    icon: '📄',
+    icon: 'file',
   },
   {
     title: '商机中心',
     description: '发现公开 RFQ 机会、查看匹配机会和定向询价，把握业务先机。',
     href: '/workspace/supplier/opportunities',
-    icon: '🎯',
+    icon: 'target',
   },
   {
     title: '我的响应',
     description: '查看已提交响应的状态跟踪与历史记录。',
     href: '/workspace/supplier/responses',
-    icon: '📨',
+    icon: 'send',
   },
   {
     title: '我的 Offer',
     description: '查看和管理供应能力 Offer，创建新 Offer 并提交。',
     href: '/workspace/supplier/offers',
-    icon: '📦',
+    icon: 'package',
   },
   {
     title: '企业资料',
     description: '查看和编辑组织基础信息，维护企业身份与公开资料。',
     href: '/workspace/supplier/profile',
-    icon: '🏢',
+    icon: 'building',
   },
   {
     title: '展示管理',
     description: '查看和管理供应商公开展示能力，包括企业身份、产品能力和供应管理。',
     href: '/workspace/supplier/display',
-    icon: '📋',
+    icon: 'list',
   },
   {
     title: '通知中心',
     description: '进入通知页面查看当前消息和提醒。',
     href: '/workspace/notifications',
-    icon: '🔔',
+    icon: 'bell',
   },
   {
     title: '设置',
     description: '进入工作区设置查看当前账号与偏好配置。',
     href: '/workspace/settings',
-    icon: '⚙️',
+    icon: 'settings',
   },
 ] as const;
 
@@ -203,37 +221,37 @@ function SupplierDashboardContent() {
                 label="待处理 RFQ"
                 value={overviewQuery.data.rfqSummary.total}
                 description={formatStatusCounts(overviewQuery.data.rfqSummary.statusCounts)}
-                icon="📄"
+                icon="file"
               />
               <StatCard
                 label="已提交响应"
                 value={overviewQuery.data.responseSummary.total}
                 description={formatStatusCounts(overviewQuery.data.responseSummary.statusCounts)}
-                icon="📨"
+                icon="send"
               />
               <StatCard
                 label="匹配机会"
                 value={overviewQuery.data.matchSummary.total}
                 description={formatStatusCounts(overviewQuery.data.matchSummary.statusCounts)}
-                icon="🔗"
+                icon="link"
               />
               <StatCard
                 label="公开 RFQ"
                 value={availableRfqsQuery.data?.total ?? 0}
-                description="可参与报价"
-                icon="🎯"
+                description="可参与响应"
+                icon="target"
               />
               <StatCard
                 label="我的 Offer"
                 value={offersQuery.data?.total ?? 0}
                 description="供应能力 Offer"
-                icon="📦"
+                icon="package"
               />
               <StatCard
                 label="未读通知"
                 value={overviewQuery.data.notificationSummary.unreadCount}
                 description="条未读消息"
-                icon="🔔"
+                icon="bell"
               />
             </div>
           )}
@@ -250,7 +268,7 @@ function SupplierDashboardContent() {
               href="/workspace/supplier/rfqs"
               className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 transition-all hover:border-primary/30 hover:bg-white hover:shadow-sm"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100 text-blue-600 text-lg">📄</span>
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100 text-blue-600 text-lg"><UiIcon name="file" size={18} color="currentColor" /></span>
               <div>
                 <p className="text-sm font-medium text-slate-900">查看 RFQ</p>
                 <p className="text-xs text-slate-500">{overviewQuery.data?.rfqSummary.total ?? 0} 个待处理</p>
@@ -260,7 +278,7 @@ function SupplierDashboardContent() {
               href="/workspace/supplier/opportunities"
               className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 transition-all hover:border-primary/30 hover:bg-white hover:shadow-sm"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 text-lg">🎯</span>
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 text-lg"><UiIcon name="target" size={18} color="currentColor" /></span>
               <div>
                 <p className="text-sm font-medium text-slate-900">商机中心</p>
                 <p className="text-xs text-slate-500">{availableRfqsQuery.data?.total ?? 0} 个公开 RFQ</p>
@@ -270,7 +288,7 @@ function SupplierDashboardContent() {
               href="/workspace/supplier/responses"
               className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 transition-all hover:border-primary/30 hover:bg-white hover:shadow-sm"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100 text-amber-600 text-lg">📨</span>
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100 text-amber-600 text-lg"><UiIcon name="send" size={18} color="currentColor" /></span>
               <div>
                 <p className="text-sm font-medium text-slate-900">我的响应</p>
                 <p className="text-xs text-slate-500">{overviewQuery.data?.responseSummary.total ?? 0} 条记录</p>
@@ -280,7 +298,7 @@ function SupplierDashboardContent() {
               href="/workspace/supplier/offers"
               className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 transition-all hover:border-primary/30 hover:bg-white hover:shadow-sm"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-100 text-teal-600 text-lg">📦</span>
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-100 text-teal-600 text-lg"><UiIcon name="package" size={18} color="currentColor" /></span>
               <div>
                 <p className="text-sm font-medium text-slate-900">我的 Offer</p>
                 <p className="text-xs text-slate-500">{offersQuery.data?.total ?? 0} 个 Offer</p>
@@ -290,7 +308,7 @@ function SupplierDashboardContent() {
               href="/workspace/supplier/profile"
               className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 transition-all hover:border-primary/30 hover:bg-white hover:shadow-sm"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-100 text-sky-600 text-lg">🏢</span>
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-sky-100 text-sky-600 text-lg"><UiIcon name="building" size={18} color="currentColor" /></span>
               <div>
                 <p className="text-sm font-medium text-slate-900">企业资料</p>
                 <p className="text-xs text-slate-500">管理组织信息</p>
@@ -300,7 +318,7 @@ function SupplierDashboardContent() {
               href="/workspace/supplier/display"
               className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 transition-all hover:border-primary/30 hover:bg-white hover:shadow-sm"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-100 text-purple-600 text-lg">📋</span>
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-100 text-purple-600 text-lg"><UiIcon name="list" size={18} color="currentColor" /></span>
               <div>
                 <p className="text-sm font-medium text-slate-900">展示管理</p>
                 <p className="text-xs text-slate-500">管理能力展示</p>
@@ -310,7 +328,7 @@ function SupplierDashboardContent() {
               href="/workspace/notifications"
               className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 transition-all hover:border-primary/30 hover:bg-white hover:shadow-sm"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-100 text-rose-600 text-lg">🔔</span>
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-100 text-rose-600 text-lg"><UiIcon name="bell" size={18} color="currentColor" /></span>
               <div>
                 <p className="text-sm font-medium text-slate-900">通知中心</p>
                 <p className="text-xs text-slate-500">{overviewQuery.data?.notificationSummary.unreadCount ?? 0} 条未读</p>
@@ -346,7 +364,7 @@ function SupplierDashboardContent() {
                     <div className="space-y-2">
                       <div className="flex flex-wrap items-center gap-2">
                         <RFQStatusBadge status={rfq.status} />
-                        <span className="text-xs text-slate-400">RFQ ID: {rfq.id}</span>
+                        <BusinessIdentityBadge type="RFQ" id={rfq.id} createdAt={rfq.createdAt} variant="plain" />
                       </div>
                       <h3 className="text-base font-semibold text-slate-900">
                         {rfq.title}
@@ -412,19 +430,19 @@ function SupplierDashboardContent() {
                   label="已提交"
                   value={submittedResponseCount}
                   description="当前处于已提交状态的响应数"
-                  icon="📨"
+                  icon="send"
                 />
                 <StatCard
                   label="处理中"
                   value={pendingResponseCount}
                   description="尚未进入最终结果的响应数"
-                  icon="⏳"
+                  icon="clock"
                 />
                 <StatCard
                   label="已接受"
                   value={acceptedResponseCount}
                   description="已接受的响应数"
-                  icon="✅"
+                  icon="check"
                 />
               </div>
 
@@ -441,9 +459,7 @@ function SupplierDashboardContent() {
                         <div className="space-y-2">
                           <div className="flex flex-wrap items-center gap-2">
                             <RFQResponseStatusBadge status={response.status} />
-                            <span className="text-xs text-slate-400">
-                              Response ID: {response.id}
-                            </span>
+                            <BusinessIdentityBadge type="RFQ_RESPONSE" id={response.id} createdAt={response.createdAt} variant="plain" />
                           </div>
                           <h3 className="text-base font-semibold text-slate-900">
                             {response.rfq.title}
@@ -563,7 +579,7 @@ function SupplierDashboardContent() {
                   <h3 className="text-base font-semibold text-slate-900 group-hover:text-primary transition-colors">
                     {item.title}
                   </h3>
-                  <span className="text-xl">{item.icon}</span>
+                  <span className="text-xl"><UiIcon name={item.icon} size={22} color="#94a3b8" /></span>
                 </div>
                 <p className="text-sm text-slate-500 leading-relaxed">{item.description}</p>
                 <span className="inline-flex items-center gap-1 mt-4 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">

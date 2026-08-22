@@ -1,4 +1,5 @@
 import MatchCard from './MatchCard';
+import UiIcon from '@/lib/ui-icon';
 import type { MatchItem } from '@/services/match.service';
 
 interface MatchListProps {
@@ -25,7 +26,7 @@ export default function MatchList({ matches, isLoading, onStatusUpdate, onRematc
   if (matches.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-12 text-center">
-        <div className="text-3xl mb-3">🔗</div>
+        <div className="text-3xl mb-3"><UiIcon name="link" size={40} color="#94a3b8" /></div>
         <h3 className="text-sm font-medium text-slate-700 mb-1">
           暂无匹配结果
         </h3>

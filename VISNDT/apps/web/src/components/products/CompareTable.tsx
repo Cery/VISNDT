@@ -2,6 +2,7 @@
 
 import { Fragment } from 'react';
 import type { ProductDetail, ProductParameterValue, ParameterGroup } from '@/types/product';
+import { formatValueWithUnit } from '@/lib/format';
 
 interface CompareTableProps {
   products: ProductDetail[];
@@ -43,16 +44,16 @@ export default function CompareTable({ products, parameterGroups }: CompareTable
         });
       }
       const entry = paramMap.get(key)!;
-      // Display value: prefer valueNumber with unit, else raw value
-      const unit = pv.parameterDefinition.unit ? ` ${pv.parameterDefinition.unit}` : '';
+      // Display value: use unified formatter to ensure value-unit spacing
+      const unit = pv.parameterDefinition.unit ?? null;
       const displayVal =
         pv.parameterDefinition.dataType === 'NUMBER' && pv.valueNumber !== null
-          ? `${pv.valueNumber}${unit}`
+          ? formatValueWithUnit(pv.valueNumber, unit)
           : pv.parameterDefinition.dataType === 'BOOLEAN'
             ? pv.value === 'true' || pv.value === '1'
               ? '是'
               : '否'
-            : `${pv.value}${unit}`;
+            : formatValueWithUnit(pv.value, unit);
       entry.values.set(product.id, displayVal);
     }
   }

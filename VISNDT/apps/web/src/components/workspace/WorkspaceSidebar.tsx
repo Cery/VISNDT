@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/auth/AuthProvider';
+import UiIcon from '@/lib/ui-icon';
+import type { UiIconName } from '@/lib/ui-icon';
 import type { WorkspaceRole } from '@/services/auth.service';
 
 type NavigableWorkspaceRole = Exclude<WorkspaceRole, null>;
@@ -10,28 +12,28 @@ type NavigableWorkspaceRole = Exclude<WorkspaceRole, null>;
 interface NavItem {
   label: string;
   href: string;
-  icon: string;
+  icon: UiIconName;
   badge?: string;
 }
 
 const NAV_CONFIG: Record<NavigableWorkspaceRole, NavItem[]> = {
   BUYER: [
-    { label: '仪表盘', href: '/dashboard/buyer', icon: '📊' },
-    { label: '我的需求', href: '/workspace/demands', icon: '📋' },
-    { label: '询价单', href: '/workspace/rfqs', icon: '📄' },
-    { label: '匹配结果', href: '/workspace/matches', icon: '🔗' },
-    { label: '通知中心', href: '/workspace/notifications', icon: '🔔' },
-    { label: '设置', href: '/workspace/settings', icon: '⚙️' },
+    { label: '仪表盘', href: '/dashboard/buyer', icon: 'dashboard' },
+    { label: '我的需求', href: '/workspace/demands', icon: 'list' },
+    { label: '我的询价请求', href: '/workspace/rfqs', icon: 'file' },
+    { label: '匹配结果', href: '/workspace/matches', icon: 'link' },
+    { label: '通知中心', href: '/workspace/notifications', icon: 'bell' },
+    { label: '设置', href: '/workspace/settings', icon: 'settings' },
   ],
   SUPPLIER: [
-    { label: '仪表盘', href: '/dashboard/supplier', icon: '📊' },
-    { label: 'RFQs', href: '/workspace/supplier/rfqs', icon: '📄' },
-    { label: 'Responses', href: '/workspace/supplier/responses', icon: '📨' },
-    { label: 'Offers', href: '/workspace/supplier/offers', icon: '📦' },
-    { label: 'Opportunities', href: '/workspace/supplier/opportunities', icon: '🎯' },
-    { label: 'Profile', href: '/workspace/supplier/profile', icon: '🏢' },
-    { label: 'Notifications', href: '/workspace/notifications', icon: '🔔' },
-    { label: 'Display', href: '/workspace/supplier/display', icon: '📋' },
+    { label: '仪表盘', href: '/dashboard/supplier', icon: 'dashboard' },
+    { label: 'RFQ 机会', href: '/workspace/supplier/rfqs', icon: 'file' },
+    { label: '我的响应', href: '/workspace/supplier/responses', icon: 'send' },
+    { label: '我的报价', href: '/workspace/supplier/offers', icon: 'package' },
+    { label: '商机', href: '/workspace/supplier/opportunities', icon: 'target' },
+    { label: '企业资料', href: '/workspace/supplier/profile', icon: 'building' },
+    { label: '通知中心', href: '/workspace/notifications', icon: 'bell' },
+    { label: '能力展示', href: '/workspace/supplier/display', icon: 'list' },
   ],
 };
 
@@ -110,7 +112,7 @@ export default function WorkspaceSidebar({ mobileOpen, onClose }: WorkspaceSideb
                       : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                   }`}
                 >
-                  <span className="text-base">{item.icon}</span>
+                  <UiIcon name={item.icon} size={18} color="#94a3b8" />
                   <span className="flex-1">{item.label}</span>
                   {item.badge && (
                     <span className="rounded-full border border-slate-600 px-2 py-0.5 text-[10px] uppercase tracking-wide text-slate-400">

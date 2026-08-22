@@ -1,8 +1,11 @@
+import UiIcon from '@/lib/ui-icon';
+import type { UiIconName } from '@/lib/ui-icon';
+
 interface StatCardProps {
   label: string;
   value: string | number;
   description?: string;
-  icon?: string;
+  icon?: UiIconName;
 }
 
 export default function StatCard({ label, value, description, icon }: StatCardProps) {
@@ -12,7 +15,7 @@ export default function StatCard({ label, value, description, icon }: StatCardPr
         <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
           {label}
         </span>
-        {icon && <span className="text-lg">{icon}</span>}
+        {icon && <UiIcon name={icon} size={20} color="#94a3b8" />}
       </div>
       <p className="text-2xl font-bold text-slate-900">{value}</p>
       {description && (

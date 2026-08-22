@@ -23,7 +23,9 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      router.replace('/workspace/dashboard');
+      // FB2 fix: 重定向到 /dashboard 入口，由 /dashboard/page.tsx 根据 workspaceRole 角色分流
+      //（BUYER→/dashboard/buyer, SUPPLIER→/dashboard/supplier, ADMIN→管理控制台引导）
+      router.replace('/dashboard');
     } catch (err) {
       setStatus('error');
       if (err instanceof Error) {

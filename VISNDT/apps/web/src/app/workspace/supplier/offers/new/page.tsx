@@ -36,7 +36,7 @@ function OfferCreateContent() {
     async (e: React.FormEvent) => {
       e.preventDefault();
       if (!productId || !title.trim()) {
-        setError('请选择产品并填写 Offer 标题。');
+        setError('请选择产品并填写报价标题。');
         return;
       }
 
@@ -53,7 +53,7 @@ function OfferCreateContent() {
         });
         router.push(`/workspace/supplier/offers/${created.id}/edit`);
       } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : '创建 Offer 失败，请稍后重试。';
+        const message = err instanceof Error ? err.message : '创建报价失败，请稍后重试。';
         setError(message);
       } finally {
         setSubmitting(false);
@@ -67,9 +67,9 @@ function OfferCreateContent() {
       <div className="mx-auto max-w-[720px] space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">创建 Offer</h1>
+          <h1 className="text-2xl font-bold text-slate-900">创建报价</h1>
           <p className="mt-1 text-sm text-slate-500">
-            创建新的供应能力 Offer，关联平台产品并填写供应信息。
+            创建新的供应能力报价，关联平台产品并填写供应信息。
           </p>
         </div>
 
@@ -130,13 +130,13 @@ function OfferCreateContent() {
 
           {/* Offer Details */}
           <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Offer 信息</h2>
-            <p className="mt-1 text-sm text-slate-500">填写 Offer 的基本信息。</p>
+            <h2 className="text-lg font-semibold text-slate-900">报价信息</h2>
+            <p className="mt-1 text-sm text-slate-500">填写报价的基本信息。</p>
 
             <div className="mt-4 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700">
-                  Offer 标题 <span className="text-rose-500">*</span>
+                  报价标题 <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -203,7 +203,7 @@ function OfferCreateContent() {
               disabled={submitting}
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:opacity-50"
             >
-              {submitting ? '创建中...' : '创建 Offer'}
+              {submitting ? '创建中...' : '创建报价'}
             </button>
             <button
               type="button"

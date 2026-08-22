@@ -23,15 +23,15 @@ const DECISION_READY_STATUSES = new Set(['SUBMITTED', 'VIEWED']);
 function getResponseStatusLabel(status: string) {
   switch (status) {
     case 'SUBMITTED':
-      return 'SUBMITTED';
+      return '已提交';
     case 'VIEWED':
-      return 'VIEWED';
+      return '已查看';
     case 'ACCEPTED':
-      return 'ACCEPTED';
+      return '已接受';
     case 'REJECTED':
-      return 'REJECTED';
+      return '已拒绝';
     default:
-      return status || 'UNKNOWN';
+      return status || '未知';
   }
 }
 
@@ -182,7 +182,7 @@ function RfqDetailContent({ id }: { id: string }) {
           onClick={() => router.push('/workspace/rfqs')}
           className="text-sm text-slate-500 hover:text-slate-700 mb-6 flex items-center gap-1 transition-colors"
         >
-          ← 返回询价列表
+          ← 返回询价请求列表
         </button>
 
             {isLoading ? (
@@ -225,10 +225,10 @@ function RfqDetailContent({ id }: { id: string }) {
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <h2 className="text-base font-semibold text-slate-900">
-                        Response Review
+                        响应审核
                       </h2>
                       <p className="mt-1 text-sm text-slate-500">
-                        Buyer 在此完成 RFQ Response 的审核与 Accept / Reject 决策。
+                        采购方在此审核供应商响应，并做出接受 / 拒绝决策。
                       </p>
                     </div>
                     <div className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
@@ -282,7 +282,7 @@ function RfqDetailContent({ id }: { id: string }) {
                                   disabled={!canDecide || isPending}
                                   className="rounded-md border border-emerald-600 bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-200 disabled:text-slate-500"
                                 >
-                                  {isPending ? '处理中...' : 'Accept'}
+                                  {isPending ? '处理中...' : '接受'}
                                 </button>
                                 <button
                                   type="button"
@@ -290,7 +290,7 @@ function RfqDetailContent({ id }: { id: string }) {
                                   disabled={!canDecide || isPending}
                                   className="rounded-md border border-rose-600 bg-white px-3 py-1.5 text-xs font-medium text-rose-600 transition-colors hover:bg-rose-50 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400"
                                 >
-                                  {isPending ? '处理中...' : 'Reject'}
+                                  {isPending ? '处理中...' : '拒绝'}
                                 </button>
                               </div>
                             </div>
@@ -298,15 +298,15 @@ function RfqDetailContent({ id }: { id: string }) {
                             <div className="mt-4 grid gap-3 md:grid-cols-2">
                               <div className="rounded-lg border border-slate-200 bg-white p-3">
                                 <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                                  Offer
+                                  报价
                                 </p>
                                 <p className="mt-2 text-sm text-slate-700">
-                                  {response.offer?.title || response.offerId || '未关联 Offer'}
+                                  {response.offer?.title || response.offerId || '未关联报价'}
                                 </p>
                               </div>
                               <div className="rounded-lg border border-slate-200 bg-white p-3">
                                 <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                                  Message
+                                  响应说明
                                 </p>
                                 <p className="mt-2 whitespace-pre-wrap text-sm text-slate-700">
                                   {response.message?.trim() || '供应商未填写说明。'}
@@ -316,11 +316,11 @@ function RfqDetailContent({ id }: { id: string }) {
 
                             {!canDecide ? (
                               <p className="mt-3 text-xs text-slate-500">
-                                当前状态为 {getResponseStatusLabel(response.status)}，该响应已完成决策，不再提供操作。
+                                当前状态为「{getResponseStatusLabel(response.status)}」，该响应已完成决策，不再提供操作。
                               </p>
                             ) : response.status === 'SUBMITTED' ? (
                               <p className="mt-3 text-xs text-slate-500">
-                                首次决策会先调用现有 `view` decision API，再继续执行 Accept / Reject。
+                                首次决策会将响应标记为已查看，再执行接受 / 拒绝。
                               </p>
                             ) : null}
                           </div>

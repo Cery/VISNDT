@@ -11,10 +11,28 @@ import Loading from '@/components/common/Loading';
 import BuyerActionSummary from '@/components/workspace/BuyerActionSummary';
 import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
 import StatCard from '@/components/workspace/StatCard';
+import UiIcon from '@/lib/ui-icon';
+import { BusinessIdentityBadge } from '@visndt/design-system';
 import {
   getBuyerPendingDecisions,
   getBuyerWorkspaceOverview,
 } from '@/services/workspace.service';
+
+const STATUS_LABEL_MAP: Record<string, string> = {
+  DRAFT: '草稿',
+  PUBLISHED: '已发布',
+  SUBMITTED: '已提交',
+  PROCESSING: '处理中',
+  OPEN: '开放',
+  RESPONDING: '响应中',
+  CLOSED: '已关闭',
+  CANCELLED: '已取消',
+  ACCEPTED: '已接受',
+  REJECTED: '已拒绝',
+  VIEWED: '已查看',
+  PENDING: '待处理',
+  MATCHED: '已匹配',
+};
 
 function formatDateTime(value?: string | null) {
   if (!value) {
@@ -33,7 +51,7 @@ function formatStatusCounts(statusCounts?: Record<string, number>) {
 
   return entries
     .slice(0, 3)
-    .map(([status, count]) => `${status} ${count}`)
+    .map(([status, count]) => `${STATUS_LABEL_MAP[status] || status} ${count}`)
     .join(' / ');
 }
 
@@ -42,25 +60,25 @@ const DOMAIN_NAV_ITEMS = [
     title: '我的需求',
     description: '查看 Demand 列表、状态和详情页入口。',
     href: '/workspace/demands',
-    icon: '📋',
+    icon: 'list',
   },
   {
-    title: '询价管理',
-    description: '进入 RFQ 列表，查看询价进度与待决策响应。',
+    title: '我的询价请求',
+    description: '进入 RFQ 列表，查看询价请求进度与待决策响应。',
     href: '/workspace/rfqs',
-    icon: '📄',
+    icon: 'file',
   },
   {
     title: '匹配结果',
     description: '查看当前 Matching 汇总与关联结果。',
     href: '/workspace/matches',
-    icon: '🔗',
+    icon: 'link',
   },
   {
     title: '通知中心',
     description: '进入通知页面查看当前消息和提醒。',
     href: '/workspace/notifications',
-    icon: '🔔',
+    icon: 'bell',
   },
 ] as const;
 
@@ -132,25 +150,25 @@ function BuyerDashboardContent() {
                 label="需求"
                 value={overviewQuery.data.demandSummary.total}
                 description={formatStatusCounts(overviewQuery.data.demandSummary.statusCounts)}
-                icon="📋"
+                icon="list"
               />
               <StatCard
-                label="询价"
+                label="询价请求"
                 value={overviewQuery.data.rfqSummary.total}
-                description="Buyer RFQ 总量"
-                icon="📄"
+                description="RFQ 总量"
+                icon="file"
               />
               <StatCard
                 label="匹配"
                 value={overviewQuery.data.matchSummary.total}
                 description={formatStatusCounts(overviewQuery.data.matchSummary.statusCounts)}
-                icon="🔗"
+                icon="link"
               />
               <StatCard
                 label="待决策响应"
                 value={overviewQuery.data.responseSummary.pendingCount}
                 description={`待处理 ${overviewQuery.data.responseSummary.pendingCount} / 已接受 ${overviewQuery.data.responseSummary.acceptedCount} / 已拒绝 ${overviewQuery.data.responseSummary.rejectedCount}`}
-                icon="⏳"
+                icon="clock"
               />
             </div>
           )}
@@ -180,7 +198,7 @@ function BuyerDashboardContent() {
               <BuyerActionSummary
                 title="待处理供应商响应"
                 count={pendingDecisionCount}
-                description="您有 RFQ 响应等待查看和决策，进入询价管理页面进行处理。"
+                description="您有 RFQ 响应等待查看和决策，进入询价请求页面进行处理。"
                 href="/workspace/rfqs"
                 linkLabel="查看待决策响应"
               />
@@ -197,10 +215,10 @@ function BuyerDashboardContent() {
                       <div className="space-y-3">
                         <div>
                           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                            Response ID
+                            响应编号
                           </p>
                           <p className="mt-1 text-sm font-semibold text-slate-900">
-                            {decision.id}
+                            <BusinessIdentityBadge type="RFQ_RESPONSE" id={decision.id} createdAt={decision.pendingSince ?? undefined} variant="plain" />
                           </p>
                         </div>
                         <div>
@@ -227,15 +245,15 @@ function BuyerDashboardContent() {
                           <div>
                             <p className="text-xs text-slate-500">当前状态</p>
                             <p className="mt-1 text-sm font-medium text-slate-900">
-                              {decision.status}
-                            </p>
-                          </div>
-                          <Link
-                            href={`/workspace/rfqs/${decision.rfq.id}`}
-                            className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-                          >
-                            查看询价
-                          </Link>
+                            {STATUS_LABEL_MAP[decision.status] || decision.status}
+                          </p>
+                        </div>
+                        <Link
+                          href={`/workspace/rfqs/${decision.rfq.id}`}
+                          className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                        >
+                          查看询价请求
+                        </Link>
                         </div>
                       </div>
                     </article>
@@ -263,7 +281,7 @@ function BuyerDashboardContent() {
                   <h3 className="text-base font-semibold text-slate-900 group-hover:text-primary transition-colors">
                     {item.title}
                   </h3>
-                  <span className="text-xl">{item.icon}</span>
+                  <span className="text-xl"><UiIcon name={item.icon} size={22} color="#94a3b8" /></span>
                 </div>
                 <p className="text-sm text-slate-500 leading-relaxed">{item.description}</p>
                 <span className="inline-flex items-center gap-1 mt-4 text-sm font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">

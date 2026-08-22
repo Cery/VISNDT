@@ -18,6 +18,7 @@ import { demandService, rfqService } from '../api';
 import type { Demand, DemandParameter, DemandMatch } from '../types';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
+import { BusinessIdentityBadge, WorkflowTimeline, buildDemandTimeline } from '@visndt/design-system';
 
 const { Title } = Typography;
 
@@ -286,6 +287,9 @@ export default function DemandDetailPage() {
 
       <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
+          <Descriptions.Item label="业务编号">
+            <BusinessIdentityBadge type="DEMAND" id={demand.id} createdAt={demand.createdAt} />
+          </Descriptions.Item>
           <Descriptions.Item label="标题">{demand.title}</Descriptions.Item>
           <Descriptions.Item label="状态">
             <StatusTag status={demand.status} label={STATUS_LABEL_MAP[demand.status] || demand.status} />
@@ -405,7 +409,15 @@ export default function DemandDetailPage() {
       </Card>
 
       <Card title="时间线" style={{ marginBottom: 16 }}>
-        <Descriptions bordered column={{ xs: 1, sm: 2 }}>
+        <WorkflowTimeline
+          title="业务流转"
+          steps={buildDemandTimeline(demand.status, {
+            createdAt: demand.createdAt,
+            publishedAt: demand.publishedAt,
+            closedAt: demand.closedAt,
+          })}
+        />
+        <Descriptions bordered column={{ xs: 1, sm: 2 }} style={{ marginTop: 16 }}>
           <Descriptions.Item label="创建时间">
             {formatDate(demand.createdAt)}
           </Descriptions.Item>

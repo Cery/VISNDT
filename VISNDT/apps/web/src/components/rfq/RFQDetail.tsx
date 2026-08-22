@@ -1,4 +1,5 @@
 import type { RfqDetailItem } from '@/lib/api/rfqs';
+import { BusinessIdentityBadge, WorkflowTimeline, NextActionHint, buildRfqTimeline, RFQ_STATUS_PRESENTATION, presentStatus } from '@visndt/design-system';
 import RFQStatusBadge from './RFQStatusBadge';
 
 interface RFQDetailProps {
@@ -7,6 +8,13 @@ interface RFQDetailProps {
 }
 
 export default function RFQDetail({ rfq, responseCount }: RFQDetailProps) {
+  const rfqSteps = buildRfqTimeline(rfq.status, {
+    createdAt: rfq.createdAt,
+    publishedAt: rfq.publishedAt,
+    closedAt: rfq.closedAt,
+  });
+  const rfqPresentation = presentStatus(rfq.status, RFQ_STATUS_PRESENTATION);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -16,10 +24,17 @@ export default function RFQDetail({ rfq, responseCount }: RFQDetailProps) {
           <RFQStatusBadge status={rfq.status} />
         </div>
         <div className="flex items-center gap-3 text-xs text-slate-400">
+          <BusinessIdentityBadge type="RFQ" id={rfq.id} createdAt={rfq.createdAt} />
           <span>创建时间: {new Date(rfq.createdAt).toLocaleDateString()}</span>
           <span>更新时间: {new Date(rfq.updatedAt).toLocaleDateString()}</span>
         </div>
       </div>
+
+      {/* Workflow Visualization */}
+      <section className="space-y-3">
+        <NextActionHint current={rfqPresentation.label} action={rfqPresentation.nextAction} />
+        <WorkflowTimeline title="业务流转" steps={rfqSteps} />
+      </section>
 
       {/* Demand Reference */}
       {rfq.demand && (

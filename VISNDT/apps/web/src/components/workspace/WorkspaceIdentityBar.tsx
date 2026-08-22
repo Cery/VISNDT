@@ -31,7 +31,7 @@ export default function WorkspaceIdentityBar({
 
   return (
     <div className="rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-8 shadow-industrial-sm">
-      <IndustrialBadge label="VISNDT Workspace" tone="cyan" />
+      <IndustrialBadge label="VISNDT 工作区" tone="cyan" />
 
       <h1 className="mt-4 text-2xl sm:text-3xl font-extrabold text-foreground">{title}</h1>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{subtitle}</p>

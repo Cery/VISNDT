@@ -11,6 +11,7 @@ import Pagination from '@/components/common/Pagination';
 import RFQStatusBadge from '@/components/rfq/RFQStatusBadge';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
+import { BusinessIdentityBadge } from '@visndt/design-system';
 import { getAvailableRfqs } from '@/services/rfq.service';
 import type { AvailableRfqItem } from '@/lib/api/rfqs';
 
@@ -98,7 +99,7 @@ function SupplierRfqsContent() {
                           <div className="space-y-2">
                             <div className="flex flex-wrap items-center gap-2">
                               <RFQStatusBadge status={rfq.status} />
-                              <span className="text-xs text-slate-400">RFQ ID: {rfq.id}</span>
+                              <BusinessIdentityBadge type="RFQ" id={rfq.id} createdAt={rfq.createdAt} variant="plain" />
                             </div>
                             <h3 className="text-lg font-semibold text-slate-900">
                               {rfq.demand.title}
@@ -112,7 +113,7 @@ function SupplierRfqsContent() {
 
                         <div className="mt-4 rounded-lg bg-slate-50 p-4">
                           <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                            Demand
+                            需求
                           </p>
                           <p className="mt-2 text-sm font-medium text-slate-900">
                             {rfq.demand.title}

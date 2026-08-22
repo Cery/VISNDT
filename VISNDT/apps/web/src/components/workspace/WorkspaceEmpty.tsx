@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import UiIcon from '@/lib/ui-icon';
 
 interface WorkspaceEmptyProps {
   title?: string;
@@ -15,7 +16,7 @@ export default function WorkspaceEmpty({
 }: WorkspaceEmptyProps) {
   return (
     <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-12 text-center">
-      <div className="text-3xl mb-3">📭</div>
+      <div className="text-3xl mb-3"><UiIcon name="inbox" size={40} color="#94a3b8" /></div>
       <h3 className="text-sm font-medium text-slate-700 mb-1">{title}</h3>
       <p className="text-sm text-slate-400 mb-4">{message}</p>
       {actionLabel && actionHref && (

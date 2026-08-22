@@ -74,6 +74,7 @@ export default function UserEdit() {
 
   const initialValues: Partial<UserFormData> = {
     email: pageState.data.email,
+    name: pageState.data.name,
     status: pageState.data.status,
     organizationId: pageState.data.organizationId || undefined,
   };
@@ -83,10 +84,10 @@ export default function UserEdit() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>Edit User</Title>
+          <Title level={4} style={{ margin: 0 }}>编辑用户</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          Update user information and roles
+          更新用户信息与角色配置
         </Text>
       </div>
       <UserForm

@@ -5,6 +5,7 @@ export interface Rfq {
   demandId: string;
   createdBy: string;
   status: RfqStatus;
+  targetOrganizationId?: string | null;
   publishedAt?: string;
   closedAt?: string;
   createdAt: string;

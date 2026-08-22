@@ -1,16 +1,18 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   S3Client,
   PutObjectCommand,
   GetObjectCommand,
   DeleteObjectCommand,
+  HeadBucketCommand,
+  CreateBucketCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { createS3Client } from './storage.config';
 
 @Injectable()
-export class StorageService {
+export class StorageService implements OnModuleInit {
   private readonly logger = new Logger(StorageService.name);
   private readonly s3Client: S3Client;
   private readonly bucket: string;
@@ -18,6 +20,32 @@ export class StorageService {
   constructor(private readonly config: ConfigService) {
     this.s3Client = createS3Client(config);
     this.bucket = config.get<string>('S3_BUCKET')!;
+  }
+
+  /**
+   * Ensure the configured bucket exists at startup. Creates it if missing
+   * (e.g. first boot of MinIO before any bucket is provisioned). This is a
+   * best-effort, idempotent environment check — it does not replace the
+   * storage provider or alter the FileAsset model.
+   */
+  async onModuleInit(): Promise<void> {
+    try {
+      await this.s3Client.send(
+        new HeadBucketCommand({ Bucket: this.bucket }),
+      );
+      this.logger.log(`Storage bucket "${this.bucket}" already exists`);
+    } catch {
+      try {
+        await this.s3Client.send(
+          new CreateBucketCommand({ Bucket: this.bucket }),
+        );
+        this.logger.log(`Storage bucket "${this.bucket}" created`);
+      } catch (createErr) {
+        this.logger.error(
+          `Failed to auto-create storage bucket "${this.bucket}": ${(createErr as Error).message}`,
+        );
+      }
+    }
   }
 
   /**

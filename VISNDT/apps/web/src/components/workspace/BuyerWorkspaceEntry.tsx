@@ -7,6 +7,8 @@ import ErrorState from '@/components/common/ErrorState';
 import StatCard from '@/components/workspace/StatCard';
 import BuyerActionSummary from '@/components/workspace/BuyerActionSummary';
 import WorkspaceIdentityBar from '@/components/workspace/WorkspaceIdentityBar';
+import UiIcon from '@/lib/ui-icon';
+import type { UiIconName } from '@/lib/ui-icon';
 import {
   getBuyerWorkspaceOverview,
   getBuyerPendingDecisions,
@@ -21,10 +23,10 @@ function formatStatusCounts(statusCounts?: Record<string, number>) {
 }
 
 const BUYER_QUICK_ITEMS = [
-  { title: '我的需求', description: '创建与管理检测需求', href: '/workspace/demands', icon: '📋' },
-  { title: '询价单', description: '查看询价进度与待决策响应', href: '/workspace/rfqs', icon: '📄' },
-  { title: '匹配结果', description: '查看需求与产品的匹配结果', href: '/workspace/matches', icon: '🔗' },
-  { title: '通知中心', description: '查看消息与提醒', href: '/workspace/notifications', icon: '🔔' },
+  { title: '我的需求', description: '创建与管理检测需求', href: '/workspace/demands', icon: 'list' },
+  { title: '我的询价请求', description: '查看询价进度与待决策响应', href: '/workspace/rfqs', icon: 'file' },
+  { title: '匹配结果', description: '查看需求与产品的匹配结果', href: '/workspace/matches', icon: 'link' },
+  { title: '通知中心', description: '查看消息与提醒', href: '/workspace/notifications', icon: 'bell' },
 ] as const;
 
 /**
@@ -78,25 +80,25 @@ export default function BuyerWorkspaceEntry() {
               label="需求"
               value={overviewQuery.data.demandSummary.total}
               description={formatStatusCounts(overviewQuery.data.demandSummary.statusCounts)}
-              icon="📋"
+              icon="list"
             />
             <StatCard
-              label="询价"
+              label="询价请求"
               value={overviewQuery.data.rfqSummary.total}
-              description="Buyer RFQ 总量"
-              icon="📄"
+              description="询价请求总量"
+              icon="file"
             />
             <StatCard
               label="匹配"
               value={overviewQuery.data.matchSummary.total}
               description={formatStatusCounts(overviewQuery.data.matchSummary.statusCounts)}
-              icon="🔗"
+              icon="link"
             />
             <StatCard
               label="待决策响应"
               value={overviewQuery.data.responseSummary.pendingCount}
               description="等待查看与决策的供应商响应"
-              icon="⏳"
+              icon="clock"
             />
           </div>
         )}
@@ -126,7 +128,7 @@ export default function BuyerWorkspaceEntry() {
             <BuyerActionSummary
               title="待处理供应商响应"
               count={pendingDecisionCount}
-              description="您有 RFQ 响应等待查看和决策，进入询价管理页面进行处理。"
+              description="您有 RFQ 响应等待查看和决策，进入我的询价请求页面进行处理。"
               href="/workspace/rfqs"
               linkLabel="查看待决策响应"
             />
@@ -144,7 +146,7 @@ export default function BuyerWorkspaceEntry() {
                       href={`/workspace/rfqs/${d.rfq.id}`}
                       className="mt-3 inline-flex text-sm font-medium text-primary hover:text-primary/80 transition-colors"
                     >
-                      查看询价
+                      查看询价请求
                     </Link>
                   </article>
                 ))}
@@ -171,7 +173,7 @@ export default function BuyerWorkspaceEntry() {
                 <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
                   {item.title}
                 </h3>
-                <span className="text-xl">{item.icon}</span>
+                <span className="text-xl"><UiIcon name={item.icon as UiIconName} size={22} color="#94a3b8" /></span>
               </div>
               <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
             </Link>

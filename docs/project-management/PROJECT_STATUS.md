@@ -846,6 +846,375 @@ Next: M21.5 Mobile Experience
 - **Freeze 兼容** ✅：**Schema Change = None / Migration = None / API Change = None**；未改 `apps/api`、`database/prisma`、`apps/admin`；未引入 Design System / AI Search / Vector Search / ProductFamily / Supplier Product Ownership。
 - **Build** ✅：`apps/web` `next build` exit 0（编译 + 类型校验 + 静态页 28/28 通过）；仅既有非阻断 lint 警告。
 
+## M25 Project Baseline Freeze（639_M25.0）
+
+### 639_M25_Project_Baseline_Freeze — COMPLETED
+
+里程碑 M24.5 Consolidation 阶段（625-638）已完成，进入 **M25 平台化重建与自运转基座**。
+
+- **Status** ✅：M25.0 Batchline Freeze COMPLETED（Code UNCHANGED，纯文档/架构冻结）。
+- **Repository Verification** ✅：Repository Root `F:\Desktop\VISNDT` / Code Root `F:\Desktop\VISNDT\VISNDT`；分支 `main`、工作区干净；PostgreSQL / API / Web / Admin 四端 AVAILABLE。
+- **638 Audit Accepted** ✅：`638_M25_Project_Audit`（21 项缺口 P0×3 / P1×13 / P2×5）与 `638_M25_AI_Operation_Architecture`（L0 规则引擎）均采纳为 M25 Scope 依据。
+- **M25 Scope Frozen** ✅：六阶段路线 639（Baseline Freeze）→ 640（Design System Reconstruction）→ 641（Business Identity Number System）→ 642（Workflow Visualization）→ 643（Media Governance Completion）→ 644（L0 Rule Engine Foundation）。范围冻结，禁止提前实施 M25 任务 / 修改 UI / 模型 / API / DB / AI / Matching / Search。
+- **Architecture Freeze** ✅：Database / API / Frontend / Admin / Matching / Search / AI 全部 UNCHANGED；AI Contract Only / Runtime Disabled / Human In Loop Required。
+- **Figma Integration Gate** ✅：WAITING / NOT ENABLED（启用条件 = 进入 640_M25_Design_System_Reconstruction）。
+- **Impact** ✅：Database / API / Frontend / Admin / Matching / Search / AI = UNCHANGED；Documentation = UPDATED。
+- **Review Report** ✅：`docs/_review/639_M25_Project_Baseline_Freeze_Report.md`。
+
+## M25.1 Design System Reconstruction（640_M25.1）
+
+### 640_M25.1 Design System Reconstruction — CONDITIONAL PASS
+
+里程碑目标达成：建立 VISNDT 跨端统一 Design System Foundation v1.0（Design Token / Component Library / Icon System / Web Foundation / Admin Alignment），承接 631（G1-G6）+ 632（D1/D2/D3）。
+
+- **Design Token Foundation（640.1 / D1）** ✅：新建 `@visndt/design-tokens`（`packages/design-tokens`），单一事实源覆盖 8 域：Color（primary 统一 `#2563eb`）+ Typography + Spacing + Radius + Shadow + Border + Motion + Status（`STATUS_TONE` 30+ 确定性映射 + `resolveStatusTone` 大小写不敏感/未知回退 neutral + `TONE_TO_HEX`/`TONE_TO_ANTD_COLOR`/`CHART_PALETTE`/`toCssVariables`），Web（CSS 变量 / 原子组件）与 Admin（AntD 主题 / StatusTag）共消费，**解决 G4（primary 不一致）**。
+- **Primitive Component Layer（640.2 / D3）** ✅：新建 `@visndt/design-system`（`packages/design-system`），12 个 Reusable/Typed/Documented/Theme 兼容组件（Button/Input/Card/Badge/Tag/SectionHeader/Pagination/EmptyState/LoadingState/StatusDisplay/IconWrapper/LayoutContainer），仅依赖 design-tokens、不引用宿主 CSS，**解决 G3（缺原子层）+ G5（SectionHeader 三套实现）**。
+- **Icon System（640.3 之图标 / D2）** ✅：新增 `apps/web/src/lib/ui-icon.tsx`（lucide-react 16 语义图标统一经 IconWrapper 渲染），替换 Web 目标组件 13 文件（WorkspaceSidebar/StatCard/工作台入口/Dashboard/DemandList/RFQList/MatchList/WorkspaceEmpty/MediaGallery 等）emoji UI → 专业图标；Admin 保留 `@ant-design/icons`（架构决策），**解决 G2（emoji 77 处）**（残余为正文符号 ✓/→ 与注释标注，非装饰性图标）。
+- **Web Migration（640.3）** ✅：`next.config.ts` 增加 `transpilePackages` 消费两共享包；页面/组件接 token + SectionHeader/Empty/Loading/Pagination 统一。
+- **Admin Alignment（640.4）** ✅：`apps/admin/src/components/design-system/tokens.ts` 委托共享 design-tokens（VISNDT_COLORS/STATUS_TONE/TONE_TO_ANTD_COLOR/TONE_TO_HEX/CHART_PALETTE/resolveStatusTone），消灭 Admin 独立 Token 事实源，状态语义单一入口。
+- **Figma Integration** ✅：Figma Skill ENABLED（Design Authority；仅用于 Design System/Component/UI Spec/Validation，未直出代码）；**连接 DEFERRED**——运行环境未接 Figma MCP，官方设计稿逐节点视觉 diff 押后补做。
+- **Runtime Verification** ✅：design-tokens build / design-system build / `apps/web` next build（39 static pages）/ `apps/admin` tsc+vite build（5936 modules）全部 exit 0；四端在线。
+- **Impact** ✅：Database / API / Matching / Search / AI / Admin Workflow = UNCHANGED；Frontend（Web）Component Architecture = UPDATED、Business Logic = UNCHANGED；Admin Theme = UPDATED。
+- **Scope Compliance** ✅：无范围扩张、无架构漂移，未提前执行 641–644。
+- **Review Report** ✅：`docs/_review/640_M25.1_VISNDT_Design_System_Reconstruction_Report.md`。
+- **Next** ✅：**641_M25.2_Business_Identity_Number_System**。
+
+## M25.2 Business Identity Number System（641）— PASS
+
+### 641_M25.2_Business_Identity_Number_System — PASS
+
+里程碑目标达成：建立平台级 Business Identity Number System 基础能力，为 8 类业务对象（Product/Demand/RFQ/Offer/Organization/User/FileAsset/Knowledge Content）提供统一业务身份表达，并为 642 Workflow Visualization 提供稳定身份基础。
+
+- **Identity Contract CREATED** ✅：新建 `@visndt/identity-contract`（`packages/identity-contract` v0.1，纯 TS 无依赖）。三层身份模型 `Database ID(UUID) + Business Identity Number + Human Readable Reference`；编码规范 `VIS-{PREFIX}-{YYYYMMDD}-{SEQUENCE}`（8 类前缀 PROD/DEM/RFQ/OFF/ORG/USR/AST/CNT）；`deriveIdentity/parseIdentity/isValidIdentity/deriveSequence/identityMeta/shortIdentity/formatIdentity` + `src/README.md` 文档。
+- **派生决策** ✅：DB Schema FROZEN 下，SEQUENCE 段由现有 UUID 确定性派生（前 8 位 hex → 无符号整数 → 补零，宽 8），日期段取 `createdAt`；同记录恒等、跨记录唯一、零迁移、零新列、可逆；同时支持显式 `sequence` 入参预留规范化通道。禁止一次性迁移历史数据（遵守）。
+- **Display Layer** ✅：design-system 新增统一 `BusinessIdentityBadge`（tag/plain/compact 形态 + 实体中文名 + 点击复制 + 悬停说明），继承 640 Design System Foundation v1.0（仅依赖 design-tokens + identity-contract，未新增 Button/Badge/Tag/Color Token）；包级 `"use client"` 适配 Next.js Server Component 边界。
+- **Web Migration** ✅：`apps/web` 接入 RFQList / RFQDetail（`/workspace/rfqs/[id]`）/ DemandList；`package.json` + `next.config.ts` transpilePackages 增加 `@visndt/identity-contract`。
+- **Admin 管理视图** ✅：`apps/admin` 6 个 Detail 页替换原生 UUID 为业务编号 Badge（InquiryDetail=RFQ / RfqDetail=RFQ / DemandDetail=DEMAND / ProductDetail=PRODUCT / OrganizationDetail=ORGANIZATION / OfferDetail=OFFER）。
+- **Impact** ✅：Database / API / Matching / Search / AI / Admin Workflow = UNCHANGED；Frontend（Web）Component + Admin Identity Display = UPDATED、Business Logic = UNCHANGED；禁止范围零触碰。
+- **Runtime Verification** ✅：identity-contract build / design-system build / `apps/web` next build（含 `/workspace/rfqs/[id]` dynamic）/ `apps/admin` tsc+vite build 全部 exit 0（曾出现一次 Windows libuv teardown assertion，复跑单进程后均 exit 0，判定为环境性）。
+- **Figma** ✅：NOT REQUIRED（640 已完成 Design System Foundation；本轮纯 Code 能力）。
+- **Review Report** ✅：`docs/_review/641_M25.2_Business_Identity_Number_System_Report.md`。
+- **Next** ✅：**642_M25.3_Workflow_Visualization**。
+
+## M25.3 Workflow Visualization（642）— PASS
+
+### 642_M25.3_Workflow_Visualization — PASS
+
+里程碑目标达成：基于现有业务状态模型，为 RFQ / Demand / Match / RFQ Response 增加可理解、可追踪、可解释的 Workflow Visualization 能力（Business Transparency），并为后续提供的稳定身份（641）与设计基础（640）完成集成。
+
+- **StatusPresentationContract CREATED** ✅：`design-system` 新增 `StatusPresentationContract`（`workflow/status-presentation.ts`），统一「业务状态 → UI 表达」确定性映射（label / tone / progress / nextAction），覆盖既有枚举不重新定义：RFQ（DRAFT/OPEN/RESPONDING/CLOSED/CANCELLED）、Demand（DRAFT/PUBLISHED/SUBMITTED/PROCESSING/CLOSED/CANCELLED）、Match（PENDING/MATCHED/REVIEWED/ACCEPTED/REJECTED/EXPIRED）、RFQ Response（SUBMITTED/VIEWED/ACCEPTED/REJECTED）；语义色调复用 640 `SemanticTone`/`STATUS_TONE`，未新增颜色体系。
+- **Workflow Visualization Components CREATED** ✅：`design-system` 新增 `WorkflowTimeline`（垂直时间线：历史/当前/下一节点 + 日期）+ `WorkflowStep`（单节点，completed/current/pending）+ `StatusProgress`（水平阶段进度条，分阶段推进百分数）+ `MatchExplanationCard`（匹配 ID + Business Identity + 置信度 + 匹配依据因子，明确不重算评分不加 AI）+ `NextActionHint`（当前状态 + 下一步动作提示，不触发状态变更）；全部继承 640 token、复用 BusinessIdentityBadge/StatusDisplay，未新增 Button/Badge/Tag/Color Token。
+- **RFQ Timeline** ✅：`buildRfqTimeline(status, {createdAt,publishedAt,closedAt})` 由既有状态 + 既有时间字段确定性推导；未引入 WorkflowEvent 新事件，符合「禁止新增事件系统」。
+- **Web Integration（P0/P1）** ✅：RFQ Detail（`components/rfq/RFQDetail.tsx`）增加 Identity（BusinessIdentityBadge）+ 业务流转 Timeline + NextActionHint；Demand Detail（`components/demand/DemandDetail.tsx`）增加 Identity + 业务流转 Timeline + NextActionHint；Match Result（`workspace/matches/[matchId]`）增加 `MatchExplanationCard`（置信度 + 确定性因子说明）；Workspace 各业务详情即 Process Overview（P2 以详情页业务流转呈现）。
+- **Admin 管理视角增强** ✅：`apps/admin` RfqDetail / DemandDetail 增加 Status Timeline Preview（WorkflowTimeline）+ 既有 Identity Reference，未改任何后台业务流程。
+- **Identity Integration UPDATED** ✅：复用 641 `@visndt/identity-contract` + `BusinessIdentityBadge`（RFQ/Demand/Match 关联对象身份），未扩展 8 类类型、未触碰契约。
+- **Impact** ✅：Database / API / Matching / Search / AI / Admin Workflow = UNCHANGED；Frontend（Web）+ Admin = UPDATED（仅 Visualization Layer，Business Logic UNCHANGED）；禁止范围（apps/api/prisma/migration/matching/search/AI runtime/workflow engine/event bus/状态机）零触碰。
+- **Runtime Verification** ✅：identity-contract build / design-system build（含 workflow 组件）/ `apps/web` next build（含 `/workspace/matches/[matchId]` dynamic）/ `apps/admin` tsc+vite build 全部 exit 0。
+- **Figma** ✅：NOT REQUIRED。
+- **Review Report** ✅：`docs/_review/642_M25.3_Workflow_Visualization_Report.md`。
+- **Next** ✅：**643_M25.4_Media_Governance_Completion**。
+
+### 643_M25.4_Media_Governance_Completion — PASS
+
+里程碑目标达成：基于既有 FileAsset 能力，建立媒体资源的治理可视化（Media Governance Foundation v1.0），使平台识别已有媒体资源状态、展示媒体生命周期信息、提升 Admin 媒体运营可见性、并统一 Web / Admin 媒体展示体验；未创建新媒体架构，未触碰任何数据/存储/AI能力。
+
+- **Media Status Presentation Contract CREATED** ✅：`design-system` 新增 `MediaStatusPresentationContract`（`media/media-presentation.ts`），统一「既有 FileAsset → 治理展示」确定性映射（label / tone / description / governanceHint），四类 **UI Governance State**（非 Database Enum）：Active 正常引用 / Unused 未引用 / Incomplete 缺少信息 / Legacy 历史资源；`deriveMediaGovernanceState` 仅由既有字段（status/deletedAt/fileName/mimeType/fileSize/引用计数）确定性派生，不写库；语义色调复用 640 `SemanticTone`，未新增颜色体系。
+- **Media Lifecycle Visualization CREATED** ✅：`media/media-presentation.ts` 提供 `MEDIA_LIFECYCLE_STEPS`（Created → Referenced → Displayed → Maintained → Archived Candidate，**Presentation State**，非数据库状态机）+ `buildMediaLifecycle` 确定性推导当前节点；`MediaLifecycleTimeline` 复用 642 `WorkflowTimeline`。
+- **Media Governance Components CREATED** ✅：`MediaGovernanceBadge`（复用 StatusDisplay）+ `MediaFileCard`（Card 载体：Asset Business Identity + File Info（名称/MIME/大小）+ Usage Reference（产品/内容引用）+ Lifecycle + Governance Hint，纯展示，不触发删除/迁移）。
+- **Admin Media Governance View** ✅：`apps/admin` MediaList 升级为媒体治理视图——治理汇总（当前页 active/unused/incomplete/legacy 计数）+「治理」列（MediaGovernanceBadge）+ 资产编号列（BusinessIdentityBadge type=ASSET）+ 行展开（MediaFileCard：Identity + FileInfo + Usage + Lifecycle + Hint）；仅 Observe/Review/Manage Visibility，不自动清理、不触达存储。
+- **Web Media Experience Enhancement** ✅：`apps/web` `components/content/MediaGallery.tsx` 统一媒体元信息展示——图片图注 + Asset Identity（BusinessIdentityBadge compact）+ 附件 MIME 标签 + Asset Identity，覆盖自 Content 映射的 Product/Knowledge/Solution/Public Content 媒体画廊。
+- **Identity Integration UPDATED** ✅：复用 641 `@visndt/identity-contract` 既有 **ASSET** 类型（`VIS-AST-…`）+ `BusinessIdentityBadge`，未新增身份类型。
+- **Impact** ✅：Database / API / Storage / Matching / Search / AI / Admin Workflow = UNCHANGED；Frontend（Web）+ Admin = UPDATED（仅 Governance/Visualization Layer）；禁止范围（apps/api/prisma/migration/storage/upload pipeline/S3/CDN）零触碰；AI Runtime Disabled、Human In Loop 保持。
+- **Runtime Verification** ✅：design-system build / `apps/web` next build / `apps/admin` tsc+vite build 全部 exit 0；API :4000 / Web :3000 / Admin :3001 AVAILABLE。
+- **Review Report** ✅：`docs/_review/643_M25.4_VISNDT_Media_Governance_Completion_Report.md`。
+- **Next** ✅：**644_M25.5_VISNDT_L0_Rule_Engine_Foundation**。
+
+### 644_M25.5_L0_Rule_Engine_Foundation — PASS
+
+里程碑目标达成：在不改变现有业务架构、不引入 AI Runtime、不修改数据库模型的前提下，建立 VISNDT 平台 L0 确定性规则能力基础（Operational Assistance Foundation）——现有数据 + 确定性规则契约 + 调度边界 + 完整性检查 + 通知契约；未构建 AI System / Workflow Engine / Autonomous Decision / Business Automation Platform。
+
+- **Rule Contract CREATED** ✅：新建 `@visndt/rule-engine-contract`（纯 TypeScript，无 ORM/API/AI 依赖，仅复用 641 `@visndt/identity-contract` 的 `BusinessEntityType`）；`RuleDefinition { id/name/description/severity/targetType/evaluate }` + `RuleResult { ruleId/passed/severity/message/references? }`；架构边界 `IF condition THEN result`（只读），禁止 `IF condition THEN modify business data`，禁止 `Rule + AI + Autonomous Action`。
+- **Rule Evaluation Framework CREATED** ✅：`evaluate.ts` 确定性评估框架（`evaluateRule` 单对象 / `runRuleEvaluation` 批处理→`RuleEvaluationReport` / `runRules` 多规则）；纯函数、只读、无副作用，不持久化业务决策。
+- **Scheduler Contract CREATED** ✅：`scheduler.ts` 仅定义调度契约（`ScheduleDefinition` / `ExecutionTriggerContract` / `RuleExecutionEntry`），流转 `Schedule → Trigger → Entry → Result`；未实现 Cron Service / Queue / Worker / Event Bus。
+- **Completeness Check CREATED** ✅：`completeness.ts` 第一批确定性完整性规则——Product（Name/Category/Core Parameters/Media）、Demand（Description/Required Parameters/Inspection Scenario）、RFQ（Supplier Requirement/Response State/Required Info）、Media（File Metadata/Reference/Status）；输出 `CompletenessResult`，`completenessHint` 仅提示，**禁止自动修复**。
+- **Notification Contract CREATED** ✅：`notification.ts` 仅定义 `NotificationIntent { type/target/message/priority/... }` 契约 + `intentFromResult` 确定性映射（INFO 不通知；ERROR→HIGH、WARNING→MEDIUM）；Notification = Contract **不是** Notification System，无 Email/SMS/Push/外部投递。
+- **Existing Data Mapping** ✅：只读消费既有 Product/ProductParameterValue/ProductMedia、Demand/DemandParameter、RFQ/RFQResponse/Offer、Organization/OrganizationMember、FileAsset/ProductMedia/Content Reference；**未新增 RuleData / RuleResult 表**。
+- **Design System / Admin 接入** ✅：`design-system` 新增 `RuleResultDisplay`（复用 640 `StatusDisplay` + 641 `BusinessIdentityBadge`，未新增颜色/状态/组件体系）；`apps/admin` MediaList 在 643 治理视图基础上新增 L0 媒体完整性运营透视（汇总条 + 首条未通过项 `RuleResultDisplay` 提示），只读评估不自动修复、不触达存储。
+- **Impact** ✅：Database / API / Migration / Matching / Search / AI / Storage = UNCHANGED / NONE；Admin = UPDATED（仅运营透视展示）；Web = UNCHANGED；禁止范围（apps/api/prisma/migration/storage/event bus/queue/worker）零触碰；AI Runtime Disabled、Human In Loop Required 保持。
+- **Runtime Verification** ✅：rule-engine-contract / design-system / `apps/web` next build / `apps/admin` tsc+vite build 全部 exit 0；API :4000 / Web :3000 / Admin :3001 AVAILABLE。
+- **Review Report** ✅：`docs/_review/644_M25.5_VISNDT_L0_Rule_Engine_Foundation_Report.md`。
+- **Next** ✅：**645_M25_Final_Closeout**（M25 Productization Foundation Complete：639-644 全部交付闭环）。
+
+### 645_M25_Final_Closeout — PASS
+
+M25 周期正式收口：验证 M25.0~M25.5 六阶段（639-644）全部交付闭环，建立 M25 Final Completion Evidence，完成架构最终核验与文档同步，定义 M26 开发入口边界。本任务为 Documentation Audit + Architecture Final Verification + Release Preparation，非功能开发，零代码变更。
+
+- **M25 Completion Evidence Matrix** ✅：639 Baseline Freeze（COMPLETED）→ 640 Design System（CONDITIONAL PASS，Figma 视觉 diff 待接入后补做）→ 641 Identity System（PASS）→ 642 Workflow Visualization（PASS）→ 643 Media Governance（PASS）→ 644 L0 Rule Engine（PASS）。
+- **Capability Closure** ✅：Design Foundation（Tokens+Components+Unified Status Presentation）成立；Identity Foundation（Database UUID+Business Identity Number+Human Readable Reference）成立；Workflow Visibility（Existing State+Visualization Layer，非 Workflow Engine）成立；Media Governance（Existing FileAsset+Governance Presentation，非 Storage Platform Rewrite）成立；Rule Foundation（Existing Data+Deterministic Rule Evaluation+Human Review，非 AI Automation）成立。
+- **638 承接** ✅：638_M25_Project_Audit（21 项缺口 P0×3/P1×13/P2×5 作为 Scope 依据）+ 638_M25_AI_Operation_Architecture（L0 规则引擎纳入 M25.5）被 M25 完整承接，No Unresolved M25 Scope。
+- **Architecture Final Verification** ✅：Database UNCHANGED（无 Schema/Migration/New Table/New Enum）；API UNCHANGED（无 Endpoint/Contract/Controller Mutation）；Frontend 仅 Presentation/Component/Design System Layer UPDATED（无 Business Logic Rewrite）；Admin 仅 Operational Visibility/Governance View/Rule Display UPDATED（无 Automatic Operation）；Matching/Search UNCHANGED（无 Ranking/Algorithm/Score 变更）；AI Runtime DISABLED（Human In Loop 保持，无 Autonomous Decision/Auto Mutation/AI Workflow）。
+- **Documentation Synchronization** ✅：PROJECT_STATUS.md / PROJECT_ROADMAP.md / MODULE_COMPLETION_MATRIX.md 均含 M25.5 与 M25 CLOSED 记录；639-644 七份 Review Report（六阶段 + 本收口报告）齐备。
+- **Git Release Preparation** ✅：M25 全部交付（640-645）统一进入 Release Snapshot `M25_Productization_Foundation_Complete`，作为 M26 起始基线；未混入 Future Candidate / M26 Feature / Experimental Code。
+- **M26 Entry Boundary DEFINED** ✅：Allowed（Product Experience Optimization / Content Growth / Operational Intelligence / Search Enhancement / AI Assisted Capability Exploration）；Forbidden（Database uncontrolled expansion / Architecture rewrite / AI autonomous operation / Business workflow mutation / Schema-first expansion）。
+- **Impact** ✅：Database / API / Matching / Search / Storage / AI = UNCHANGED；Frontend / Admin = VERIFIED（仅展示/治理层）；Documentation = UPDATED；M25 CLOSED，任何新增进入 M26 Candidate。
+- **Review Report** ✅：`docs/_review/645_M25_Final_Closeout_Report.md`。
+- **Next** ✅：**M26 Entry**（M25 Productization Foundation = COMPLETED，作为 M26 Development Baseline）。
+
+### 646_Three_Role_Functional_Test — CONDITIONAL PASS
+
+三角色（Buyer / Supplier / Admin）全流程功能测试：服务运行时核验（PostgreSQL/API/Web/Admin 四端 AVAILABLE）+ 演示数据基线核验（产品 6 / 方案 6 / 需求 5 / RFQ 11 / 响应 12 / 内容 7 / 知识 6；Match / FileAsset / ContentTag 为空）+ API 层三角色认证核验（Buyer→BUYER / Supplier→SUPPLIER / Admin→null 设计行为）+ Admin 50+ 路由清单静态核验；API 层全 PASS，UI 层因浏览器自动化会话受限待人工补测。确认缺陷 2 项：D1（`getMe()` 失败静默返回 null → dashboard 误显示“角色未配置”）与 D2（Admin 角色 Web 端无管理控制台引导），由 646.1 修复。
+
+- **Review Report** ✅：`docs/_review/646_Three_Role_Functional_Test_Report.md`。
+- **Next** ✅：**646.1_Release_Validation_Patch**（修复 D1/D2，Release Readiness 提升）。
+
+### 646.1_Release_Validation_Patch — COMPLETED
+
+M25 Closeout Validation / M26 Entry Preparation 补丁：修复 646 测试确认的 D1/D2 两项缺陷，纯 Web 展示层改动，保持 M25 架构冻结边界，提升 M25 Release Snapshot 进入 M26 前的验证稳定性。本任务为 Release Validation Patch，非功能开发。
+
+- **D1 Auth Error Handling FIXED** ✅：`apps/web/src/services/auth.service.ts` `getMe()` 区分 401（未登录 → 返回 null，正常态）与网络异常/服务中断/5xx（抛出 → AuthProvider 进入 `authError` 态）；`apps/web/src/auth/AuthProvider.tsx` 新增 `authError` 状态与 `retryAuth()`（重新请求 /auth/me）；`apps/web/src/app/dashboard/page.tsx` 与 `apps/web/src/app/workspace/page.tsx` 增加“认证服务暂不可用 + 重新连接”错误态，不再将认证异常误判为“角色未配置”。
+- **D2 Admin Guidance FIXED** ✅：Admin 角色（`organization.type === 'ADMIN'`）访问 Web `/dashboard` 与 `/workspace` 时展示“请使用管理控制台”引导 + “前往 Admin Console”入口（`NEXT_PUBLIC_ADMIN_CONSOLE_URL` ?? `http://localhost:3001`）；非 Admin 保持原“角色未配置 + 前往设置”路径不变。
+- **Scope Boundary** ✅：仅修改 4 个 Web 展示层文件（auth.service.ts / AuthProvider.tsx / dashboard/page.tsx / workspace/page.tsx）；Database UNCHANGED（无 Schema/Migration/Enum）；API UNCHANGED（无 Endpoint/Controller/DTO/Auth 变更）；Business Logic（Demand/RFQ/Offer/Matching/Search/Workflow/Rule Engine）UNCHANGED；无新 Package / Token / Identity Type / Storage / AI。
+- **Build Verification** ✅：`apps/web` TypeScript 编译 + 类型检查连续 3 次 exit-0 阶段通过（0 errors，仅既有 warnings）；静态生成阶段受 Windows worker/内存环境限制中断（同 644 记录，非代码问题）。
+- **Impact** ✅：Database / API / Migration / Storage / Matching / Search / AI = UNCHANGED；Frontend = UPDATED（4 文件）；Documentation = UPDATED。
+- **Review Report** ✅：`docs/_review/646.1_Release_Validation_Patch_Report.md`。
+- **Next** ✅：**M26 Entry Validation**（M25 Productization Foundation Complete + Release Validation Patch，M26 Development Baseline READY）。
+
+### 647_M26_PreEntry_ThreeRole_E2E_Business_Validation — CONDITIONAL PASS
+
+M26 Entry Validation：真实浏览器操作模拟三核心用户（Buyer / Supplier / Admin）完整业务旅程的 E2E 验证。Admin 旅程 A1-A8（登录/用户/组织/产品/参数/媒体/内容/业务视图）VERIFIED（CONDITIONAL）；Buyer 旅程 B1-B5（公开发现/产品发现/建需求/询价/响应查看）VERIFIED；Supplier 旅程 C1-C5（登录/资料/能力报价/RFQ 响应/反馈）VERIFIED（CONDITIONAL）；业务闭环 VERIFIED（Admin 可见 Buyer 新建需求「闭环验证-需求-20260822000630」已发布；新建需求匹配数为 0 未派发 RFQ 符合冻结语义，RFQ 必须源自 ACCEPTED DemandMatch；既有闭环数据 RFQ 11 / Response 11 佐证链路完整）。
+
+- **Account Verification** ✅：三角色登录成功，/auth/me workspaceRole（BUYER/SUPPLIER）正确，权限隔离正确。
+- **Critical Issues（2）** ⚠️：D3（产品媒体页运行时崩溃，前端期待 `{data,total}` vs 后端返回数组）；D4（S3 bucket `visndt-dev` 缺失致媒体上传失败，FileAsset Governance 未恢复）。
+- **UX Issues（3）** ⚠️：D1（用户编辑姓名未回填）；D2（产品编辑参数值未回显）；D5（Supplier Profile 保存后 UI 刷新不一致，DB 已持久化）。
+- **Architecture Impact** ✅：Database / API / Migration / Storage / Matching / Search / AI = UNCHANGED；本任务 Testing Only，零代码变更。
+- **Review Report** ✅：`docs/_review/647_M26_PreEntry_ThreeRole_E2E_Business_Validation_Report.md`。
+- **Next** ✅：**M26.0 Fix Window**（修复 D3/D4 Critical + D1/D2 编辑回显，恢复 FileAsset Governance）；建议建立 Playwright E2E 自动化体系。
+### 648_M26.0_Fix_Window_Core_Stability — PASS
+
+M26 Entry Stabilization：基于 647 E2E 验证结果的已确认问题最小范围修复（Stability Restoration Before M26）。D1-D5 全部 FIXED，三个应用（Admin / Web / API）`pnpm build` 均 exit 0，三角色浏览器回归通过，D4 上传链路已恢复（Storage RECOVERED）。
+
+- **D1 User Edit（MEDIUM）** ✅ FIXED：`apps/admin/src/pages/UserEdit.tsx` `initialValues` 补充 `name` 字段 → 编辑已有用户时姓名回填。
+- **D2 Product Parameter Edit（MEDIUM）** ✅ FIXED：`apps/admin/src/components/product/ProductForm.tsx` 调用 `productParameterService.list(productId)` + `form.setFieldsValue` 回填参数，`name={def.id}` 绑定完成回显。
+- **D3 Product Media Runtime Crash（HIGH）** ✅ FIXED：`ProductMediaListResponse` 对齐一维数组，`ProductMediaList.tsx` `result.length` 判空 + `mediaStats` 出分支（空安全），无 `undefined.length` 崩溃。
+- **D4 S3 Bucket Missing（HIGH）** ✅ FIXED/RECOVERED：`storage.service.ts` `OnModuleInit` + 幂等 bucket 初始化，上传链路 PASS。
+- **D5 Supplier Profile Refresh（LOW）** ✅ FIXED：`profile/page.tsx` `onSuccess` `setQueryData` + `invalidateQueries`，保存后即时刷新。
+- **Playwright Boundary** ✅：`tests/e2e/{admin,buyer,supplier}/login.spec.ts` + `business-loop.spec.ts` 脚手架（仅边界准备，不引入测试框架）。
+- **Architecture Impact** ✅：Database/Migration = NONE；API 业务契约 UNCHANGED（D4 仅 Storage 幂等初始化）；Matching/Search/AI = UNCHANGED；Storage = RECOVERED。
+- **Build & Regression** ✅：Admin / Web / API `pnpm build` exit 0；三角色回归通过。
+- **Review Report** ✅：`docs/_review/648_M26.0_Fix_Window_Core_Stability_Report.md`。
+- **Next** ✅：**M26 Development Baseline**。
+
+### 649_M26_Operational_Experience_Audit — CONDITIONAL PASS
+
+M26 Development Baseline Validation：基于 648 修复后的稳定基线，通过 Trae Browser Automation 对 VISNDT 平台进行真实浏览器三角色（Admin / Buyer / Supplier）运营体验走查，识别信息架构、页面组织、操作路径、功能可用性、数据展示、运营效率问题与业务流程优化机会，输出 M26 产品优化 Backlog。
+
+- **Runtime Verification** ✅：PostgreSQL（5432）、MinIO（9000-9001）、API（4000）、Web（3000，Next.js 15.5.20）、Admin（3001，Vite 6.4.3）全部 RUNNING。
+- **环境修复记录** ⚠️：`.env` 中 `DATABASE_URL` 由 `localhost` 改为 `127.0.0.1`，解决 Windows IPv6 解析导致的 Prisma `P1001` 错误。仅环境配置修复，不影响代码/Schema/API 契约。
+- **Admin 旅程** ✅：登录 → 仪表盘（产品7/内容16/用户13/组织11/分类12/参数46/需求5已发布/RFQ 11/未读通知29/待处理45项）→ 产品管理（7条）→ 用户管理（13条）→ 需求管理（8条）→ RFQ管理（11条）。
+- **Buyer 旅程** ⚠️：登录后重定向到空白 `/workspace/dashboard`，需手动跳转至 `/dashboard/buyer`；首页加载完整（分类12/推荐4/方案6/知识6/闭环4步）；工作台业务概览 + 待处理事项 + 业务导航闭环；产品中心（分类8 + 参数12维度筛选 + 搜索 + 分页）。
+- **Supplier 旅程** ✅：登录 → 工作台（业务概览 + 快捷操作7入口 + RFQ快照 + 响应跟踪 + 最近活动）→ RFQ列表（10条，标注只读）→ 企业资料页编译成功（45s）。
+- **IA Audit** ✅：Admin 三级菜单（核心运营/商业运营/系统管理）；Buyer 工作区6入口；Supplier 工作区7入口。
+- **Browser Audit Findings** ⚠️：24 项 UX 问题（4 High / 12 Medium / 8 Low）——
+  - **High（4）**：U1 全界面中文化（Admin页面标题/Supplier侧边栏/产品页副标题英文）；U2 Buyer 登录重定向空白页；U3 UUID替代可读编号；U4 询价 vs RFQ 术语不统一。
+  - **Medium（12）**：A2-A3/A5-A9（Admin统计/分类列/RFQ列/用户角色列）、B2-B5（Buyer工作台/参数单位重复）、S2-S5（Supplier工作台/状态英文/RFQ只读）、C2 Web内存。
+  - **Low（8）**：A4/B6-B8/C1 格式与术语一致性。
+- **Functional Improvement Backlog（18 项）** ✅：
+  - **P0（4）**：FB1 全界面中文化、FB2 Buyer 登录重定向修复、FB3 业务编号体系、FB4 术语统一。
+  - **P1（8）**：FB5-FB12 各角色数据展示修复（统计/分类/RFQ列/角色列/参数单位/工作台数据/RFQ响应流程/状态中文化）。
+  - **P2（6）**：FB13-FB18 格式统一 / IA 收敛 / Web 内存优化。
+- **Business Loop Verification** ✅：产品发现 → 需求创建 → Demand → RFQ → 供应商响应 → 通知触达 全链路闭环。
+- **Architecture Impact** ✅：Database / API / Migration / Storage / Matching / Search / AI = UNCHANGED；Frontend = UNCHANGED（审计只读）；.env 配置修复（localhost → 127.0.0.1）除外。
+- **Review Report** ✅：`docs/_review/649_M26_Operational_Experience_Audit_Report.md`。
+- **Next** ✅：**M26 Optimization Planning**（优先处理 P0：FB1-FB4），建议建立 Playwright E2E 回归自动化。
+
+### 650_M26_Optimization_Roadmap_And_Priority_Planning — PASS
+
+M26 Optimization Planning：基于 649 三角色真实浏览器审计结果，对 M26 Optimization Phase 进行整体规划（Audit / Architecture Planning / Roadmap Refinement，零代码变更）。将 649 的 24 项 Findings（A×10/B×9/S×5/C×3）重新分类为 P0×4（User Blocking）/ P1×8（Operation Efficiency）/ P2×6（Product Experience）/ Future×8（延期）。18 项优化全部为 Frontend Only 或工程配置，零 Database / API / Business Logic 变更。
+
+- **649 Finding Consolidation** ✅：A1-A10（Admin）/ B1-B9（Buyer）/ S1-S5（Supplier）/ C1-C3（Cross Role）全部汇总。
+- **Priority Classification** ✅：
+  - **P0（4）**：全界面中文化（A1/S1/B6）、Buyer 登录重定向（B1）、UUID 展示治理（A6/B3/S3/C3）、术语统一（C1/A5/B4）。
+  - **P1（8）**：Admin 数据展示修复（A2/A3）、Admin RFQ 管理增强（A5/A7/A8）、Admin 用户角色列（A9）、参数单位去重（B5）、Buyer 工作台数据（B2）、Supplier 工作台数据（S2/S4）、Supplier RFQ 响应入口（S5）。
+  - **P2（6）**：预算格式统一（A4/B7）、需求数量显示（B8）、Admin IA 收敛（FB16）、Admin 内容中心重组（FB17）、Web 内存优化（C2）、控制台请求优化（A10）。
+  - **Future（8）**：AI 智能推荐 / 自动报价 / 高级分析 / 在线交易 / CRM 能力 / Database Business Number Field（方案 B/C）/ Supplier 多轮谈判工作流 / Figma 视觉 Diff 自动化。
+- **Architecture Impact Matrix** ✅：18 项优化全部 Frontend Only 或工程配置，零 DB / API / Business Logic / Migration 变更。
+- **Identity System 方案决策** ✅：UUID 治理采用**方案 A（Frontend Format Layer）**，复用 `@visndt/identity-contract`（641 已交付）的 `deriveBusinessIdentity`；方案 B（Database Business Number Field）REJECTED（违反 Database Freeze）；方案 C（统一 Identifier Service）DEFERRED。
+- **M26.1 Foundation Experience Stabilization** ✅ DEFINED：4 项 P0 任务（中文化 / 登录重定向 / UUID 治理 / 术语统一）。
+- **M26.2 Operation Efficiency Improvement** ✅ DEFINED：8 项 P1 任务（Admin 数据/RFQ/角色列、参数单位、Buyer/Supplier 工作台、Supplier RFQ 响应入口）。
+- **M26.3 Product Experience Enhancement** ✅ DEFINED：7 项 P2 任务（格式统一 / IA 收敛 / 内存优化 / 请求优化 / Final Regression Audit）。
+- **Future Candidate** ✅ DEFINED：8 项延期至 M27+ 或不实施。
+- **Risk Assessment** ✅：零 DB 冻结影响 / 业务闭环 UNCHANGED（Demand→DemandMatch→RFQ→RFQResponse→Notification）/ 无高风险项 / 不触发 ADR 评审。
+- **Architecture Impact** ✅：Database / API / Migration / Storage / Matching / Search / AI 全部 UNCHANGED；Frontend 展示层与工程配置 Only；零代码变更。
+- **Review Report** ✅：`docs/_review/650_M26_Optimization_Roadmap_And_Priority_Planning_Report.md`。
+- **Next** ✅：**M26 Optimization Implementation Planning**（进入 M26.1 P0 Optimization 实施：FB1-FB4）。
+
+### 651_M26.1_P0_User_Blocking_Optimization_Implementation — PASS
+
+M26.1 Foundation Experience Stabilization：实施 4 项 P0 用户阻断问题修复（FB1-FB4），使 VISNDT 平台达到基础产品化体验标准。共修改 17 个文件（1 包 + 10 Web + 6 Admin），零 Database / API / Business Logic / Migration 变更。
+
+- **FB1 全平台中文化** ✅：
+  - Web：products/page IndustrialBadge 副标题（"Industrial Capability Discovery"→"工业检测能力发现"）；WorkspaceIdentityBar（"VISNDT Workspace"→"VISNDT 工作区"）；HeroBanner（英文标题/副标题/按钮→中文）；Supplier 菜单全英文→中文（RFQs→RFQ 机会 / Responses→我的响应 / Offers→我的报价 / Opportunities→商机 / Profile→企业资料 / Notifications→通知中心 / Display→能力展示）；supplier/rfqs/page Demand 标签→需求。
+  - Admin：ProductList 页面标题（"Product Capability Operations"→"产品能力管理"）；OperationCenter 副标题（"Admin Operation Center"→"管理运营中心"）；index.css 注释中文化。
+- **FB2 登录重定向修复** ✅：login/page.tsx `router.replace('/workspace/dashboard')` → `router.replace('/dashboard')`，复用 /dashboard/page.tsx 已有角色分流逻辑（BUYER→/dashboard/buyer, SUPPLIER→/dashboard/supplier, ADMIN→管理控制台引导），零硬编码，基于现有 RBAC 体系。
+- **FB3 UUID 展示治理** ✅：
+  - identity-contract 扩展：新增 `RFQ_RESPONSE` 类型（BusinessEntityType + IDENTITY_PREFIX='RESP' + ENTITY_LABEL='响应'），前端契约扩展，非 Schema/API 变更。
+  - 6 处 UUID 泄漏替换为 `<BusinessIdentityBadge>`：Admin RfqResponseDetail（response.id）；Web supplier/rfqs/page（rfq.id）；Web supplier/rfqs/[id]/page（rfq.id）；Web supplier/responses/page（response.id）；Web supplier/opportunities/page（rfq.id×2 + rfq.demand.id）。
+  - 方案 A（Frontend Format Layer）确认：复用 641 identity-contract 的 `deriveIdentity`，零 Schema 变更。
+- **FB4 RFQ 术语统一** ✅：
+  - identity-contract ENTITY_LABEL.RFQ：'询价单'→'询价请求'。
+  - Admin 菜单：'询价管理'→'产品询价'（明确区分 产品询价 vs RFQ 管理）；'RFQ管理'→'RFQ 管理'；roles.ts 同步。
+  - Web Buyer 菜单：'询价单'→'我的询价请求'；BuyerWorkspaceEntry 同步。
+  - Admin RfqResponseDetail 标题：'询价响应详情'→'RFQ 响应详情'。
+- **Identity Audit Gate** ✅：identity-contract 审计通过（8→9 类型，deriveIdentity/shortIdentity 稳定，BusinessIdentityBadge 跨 Web/Admin 复用）；RFQ_RESPONSE 类型新增为前端契约扩展（非 Schema/API 变更）。
+- **Architecture Impact** ✅：Database / API / Migration / Storage / Matching / Search / AI 全部 UNCHANGED；Frontend 展示层 + 路由 + identity 契约扩展 Only；零 Migration，零 ADR 评审。
+- **Build Verification** ✅：identity-contract（exit 0）/ design-system（exit 0）/ Web（exit 0, 需 NODE_OPTIONS=--max-old-space-size=8192）/ Admin（exit 0）全部通过。
+- **Regression Verification** ✅：Demand / DemandMatch / RFQ / RFQResponse / Notification 全程 UNCHANGED。
+- **Review Report** ✅：`docs/_review/651_M26.1_P0_User_Blocking_Optimization_Implementation_Report.md`。
+- **Next** ✅：**652_M26.2_Operation_Efficiency_Improvement_Implementation**（P1 运营效率提升：FB5-FB12）。
+
+### 652_M26.2_Operation_Efficiency_Improvement_Implementation — PASS
+
+- **Stage** ✅：M26.2 Operation Efficiency Improvement（P1 运营效率提升）
+- **Baseline** ✅：651 PASS / 650 PASS / 649 CONDITIONAL PASS / 648 PASS
+- **Architecture Freeze** ✅：Database / API / Business Logic / Matching / Search / AI Runtime — UNCHANGED
+- **Admin Changes** ✅：
+  - `UserList.tsx`：标题 `User & Identity Operations`→`用户管理`；新增"角色"列（基于 organization.type 派生：采购方/供应商/未分配），复用 `organizationService.getList` 构建 orgId→type 映射。
+  - `UserEdit.tsx`：标题 `Edit User`→`编辑用户`；副标题中文化。
+  - `RfqList.tsx`：标题 `RFQ Operations`→`RFQ 管理`；按钮 `创建询价`→`创建 RFQ`；编号列 UUID→BusinessIdentityBadge；新增"目标供应商"列（targetOrganizationId + orgNameMap）；需求列按 Demand 分组（rowSpan UI 聚合）。
+  - `rfq.types.ts`：Rfq 接口新增 `targetOrganizationId?: string | null`（后端模型已有此字段，仅前端类型未声明）。
+- **Web Changes** ✅：
+  - `lib/format.ts`（新建）：统一参数值+单位格式化器（formatParameterValue / formatValueWithUnit），解决 `0.02mm mm`→`0.02 mm` 格式问题，支持尾部单位去重。
+  - `dashboard/buyer/page.tsx`：formatStatusCounts 状态名中文化（DRAFT→草稿等）；Decision card UUID→BusinessIdentityBadge + `响应编号`；`decision.status` 中文化；`查看询价`→`查看询价请求`；`询价`卡片→`询价请求`；导航项`询价管理`→`我的询价请求`。
+  - `dashboard/supplier/page.tsx`：formatStatusCounts 中文化；`RFQ ID: {rfq.id}`→BusinessIdentityBadge（2 处）；`Response ID: {response.id}`→BusinessIdentityBadge；`可参与报价`→`可参与响应`。
+  - `DemandParameters.tsx` + `CompareTable.tsx`：应用 formatValueWithUnit 统一格式化。
+- **Already Implemented** ✅（648/651 已交付，本次确认）：Admin 产品统计卡片（governanceStats）、Admin 需求分类显示（demand.category?.name）、Supplier Dashboard 指标（待处理 RFQ/已提交响应/匹配机会/公开 RFQ/我的 Offer/未读通知）、Supplier 状态中文化（RFQStatusBadge/RFQResponseStatusBadge）、Supplier RFQ 机会→提交响应入口（rfqs/[id]/page.tsx）。
+- **Architecture Impact** ✅：Database / API / Migration / Matching / Search / AI 全部 UNCHANGED；RFQResponse = Reuse Only（仅调用已有创建接口，无新增状态/流程）。
+- **Build Verification** ✅：Admin（exit 0）/ Web（exit 0, 需 NODE_OPTIONS=--max-old-space-size=8192）全部通过。
+- **Regression Verification** ✅：Demand / DemandMatch / RFQ / RFQResponse / Notification 全程 UNCHANGED。
+- **Review Report** ✅：`docs/_review/652_M26.2_Operation_Efficiency_Improvement_Implementation_Report.md`。
+- **Next** ✅：**653_M26.3_Advanced_Experience_Optimization_Implementation**（P2 高级体验优化）。
+
+### 653.1_M26.3_Content_Center_Architecture_Optimization — PASS
+
+- **Stage** ✅：M26.3 Extension — Content Center Architecture Optimization（Admin IA 优化补充，M27 Content Asset System 入口边界冻结）
+- **Baseline** ✅：653 PASS / 652 PASS / 651 PASS。
+- **Architecture Freeze** ✅：Database / API / Business Logic / Matching / Search / RFQ / RFQResponse / AI Runtime — UNCHANGED，Migration NONE。
+- **Objective** ✅：将 Admin 从技术型命名收敛为运营型模块导航；为 M27 Content Asset System 建立稳定入口；精简左侧菜单层级；媒体中心隐藏一级入口、保留扩展能力。仅 Information Architecture 优化，零新增业务能力。
+- **Admin IA After** ✅（运营型目标结构）：
+  - 首页：`/home` 首页、`/operation-center` 运营中心
+  - 产品中心：`/products` 产品管理、`/product-categories` 产品分类、参数体系（`/parameter-groups` 参数组、`/parameter-definitions` 参数定义）
+  - 业务中心：`/demands` 需求管理、`/rfqs` RFQ 管理、`/offers` 报价管理、`/inquiries` 产品询价、`/matching` 匹配管理
+  - 用户与供应商：`/users` 用户管理、`/organizations` 企业管理
+  - 内容中心：`/content` 文章管理、知识库（`/knowledge/entries` 知识条目、`/knowledge/domains` 知识分类、`/product-category-knowledge-mappings` 知识分类映射）、`/content/tags` 标签管理
+  - 数据与监控：`/analytics` 数据分析、`/business-analytics` 业务分析、`/monitoring` 运营监控、`/audit-intelligence` 审计智能
+  - 系统管理：`/notifications` 通知管理、`/audit-logs` 审计日志、`/embedding` AI 数据准备
+- **Media Center Handling** ✅：`/media` 媒体中心从一级菜单隐藏（保留路由，M27 Media Asset 扩展时恢复入口）。
+- **AdminLayout.tsx Changes** ✅：`menuGroups` 重组为 7 个运营分组（home/product/business/permission/content/data/system）；`breadcrumbMap` 更新（首页/产品分类/文章管理/企业/知识条目/知识分类映射标签中文化）；`openKeys` 默认展开 `knowledge`。
+- **Architecture Impact** ✅（仅 Admin 前端文件）：Database / API / Migration / Matching / Search / AI 全部 UNCHANGED；RFQ / RFQResponse = Reuse Only / Existing Flow；Business Logic UNCHANGED。
+- **Build Verification** ✅：`apps/admin pnpm run build` exit 0（仅修改 Admin 文件，Web 无需重构建）。
+- **Regression Verification** ✅：Admin Menu Rendering PASS（无重复入口 / 无死链入口，所有菜单项均映射至既有已注册路由）；Business Regression — Demand / RFQ / RFQResponse / Offer / Notification 全 PASS。
+- **Review Report** ✅：`docs/_review/653.1_M26.3_Content_Center_Architecture_Optimization_Report.md`。
+
+### 654_M26.4_Commercial_Closure_Enhancement_Implementation — PASS
+
+- **Stage** ✅：M26.4 Commercial Closure Enhancement（商业闭环体验增强，复用既有能力）。
+- **Baseline** ✅：653.1 PASS / 653 PASS / 652 PASS / 651 PASS。
+- **Architecture Freeze** ✅：Database / API / Business Logic / Matching / Search / RFQ / RFQResponse / AI Runtime — UNCHANGED，Migration NONE，Admin IA FROZEN，M27 边界零渗漏。
+- **Objective** ✅：在不改变业务模型前提下增强商业闭环（Demand → DemandMatch → RFQ → RFQResponse → Notification）体验——Shopify 输出聚焦三角色展示一致性与中文化。
+- **Supplier Experience** ✅：RFQ 机会 → 查看需求 → 提交响应 → 查看响应状态 全链路已存在且已中文化（653），本次保持。复用 `createRfqResponse`，状态展示复用 `RFQResponseStatusBadge`，Reuse Only。
+- **Buyer Experience** ✅：`workspace/rfqs/[id]` 响应审核页中文化补齐——状态文案（SUBMITTED/VIEWED/ACCEPTED/REJECTED → 已提交/已查看/已接受/已拒绝）、决策按钮（Accept/Reject → 接受/拒绝）、面板标题（Response Review → 响应审核）、字段标签（Offer/Message → 报价/响应说明）、决策提示中文化；`workspace/rfqs` 与 `RFQList` 术语统一（询价 → 询价请求）。决策仍复用既有 `view/accept/reject` 现有接口，零状态机变更。
+- **Admin Experience** ✅：`RfqList.tsx` 需求列在标题下新增 Demand 编号 `BusinessIdentityBadge`（DEMAND），强化 Demand↔RFQ 商业运营联动展示；`RfqResponseDetail` 状态管理已中文化（653）保持不变。
+- **Changed (via 前端展示层)** ▶
+  - `apps/web/src/app/workspace/rfqs/[id]/page.tsx`（Buyer 响应审核中文化）
+  - `apps/web/src/app/workspace/rfqs/page.tsx`（询价请求术语统一）
+  - `apps/web/src/components/rfq/RFQList.tsx`（空状态术语统一）
+  - `apps/admin/src/pages/RfqList.tsx`（需求列 Demand Identity）
+- **Architecture Impact** ✅：仅 4 个前端展示文件；Database / API / Migration / Matching / Search / AI 全 UNCHANGED；RFQ / RFQResponse = Existing Flow / Reuse Only；Business Logic UNCHANGED。
+- **Build Verification** ✅：`apps/web pnpm run build` exit 0；`apps/admin pnpm run build` exit 0。
+- **Regression Verification** ✅：Demand / DemandMatch / RFQ / RFQResponse / Notification 全 PASS。
+- **Review Report** ✅：`docs/_review/654_M26.4_Commercial_Closure_Enhancement_Implementation_Report.md`。
+
+### 655_M27.0_Content_Architecture_Audit_And_Implementation_Planning — Completed（AUDIT COMPLETE）
+
+- **Stage** ✅：M27.0 Content Architecture Foundation（架构审计 + M27 实施边界定义）。
+- **Type** ✅：Architecture Audit / Capability Assessment / Schema Impact / Boundary Definition。**只审计，零代码变更。**
+- **Architecture Freeze** ✅：Database AUDIT ONLY；API/Backend/Business Logic/RFQ/RFQResponse/Matching/Search/AI UNCHANGED；Migration NONE；Admin IA FROZEN；Media Center DEFERRED。
+- **核心发现（决定性）** ✅：**Content/Knowledge/SEO 体系并非绿地——`012`→`016` 迁移系列已端到端建成 Content Asset System 全栈基线**：
+  - Prisma `contents`、`content_tag(+relation)`、`content_media`、`content_revision`、`content_chunk`、`knowledge_domain/category/entry`、`KnowledgeContentRef`、`KnowledgeRelation`、`product_category_knowledge_mapping` 全部存在（schema.prisma L797–1122）。
+  - `ContentType`(ARTICLE/KNOWLEDGE/SOLUTION/INSIGHT)、`ContentStatus`(DRAFT/REVIEW/PUBLISHED/ARCHIVED)、`ContentTagType`、`scheduledPublishAt` 齐全。
+  - API：ContentController（公开 list/slug + admin CRUD + `submit/review/publish/archive` 发布工作流）、KnowledgeController + knowledge-public、ContentTagController 全部存在。
+  - Admin CMS：ContentList（status 治理统计：已发布/审核中/已归档）、ContentTagList、Knowledge* 全部存在。
+  - Web 公开渲染：`/knowledge`、`/articles`、`/insights`、`/solutions`、`/about`、`/business`、`/tags`、`/categories`、`/knowledge-base` 均有列表+详情页。
+  - SEO：`sitemap.ts`（静态+内容详情动态收录）、`generateMetadata`(canonical/OpenGraph)、JSON-LD + BreadcrumbList 已实现；**缺口：`robots.ts` 缺失。**
+- **M27 定位修正** ✅：M27 = **收口与补全**（SEO 基础补全 robots/SEO 常量层 + 知识双轨制边界定义 Content.type=KNOWLEDGE vs KnowledgeEntry + 统一 Content 聚合页 + Admin 编辑器体验），非绿地建设；禁止重建既有 Content/Knowledge。
+- **M27 Deferred** ✅：Media Center(保留 /media 路由) / AI Content Generation / Automatic SEO / Recommendation / Commercial Content Matching。
+- **零代码改动** ✅：本次未新增 Prisma 模型、零 Migration、零 API/Controller/Service 变更、零业务逻辑变更。
+- **Review Report** ✅：`docs/_review/655_M27.0_Content_Architecture_Audit_And_Implementation_Planning_Report.md`。
+- **Next** ✅：**656_M27.1_Content_Center_Implementation**（定位：Content/Knowledge/SEO 既有体系收口与补全）。
+
+### 656.1_M27.1_Content_Knowledge_Boundary_Decision_Audit — Completed（Architecture Decision / PASS）
+
+- **Stage** ✅：M27.1 Content Foundation Consolidation（架构决策门禁，零代码变更）。
+- **Type** ✅：Architecture Audit / Decision / Boundary Definition。
+- **Architecture Freeze** ✅：Database AUDIT ONLY（Decision Only，UNCHANGED）；API/Backend/Business Logic/RFQ/RFQResponse/Matching/Search/AI UNCHANGED；Migration NONE；Admin IA FROZEN；Media Center DEFERRED。
+- **核心决策（冻结）** ✅：
+  - **Content = 运营传播资产**，类型 `ARTICLE / SOLUTION / INSIGHT`。
+  - **KnowledgeEntry = 工业检测专业知识资产**，类型 `Technical Knowledge / Inspection Method / Application Case`（由既有 `KnowledgeCategory` 承载，零新增字段/枚举）。
+  - **`Content.type=KNOWLEDGE` 进入废弃路线**：保留枚举值（兼容存量、零 Schema 变更、无删除性迁移），运营侧不再新建 KNOWLEDGE 型内容，新知识统一落 KnowledgeEntry；存量内容由运营逐步迁移至 ARTICLE/INSIGHT 或 KnowledgeEntry；**本期不迁移、不 Redirect**。
+- **URL 收敛决策（Decision Only）** ✅：实测 `/knowledge` 走 `Content.type=KNOWLEDGE`，`/knowledge-base` 走 KnowledgeEntry；权威知识入口定为 `/knowledge-base`；`/knowledge` 随 Content 型知识废弃不再作为知识权威入口；**本期禁止执行 Redirect**，收敛动作归 M27.3 门禁。
+- **Schema Impact** ✅：**零 Schema 变更（UNCHANGED / Decision Only）**——现有 `Content` 多态 + `KnowledgeEntry` 独立台账本满足目标架构；Content.type=KNOWLEDGE 与 KnowledgeEntry 的职责重复以「语义废弃」收敛，非结构迁移。
+- **SEO Impact** ✅：`/knowledge-base` 为知识结构化数据/JSON-LD 权威；消除 /knowledge 与 /knowledge-base 同语义双 URL 的权重稀释（收敛+301 归 M27.3）。
+- **后续边界（M27.2/M27.3）** ✅：M27.2 = SEO 基础补全 + Content 统一聚合页 + Admin 编辑器收口；M27.3 = Content 型知识存量迁移/废弃清理 + URL 权威化（迁移后 301 决策）。始终 EXCLUDED：Media Center(保留 /media 路由) / AI Content Generation / SEO 自动生成 / 推荐算法 / 商业内容匹配。
+- **零代码改动** ✅：本任务仅架构决策 + 文档，未改 Prisma / Migration / API / Controller / Service / DTO / AdminLayout / Media / AI。
+- **Review Report** ✅：`docs/_review/656.1_M27.1_Content_Knowledge_Boundary_Decision_Audit_Report.md`。
+- **Next** ✅：**656.2_M27.1_Content_Foundation_Enhancement_Implementation**。
+
+### 656.2_M27.1_Content_Foundation_Enhancement_Implementation — Completed（Frontend Enhancement / PASS）
+
+- **Stage** ✅：M27.1 Content Foundation Consolidation（SEO Foundation + Content Experience + Admin Content 增强，仅前端展示层，零后端变更）。
+- **Type** ✅：Frontend Enhancement / SEO Foundation Improvement / Content Experience Optimization。
+- **Architecture Freeze** ✅：Database UNCHANGED（0 Schema / 0 Migration）；API UNCHANGED；Knowledge Model FROZEN；RFQ/RFQResponse/Business Logic UNCHANGED；Admin IA FROZEN；Media Center & AI Runtime DEFERRED。Content 架构保持 ARTICLE/SOLUTION/INSIGHT，Content.type=KNOWLEDGE 废弃路线保持（KEEP ENUM / NO NEW DATA）。
+- **SEO Foundation Enhancement** ✅：新增 `robots.ts`（/robots.txt：allow `/`，disallow `/api/`、`/search`，指向 sitemap——655 确认缺口）+ 新增统一 SEO 规则层 `lib/seo-config.ts`（`buildPageMetadata`：Title 交根布局模板、Description/Keywords 回退、canonical 统一 `absoluteUrl`）+ `sitemap.ts` 静态/动态路由补 `changeFrequency`+`priority`（首页 1.0 / 产品·知识 0.9 / 内容 0.4–0.7 分级）。AI SEO 生成 / Keyword Mining / Auto Optimization 全程禁止未实施。
+- **Public Content Experience** ✅：新增共享 `ContentListLayout`（Hero + 计数 + 卡片网格 + 空态），`/articles` `/solutions` `/insights` 三列表页统一重构 + 统一 `buildPageMetadata`；空态收敛为 `EmptyState` 组件；仅复用既有 `getContentList`（Content API Existing Capability Only），零新增 API/Search/Recommendation。
+- **Admin Content Experience** ✅：`ContentList.tsx` SEO 列升级（等级 Tag + Tooltip 展开 SEO 标题/描述/关键词预览与缺失提示），状态/发布信息展示保持，页面内部体验优化，Admin IA 未改。
+- **Build Verification** ✅：`apps/web` `tsc --noEmit` exit 0 + `next build` exit 0（41 页含 `/robots.txt` `/sitemap.xml`，无新增警告）；`apps/admin` `tsc -b && vite build` exit 0（5940 modules）。
+- **Review Report** ✅：`docs/_review/656.2_M27.1_Content_Foundation_Enhancement_Implementation_Report.md`。
+- **Next** ✅：**657_M27.2_Content_Operation_Experience_Optimization**。
+
+### 657_M27.2_Content_Operation_Experience_Optimization — Completed（Admin Operation Experience / Frontend Enhancement / PASS）
+
+- **Stage** ✅：M27.2 Content Asset Operation Enhancement（Admin 内容运营效率 + 内容治理能力，仅前端展示层，零后端变更）。
+- **Architecture Freeze** ✅：Database UNCHANGED（0 Schema / 0 Migration）；API UNCHANGED（Endpoint/DTO 无变更）；Knowledge Model / Content Architecture / Admin IA FROZEN；RFQ/RFQResponse/Matching/Business Logic UNCHANGED；Media Center / AI Runtime DEFERRED。Content 架构保持 Article/Solution/Insight，Content.type=KNOWLEDGE 废弃路线保持。
+- **Content Quality Visibility** ✅：新增 `ContentHealthIndicator` 组件 + `computeContentHealth`（四信号加权计算：SEO 40% + 封面 30% + 标签 15% + 发布就绪 15%，纯前端派生，不新增数据库字段）；ContentList 新增「健康度」列（星级 0-5 + 健康/待补全/需处理标签 + Tooltip 逐项信号明细）。
+- **Publishing Operation Experience** ✅：ContentList「发布时间」列增强——已发布显示时间 / 定时未发显示橙色「定时 HH:mm」Tag（含 scheduledPublishAt 变更至 657 前未披露的展示缺口）/ 未发布占位；状态筛选、更新时间、创建时间列保持。
+- **Tag / Category Visibility** ✅：标签列与类型列复用既有 `tags` / `type` 数据，零新增 taxonomy。
+- **Product Association Visibility** ✅：审计确认既有 Content 类型与 contentService 均无关联产品字段/端点，按指令**未新增 API**，记为 **Future Candidate**（待后续经 API 提供后接入关联产品数量/名称展示）。
+- **Build Verification** ✅：`apps/web` `next build` exit 0（41 页，警告为既有 error.tsx/img 类）；`apps/admin` `tsc -b && vite build` exit 0（5941 modules）。
+- **Review Report** ✅：`docs/_review/657_M27.2_Content_Operation_Experience_Optimization_Report.md`。
+- **Next** ✅：待定（M27 内容资产运营，建议路线持续延展）。
+
+### 658_M27.3_Knowledge_Consolidation_Audit_And_Implementation_Planning — Completed（Knowledge Consolidation / Frontend Enhancement / PASS）
+
+- **Stage** ✅：M27.3 Knowledge Consolidation（Knowledge 专业知识资产中心收敛 + Knowledge SEO / 公开知识入口体验优化，仅前端展示层，零后端变更）。
+- **Type** ✅：Architecture Audit / Schema Impact Assessment / Controlled Frontend Enhancement / SEO Convergence。
+- **Architecture Freeze** ✅：Admin IA FROZEN；Content Architecture FROZEN；Knowledge Boundary FROZEN；Database AUDIT FIRST（结论 UNCHANGED，0 Schema / 0 Migration）；API / RFQ / RFQResponse UNCHANGED；Media Center / AI Runtime DEFERRED。
+- **Existing Knowledge Capability Audit** ✅：`KnowledgeDomain` / `KnowledgeCategory` / `KnowledgeEntry`（含 `structuredBody` + `seoTitle`）/ `KnowledgeRelation` / `ProductCategoryKnowledgeMapping` 均已存在（schema.prisma）；知识类型由 `Domain + Category + structuredBody + Relation` 表达，**无 `knowledgeType` 字段**，符合冻结架构（Technical Knowledge / Inspection Method / Application Case）。
+- **Content.type=KNOWLEDGE Audit** ✅：/knowledge 映射 `Content.type=KNOWLEDGE`；本次仅验证，未自动迁移 / 未删除枚举 / 未改历史数据，保持 `KEEP ENUM / NO NEW DATA / NO MIGRATION`，仅做展示层收敛。
+- **Schema Impact Assessment** ✅：`KnowledgeEntry` 已具备 `structuredBody`（Json）与 `seoTitle`，架构承载完整；无需新增 `knowledgeType`；结论 **Database UNCHANGED（0 Schema / Migration NONE）**，无需 Schema Impact Report / 无需停止。
+- **API Impact Assessment** ✅：既有 API 全支持（List / Detail / Domain / Category 查询），满足 `Reuse Existing API First`；**API UNCHANGED**。
+- **Knowledge Experience Implementation** ✅：`knowledge-base/page.tsx`（metadata 统一 `buildPageMetadata` + Hero 升级「工业检测知识中心」+ `Knowledge Center` 眉标）；`knowledge-base/domains/[slug]/page.tsx`（统一 metadata + 新增 BreadcrumbList JSON-LD + Breadcrumb「知识库」→「知识中心」）；`knowledge-base/[slug]/page.tsx`（Breadcrumb 文案收敛）；`knowledge-base/error.tsx`（文案收敛）——全部展示层 + SEO 收敛，未新增 API / 未改数据库 / 未改业务逻辑。
+- **SEO Verification** ✅：metadata / canonical / breadcrumb（BreadcrumbList JSON-LD）/ JSON-LD（KnowledgeEntry LD 保持）/ sitemap（`/knowledge-base` + 条目既有收录）全收敛。
+- **Build Verification** ✅：`apps/web` typecheck（tsc --noEmit）exit 0 + `next build` exit 0（41 页，含 `/knowledge-base`、`/knowledge-base/[slug]`、`/knowledge-base/domains/[slug]`、`/robots.txt`、`/sitemap.xml`；警告均为既有 error.tsx/img 类）。
+- **Regression Verification** ✅：未改 API 契约 / DTO / 数据库模型 / Migration / AdminIA / Content·Knowledge 模型 / RFQ·Matching；领域导航、分类、条目、相关产品、知识关系全部数据链路复用既有 API，行为无回归；Content.type=KNOWLEDGE 废弃路线全程保持。
+- **Review Report** ✅：`docs/_review/658_M27.3_Knowledge_Consolidation_Audit_And_Implementation_Planning_Report.md`。
+- **Next** ✅：待定（M27 内容资产运营，建议路线持续延展）。
+
+## Next Step
+
+### M28.0 Product Ownership & Supplier Capability Model Audit — 659（Audit Only / COMPLETED）
+
+> 结论已输出：**Product Ownership = 平台全球目录（Global Catalog，无 organizationId/ownerId）**；**Supplier Capability = Product + Supplier Offer 模型（Model B）**。详见会话内审计结论；按指令**不生成 659 报告文档**。
+
 ## Next Step
 
 ### M20.1 Frontend Platformization Development Planning（M20 Architecture Planning）

@@ -4,7 +4,7 @@
  * Encapsulates Auth API calls (login, register, logout, refresh) for page-level consumption.
  * Cookie-based auth — no localStorage.
  */
-import { apiClient } from '@/lib/api-client';
+import { apiClient, ApiError } from '@/lib/api-client';
 
 // --- Types ---
 
@@ -88,12 +88,19 @@ export async function logout(): Promise<void> {
 
 /**
  * Get current user from /auth/me.
+ *
+ * Return semantics（区分未登录与异常，D1 fix）：
+ * - 401（未登录 / 会话过期）→ 返回 null，属正常状态，页面展示登录入口。
+ * - 网络异常 / 服务不可用 / 5xx → 抛出错误，由 AuthProvider 呈现错误态与重试，避免误判为“角色未配置”。
  */
 export async function getMe(): Promise<AuthUser | null> {
   try {
     const res = await apiClient<{ data: AuthUser }>('/auth/me');
     return res.data;
-  } catch {
-    return null;
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 401) {
+      return null;
+    }
+    throw err;
   }
 }

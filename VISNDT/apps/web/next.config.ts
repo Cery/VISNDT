@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  transpilePackages: ["@visndt/design-tokens", "@visndt/design-system", "@visndt/identity-contract"],
 };
 
 export default nextConfig;

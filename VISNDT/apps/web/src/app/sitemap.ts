@@ -20,17 +20,17 @@ import { getEntries } from '@/services/knowledge-base.service';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const url = (path: string) => new URL(path, SITE_URL).toString();
 
-  // 静态核心路由
+  // 静态核心路由（含 SEO 元数据：更新频率 + 优先级）
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: url('/') },
-    { url: url('/products') },
-    { url: url('/knowledge-base') },
-    { url: url('/knowledge') },
-    { url: url('/solutions') },
-    { url: url('/articles') },
-    { url: url('/insights') },
-    { url: url('/business') },
-    { url: url('/about') },
+    { url: url('/'), changeFrequency: 'daily', priority: 1.0 },
+    { url: url('/products'), changeFrequency: 'daily', priority: 0.9 },
+    { url: url('/knowledge-base'), changeFrequency: 'weekly', priority: 0.9 },
+    { url: url('/knowledge'), changeFrequency: 'weekly', priority: 0.4 },
+    { url: url('/solutions'), changeFrequency: 'weekly', priority: 0.8 },
+    { url: url('/articles'), changeFrequency: 'weekly', priority: 0.7 },
+    { url: url('/insights'), changeFrequency: 'weekly', priority: 0.7 },
+    { url: url('/business'), changeFrequency: 'monthly', priority: 0.5 },
+    { url: url('/about'), changeFrequency: 'yearly', priority: 0.4 },
   ];
 
   // 动态路由收集
@@ -43,6 +43,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       dynamicRoutes.push({
         url: url(`/products/${p.id}`),
         lastModified: p.updatedAt ? new Date(p.updatedAt) : undefined,
+        changeFrequency: 'weekly',
+        priority: 0.7,
       });
     });
   } catch {
@@ -56,6 +58,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       dynamicRoutes.push({
         url: url(`/knowledge-base/${e.slug}`),
         lastModified: e.updatedAt ? new Date(e.updatedAt) : undefined,
+        changeFrequency: 'weekly',
+        priority: 0.7,
       });
     });
   } catch {
@@ -70,6 +74,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     INSIGHT: '/insights',
     SOLUTION: '/solutions',
   };
+  const contentPriority: Record<string, number> = {
+    KNOWLEDGE: 0.4,
+    ARTICLE: 0.6,
+    INSIGHT: 0.6,
+    SOLUTION: 0.7,
+  };
 
   for (const type of contentTypes) {
     try {
@@ -78,6 +88,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         dynamicRoutes.push({
           url: url(`${contentPaths[type]}/${c.slug}`),
           lastModified: c.updatedAt ? new Date(c.updatedAt) : undefined,
+          changeFrequency: 'weekly',
+          priority: contentPriority[type] ?? 0.5,
         });
       });
     } catch {

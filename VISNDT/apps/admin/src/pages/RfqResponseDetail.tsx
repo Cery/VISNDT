@@ -13,6 +13,7 @@ import {
   message,
 } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import { BusinessIdentityBadge } from '@visndt/design-system';
 import { rfqResponseService } from '../api';
 import type { RfqResponse } from '../types';
 
@@ -123,11 +124,11 @@ export default function RfqResponseDetailPage() {
         </Button>
       </Space>
 
-      <Title level={3}>询价响应详情</Title>
+      <Title level={3}>RFQ 响应详情</Title>
 
       <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="ID">{response.id}</Descriptions.Item>
+          <Descriptions.Item label="业务编号"><BusinessIdentityBadge type="RFQ_RESPONSE" id={response.id} createdAt={response.createdAt} /></Descriptions.Item>
           <Descriptions.Item label="状态">
             <Tag color={STATUS_COLOR[response.status] || 'default'}>
               {RESPONSE_STATUS_LABEL_MAP[response.status] || response.status}

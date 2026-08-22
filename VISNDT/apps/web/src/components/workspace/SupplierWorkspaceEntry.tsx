@@ -6,6 +6,8 @@ import Loading from '@/components/common/Loading';
 import ErrorState from '@/components/common/ErrorState';
 import StatCard from '@/components/workspace/StatCard';
 import WorkspaceIdentityBar from '@/components/workspace/WorkspaceIdentityBar';
+import UiIcon from '@/lib/ui-icon';
+import type { UiIconName } from '@/lib/ui-icon';
 import { useAuth } from '@/auth/AuthProvider';
 import {
   getSupplierWorkspaceOverview,
@@ -23,12 +25,12 @@ function formatStatusCounts(statusCounts?: Record<string, number>) {
 }
 
 const SUPPLIER_QUICK_ITEMS = [
-  { title: 'RFQ 机会', description: '查看定向询价机会', href: '/workspace/supplier/rfqs', icon: '📄' },
-  { title: '商机中心', description: '发现公开 RFQ 机会', href: '/workspace/supplier/opportunities', icon: '🎯' },
-  { title: '我的响应', description: '跟踪响应状态与历史', href: '/workspace/supplier/responses', icon: '📨' },
-  { title: '我的 Offer', description: '管理供应能力 Offer', href: '/workspace/supplier/offers', icon: '📦' },
-  { title: '企业资料', description: '维护企业身份与公开资料', href: '/workspace/supplier/profile', icon: '🏢' },
-  { title: '展示管理', description: '管理能力展示', href: '/workspace/supplier/display', icon: '📋' },
+  { title: 'RFQ 机会', description: '查看定向询价机会', href: '/workspace/supplier/rfqs', icon: 'file' },
+  { title: '商机中心', description: '发现公开 RFQ 机会', href: '/workspace/supplier/opportunities', icon: 'target' },
+  { title: '我的响应', description: '跟踪响应状态与历史', href: '/workspace/supplier/responses', icon: 'send' },
+  { title: '我的报价', description: '管理供应能力报价', href: '/workspace/supplier/offers', icon: 'package' },
+  { title: '企业资料', description: '维护企业身份与公开资料', href: '/workspace/supplier/profile', icon: 'building' },
+  { title: '展示管理', description: '管理能力展示', href: '/workspace/supplier/display', icon: 'list' },
 ] as const;
 
 /**
@@ -99,37 +101,37 @@ export default function SupplierWorkspaceEntry() {
               label="待处理 RFQ"
               value={overviewQuery.data.rfqSummary.total}
               description={formatStatusCounts(overviewQuery.data.rfqSummary.statusCounts)}
-              icon="📄"
+              icon="file"
             />
             <StatCard
               label="已提交响应"
               value={overviewQuery.data.responseSummary.total}
               description={formatStatusCounts(overviewQuery.data.responseSummary.statusCounts)}
-              icon="📨"
+              icon="send"
             />
             <StatCard
               label="匹配机会"
               value={overviewQuery.data.matchSummary.total}
               description={formatStatusCounts(overviewQuery.data.matchSummary.statusCounts)}
-              icon="🔗"
+              icon="link"
             />
             <StatCard
               label="公开 RFQ"
               value={availableRfqsQuery.data?.total ?? 0}
-              description="可参与报价"
-              icon="🎯"
+              description="可参与响应"
+              icon="target"
             />
             <StatCard
-              label="我的 Offer"
+              label="我的报价"
               value={offersQuery.data?.total ?? 0}
-              description="供应能力 Offer"
-              icon="📦"
+              description="供应能力报价"
+              icon="package"
             />
             <StatCard
               label="未读通知"
               value={overviewQuery.data.notificationSummary.unreadCount}
               description="条未读消息"
-              icon="🔔"
+              icon="bell"
             />
           </div>
         )}
@@ -195,7 +197,7 @@ export default function SupplierWorkspaceEntry() {
                 <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
                   {item.title}
                 </h3>
-                <span className="text-xl">{item.icon}</span>
+                <span className="text-xl"><UiIcon name={item.icon as UiIconName} size={22} color="#94a3b8" /></span>
               </div>
               <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
             </Link>

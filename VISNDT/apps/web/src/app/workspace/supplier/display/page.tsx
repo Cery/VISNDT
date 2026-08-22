@@ -169,7 +169,7 @@ function DisplayPageContent() {
               <div>
                 <h1 className="text-2xl font-bold text-slate-900">展示管理</h1>
                 <p className="mt-1 text-sm text-slate-500">
-                  查看和管理供应商公开展示能力。所有数据基于现有 Offer 和 Organization，无需新增 Schema。
+                  查看和管理供应商公开展示能力。所有数据基于现有报价和组织，无需新增 Schema。
                 </p>
               </div>
               <div className="text-sm text-slate-500">
@@ -182,33 +182,33 @@ function DisplayPageContent() {
               <div className="mb-4">
                 <h2 className="text-lg font-semibold text-slate-900">展示概览</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  供应商公开展示能力概览，包括活跃 Offer 数量、产品覆盖和展示完整度。
+                  供应商公开展示能力概览，包括活跃报价数量、产品覆盖和展示完整度。
                 </p>
               </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <StatCard
-                  label="活跃 Offer"
+                  label="活跃报价"
                   value={activeOffers.length}
-                  description={`总计 ${offers.length} 个 Offer`}
-                  icon="📦"
+                  description={`总计 ${offers.length} 个报价`}
+                  icon="package"
                 />
                 <StatCard
                   label="产品覆盖"
                   value={new Set(offers.map((o) => o.productId)).size}
                   description={`覆盖 ${categories.size} 个分类`}
-                  icon="🏷️"
+                  icon="tag"
                 />
                 <StatCard
                   label="RFQ 机会"
                   value={overviewQuery.data?.rfqSummary?.total ?? 0}
                   description="当前定向 RFQ 总数"
-                  icon="📄"
+                  icon="file"
                 />
                 <StatCard
                   label="展示完整度"
                   value={`${completeness.score}%`}
                   description={`${completeness.completed.length}/${completeness.completed.length + completeness.missing.length} 项完成`}
-                  icon="✅"
+                  icon="check"
                 />
               </div>
               {/* Completeness Detail */}
@@ -305,16 +305,16 @@ function DisplayPageContent() {
             {/* Module 3: Product Capability */}
             <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="mb-4">
-                <h2 className="text-lg font-semibold text-slate-900">Products Supplier Can Provide</h2>
+                <h2 className="text-lg font-semibold text-slate-900">可供货产品</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  基于 Offer 关联的产品能力展示。供应商通过 Offer 挂载到平台标准产品目录。
+                  基于报价关联的产品能力展示。供应商通过报价挂载到平台标准产品目录。
                 </p>
               </div>
               {offers.length === 0 ? (
                 <EmptyState
                   icon="package"
                   message="暂无供应产品"
-                  description="当前尚未创建任何 Offer。Offer 是供应商与平台标准产品之间的供应能力表达。"
+                  description="当前尚未创建任何报价。报价是供应商与平台标准产品之间的供应能力表达。"
                 />
               ) : (
                 <div className="space-y-3">
@@ -387,21 +387,21 @@ function DisplayPageContent() {
               <div className="mb-4">
                 <h2 className="text-lg font-semibold text-slate-900">供应管理</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  查看 Offer 状态与描述信息。Offer = Supplier Capability Expression。
+                  查看报价状态与描述信息。报价 = 供应商能力表达。
                 </p>
               </div>
               {offers.length === 0 ? (
                 <EmptyState
                   icon="document"
-                  message="暂无 Offer"
-                  description="Offer 是供应商对平台标准产品的供应能力表达。当前尚未创建任何 Offer。"
+                  message="暂无报价"
+                  description="报价是供应商对平台标准产品的供应能力表达。当前尚未创建任何报价。"
                 />
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-slate-200 text-left">
-                        <th className="pb-3 font-medium text-slate-500">Offer 标题</th>
+                        <th className="pb-3 font-medium text-slate-500">报价标题</th>
                         <th className="pb-3 font-medium text-slate-500 hidden sm:table-cell">描述</th>
                         <th className="pb-3 font-medium text-slate-500">状态</th>
                         <th className="pb-3 font-medium text-slate-500 hidden md:table-cell">关联产品</th>

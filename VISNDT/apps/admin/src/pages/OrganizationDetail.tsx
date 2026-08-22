@@ -18,6 +18,7 @@ import { organizationService } from '../api';
 import type { Organization, OrganizationMember } from '../types';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
+import { BusinessIdentityBadge } from '@visndt/design-system';
 
 const { Title, Text } = Typography;
 
@@ -149,7 +150,9 @@ export default function OrganizationDetailPage() {
 
       <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="ID">{org.id}</Descriptions.Item>
+          <Descriptions.Item label="业务编号">
+            <BusinessIdentityBadge type="ORGANIZATION" id={org.id} createdAt={org.createdAt} />
+          </Descriptions.Item>
           <Descriptions.Item label="名称">{org.name}</Descriptions.Item>
           <Descriptions.Item label="类型">{org.type || '-'}</Descriptions.Item>
           <Descriptions.Item label="状态">

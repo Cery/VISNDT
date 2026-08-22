@@ -173,8 +173,8 @@ export const PERMISSIONS: Record<string, PermissionDef> = {
   },
   'inquiry:manage': {
     key: 'inquiry:manage',
-    label: '询价管理',
-    description: '管理询价',
+    label: '产品询价',
+    description: '管理产品询价',
     roles: [AdminRole.SUPER_ADMIN, AdminRole.ADMIN, AdminRole.OPERATOR],
   },
   'rfq:manage': {

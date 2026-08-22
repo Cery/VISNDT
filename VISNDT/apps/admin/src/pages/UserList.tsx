@@ -3,12 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import { Table, Space, Spin, Alert, Button, Typography, message, Modal } from 'antd';
 import { EyeOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
-import { userService } from '../api';
+import { userService, organizationService } from '../api';
 import type { User, SearchUserParams } from '../types';
 import { ExportButton, BatchActionBar, AdvancedFilterPanel } from '../components/operation';
 import type { ExportColumn } from '../utils/export';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
+
+const ORG_TYPE_ROLE_LABEL: Record<string, string> = {
+  BUYER: '采购方',
+  SUPPLIER: '供应商',
+};
+
+function resolveRoleLabel(organizationId: string | undefined, orgTypeMap: Map<string, string>): string {
+  if (!organizationId) return '-';
+  const orgType = orgTypeMap.get(organizationId);
+  if (!orgType) return '-';
+  return ORG_TYPE_ROLE_LABEL[orgType] || orgType;
+}
 
 const { Title, Text } = Typography;
 
@@ -55,12 +67,32 @@ function UserList() {
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [batchLoading, setBatchLoading] = useState(false);
+  const [orgTypeMap, setOrgTypeMap] = useState<Map<string, string>>(new Map());
   const [query, setQuery] = useState<QueryParams>({
     keyword: '',
     status: '',
     page: 1,
     pageSize: 20,
   });
+
+  // Load organization type mapping for role display (reuse existing API, no schema change)
+  useEffect(() => {
+    const loadOrgTypes = async () => {
+      try {
+        const result = await organizationService.getList({ page: 1, pageSize: 10000 });
+        const map = new Map<string, string>();
+        for (const org of result.data) {
+          if (org.id && org.type) {
+            map.set(org.id, org.type);
+          }
+        }
+        setOrgTypeMap(map);
+      } catch {
+        // Non-critical: role column will show '-' if org type unavailable
+      }
+    };
+    loadOrgTypes();
+  }, []);
 
   const fetchUsers = useCallback(async () => {
     setPageState({ status: 'loading' });
@@ -208,6 +240,19 @@ function UserList() {
       render: (org: User['organization']) => org?.name || '-',
     },
     {
+      title: '角色',
+      key: 'role',
+      width: 100,
+      render: (_: unknown, record: User) => {
+        const label = resolveRoleLabel(record.organizationId, orgTypeMap);
+        return label !== '-' ? (
+          <span style={{ fontWeight: 500, color: VISNDT_COLORS.primary }}>{label}</span>
+        ) : (
+          <span style={{ color: VISNDT_COLORS.neutral }}>未分配</span>
+        );
+      },
+    },
+    {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
@@ -260,10 +305,10 @@ function UserList() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>User & Identity Operations</Title>
+          <Title level={4} style={{ margin: 0 }}>用户管理</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          Manage platform users, roles and account status
+          管理平台用户、角色与账户状态
         </Text>
       </div>
 

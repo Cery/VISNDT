@@ -61,6 +61,38 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
     }
   }, [initialValues, form]);
 
+  // Hydrate existing parameter values in edit mode so they echo back in the form
+  useEffect(() => {
+    if (!productId) return;
+    let cancelled = false;
+    productParameterService
+      .list(productId)
+      .then((values) => {
+        if (cancelled) return;
+        const initial: Record<string, { value: string; valueNumber?: number }> = {};
+        const fields: Record<string, string | number> = {};
+        values.forEach((v) => {
+          const display =
+            v.valueNumber !== undefined && v.valueNumber !== null
+              ? v.valueNumber
+              : v.value || '';
+          initial[v.parameterDefinitionId] = {
+            value: String(display),
+            valueNumber: v.valueNumber,
+          };
+          fields[v.parameterDefinitionId] = display;
+        });
+        setParameterValues(initial);
+        form.setFieldsValue(fields);
+      })
+      .catch(() => {
+        // silently fail — parameter editing remains available
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [productId, form]);
+
   const handleParameterChange = (defId: string, value: string, dataType: string) => {
     const numValue = dataType === 'NUMBER' ? parseFloat(value) : undefined;
     setParameterValues((prev) => ({
@@ -217,6 +249,7 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
                     <div key={def.id} style={{ flex: '1 1 200px', minWidth: 200 }}>
                       <Form.Item
                         label={`${def.name}${def.unit ? ` (${def.unit})` : ''}${def.required ? ' *' : ''}`}
+                        name={def.id}
                       >
                         {def.dataType === 'BOOLEAN' ? (
                           <Select

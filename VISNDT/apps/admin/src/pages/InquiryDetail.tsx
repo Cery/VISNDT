@@ -16,6 +16,7 @@ import { inquiryService } from '../api';
 import type { Inquiry, InquiryStatus } from '../types';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
+import { BusinessIdentityBadge } from '@visndt/design-system';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -131,7 +132,9 @@ export default function InquiryDetailPage() {
       {/* Card 1: Inquiry Summary */}
       <Card title="询价摘要" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-          <Descriptions.Item label="询价编号">{inquiry.id}</Descriptions.Item>
+          <Descriptions.Item label="询价编号">
+            <BusinessIdentityBadge type="RFQ" id={inquiry.id} createdAt={inquiry.createdAt} />
+          </Descriptions.Item>
           <Descriptions.Item label="状态">
             <StatusTag status={inquiry.status} />
           </Descriptions.Item>

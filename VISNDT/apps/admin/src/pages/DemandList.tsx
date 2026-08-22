@@ -9,6 +9,7 @@ import type { Demand, SearchDemandParams } from '../types';
 import { BatchActionBar } from '../components/operation';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
+import { formatBudgetRange } from '../utils/format';
 
 const { Title, Text } = Typography;
 
@@ -238,13 +239,15 @@ function DemandList() {
       title: '预算范围',
       dataIndex: 'budgetRange',
       key: 'budgetRange',
-      render: (range: string | undefined) => range || '-',
+      render: (range: string | undefined) => formatBudgetRange(range),
     },
     {
       title: '数量',
-      dataIndex: 'quantity',
       key: 'quantity',
-      render: (quantity: number | undefined) => (quantity != null ? quantity : '-'),
+      render: (_: unknown, record: Demand) => {
+        if (record.quantity == null) return '-';
+        return record.quantityUnit ? `${record.quantity} ${record.quantityUnit}` : `${record.quantity}`;
+      },
     },
     {
       title: '状态',

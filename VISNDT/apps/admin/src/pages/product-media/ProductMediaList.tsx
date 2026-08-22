@@ -76,21 +76,22 @@ function ProductMediaList() {
         page: query.page,
         pageSize: query.pageSize,
       });
-      if (result.data.length === 0) {
+      if (result.length === 0) {
         setPageState({ status: 'empty' });
       } else {
         setPageState({
           status: 'success',
-          data: result.data,
-          total: result.total,
+          data: result,
+          total: result.length,
         });
-        // Compute media stats
-        const images = result.data.filter((i) => i.mediaType === 'IMAGE').length;
-        const documents = result.data.filter((i) => i.mediaType === 'DOCUMENT').length;
-        const certificates = result.data.filter((i) => i.mediaType === 'CERTIFICATE').length;
-        setMediaStats({ total: result.total, images, documents, certificates });
-        // Resolve signed URLs for image previews using inline fileAsset data
-        result.data.forEach((item) => {
+      }
+      // Compute media stats (empty-safe)
+      const images = result.filter((i) => i.mediaType === 'IMAGE').length;
+      const documents = result.filter((i) => i.mediaType === 'DOCUMENT').length;
+      const certificates = result.filter((i) => i.mediaType === 'CERTIFICATE').length;
+      setMediaStats({ total: result.length, images, documents, certificates });
+      // Resolve signed URLs for image previews using inline fileAsset data
+      result.forEach((item) => {
           const fa = item.fileAsset;
           if (fa && fa.fileType === 'IMAGE' && !(fa.id in signedUrlCache)) {
             fileAssetService
@@ -103,7 +104,6 @@ function ProductMediaList() {
               });
           }
         });
-      }
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : '加载媒体失败';

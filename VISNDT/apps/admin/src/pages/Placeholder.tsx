@@ -5,8 +5,8 @@ const { Title, Paragraph } = Typography;
 function Placeholder() {
   return (
     <div style={{ textAlign: 'center', paddingTop: 60 }}>
-      <Title level={3}>Coming Soon</Title>
-      <Paragraph type="secondary">This page is under development.</Paragraph>
+      <Title level={3}>即将上线</Title>
+      <Paragraph type="secondary">此页面正在开发中。</Paragraph>
     </div>
   );
 }

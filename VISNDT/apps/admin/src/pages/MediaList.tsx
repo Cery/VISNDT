@@ -24,6 +24,15 @@ import type { FileAssetListItem } from '../types/file-asset.types';
 import type { Organization } from '../types/organization.types';
 import { getFileTypeIcon, formatFileSize } from '../utils/file-utils';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
+import {
+  BusinessIdentityBadge,
+  MediaGovernanceBadge,
+  MediaFileCard,
+  RuleResultDisplay,
+  deriveMediaGovernanceState,
+} from '@visndt/design-system';
+import type { MediaGovernanceState } from '@visndt/design-system';
+import { mediaCompletenessRule } from '@visndt/rule-engine-contract';
 
 const { Title, Text } = Typography;
 
@@ -86,6 +95,27 @@ const ENTITY_TYPE_OPTIONS = [
   { value: 'CONTENT', label: '内容' },
 ];
 
+const GOVERNANCE_ORDER: MediaGovernanceState[] = ['active', 'unused', 'incomplete', 'legacy'];
+const GOVERNANCE_LABEL: Record<MediaGovernanceState, string> = {
+  active: '正常引用',
+  unused: '未引用',
+  incomplete: '缺少信息',
+  legacy: '历史资源',
+};
+
+/** 由既有 FileAsset 列表字段确定性推导治理展示状态（纯展示，不写库） */
+function governanceStateOf(r: FileAssetListItem): MediaGovernanceState {
+  return deriveMediaGovernanceState({
+    status: r.status,
+    deletedAt: r.deletedAt,
+    fileName: r.fileName,
+    mimeType: r.mimeType,
+    fileSize: r.fileSize,
+    productRefCount: r.productMediaCount,
+    contentRefCount: r.contentMediaCount,
+  });
+}
+
 interface QueryParams {
   page: number;
   pageSize: number;
@@ -103,6 +133,58 @@ function MediaList() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
+
+  /** 当前页治理状态汇总（页面级展示提示） */
+  const governanceCounts = useMemo(() => {
+    const counts: Record<MediaGovernanceState, number> = {
+      active: 0,
+      unused: 0,
+      incomplete: 0,
+      legacy: 0,
+    };
+    for (const it of items) counts[governanceStateOf(it)] += 1;
+    return counts;
+  }, [items]);
+
+  /** 当前页媒体完整性评估（L0 确定性规则，只读，不自动修复） */
+  const completenessResults = useMemo(
+    () =>
+      items.map((it) =>
+        mediaCompletenessRule.evaluate({
+          trigger: 'ON_DEMAND',
+          data: {
+            fileName: it.fileName,
+            mimeType: it.mimeType,
+            fileSize: it.fileSize,
+            referenced: it.productMediaCount + it.contentMediaCount > 0,
+            deletedAt: it.deletedAt,
+          },
+        }),
+      ),
+    [items],
+  );
+  const completenessPass = completenessResults.filter((r) => r.passed).length;
+
+  /** 行展开：媒体资产治理详情（Identity + FileInfo + Usage + Lifecycle + Hint） */
+  const expandedRowRender = (r: FileAssetListItem) => (
+    <div style={{ padding: '4px 0 12px' }}>
+      <MediaFileCard
+        assetId={r.id}
+        status={r.status}
+        deletedAt={r.deletedAt}
+        fileName={r.fileName}
+        mimeType={r.mimeType}
+        fileSize={r.fileSize}
+        productRefCount={r.productMediaCount}
+        contentRefCount={r.contentMediaCount}
+        entityLabel={ENTITY_TYPE_LABEL[r.entityType] || r.entityType}
+        organizationName={r.organizationName}
+        uploaderName={r.uploaderName || r.uploaderEmail}
+        createdAt={r.createdAt}
+        updatedAt={r.updatedAt}
+      />
+    </div>
+  );
 
   const orgOptions = useMemo(
     () => [
@@ -215,6 +297,14 @@ function MediaList() {
       ),
     },
     {
+      title: '治理',
+      key: 'governance',
+      width: 120,
+      render: (_: unknown, record: FileAssetListItem) => (
+        <MediaGovernanceBadge state={governanceStateOf(record)} />
+      ),
+    },
+    {
       title: '所属实体',
       dataIndex: 'entityType',
       key: 'entityType',
@@ -269,14 +359,17 @@ function MediaList() {
       render: (size: number) => formatFileSize(size),
     },
     {
-      title: '文件 ID',
-      dataIndex: 'id',
-      key: 'id',
-      width: 180,
-      render: (id: string) => (
-        <Typography.Text copyable={{ text: id }} style={{ fontSize: 12 }}>
-          {id.slice(0, 8)}…
-        </Typography.Text>
+      title: '资产编号',
+      key: 'assetIdentity',
+      width: 210,
+      render: (_: unknown, record: FileAssetListItem) => (
+        <BusinessIdentityBadge
+          type="ASSET"
+          id={record.id}
+          createdAt={record.createdAt}
+          variant="tag"
+          label
+        />
       ),
     },
     {
@@ -410,12 +503,83 @@ function MediaList() {
         <Button onClick={fetchData}>刷新</Button>
       </Space>
 
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+          gap: 12,
+          marginBottom: 16,
+        }}
+      >
+        {GOVERNANCE_ORDER.map((g) => (
+          <div
+            key={g}
+            style={{
+              background: VISNDT_COLORS.layoutBg,
+              border: '1px solid #e2e8f0',
+              borderRadius: 8,
+              padding: '10px 14px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <span style={{ fontSize: 13, color: '#475569' }}>{GOVERNANCE_LABEL[g]}</span>
+            <MediaGovernanceBadge state={g} label={`${governanceCounts[g]}`} variant="badge" />
+          </div>
+        ))}
+      </div>
+      {items.length > 0 && (
+        <>
+          <Text type="secondary" style={{ display: 'block', marginBottom: 8, fontSize: 12 }}>
+            「治理」列与行展开为媒体资产治理视图（Asset Identity + File Info + Usage Reference + Lifecycle + Governance Hint）——当前页 {items.length} 项，仅展示，不触发删除/迁移。
+          </Text>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
+              background: VISNDT_COLORS.layoutBg,
+              border: '1px solid #e2e8f0',
+              borderRadius: 8,
+              padding: '10px 14px',
+              marginBottom: 8,
+            }}
+          >
+            <Text style={{ fontSize: 13, color: '#334155', fontWeight: 600 }}>
+              媒体完整性（L0 规则 · 只读评估）
+            </Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              当前页 {items.length} 项，通过 {completenessPass} 项
+            </Text>
+          </div>
+          {(() => {
+            const firstIssue = completenessResults.find((r) => !r.passed);
+            return firstIssue ? (
+              <div
+                style={{
+                  background: VISNDT_COLORS.layoutBg,
+                  border: '1px solid #e2e8f0',
+                  borderRadius: 8,
+                  padding: '10px 14px',
+                  marginBottom: 8,
+                }}
+              >
+                <RuleResultDisplay result={firstIssue} />
+              </div>
+            ) : null;
+          })()}
+        </>
+      )}
+
       <Table<FileAssetListItem>
         rowKey="id"
         columns={columns}
         dataSource={items}
         loading={loading}
         onChange={handleTableChange}
+        expandable={{ expandedRowRender, rowExpandable: () => true }}
         pagination={{
           current: query.page,
           pageSize: query.pageSize,

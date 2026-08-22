@@ -11,6 +11,7 @@ import RFQStatusBadge from '@/components/rfq/RFQStatusBadge';
 import RFQResponseStatusBadge from '@/components/rfq/RFQResponseStatusBadge';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
+import { BusinessIdentityBadge } from '@visndt/design-system';
 import { getRfq, createRfqResponse, getMyRfqResponses } from '@/services/rfq.service';
 import { ApiError } from '@/lib/api-client';
 
@@ -214,7 +215,7 @@ function SupplierRfqDetailContent({ id }: { id: string }) {
                       <div className="space-y-3">
                         <div className="flex flex-wrap items-center gap-2">
                           <RFQStatusBadge status={rfq.status} />
-                          <span className="text-xs text-slate-400">RFQ ID: {rfq.id}</span>
+                          <BusinessIdentityBadge type="RFQ" id={rfq.id} createdAt={rfq.createdAt} variant="plain" />
                         </div>
                         <div>
                           <h1 className="text-2xl font-bold text-slate-900">{demandTitle}</h1>

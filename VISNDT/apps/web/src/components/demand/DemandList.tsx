@@ -1,5 +1,8 @@
 import Link from 'next/link';
+import { BusinessIdentityBadge } from '@visndt/design-system';
 import DemandStatusBadge from './DemandStatusBadge';
+import UiIcon from '@/lib/ui-icon';
+import { formatBudgetRange } from '@/lib/format';
 import type { DemandItem } from '@/lib/api/demands';
 
 interface DemandListProps {
@@ -24,7 +27,7 @@ export default function DemandList({ demands, isLoading }: DemandListProps) {
   if (demands.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-12 text-center">
-        <div className="text-3xl mb-3">📋</div>
+        <div className="text-3xl mb-3"><UiIcon name="list" size={40} color="#94a3b8" /></div>
         <h3 className="text-sm font-medium text-slate-700 mb-1">
           暂无需求
         </h3>
@@ -63,6 +66,7 @@ export default function DemandList({ demands, isLoading }: DemandListProps) {
             <DemandStatusBadge status={demand.status} />
           </div>
           <div className="flex items-center gap-3 mt-3 text-xs text-slate-400">
+            <BusinessIdentityBadge type="DEMAND" id={demand.id} createdAt={demand.createdAt} />
             {demand.category && (
               <span className="bg-slate-100 px-2 py-0.5 rounded-full">
                 {demand.category.name}
@@ -70,7 +74,7 @@ export default function DemandList({ demands, isLoading }: DemandListProps) {
             )}
             {demand.budgetRange && (
               <span className="bg-slate-100 px-2 py-0.5 rounded-full">
-                {demand.budgetRange}
+                {formatBudgetRange(demand.budgetRange)}
               </span>
             )}
             {demand.quantity != null && (

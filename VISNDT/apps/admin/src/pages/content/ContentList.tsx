@@ -8,6 +8,7 @@ import type { Content, ContentType, ContentStatus } from '../../types';
 import { ExportButton, AdvancedFilterPanel } from '../../components/operation';
 import type { ExportColumn } from '../../utils/export';
 import { VISNDT_COLORS } from '../../components/design-system/tokens';
+import ContentHealthIndicator from '../../components/content/ContentHealthIndicator';
 
 const { Title } = Typography;
 
@@ -228,12 +229,45 @@ function ContentList() {
     {
       title: 'SEO',
       key: 'seo',
-      width: 100,
+      width: 120,
       render: (_: unknown, record: Content) => {
         const level = getSeoLevel(record);
         const cfg = SEO_LEVEL_CONFIG[level];
-        return <Tag color={cfg.color}>{cfg.label}</Tag>;
+        const seoTitle = record.seoTitle || record.title;
+        const seoDesc = record.seoDescription || record.summary;
+        const preview = (value?: string | null) =>
+          value && value.length > 60 ? `${value.slice(0, 60)}…` : value;
+        return (
+          <Tooltip
+            title={
+              <div style={{ maxWidth: 280 }}>
+                <div style={{ marginBottom: 4 }}>
+                  <b>SEO 标题：</b>
+                  {seoTitle || <Typography.Text type="secondary">未设置</Typography.Text>}
+                </div>
+                <div style={{ marginBottom: 4 }}>
+                  <b>SEO 描述：</b>
+                  {preview(seoDesc) || <Typography.Text type="secondary">未设置</Typography.Text>}
+                </div>
+                <div>
+                  <b>关键词：</b>
+                  {preview(record.seoKeywords) || <Typography.Text type="secondary">未设置</Typography.Text>}
+                </div>
+              </div>
+            }
+          >
+            <Tag color={cfg.color} style={{ cursor: 'default' }}>
+              {cfg.label}
+            </Tag>
+          </Tooltip>
+        );
       },
+    },
+    {
+      title: '健康度',
+      key: 'health',
+      width: 170,
+      render: (_: unknown, record: Content) => <ContentHealthIndicator content={record} />,
     },
     {
       title: '标签',
@@ -286,9 +320,20 @@ function ContentList() {
       title: '发布时间',
       dataIndex: 'publishedAt',
       key: 'publishedAt',
-      width: 160,
-      render: (date: string | null) =>
-        date ? new Date(date).toLocaleString() : <Typography.Text type="secondary">未发布</Typography.Text>,
+      width: 180,
+      render: (date: string | null, record: Content) => {
+        if (date) return new Date(date).toLocaleString();
+        if (record.scheduledPublishAt) {
+          return (
+            <Tooltip title={`计划于 ${new Date(record.scheduledPublishAt).toLocaleString()} 自动发布`}>
+              <Tag color="orange" icon={<ClockCircleOutlined />}>
+                定时 {new Date(record.scheduledPublishAt).toLocaleString()}
+              </Tag>
+            </Tooltip>
+          );
+        }
+        return <Typography.Text type="secondary">未发布</Typography.Text>;
+      },
     },
     {
       title: '创建时间',

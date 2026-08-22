@@ -17,73 +17,98 @@ import {
   MailOutlined,
   AuditOutlined,
   LogoutOutlined,
-  PictureOutlined,
   HomeOutlined,
   MenuOutlined,
-  BarChartOutlined,
-  RiseOutlined,
-  MonitorOutlined,
   GlobalOutlined,
   AppstoreOutlined,
-  SafetyOutlined,
   TeamOutlined,
   ExperimentOutlined,
-  BookOutlined,
   FundOutlined,
+  DatabaseOutlined,
+  ReadOutlined,
 } from '@ant-design/icons';
 import { authStore } from '../stores/auth.store';
 
 const { Header, Sider, Content } = Layout;
 
 // ============================================
-// Sectioned Menu Configuration
+// Sectioned Menu Configuration — Operational IA
 // ============================================
-type MenuGroup = 'core' | 'business' | 'system';
+// 目标结构（M26.3 Extension）：
+// 首页 / 产品中心 / 业务中心 / 用户与供应商 / 内容中心 / 数据与监控 / 系统管理
+// 媒体中心：隐藏一级入口，保留 /media 路由供 M27 Media Asset 扩展。
+type MenuGroup = 'home' | 'product' | 'business' | 'permission' | 'content' | 'data' | 'system';
 
 const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }> = {
-  core: {
-    label: '核心运营',
+  home: {
+    label: '首页',
     items: [
-      { key: '/home', icon: <DashboardOutlined />, label: '运营仪表盘' },
+      { key: '/home', icon: <DashboardOutlined />, label: '首页' },
       { key: '/operation-center', icon: <FundOutlined />, label: '运营中心' },
-      { key: '/analytics', icon: <BarChartOutlined />, label: '数据分析' },
-      { key: '/business-analytics', icon: <RiseOutlined />, label: '业务分析' },
-      { key: '/monitoring', icon: <MonitorOutlined />, label: '运营监控' },
-      { key: '/audit-intelligence', icon: <SafetyOutlined />, label: '审计智能' },
+    ],
+  },
+  product: {
+    label: '产品中心',
+    items: [
       { key: '/products', icon: <AppstoreOutlined />, label: '产品管理' },
-      { key: '/content', icon: <FileTextOutlined />, label: '内容管理' },
-      { key: '/content/tags', icon: <TagsOutlined />, label: '标签管理' },
-      { key: '/knowledge/domains', icon: <BookOutlined />, label: '知识分类' },
-      { key: '/knowledge/entries', icon: <FileTextOutlined />, label: '知识条目' },
-      { key: '/media', icon: <PictureOutlined />, label: '媒体中心' },
+      { key: '/product-categories', icon: <TagsOutlined />, label: '产品分类' },
+      {
+        key: 'parameters',
+        icon: <SettingOutlined />,
+        label: '参数体系',
+        children: [
+          { key: '/parameter-groups', label: '参数组' },
+          { key: '/parameter-definitions', label: '参数定义' },
+        ],
+      },
     ],
   },
   business: {
-    label: '商业运营',
+    label: '业务中心',
     items: [
-      { key: '/inquiries', icon: <MailOutlined />, label: '询价管理' },
       { key: '/demands', icon: <FileTextOutlined />, label: '需求管理' },
-      { key: '/rfqs', icon: <SnippetsOutlined />, label: 'RFQ管理' },
+      { key: '/rfqs', icon: <SnippetsOutlined />, label: 'RFQ 管理' },
       { key: '/offers', icon: <TagsOutlined />, label: '报价管理' },
+      { key: '/inquiries', icon: <MailOutlined />, label: '产品询价' },
       { key: '/matching', icon: <NodeIndexOutlined />, label: '匹配管理' },
+    ],
+  },
+  permission: {
+    label: '用户与供应商',
+    items: [
+      { key: '/users', icon: <TeamOutlined />, label: '用户管理' },
+      { key: '/organizations', icon: <BankOutlined />, label: '企业管理' },
+    ],
+  },
+  content: {
+    label: '内容中心',
+    items: [
+      { key: '/content', icon: <ReadOutlined />, label: '文章管理' },
+      {
+        key: 'knowledge',
+        icon: <ExperimentOutlined />,
+        label: '知识库',
+        children: [
+          { key: '/knowledge/entries', label: '知识条目' },
+          { key: '/knowledge/domains', label: '知识分类' },
+          { key: '/product-category-knowledge-mappings', label: '知识分类映射' },
+        ],
+      },
+      { key: '/content/tags', label: '标签管理' },
+    ],
+  },
+  data: {
+    label: '数据与监控',
+    items: [
+      { key: '/analytics', icon: <DatabaseOutlined />, label: '数据分析' },
+      { key: '/business-analytics', icon: <FundOutlined />, label: '业务分析' },
+      { key: '/monitoring', icon: <DashboardOutlined />, label: '运营监控' },
+      { key: '/audit-intelligence', icon: <AuditOutlined />, label: '审计智能' },
     ],
   },
   system: {
     label: '系统管理',
     items: [
-      { key: '/users', icon: <TeamOutlined />, label: '用户管理' },
-      { key: '/organizations', icon: <BankOutlined />, label: '组织管理' },
-      {
-        key: 'parameters',
-        icon: <SettingOutlined />,
-        label: '参数管理',
-        children: [
-          { key: '/parameter-groups', label: '参数组' },
-          { key: '/parameter-definitions', label: '参数定义' },
-          { key: '/product-categories', label: '分类管理' },
-          { key: '/product-category-knowledge-mappings', label: '知识分类映射' },
-        ],
-      },
       { key: '/notifications', icon: <BellOutlined />, label: '通知管理' },
       { key: '/audit-logs', icon: <AuditOutlined />, label: '审计日志' },
       { key: '/embedding', icon: <ExperimentOutlined />, label: 'AI 数据准备' },
@@ -93,31 +118,32 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
 
 // Breadcrumb route mapping
 const breadcrumbMap: Record<string, string> = {
-  '/home': '运营仪表盘',
+  '/home': '首页',
   '/operation-center': '运营中心',
   '/analytics': '数据分析',
   '/business-analytics': '业务分析',
   '/monitoring': '运营监控',
   '/audit-intelligence': '审计智能',
   '/products': '产品管理',
-  '/content': '内容管理',
+  '/product-categories': '产品分类',
+  '/content': '文章管理',
   '/content/tags': '标签管理',
-  '/inquiries': '询价管理',
+  '/inquiries': '产品询价',
   '/demands': '需求管理',
-  '/rfqs': 'RFQ管理',
+  '/rfqs': 'RFQ 管理',
   '/offers': '报价管理',
   '/matching': '匹配管理',
   '/users': '用户管理',
-  '/organizations': '组织管理',
+  '/organizations': '企业管理',
   '/parameter-groups': '参数组',
   '/parameter-definitions': '参数定义',
-  '/product-categories': '分类管理',
   '/notifications': '通知管理',
   '/audit-logs': '审计日志',
   '/media': '媒体中心',
   '/embedding': 'AI 数据准备',
+  '/knowledge/entries': '知识条目',
   '/knowledge/domains': '知识分类',
-  '/knowledge/categories': '知识分类',
+  '/product-category-knowledge-mappings': '知识分类映射',
 };
 
 // Build flat menu items from groups
@@ -131,7 +157,7 @@ const allMenuItems: MenuProps['items'] = (Object.entries(menuGroups) as [MenuGro
 function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const [openKeys, setOpenKeys] = useState<string[]>(['parameters']);
+  const [openKeys, setOpenKeys] = useState<string[]>(['knowledge']);
   const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();

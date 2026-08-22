@@ -12,6 +12,10 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.2",
+    "@visndt/design-system": "workspace:^",
+    "@visndt/design-tokens": "workspace:^",
+    "@visndt/identity-contract": "workspace:^",
+    "@visndt/rule-engine-contract": "workspace:^",
     "antd": "^5.29.3",
     "axios": "^1.18.1",
     "dayjs": "^1.11.21",

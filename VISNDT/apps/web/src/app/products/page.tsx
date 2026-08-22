@@ -227,7 +227,7 @@ function ProductsPageContent() {
   return (
     <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
       <div className="mb-6 sm:mb-8 rounded-2xl border border-slate-200/80 shadow-industrial-sm bg-white px-6 py-7 sm:px-8 sm:py-9">
-        <IndustrialBadge label="Industrial Capability Discovery" tone="cyan" />
+        <IndustrialBadge label="工业检测能力发现" tone="cyan" />
         <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground mt-4">
           工业检测能力目录
         </h1>

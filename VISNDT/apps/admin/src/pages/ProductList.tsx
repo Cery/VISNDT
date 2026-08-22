@@ -377,10 +377,10 @@ function ProductList() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>Product Capability Operations</Title>
+          <Title level={4} style={{ margin: 0 }}>产品能力管理</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          Manage industrial inspection product capabilities, status and categories
+          管理工业检测产品能力、状态与分类
         </Text>
       </div>
 

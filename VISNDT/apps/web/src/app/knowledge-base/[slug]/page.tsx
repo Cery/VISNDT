@@ -109,7 +109,7 @@ export default async function KnowledgeEntryDetailPage({ params }: EntryDetailPa
 
   const breadcrumbItems = [
     { name: '首页', url: absoluteUrl('/') },
-    { name: '知识库', url: absoluteUrl('/knowledge-base') },
+    { name: '知识中心', url: absoluteUrl('/knowledge-base') },
   ];
   if (entry.domain) {
     breadcrumbItems.push({
@@ -130,7 +130,7 @@ export default async function KnowledgeEntryDetailPage({ params }: EntryDetailPa
         </Link>
         <span className="text-slate-300">/</span>
         <Link href="/knowledge-base" className="hover:text-primary transition-colors whitespace-nowrap">
-          知识库
+          知识中心
         </Link>
         {entry.domain && (
           <>
@@ -319,7 +319,7 @@ export default async function KnowledgeEntryDetailPage({ params }: EntryDetailPa
           href="/knowledge-base"
           className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors"
         >
-          <span>返回知识库</span>
+          <span>返回知识中心</span>
           <span className="text-xs">&rarr;</span>
         </Link>
       </div>

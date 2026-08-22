@@ -89,9 +89,9 @@ function OfferListContent() {
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">我的 Offer</h1>
+            <h1 className="text-2xl font-bold text-slate-900">我的报价</h1>
             <p className="mt-1 text-sm text-slate-500">
-              管理您的供应能力 Offer，查看状态并创建新的 Offer。
+              管理您的供应能力报价，查看状态并创建新的报价。
             </p>
           </div>
           <Link
@@ -101,7 +101,7 @@ function OfferListContent() {
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            创建 Offer
+            创建报价
           </Link>
         </div>
 
@@ -134,14 +134,14 @@ function OfferListContent() {
         ) : offersQuery.isError ? (
           <div className="rounded-xl border border-slate-200 bg-white p-6">
             <ErrorState
-              message="加载 Offer 列表失败，请稍后重试。"
+              message="加载报价列表失败，请稍后重试。"
               onRetry={() => offersQuery.refetch()}
             />
           </div>
         ) : offers.length === 0 ? (
           <div className="rounded-xl border border-slate-200 bg-white p-6">
             <EmptyState
-              message={statusFilter ? '当前筛选条件下没有 Offer。' : '暂无 Offer，点击上方按钮创建第一个 Offer。'}
+              message={statusFilter ? '当前筛选条件下没有报价。' : '暂无报价，点击上方按钮创建第一个报价。'}
             />
           </div>
         ) : (

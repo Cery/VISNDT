@@ -32,10 +32,8 @@ export interface UpdateProductMediaDto {
   displayOrder?: number;
 }
 
-export interface ProductMediaListResponse {
-  data: ProductMediaItem[];
-  total: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
-}
+/**
+ * The `GET /products/:productId/media` endpoint returns a raw array via
+ * ApiResponse.data. It is not paginated (full list for the product).
+ */
+export type ProductMediaListResponse = ProductMediaItem[];

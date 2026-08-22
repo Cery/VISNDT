@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getDomainBySlug, getEntries } from '@/services/knowledge-base.service';
 import type { KnowledgeDomainDetail, KnowledgeEntryListItem } from '@/types/knowledge-base';
-import { SITE_URL } from '@/lib/seo';
+import { buildPageMetadata } from '@/lib/seo-config';
+import { absoluteUrl, buildBreadcrumbListJsonLd, JsonLdScript } from '@/lib/seo';
 
 interface DomainPageProps {
   params: Promise<{ slug: string }>;
@@ -22,16 +23,11 @@ export async function generateMetadata({ params }: DomainPageProps): Promise<Met
   const { slug } = await params;
   try {
     const domain = await getDomainBySlug(slug);
-    return {
-      title: `${domain.name} – 知识库`,
+    return buildPageMetadata({
+      title: `${domain.name} – 知识中心`,
       description: domain.description ?? `工业检测${domain.name}领域知识，共${domain._count?.knowledgeEntries ?? 0}个知识条目。`,
-      openGraph: {
-        title: `${domain.name} – 知识库`,
-        description: domain.description ?? '',
-        type: 'website',
-        url: `${SITE_URL}/knowledge-base/domains/${slug}`,
-      },
-    };
+      path: `/knowledge-base/domains/${slug}`,
+    });
   } catch {
     return { title: '知识领域', description: '' };
   }
@@ -56,8 +52,15 @@ export default async function KnowledgeDomainPage({ params }: DomainPageProps) {
     entries = [];
   }
 
+  const breadcrumbItems = [
+    { name: '首页', url: absoluteUrl('/') },
+    { name: '知识中心', url: absoluteUrl('/knowledge-base') },
+    { name: domain.name, url: absoluteUrl(`/knowledge-base/domains/${slug}`) },
+  ];
+
   return (
     <div>
+      <JsonLdScript data={buildBreadcrumbListJsonLd(breadcrumbItems)} />
       {/* Domain Hero */}
       <section className="bg-industrial-dark text-white py-10 sm:py-16 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-pattern bg-grid-md opacity-30" />
@@ -81,7 +84,7 @@ export default async function KnowledgeDomainPage({ params }: DomainPageProps) {
           </Link>
           <span className="text-slate-300">/</span>
           <Link href="/knowledge-base" className="hover:text-primary transition-colors whitespace-nowrap">
-            知识库
+            知识中心
           </Link>
           <span className="text-slate-300">/</span>
           <span className="text-foreground truncate">{domain.name}</span>

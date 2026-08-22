@@ -185,9 +185,9 @@ function OfferEditContent() {
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">编辑 Offer</h1>
+            <h1 className="text-2xl font-bold text-slate-900">编辑报价</h1>
             <p className="mt-1 text-sm text-slate-500">
-              {isDraft ? '编辑草稿 Offer 并提交。' : '查看 Offer 详情与状态。'}
+              {isDraft ? '编辑草稿报价并提交。' : '查看报价详情与状态。'}
             </p>
           </div>
           <OfferStatusBadge status={offer.status} />
@@ -195,14 +195,14 @@ function OfferEditContent() {
 
         {/* Offer Info Summary */}
         <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900">Offer 概览</h2>
+          <h2 className="text-lg font-semibold text-slate-900">报价概览</h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div className="rounded-lg bg-slate-50 p-3">
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Product ID</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">产品编号</p>
               <p className="mt-1 text-sm font-medium text-slate-900">{offer.productId}</p>
             </div>
             <div className="rounded-lg bg-slate-50 p-3">
-              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Organization</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500">所属组织</p>
               <p className="mt-1 text-sm font-medium text-slate-900">
                 {offer.organization?.name ?? '未命名组织'}
               </p>
@@ -220,7 +220,7 @@ function OfferEditContent() {
 
         {/* Edit Form */}
         <form onSubmit={handleSave} className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900">Offer 信息</h2>
+          <h2 className="text-lg font-semibold text-slate-900">报价信息</h2>
 
           <div className="mt-4 space-y-4">
             <div>

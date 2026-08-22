@@ -2,18 +2,14 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getDomains, getEntries } from '@/services/knowledge-base.service';
 import type { KnowledgeDomain, KnowledgeEntryListItem } from '@/types/knowledge-base';
-import { SITE_URL } from '@/lib/seo';
+import { buildPageMetadata } from '@/lib/seo-config';
 
-export const metadata: Metadata = {
-  title: '知识库 – 工业检测知识体系',
+export const metadata: Metadata = buildPageMetadata({
+  title: '知识中心 – 工业检测专业知识库',
   description: '结构化的工业检测知识体系，涵盖检测技术、检测场景、设备应用、行业应用、检测方法及参数指导等领域。',
-  openGraph: {
-    title: '知识库 – 工业检测知识体系',
-    description: '结构化的工业检测知识体系，涵盖检测技术、检测场景、设备应用、行业应用、检测方法及参数指导等领域。',
-    type: 'website',
-    url: `${SITE_URL}/knowledge-base`,
-  },
-};
+  path: '/knowledge-base',
+  keywords: ['工业检测', '知识库', '检测技术', '检测方法', '参数指导'],
+});
 
 function formatDate(value?: string | null): string {
   if (!value) return '';
@@ -49,11 +45,14 @@ export default async function KnowledgeBaseHomePage() {
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-industrial-cyan/5 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
         <div className="max-w-4xl mx-auto text-center relative z-10">
+          <p className="text-sm font-medium text-industrial-cyan tracking-widest uppercase mb-4">
+            Knowledge Center
+          </p>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4">
-            工业检测<span className="text-industrial-cyan">知识库</span>
+            工业检测<span className="text-industrial-cyan">知识中心</span>
           </h1>
           <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto">
-            结构化的工业检测知识体系，为检测专业人士提供系统化的技术参考与方案指导。
+            结构化的工业检测专业知识资产，为检测专业人士提供系统化的技术参考、检测方法与方案指导。
           </p>
         </div>
       </section>

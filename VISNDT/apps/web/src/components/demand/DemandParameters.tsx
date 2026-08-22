@@ -1,3 +1,5 @@
+import { formatValueWithUnit } from '@/lib/format';
+
 interface DemandParametersProps {
   parameters?: Array<{
     id: string;
@@ -34,10 +36,7 @@ export default function DemandParameters({ parameters }: DemandParametersProps) 
                 {param.name}
               </td>
               <td className="px-4 py-2.5 text-slate-600">
-                {param.value}
-                {param.unit && (
-                  <span className="text-slate-400 ml-1">{param.unit}</span>
-                )}
+                {formatValueWithUnit(param.value, param.unit)}
               </td>
             </tr>
           ))}

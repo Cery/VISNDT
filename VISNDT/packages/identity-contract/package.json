@@ -1,0 +1,25 @@
+{
+  "name": "@visndt/identity-contract",
+  "version": "0.1.0",
+  "private": true,
+  "description": "VISNDT Business Identity Number System Contract v0.1 — types, prefix mapping, deterministic formatter & validator (pure TS, no runtime deps)",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --watch"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.7.0"
+  }
+}

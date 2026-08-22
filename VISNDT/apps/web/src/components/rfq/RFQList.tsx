@@ -1,5 +1,7 @@
 import Link from 'next/link';
+import { BusinessIdentityBadge } from '@visndt/design-system';
 import RFQStatusBadge from './RFQStatusBadge';
+import UiIcon from '@/lib/ui-icon';
 import type { RfqItem } from '@/lib/api/rfqs';
 
 interface RFQListProps {
@@ -24,12 +26,12 @@ export default function RFQList({ rfqs, isLoading }: RFQListProps) {
   if (rfqs.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-12 text-center">
-        <div className="text-3xl mb-3">📄</div>
+        <div className="text-3xl mb-3"><UiIcon name="file" size={40} color="#94a3b8" /></div>
         <h3 className="text-sm font-medium text-slate-700 mb-1">
-          暂无询价
+          暂无询价请求
         </h3>
         <p className="text-sm text-slate-400">
-          您的组织尚未收到任何询价。
+          您的组织尚未收到任何询价请求。
         </p>
       </div>
     );
@@ -57,6 +59,7 @@ export default function RFQList({ rfqs, isLoading }: RFQListProps) {
             <RFQStatusBadge status={rfq.status} />
           </div>
           <div className="flex items-center gap-3 mt-3 text-xs text-slate-400">
+            <BusinessIdentityBadge type="RFQ" id={rfq.id} createdAt={rfq.createdAt} />
             <span>创建时间: {new Date(rfq.createdAt).toLocaleDateString()}</span>
             {rfq.publishedAt && (
               <span>发布时间: {new Date(rfq.publishedAt).toLocaleDateString()}</span>

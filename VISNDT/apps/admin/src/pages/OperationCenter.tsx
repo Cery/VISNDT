@@ -611,7 +611,7 @@ export default function OperationCenter() {
             </Typography.Title>
           </div>
           <Text type="secondary" style={{ fontSize: 13, marginLeft: 42 }}>
-            Admin Operation Center · CRUD 管理之上的统一运营体验入口
+            管理运营中心 · CRUD 管理之上的统一运营体验入口
           </Text>
         </div>
         <Button icon={<ReloadOutlined />} onClick={() => { fetchOverview(); loadProduct(); }} size="small">

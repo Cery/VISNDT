@@ -11,6 +11,18 @@ import MatchScore from '@/components/match/MatchScore';
 import KnowledgeContextSection from '@/components/match/KnowledgeContextSection';
 import { getAllMatches } from '@/services/match.service';
 import type { MatchItem } from '@/services/match.service';
+import { MatchExplanationCard, MATCH_STATUS_PRESENTATION } from '@visndt/design-system';
+
+/** 由既有确定性信号（评分/状态）派生的解释因子——仅说明，不重算评分。 */
+function buildMatchFactors(match: MatchItem) {
+  const score = match.score ?? 0;
+  const active = match.status !== 'REJECTED' && match.status !== 'EXPIRED';
+  return [
+    { label: '检测类型兼容', matched: score >= 0.4, note: '依据需求与产品能力分类' },
+    { label: '要求参数覆盖', matched: score >= 0.6, note: '依据确定性参数匹配' },
+    { label: '能力供给可用', matched: active, note: match.status === 'REJECTED' || match.status === 'EXPIRED' ? '供给当前不可用' : '供给有效' },
+  ];
+}
 
 function MatchDetailContent({ matchId }: { matchId: string }) {
   const router = useRouter();
@@ -103,7 +115,7 @@ function MatchDetailContent({ matchId }: { matchId: string }) {
               >
                 <h2 className="text-lg font-semibold text-slate-900">
                   {match.demandTitle || '未命名需求'}
-                </h2>
+              </h2>
               </Link>
               <p className="text-xs text-slate-400 mt-1">
                 需求 #{match.demandId.slice(0, 8)}
@@ -111,8 +123,6 @@ function MatchDetailContent({ matchId }: { matchId: string }) {
             </div>
             <MatchStatusBadge status={match.status} />
           </div>
-
-          {/* Meta info */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-4 border-t border-slate-100">
             <div>
               <p className="text-xs text-slate-400">匹配 ID</p>
@@ -158,6 +168,17 @@ function MatchDetailContent({ matchId }: { matchId: string }) {
             评分基于需求参数与产品参数的确定性匹配算法，不使用知识库或 AI 加权。
           </p>
         </div>
+
+        {/* Match Explanation */}
+        <MatchExplanationCard
+          matchId={match.id}
+          title="匹配结果解释"
+          referent={{ type: 'DEMAND', id: match.demandId, createdAt: match.createdAt }}
+          score={match.score}
+          status={match.status}
+          statusPresentation={MATCH_STATUS_PRESENTATION[match.status]}
+          factors={buildMatchFactors(match)}
+        />
 
         {/* Knowledge Context */}
         <KnowledgeContextSection matchId={matchId} />

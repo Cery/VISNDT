@@ -13,6 +13,7 @@ import { getAvailableRfqs } from '@/services/rfq.service';
 import { getSupplierWorkspaceOverview, getSupplierWorkspaceRfqs, getSupplierWorkspaceResponses } from '@/services/workspace.service';
 import type { AvailableRfqItem } from '@/lib/api/rfqs';
 import type { WorkspaceSupplierRfqItem } from '@/lib/api/workspace';
+import { BusinessIdentityBadge } from '@visndt/design-system';
 
 const RFQ_STATUS_LABELS: Record<string, string> = {
   DRAFT: '草稿',
@@ -207,12 +208,12 @@ function OpportunityContent() {
                       </div>
                       <div className="mt-4 grid gap-3 sm:grid-cols-3">
                         <div className="rounded-lg bg-slate-50 p-3">
-                          <p className="text-xs text-slate-500">RFQ ID</p>
-                          <p className="text-sm font-medium text-slate-900 truncate">{rfq.id}</p>
+                          <p className="text-xs text-slate-500">RFQ 编号</p>
+                          <div className="mt-1"><BusinessIdentityBadge type="RFQ" id={rfq.id} createdAt={rfq.createdAt} variant="plain" /></div>
                         </div>
                         <div className="rounded-lg bg-slate-50 p-3">
-                          <p className="text-xs text-slate-500">需求 ID</p>
-                          <p className="text-sm font-medium text-slate-900 truncate">{rfq.demand.id}</p>
+                          <p className="text-xs text-slate-500">需求编号</p>
+                          <div className="mt-1"><BusinessIdentityBadge type="DEMAND" id={rfq.demand.id} variant="plain" /></div>
                         </div>
                         <div className="rounded-lg bg-slate-50 p-3">
                           <p className="text-xs text-slate-500">状态</p>
@@ -295,8 +296,8 @@ function OpportunityContent() {
                     </div>
                     <div className="mt-4 grid gap-3 sm:grid-cols-3">
                       <div className="rounded-lg bg-slate-50 p-3">
-                        <p className="text-xs text-slate-500">RFQ ID</p>
-                        <p className="text-sm font-medium text-slate-900 truncate">{rfq.id}</p>
+                        <p className="text-xs text-slate-500">RFQ 编号</p>
+                        <div className="mt-1"><BusinessIdentityBadge type="RFQ" id={rfq.id} createdAt={rfq.createdAt} variant="plain" /></div>
                       </div>
                       <div className="rounded-lg bg-slate-50 p-3">
                         <p className="text-xs text-slate-500">采购方</p>

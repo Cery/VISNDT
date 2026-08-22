@@ -1,4 +1,5 @@
 import type { DemandDetailItem } from '@/lib/api/demands';
+import { BusinessIdentityBadge, WorkflowTimeline, NextActionHint, buildDemandTimeline, DEMAND_STATUS_PRESENTATION, presentStatus } from '@visndt/design-system';
 import DemandStatusBadge from './DemandStatusBadge';
 import DemandParameters from './DemandParameters';
 
@@ -8,6 +9,11 @@ interface DemandDetailProps {
 }
 
 export default function DemandDetail({ demand, matchesCount }: DemandDetailProps) {
+  const demandSteps = buildDemandTimeline(demand.status, {
+    createdAt: demand.createdAt,
+  });
+  const presentation = presentStatus(demand.status, DEMAND_STATUS_PRESENTATION);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -17,6 +23,7 @@ export default function DemandDetail({ demand, matchesCount }: DemandDetailProps
           <DemandStatusBadge status={demand.status} />
         </div>
         <div className="flex items-center gap-3 text-xs text-slate-400">
+          <BusinessIdentityBadge type="DEMAND" id={demand.id} createdAt={demand.createdAt} />
           {demand.category && (
             <span className="bg-slate-100 px-2 py-0.5 rounded-full">
               {demand.category.name}
@@ -26,6 +33,12 @@ export default function DemandDetail({ demand, matchesCount }: DemandDetailProps
           <span>更新时间: {new Date(demand.updatedAt).toLocaleDateString()}</span>
         </div>
       </div>
+
+      {/* Workflow Visualization */}
+      <section className="space-y-3">
+        <NextActionHint current={presentation.label} action={presentation.nextAction} />
+        <WorkflowTimeline title="业务流转" steps={demandSteps} />
+      </section>
 
       {/* Description */}
       {demand.description && (

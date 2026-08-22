@@ -37,6 +37,7 @@ import {
 import { productService } from '../api';
 import type { ProductDetail, ProductParameterValue } from '../types';
 import { VISNDT_COLORS, resolveStatusTone, TONE_TO_HEX } from '../components/design-system/tokens';
+import { BusinessIdentityBadge } from '@visndt/design-system';
 import { StatusTag } from '../components/design-system';
 
 const { Title, Text } = Typography;
@@ -246,6 +247,9 @@ export default function ProductDetailPage() {
 
       <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
+          <Descriptions.Item label="业务编号">
+            <BusinessIdentityBadge type="PRODUCT" id={product.id} createdAt={product.createdAt} />
+          </Descriptions.Item>
           <Descriptions.Item label="名称">{product.name}</Descriptions.Item>
           <Descriptions.Item label="型号">{product.model || '-'}</Descriptions.Item>
           <Descriptions.Item label="分类">

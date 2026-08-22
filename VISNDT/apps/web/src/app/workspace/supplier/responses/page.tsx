@@ -10,6 +10,7 @@ import Pagination from '@/components/common/Pagination';
 import RFQResponseStatusBadge from '@/components/rfq/RFQResponseStatusBadge';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
+import { BusinessIdentityBadge } from '@visndt/design-system';
 import { getMyRfqResponses } from '@/services/rfq.service';
 import type { RfqResponseItem } from '@/lib/api/rfqs';
 
@@ -20,6 +21,27 @@ const RESPONSE_STATUS_FILTERS = [
   { label: '已接受', value: 'ACCEPTED' },
   { label: '已拒绝', value: 'REJECTED' },
 ] as const;
+
+const STATUS_LABEL_MAP: Record<string, string> = {
+  DRAFT: '草稿',
+  PUBLISHED: '已发布',
+  SUBMITTED: '已提交',
+  PROCESSING: '处理中',
+  OPEN: '开放',
+  RESPONDING: '响应中',
+  CLOSED: '已关闭',
+  CANCELLED: '已取消',
+  ACCEPTED: '已接受',
+  REJECTED: '已拒绝',
+  VIEWED: '已查看',
+  PENDING: '待处理',
+  MATCHED: '已匹配',
+};
+
+function formatStatus(status: string | undefined | null): string {
+  if (!status) return '暂无';
+  return STATUS_LABEL_MAP[status] || status;
+}
 
 function formatDateTime(value?: string | null) {
   if (!value) {
@@ -179,9 +201,7 @@ function SupplierResponsesContent() {
                             <div className="space-y-2">
                               <div className="flex flex-wrap items-center gap-2">
                                 <RFQResponseStatusBadge status={response.status} />
-                                <span className="text-xs text-slate-400">
-                                  Response ID: {response.id}
-                                </span>
+                                <BusinessIdentityBadge type="RFQ_RESPONSE" id={response.id} createdAt={response.createdAt} variant="plain" />
                               </div>
                               <h3 className="text-lg font-semibold text-slate-900">
                                 {response.rfq?.demand?.title || '未关联需求标题'}
@@ -189,14 +209,14 @@ function SupplierResponsesContent() {
                             </div>
                             <div className="text-sm text-slate-500 space-y-1 text-right">
                               <p>提交时间：{formatDateTime(response.createdAt)}</p>
-                              <p>RFQ 状态：{response.rfq?.status || '暂无'}</p>
+                              <p>RFQ 状态：{formatStatus(response.rfq?.status)}</p>
                             </div>
                           </div>
 
                           <div className="mt-4 grid gap-4 md:grid-cols-2">
                             <div className="rounded-lg bg-slate-50 p-4">
                               <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                                Offer
+                                报价
                               </p>
                               <p className="mt-2 text-sm text-slate-700">
                                 {formatOfferSummary(response)}
@@ -210,10 +230,10 @@ function SupplierResponsesContent() {
 
                             <div className="rounded-lg bg-slate-50 p-4">
                               <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                                Response
+                                响应
                               </p>
                               <p className="mt-2 text-sm text-slate-700">
-                                当前状态：{response.status}
+                                当前状态：{formatStatus(response.status)}
                               </p>
                               <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-600">
                                 {response.message?.trim() || '暂无响应说明'}
@@ -266,16 +286,22 @@ function SupplierResponsesContent() {
                               </p>
                               <div className="mt-2 grid gap-2 sm:grid-cols-3">
                                 <div>
-                                  <span className="text-xs text-slate-400">RFQ ID</span>
-                                  <p className="text-sm font-medium text-slate-700">{response.rfq.id}</p>
+                                  <span className="text-xs text-slate-400">RFQ 编号</span>
+                                  <p className="text-sm font-medium text-slate-700">
+                                    <BusinessIdentityBadge type="RFQ" id={response.rfq.id} variant="plain" />
+                                  </p>
                                 </div>
                                 <div>
                                   <span className="text-xs text-slate-400">RFQ 状态</span>
-                                  <p className="text-sm font-medium text-slate-700">{response.rfq.status || '暂无'}</p>
+                                  <p className="text-sm font-medium text-slate-700">{formatStatus(response.rfq.status)}</p>
                                 </div>
                                 <div>
-                                  <span className="text-xs text-slate-400">Demand ID</span>
-                                  <p className="text-sm font-medium text-slate-700">{response.rfq.demand?.id || '暂无'}</p>
+                                  <span className="text-xs text-slate-400">需求编号</span>
+                                  <p className="text-sm font-medium text-slate-700">
+                                    {response.rfq.demand ? (
+                                      <BusinessIdentityBadge type="DEMAND" id={response.rfq.demand.id} variant="plain" />
+                                    ) : '暂无'}
+                                  </p>
                                 </div>
                               </div>
                             </div>
