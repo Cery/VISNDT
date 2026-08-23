@@ -68,6 +68,7 @@ const FILE_STATUS_COLOR: Record<string, string> = {
 
 const ENTITY_TYPE_LABEL: Record<string, string> = {
   PRODUCT: '产品',
+  SUPPLIER_PRODUCT: '供应商型号',
   ORGANIZATION: '组织',
   DEMAND: '需求',
   RFQ: 'RFQ',
@@ -88,6 +89,7 @@ const FILE_TYPE_OPTIONS = [
 const ENTITY_TYPE_OPTIONS = [
   { value: '', label: '全部实体' },
   { value: 'PRODUCT', label: '产品' },
+  { value: 'SUPPLIER_PRODUCT', label: '供应商型号' },
   { value: 'ORGANIZATION', label: '组织' },
   { value: 'DEMAND', label: '需求' },
   { value: 'RFQ', label: 'RFQ' },

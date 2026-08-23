@@ -99,6 +99,8 @@ export interface DiscoveryAnalyticsContext {
 /** Breakdown of result counts per entity type */
 export interface SearchResultCount {
   products: number;
+  /** M28.0 M661.6 — SupplierProduct dimension folded into unified search analytics */
+  supplierProducts: number;
   knowledge: number;
   content: number;
   solutions: number;

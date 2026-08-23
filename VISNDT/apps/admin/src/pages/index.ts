@@ -30,6 +30,8 @@ export { default as RfqResponseDetail } from './RfqResponseDetail';
 export { default as MatchDetail } from './MatchDetail';
 export { default as OfferList } from './OfferList';
 export { default as OfferDetail } from './OfferDetail';
+export { default as SupplierProductList } from './SupplierProductList';
+export { default as SupplierProductDetail } from './SupplierProductDetail';
 export { default as InquiryList } from './InquiryList';
 export { default as InquiryDetail } from './InquiryDetail';
 export { default as ParameterGroupList } from './parameter/ParameterGroupList';

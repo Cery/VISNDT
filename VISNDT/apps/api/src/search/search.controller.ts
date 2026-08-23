@@ -1,10 +1,11 @@
-import { Controller, Get, Query, Req } from '@nestjs/common';
+import { Controller, Get, Query, Req, Logger } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 import { randomUUID } from 'crypto';
 import { SearchService } from './search.service';
 import { SearchContextService } from './search-context.service';
 import { DiscoveryAnalyticsService } from './search-analytics.service';
+import { SupplierModelFacetSearchService, SupplierProductFacetBundle } from './supplier-model-facet-search.service';
 import { UnifiedSearchDto } from './dto/unified-search.dto';
 import { SearchContextDto } from './dto/search-context.dto';
 import type { SearchEvent } from './search-analytics.types';
@@ -27,25 +28,61 @@ import type { SearchEvent } from './search-analytics.types';
 @ApiTags('Search')
 @Controller('search')
 export class SearchController {
+  private readonly logger = new Logger(SearchController.name);
+
   constructor(
     private readonly searchService: SearchService,
     private readonly contextService: SearchContextService,
     private readonly analytics: DiscoveryAnalyticsService,
+    private readonly supplierModelSearch: SupplierModelFacetSearchService,
   ) {}
 
   @Get()
   @ApiOperation({
     summary: 'Unified Industrial Discovery',
-    description: 'Search across Products, Knowledge, Content, Solutions, and Suppliers in a single unified endpoint.',
+    description: 'Search across Products, SupplierProducts, Knowledge, Content, Solutions, and Suppliers in a single unified endpoint.',
   })
   @ApiResponse({ status: 200, description: 'Unified discovery results across all entity types' })
   async search(@Query() dto: UnifiedSearchDto, @Req() req?: Request) {
-    const result = await this.searchService.search(dto.q, dto.page, dto.pageSize, dto.category, dto.filters);
+    const hasActiveOffer = dto.hasOffer === 'true';
+    const result = await this.searchService.search(
+      dto.q,
+      dto.page,
+      dto.pageSize,
+      dto.category,
+      dto.filters,
+      dto.brand,
+      dto.series,
+      hasActiveOffer,
+    );
+
+    // ─── M28.0 M661.6 — SupplierProduct dimension facets served by unified /search ───
+    // Pagination-independent facet bundle (brand / series / commercial) over the
+    // published candidate population. SearchPage therefore only consumes /search
+    // and never the legacy /search/supplier-models endpoint. Facet failure must
+    // NOT break the search response (Search Runtime > Facet).
+    let supplierProductFacets: SupplierProductFacetBundle = {
+      brands: [],
+      series: [],
+      commercial: { hasActiveOffer: 0, inquiryAvailable: 0 },
+    };
+    try {
+      supplierProductFacets = await this.supplierModelSearch.getFacets({
+        keyword: dto.q,
+        categoryId: dto.category,
+        brand: dto.brand,
+        series: dto.series,
+        hasActiveOffer,
+        parameterFilters: dto.filters,
+      });
+    } catch (error) {
+      this.logger.warn(`SupplierProduct facet computation failed (non-blocking): ${(error as Error).message}`);
+    }
 
     // ─── M23.0.3 Analytics: non-blocking search event recording ───
     this.recordSearchAnalytics(dto.q, result, req);
 
-    return result;
+    return { ...result, supplierProductFacets };
   }
 
   /**
@@ -67,6 +104,48 @@ export class SearchController {
     return this.contextService.getContext(dto.q);
   }
 
+  // ─── M28.0 M661.4 — Supplier Model Facet Search ───────────────────────────
+
+  /**
+   * Supplier Model Facet Discovery.
+   *
+   * Search = Discovery Acceleration Layer. Only PUBLISHED SupplierProduct is
+   * indexed (published boundary enforced server-side). Supports capability
+   * filter, supplier model filter, technical parameter facets, and commercial
+   * availability facets. Results are DTO projections — no raw Prisma entity
+   * and no bare DB join is returned.
+   */
+  @Get('supplier-models')
+  @ApiOperation({
+    summary: 'Supplier Model Facet Discovery',
+    description: 'Search PUBLISHED supplier models with capability / brand / series / technical-parameter / commercial-availability facets.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Published supplier model facet search results',
+  })
+  async searchSupplierModels(
+    @Query('q') q?: string,
+    @Query('categoryId') categoryId?: string,
+    @Query('brand') brand?: string,
+    @Query('series') series?: string,
+    @Query('hasOffer') hasOffer?: string,
+    @Query('filters') filters?: string,
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+  ) {
+    return this.supplierModelSearch.search({
+      keyword: q,
+      categoryId,
+      brand,
+      series,
+      hasActiveOffer: hasOffer === 'true',
+      parameterFilters: filters,
+      page: page ? Number(page) : 1,
+      pageSize: pageSize ? Number(pageSize) : 20,
+    });
+  }
+
   // ─── Analytics Hook ──────────────────────────────────────────
 
   /**
@@ -81,10 +160,12 @@ export class SearchController {
     try {
       const searchEventId = randomUUID();
       const source = this.detectSource(req);
-      const entityTypes = ['product', 'knowledge', 'content', 'solution', 'supplier'];
+      // M28.0 M661.6 — SupplierProduct dimension folded into unified analytics
+      const entityTypes = ['product', 'supplierProduct', 'knowledge', 'content', 'solution', 'supplier'];
       const resultCounts = this.analytics.extractResultCounts(result);
       const totalCount =
         resultCounts.products +
+        resultCounts.supplierProducts +
         resultCounts.knowledge +
         resultCounts.content +
         resultCounts.solutions +

@@ -1,0 +1,19 @@
+=== Post-scale Facet Filter Verification ===
+
+1) brand=明视 → total=2
+     明视 | 3DSCAN-Pro-S
+     明视 | VX-6000-PRO
+
+2) series=高清智能系列 → total=1
+     明视 | 高清智能系列 | VX-6000-PRO
+
+3) hasOffer=false → total=6
+
+4) hasOffer=true → total=6
+
+5) brand=锐视&hasOffer=true → total=2
+     锐视 | MIC-5000-ULTRA | PUBLISHED
+     锐视 | FB-3000-PLUS | PUBLISHED
+
+6) q=VX-6000 → supplierProducts total=1
+     明视 | 高清智能系列 | VX-6000-PRO

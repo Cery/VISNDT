@@ -26,6 +26,7 @@ import {
   FundOutlined,
   DatabaseOutlined,
   ReadOutlined,
+  PictureOutlined,
 } from '@ant-design/icons';
 import { authStore } from '../stores/auth.store';
 
@@ -34,10 +35,10 @@ const { Header, Sider, Content } = Layout;
 // ============================================
 // Sectioned Menu Configuration — Operational IA
 // ============================================
-// 目标结构（M26.3 Extension）：
-// 首页 / 产品中心 / 业务中心 / 用户与供应商 / 内容中心 / 数据与监控 / 系统管理
-// 媒体中心：隐藏一级入口，保留 /media 路由供 M27 Media Asset 扩展。
-type MenuGroup = 'home' | 'product' | 'business' | 'permission' | 'content' | 'data' | 'system';
+// 目标结构（M26.3 Extension + 663 Optimization）：
+// 首页 / 产品中心 / 业务中心 / 用户与供应商 / 内容中心 / 媒体中心 / 数据与分析 / 系统管理
+// 媒体中心：恢复一级入口（663 D5），页面基于既有 FileAsset entityType/entityId 归属展示。
+type MenuGroup = 'home' | 'product' | 'business' | 'permission' | 'content' | 'media' | 'data' | 'system';
 
 const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }> = {
   home: {
@@ -51,6 +52,7 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
     label: '产品中心',
     items: [
       { key: '/products', icon: <AppstoreOutlined />, label: '产品管理' },
+      { key: '/supplier-products', icon: <ExperimentOutlined />, label: '供应商型号审核' },
       { key: '/product-categories', icon: <TagsOutlined />, label: '产品分类' },
       {
         key: 'parameters',
@@ -83,22 +85,27 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
   content: {
     label: '内容中心',
     items: [
-      { key: '/content', icon: <ReadOutlined />, label: '文章管理' },
+      { key: '/content', icon: <ReadOutlined />, label: '内容管理' },
       {
         key: 'knowledge',
         icon: <ExperimentOutlined />,
         label: '知识库',
         children: [
           { key: '/knowledge/entries', label: '知识条目' },
-          { key: '/knowledge/domains', label: '知识分类' },
+          { key: '/knowledge/domains', label: '知识领域' },
+          { key: '/knowledge/categories', label: '知识分类' },
           { key: '/product-category-knowledge-mappings', label: '知识分类映射' },
         ],
       },
       { key: '/content/tags', label: '标签管理' },
     ],
   },
+  media: {
+    label: '媒体中心',
+    items: [{ key: '/media', icon: <PictureOutlined />, label: '媒体管理' }],
+  },
   data: {
-    label: '数据与监控',
+    label: '数据与分析',
     items: [
       { key: '/analytics', icon: <DatabaseOutlined />, label: '数据分析' },
       { key: '/business-analytics', icon: <FundOutlined />, label: '业务分析' },
@@ -126,12 +133,13 @@ const breadcrumbMap: Record<string, string> = {
   '/audit-intelligence': '审计智能',
   '/products': '产品管理',
   '/product-categories': '产品分类',
-  '/content': '文章管理',
+  '/content': '内容管理',
   '/content/tags': '标签管理',
   '/inquiries': '产品询价',
   '/demands': '需求管理',
   '/rfqs': 'RFQ 管理',
   '/offers': '报价管理',
+  '/supplier-products': '供应商型号审核',
   '/matching': '匹配管理',
   '/users': '用户管理',
   '/organizations': '企业管理',
@@ -142,7 +150,8 @@ const breadcrumbMap: Record<string, string> = {
   '/media': '媒体中心',
   '/embedding': 'AI 数据准备',
   '/knowledge/entries': '知识条目',
-  '/knowledge/domains': '知识分类',
+  '/knowledge/domains': '知识领域',
+  '/knowledge/categories': '知识分类',
   '/product-category-knowledge-mappings': '知识分类映射',
 };
 

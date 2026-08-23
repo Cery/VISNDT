@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { RequireAuth } from '../auth';
 import AdminLayout from '../layouts/AdminLayout';
-import { DemandDetail, DemandEdit, DemandList, EmbeddingManagement, FileAssetOrphanList, Home, Analytics, BusinessAnalytics, Monitoring, AuditIntelligence, InquiryDetail, InquiryList, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ParameterDefinitionCreate, ParameterDefinitionDetail, ParameterDefinitionEdit, ParameterDefinitionList, ParameterGroupCreate, ParameterGroupDetail, ParameterGroupEdit, ParameterGroupList, ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList, OperationCenter, ProductCreate, ProductDetail, ProductEdit, ProductList, ProductMediaCreate, ProductMediaEdit, ProductMediaList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, AuditLogList, UserCreate, UserDetail, UserEdit, UserList, ContentList, ContentCreate, ContentEdit, ContentTagList, ContentTagCreate, ContentTagEdit, KnowledgeDomainList, KnowledgeDomainCreate, KnowledgeDomainEdit, KnowledgeCategoryList, KnowledgeCategoryCreate, KnowledgeCategoryEdit, KnowledgeEntryList, KnowledgeEntryCreate, KnowledgeEntryEdit, MediaList, ProductCategoryKnowledgeMappingList, ProductCategoryKnowledgeMappingCreate, ProductCategoryKnowledgeMappingEdit } from '../pages';
+import { DemandDetail, DemandEdit, DemandList, EmbeddingManagement, FileAssetOrphanList, Home, Analytics, BusinessAnalytics, Monitoring, AuditIntelligence, InquiryDetail, InquiryList, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ParameterDefinitionCreate, ParameterDefinitionDetail, ParameterDefinitionEdit, ParameterDefinitionList, ParameterGroupCreate, ParameterGroupDetail, ParameterGroupEdit, ParameterGroupList, ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList, OperationCenter, ProductCreate, ProductDetail, ProductEdit, ProductList, ProductMediaCreate, ProductMediaEdit, ProductMediaList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, AuditLogList, UserCreate, UserDetail, UserEdit, UserList, ContentList, ContentCreate, ContentEdit, ContentTagList, ContentTagCreate, ContentTagEdit, KnowledgeDomainList, KnowledgeDomainCreate, KnowledgeDomainEdit, KnowledgeCategoryList, KnowledgeCategoryCreate, KnowledgeCategoryEdit, KnowledgeEntryList, KnowledgeEntryCreate, KnowledgeEntryEdit, MediaList, ProductCategoryKnowledgeMappingList, ProductCategoryKnowledgeMappingCreate, ProductCategoryKnowledgeMappingEdit, SupplierProductList, SupplierProductDetail } from '../pages';
 
 const router = createBrowserRouter([
   {
@@ -51,6 +51,8 @@ const router = createBrowserRouter([
       { path: 'rfq-responses/:id', element: <RfqResponseDetail /> },
       { path: 'offers', element: <OfferList /> },
       { path: 'offers/:id', element: <OfferDetail /> },
+      { path: 'supplier-products', element: <SupplierProductList /> },
+      { path: 'supplier-products/:id', element: <SupplierProductDetail /> },
       { path: 'inquiries', element: <InquiryList /> },
       { path: 'inquiries/:id', element: <InquiryDetail /> },
       { path: 'parameter-groups', element: <ParameterGroupList /> },

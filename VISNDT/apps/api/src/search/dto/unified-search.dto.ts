@@ -47,4 +47,24 @@ export class UnifiedSearchDto {
   @IsOptional()
   @IsString()
   filters?: string;
+
+  // ─── M28.0 M661.5 — Supplier Model facet inputs (SupplierProduct dimension) ───
+  // Brand / Series / Has-Active-Offer filters fold into the unified search model.
+  // They only affect the SupplierProduct dimension; Product / Knowledge / Content /
+  // Solution / Supplier dimensions are unchanged. No new search entry is created.
+
+  @ApiPropertyOptional({ description: 'Filter SupplierProduct dimension by brand (contains, case-insensitive)' })
+  @IsOptional()
+  @IsString()
+  brand?: string;
+
+  @ApiPropertyOptional({ description: 'Filter SupplierProduct dimension by series (contains, case-insensitive)' })
+  @IsOptional()
+  @IsString()
+  series?: string;
+
+  @ApiPropertyOptional({ description: 'Filter SupplierProduct dimension to those with >=1 ACTIVE offer ("true")' })
+  @IsOptional()
+  @IsString()
+  hasOffer?: string;
 }

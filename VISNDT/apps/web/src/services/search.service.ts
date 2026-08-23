@@ -9,18 +9,28 @@
  *   - KnowledgeEntry replaces Content(KNOWLEDGE) as primary knowledge source
  *   - Server-side aggregation (not client-side Promise.allSettled)
  */
-import { searchUnified } from '@/lib/api/search';
+import { searchUnified, searchSupplierModels } from '@/lib/api/search';
 import type {
   ProductDiscoveryItem,
   KnowledgeDiscoveryItem,
   ContentDiscoveryItem,
   SupplierDiscoveryItem,
+  SupplierProductDiscoveryItem,
+  SupplierModelFacetSearchParams,
+  SupplierModelFacetSearchResponse,
+  SupplierProductFacetBundle,
 } from '@/lib/api/search';
 import type { Product } from '@/types/product';
 import type { Content } from '@/types/content';
 
 /** Search domain types */
-export type SearchDomain = 'all' | 'product' | 'knowledge' | 'solution' | 'supplier';
+export type SearchDomain =
+  | 'all'
+  | 'product'
+  | 'knowledge'
+  | 'solution'
+  | 'supplier'
+  | 'supplier-product';
 
 /** Unified search params */
 export interface UnifiedSearchParams {
@@ -30,6 +40,10 @@ export interface UnifiedSearchParams {
   pageSize?: number;
   category?: string;
   filters?: Record<string, string[]>;
+  /** M28.0 M661.5 — SupplierProduct dimension facet inputs */
+  brand?: string;
+  series?: string;
+  hasOffer?: boolean;
 }
 
 /** Search result for a single domain */
@@ -49,14 +63,48 @@ export interface SupplierSearchResult {
   matchingOfferIds: string[];
 }
 
+/** SupplierProduct (published supplier model) discovery result — capability-centric */
+export interface SupplierProductSearchResult {
+  capability: {
+    id: string;
+    name: string;
+    slug: string | null;
+    categoryId: string | null;
+  } | null;
+  supplierProduct: {
+    id: string;
+    brand: string;
+    series: string | null;
+    modelNumber: string;
+    slug: string | null;
+    status: string;
+    platformProductId: string;
+    organization: {
+      id: string;
+      name: string;
+    } | null;
+  };
+  commercialSummary: {
+    offerCount: number;
+    activeOfferCount: number;
+    priceFrom: number | null;
+    priceTo: number | null;
+    currency: string | null;
+  };
+  inquiryAvailable: boolean;
+}
+
 /** Aggregated unified search result */
 export interface UnifiedSearchResults {
   query: string;
   activeType: SearchDomain;
   products: DomainSearchResult<Product>;
+  supplierProducts: DomainSearchResult<SupplierProductSearchResult>;
   knowledge: DomainSearchResult<Content>;
   solutions: DomainSearchResult<Content>;
   suppliers: DomainSearchResult<SupplierSearchResult>;
+  /** M28.0 M661.6 — SupplierProduct dimension facets from unified /search */
+  supplierProductFacets?: SupplierProductFacetBundle;
 }
 
 // ============================================
@@ -136,6 +184,36 @@ function mapSupplier(item: SupplierDiscoveryItem): SupplierSearchResult {
   };
 }
 
+/** Map backend SupplierProductDiscoveryItem to frontend SupplierProductSearchResult */
+function mapSupplierProduct(item: SupplierProductDiscoveryItem): SupplierProductSearchResult {
+  return {
+    capability: item.capability,
+    supplierProduct: {
+      id: item.supplierProduct.id,
+      brand: item.supplierProduct.brand,
+      series: item.supplierProduct.series,
+      modelNumber: item.supplierProduct.modelNumber,
+      slug: item.supplierProduct.slug,
+      status: item.supplierProduct.status,
+      platformProductId: item.supplierProduct.platformProductId,
+      organization: item.supplierProduct.organization
+        ? {
+            id: item.supplierProduct.organization.id,
+            name: item.supplierProduct.organization.name,
+          }
+        : null,
+    },
+    commercialSummary: {
+      offerCount: item.commercialSummary.offerCount,
+      activeOfferCount: item.commercialSummary.activeOfferCount,
+      priceFrom: item.commercialSummary.priceFrom,
+      priceTo: item.commercialSummary.priceTo,
+      currency: item.commercialSummary.currency,
+    },
+    inquiryAvailable: item.inquiryAvailable,
+  };
+}
+
 // ============================================
 // Unified Search
 // ============================================
@@ -147,12 +225,12 @@ function mapSupplier(item: SupplierDiscoveryItem): SupplierSearchResult {
 export async function unifiedSearch(
   params: UnifiedSearchParams,
 ): Promise<UnifiedSearchResults> {
-  const { q, type, page = 1, pageSize = 20, category, filters } = params;
+  const { q, type, page = 1, pageSize = 20, category, filters, brand, series, hasOffer } = params;
 
   // M24.1.5 — do NOT swallow search errors here. Rethrowing lets the caller
   // (SearchPageContent.executeSearch) surface the error UI + retry instead of
   // silently rendering an empty result set (defect in error state handling).
-  const response = await searchUnified({ q, page, pageSize, category, filters });
+  const response = await searchUnified({ q, page, pageSize, category, filters, brand, series, hasOffer });
 
   return {
     query: response.query,
@@ -160,6 +238,11 @@ export async function unifiedSearch(
     products: {
       items: response.products.items.map(mapProduct),
       total: response.products.total,
+      searched: true,
+    },
+    supplierProducts: {
+      items: response.supplierProducts.items.map(mapSupplierProduct),
+      total: response.supplierProducts.total,
       searched: true,
     },
     knowledge: {
@@ -177,6 +260,8 @@ export async function unifiedSearch(
       total: response.suppliers.total,
       searched: true,
     },
+    // M28.0 M661.6 — pass through the SupplierProduct dimension facet bundle
+    supplierProductFacets: response.supplierProductFacets,
   };
 }
 
@@ -193,3 +278,20 @@ export async function getProductSuggestions(keyword: string): Promise<Product[]>
     return [];
   }
 }
+
+// ============================================
+// Supplier Model Facet Search — M28.0 M661.4
+// ============================================
+
+/**
+ * Execute supplier model facet discovery. Only PUBLISHED SupplierProduct is
+ * indexed by the backend. Search = Discovery Acceleration Layer.
+ */
+export async function supplierModelSearch(
+  params: SupplierModelFacetSearchParams,
+): Promise<SupplierModelFacetSearchResponse> {
+  return searchSupplierModels(params);
+}
+
+/** Lightweight alias for a single supplier model result type consumers. */
+export type SupplierModelResultItem = SupplierModelFacetSearchResponse['items'][number];

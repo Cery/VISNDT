@@ -112,26 +112,932 @@ M17 遵循"先设计、再评审、再开发"：M17.0 规划 → M17.1 Content M
 
 这些都与当前项目已校准的业务定位不一致。
 
+## M28.0 Product Domain Model Decision（659.2 FROZEN）
+
+以下是 659.2 冻结的 Product Domain 业务模型决策，作为 M28/M29 及 660 架构设计的权威依据。
+
+### Final Product Domain Model（冻结）
+
+```
+Platform Product
+      |
+Supplier Product（派生供应商变体）
+      |
+      Offer
+      |
+Supplier Organization
+```
+
+**Entity Responsibility**：
+- **Platform Product**：Category / Standard Capability / Standard Parameter / Search Index / SEO Entry / Public Capability Node；NOT Supplier Brand / Supplier Model / Commercial Offer / Quotation
+- **Supplier Product**：Supplier Brand / Series / Model Number / Product Description / Supplier Media / Supplier Parameters / Technical Documents / Application Information；归属 Supplier Organization；状态流 `Draft→Submitted→Reviewing→Approved→Published/Rejected`（落变体层）
+- **Offer**：Commercial Capability / Availability / Inquiry Response / Quotation / RFQ Relation / Supplier Business Commitment；**Offer != Product**（商业层 vs 能力层解耦）
+
+**Governance**：Admin 唯一维护全局 Platform Product + Supplier 变体 Draft→Submit→Review→Approve→Publish。审批流只落变体层，不污染全库 Product status。
+
+**Permission**：Admin = 全局目录/分类/参数治理 + 变体审批 + Content/纠错；Supplier = 变体 Draft + Own Info/Media/Capability + Offer 管理；Supplier 禁止修改 Platform Product / Global Category / Standard Parameter Definition。
+
+**Buyer Discovery（三层）**：① Platform Capability → ② Supplier Products → ③ Commercial Offers。能力驱动，非店铺/卖家驱动。
+
+### 长期 Architecture Constraint（冻结）
+
+**保留**：Product Global Capability Node
+**新增方向**：Supplier Product Domain
+**保持**：Offer Commercial Layer
+**长期禁止**：Product.organizationId / Supplier Marketplace / Supplier Store / Order System / Payment System / ERP
+
+**Next**: 660_Hybrid_Model_C_Architecture_Design（模型决策已冻结）→ **660 已完成（Domain Architecture Design PASS）**：领域边界已冻结（见下「660 M28.0 Hybrid Model C Domain Architecture」）。
+
+### 660 M28.0 Hybrid Model C Domain Architecture Design（660 FROZEN）
+
+以下是 660 冻结的 **Domain Architecture Design**（架构设计层，非 Schema/实现层），作为 660.1 数据库架构设计的权威依据。
+
+**三层架构**：
+
+```
+Platform Product（Capability Node，全局权威，现有 Product 演化）
+      │
+Supplier Product（Route A：Independent Domain Entity，独立实体）
+      │
+      Offer（Commercial Capability Layer，Offer != Product）
+      │
+Supplier Organization
+```
+
+**关键架构决策**：
+- **Platform Product = Capability Node**：Category + Capability Node + Standard Capability Definition + Standard Parameter Definition；平台回答「用户需要什么检测能力？」；禁止含 Supplier Brand/Model/Price/Media/Description。
+- **Supplier Product = Route A（独立领域实体）**：负责 Brand/Series/Model/Description/Media/Tech Docs/Supplier Params/Application；不负责 Global Category/Capability/Standard Param/Commercial Offer。避免 `Product.organizationId`（Platform 维持无属主全局目录）。
+- **Offer 关系（架构建议）**：`Offer → SupplierProduct + PlatformProduct（双绑，推荐）`；现有 Offer→Product 迁移为兼容过渡，交 660.1。
+- **Gov 边界**：Phase 1 Admin Central Governance（Admin → Supplier Product Pool → Admin Approval → Public）；Phase 2 Supplier Draft 为预留扩展点（NOT IMPLEMENTED）。
+- **Ownership/Parameter/Media/Search/SEO**：均已在 660 冻结（详见报告）。
+
+**零代码**：Database / API / Frontend / Migration NONE。红线保留：NO Product.organizationId / Supplier Store / Marketplace / Payment / Order / ERP。
+
+**Review Report**: `docs/_review/660_M28.0_Hybrid_Model_C_Domain_Architecture_Design_Report.md`
+**Next**: 660.1 Database Architecture Design（Schema 层设计，仍不落地迁移）→ **660.1 已完成（Database Architecture Design PASS）**：见下「660.1 Hybrid Model C Database Architecture」。
+
+### 660.1 Hybrid Model C Database Architecture Design（660.1 FROZEN）
+
+以下是 660.1 冻结的 **Database Architecture Design**（数据库层设计，非 Schema 落库/迁移），作为 660.2 Schema Implementation Design 的权威依据。
+
+**Future Database Domain Model（冻结方向）**：
+```
+PlatformProduct 1:N SupplierProduct 1:N Offer N:1 Organization
+```
+
+**关键数据库决策**：
+- **Offer = Option C 兼容双绑**：`productId`（能力聚合，供 Search/SEO/Matching/RFQ）+ `supplierProductId`（型号事实源）；弃 Option A（丢型号）与纯 B（破坏大）。
+- **SupplierProduct 独立实体（未来）**：organizationId + platformProductId + brand/series/modelNumber/description + status；生命周期 DRAFT→SUBMITTED→REVIEWING→APPROVED→PUBLISHED/REJECTED 落本实体层；belongsTo PlatformProduct + belongsTo Organization。红线：不触碰 `Product.organizationId`。
+- **Parameter**：Standard=Platform；Override=SupplierProduct（引用同 ParameterDefinition）；Extension=SupplierProduct（复用 ParameterDefinition+SupplierProductParameterValue）。
+- **Media**：Platform（ProductMedia）/ SupplierProduct（新 SupplierProductMedia）/ Organization（FileAsset.org）/ Content（ContentMedia）。
+- **Document**：复用 `FileAsset` + SupplierProductMedia（Manual/Spec/Cert/InspectionCase），不新增独立实体；`FileEntityType` 缺 SUPPLIER_PRODUCT 为扩展点（交 660.2）。
+- **Migration Strategy**：推荐 Strategy B（兼容双绑）配合 C 渐进节奏，分阶段0-3；本任务不执行迁移。
+
+**零代码**：Database / Schema / Migration / API / Frontend / Admin / Supplier 全 UNCHANGED/NONE。红线保留：NO Product.organizationId / Supplier Store / Marketplace / Payment / Order / ERP。
+
+**Review Report**: `docs/_review/660.1_M28.0_Hybrid_Model_C_Database_Architecture_Design_Report.md`
+**Next**: 660.2 Hybrid Model C Schema Implementation Design（Prisma Model 级落库设计，仍先设计后实现）→ **660.2 已完成（Schema Implementation Design PASS）**：见下「660.2 Hybrid Model C Schema Implementation Design」。
+
+### 660.2 Hybrid Model C Schema Implementation Design（660.2 FROZEN）
+
+以下是 660.2 冻结的 **Schema Implementation Design**（Prisma Model 级设计，非落库/迁移），作为 660.3 API Architecture + M28 开发阶段的权威依据。
+
+**Future Prisma Domain Model（冻结方向）**：
+```
+PlatformProduct(Product) 1:N SupplierProduct 1:N Offer(Option C 双绑) N:1 Organization
+```
+
+**关键 Schema 决策**：
+- **SupplierProduct（独立实体，未来）**：id/organizationId/platformProductId/brand/series/modelNumber/slug/description/technicalDescription/applicationInfo + governance(status/submittedAt/reviewedAt/reviewedBy/reviewedNote/publishedAt)；`@@unique([organizationId, platformProductId, modelNumber])` + index；`platformProductId→Product onDelete: Restrict`。
+- **SupplierProductStatus 冻结**：`DRAFT→SUBMITTED→REVIEWING→APPROVED→PUBLISHED / ↘REJECTED`（独立 enum，`Product.status` 平台语义互不混用）。
+- **Offer Evolution**：`productId`(能力聚合,保留) + `supplierProductId`(新增可空商业源, FK→SupplierProduct Ristrict, index)；保留 `@@unique([organizationId, productId])`。
+- **Parameter**：Standard=Platform；Override=`SupplierProductParameterValue`（引用同 ParameterDefinition）；Extension=**方案 A 复用 ParameterDefinition + SupplierProductParameterValue**。
+- **Media**：`SupplierProductMedia`（supplierProductId/fileAssetId/mediaType/documentType/title/altText/isPrimary/displayOrder）；`FileEntityType` 需增 `SUPPLIER_PRODUCT`（交实现阶段落库）。
+- **Document**：复用 `FileAsset + SupplierProductMedia.documentType`（Manual/Spec/Cert/InspectionCase），不新增独立实体。
+- **Migration Impact**：Product/DemandMatch/RFQ/RFQResponse/Search/SEO/Inquiry = NONE；仅 `Offer ADD supplierProductId` 可空；Strategy B 兼容双绑 + C 渐进（阶段0-3）。
+- **Migration Strategy**：阶段0 现状稳定 → 阶段1 新增 SupplierProduct 相关表 + Offer 可空列 + FileEntityType → 阶段2 存量回填 → 阶段3 productId 收敛能力聚合冗余；本任务不落库/不迁移。
+
+**零代码**：Database / Schema / Migration / API / Frontend / Admin / Supplier 全 UNCHANGED/NONE。红线保留：NO Product.organizationId / Supplier Store / Marketplace / Payment / Order / ERP。
+
+**Review Report**: `docs/_review/660.2_M28.0_Hybrid_Model_C_Schema_Implementation_Design_Report.md`
+**Next**: 660.3 Hybrid Model C API Architecture Design（Schema 冻结 → API 契约层设计，仍先设计后实现；进入 M28 实际开发前须先完成本链路设计冻结）→ **660.3 已完成（API Architecture Design PASS）**：见下「660.3 Hybrid Model C API Architecture Design」。
+
+### 660.3 Hybrid Model C API Architecture Design（660.3 FROZEN）
+
+以下是 660.3 冻结的 **API Architecture Design / API Contract Freeze**（API 契约层设计，非 Controller/Service 实现），作为 660.4 Readiness + M28 开发阶段的权威依据。
+
+**API 分层冻结**：
+```
+Capability Domain API    → /products（Platform Product = Capability Node，Admin 治理）
+Supplier Product Domain API → /supplier-products（新）
+Commercial Offer API     → /offers（进化：productId * supplierProductId 双绑）
+Discovery API            → /search + /capabilities（聚合）
+RFQ API                  → /rfqs + /matches（既有链路，NONE）
+```
+
+**关键 API 决策**：
+- **SupplierProduct API（Admin Pool）**：`POST /admin/supplier-products`（Draft）+ `:id/submit|review|approve|reject|publish` + `GET`（query/detail）；Buyer Query = `GET /products/:id/suppliers`（capability→型号）+ `GET /supplier-products/:slug|:id/media|:id/parameters`。状态流 `DRAFT→SUBMITTED→REVIEWING→APPROVED→PUBLISHED / ↘REJECTED`（Workflow 归 SupplierProduct Domain，不污染 `Product.status`）。
+- **Offer Dual Binding**：`organizationId(派生) + productId + supplierProductId?(可选)`；创建强校验 `supplierProduct.organizationId === Offer.organizationId` 且 `supplierProduct.platformProductId === Offer.productId`；Supplier 仅改自家 Offer 商业字段；查询返回 Capability→SupplierProduct→Offer 三级结构。
+- **Buyer Discovery**：`CapabilityDetailDTO`（platformProduct + supplierProducts[{ supplierProduct, offers[] }]），Buyer API 不暴露数据库结构；与 `/search`（找能力）互补。
+- **Permission**：Admin=Platform Product + SupplierProduct Approve/Publish + Governance；Supplier=阶段1 Offer only（预留阶段2 Draft，禁直发/改平台/改全局参数）；Buyer=Read Only + Inquiry + RFQ。
+
+**Impact**：Backend API HIGH；Prisma/Migration/Frontend NONE；Admin Future HIGH；Supplier Workspace 当前 LOW/未来 HIGH；Matching/RFQ/Search/SEO/Content NONE。
+
+**零代码**：Database / Prisma / Migration / Frontend / Admin UI / Supplier UI 全 UNCHANGED/NONE。红线保留：NO Product.organizationId / Supplier Store / Marketplace / Payment / Order / ERP。
+
+**Review Report**: `docs/_review/660.3_M28.0_Hybrid_Model_C_API_Architecture_Design_Report.md`
+**Next**: 660.4 Hybrid Model C Implementation Readiness Assessment（验证 M28 开发就绪度，进入 M28 实际开发前的最后设计审计关卡）→ **660.4 已完成（Implementation Readiness Assessment PASS）**：见下「660.4 Hybrid Model C Implementation Readiness Assessment」。
+
+### 660.4 Hybrid Model C Implementation Readiness Assessment（660.4 FROZEN）
+
+以下是 660.4 冻结的 **Implementation Readiness / Development Entry Gate** 结论，作为 M28 进入开发的准入依据。
+
+**Gate 结论：PASS — M28 Implementation = APPROVED**。演进链 `Business Model(659.2) → Domain Architecture(659/660) → Database Schema(660.1/660.2) → API Contract(660.3) → Permission → Migration Strategy → Implementation Plan` 全 FROZEN/DEFINED 且闭合。
+
+**Readiness Matrix（全 READY/PASS）**：Business Model（职责非重叠）；Database（SupplierProduct/Media/ParameterValue 可实施 + Offer+supplierProductId 可空 + 枚举 SupplierProductStatus/FileEntityType+SUPPLIER_PRODUCT、Product 零修改）；API（SupplierProduct Domain/Offer 双绑/Capability Discovery/Approval、走 DTO 不暴露 DB Join）；Permission（Admin=Platform+Approval+Publish；Supplier=Offer only、Draft Future；Buyer=Read+Inquiry+RFQ）；Migration（Strategy B+C，阶段0-3）。
+
+**Implementation Sequence（冻结，无 parallel frontend-first）**：Phase1 Prisma Schema → Phase2 Migration(B+C) → Phase3 Backend Service → Phase4 API Controller+DTO → Phase5 Admin Supplier Pool → Phase6 Buyer Discovery → Phase7 Supplier Workspace(未来候选)。
+
+**Risk（全可控）**：R1 归属（organizationId 双 FK+Offer 校验）；R2 Offer 兼容（保留 productId/unique）；R3 Search/Matching（Platform Based NONE）；R4 SEO（Platform Canonical）；R5 Permission 扩展（self-service Future）；R6 回填（阶段2 低风险独立任务）。
+
+**零代码**：Database / Prisma / Migration / API / Controller / Service / DTO / Frontend / Admin / Supplier / Product Model 全 UNCHANGED/NONE。红线（永禁）：NO Product.organizationId / Supplier Store / Marketplace / Payment / Order / ERP。
+
+**Review Report**: `docs/_review/660.4_M28.0_Hybrid_Model_C_Implementation_Readiness_Assessment_Report.md`
+**Next**: 660.5 / M28.1 首个子任务 = Prisma Schema Implementation（Phase 1，M28 实际开发首步，先落 Schema 再逐阶段迁移/Gate）→ **660.5 已完成（Prisma Schema Implementation PASS）**：见下「660.5 Hybrid Model C Prisma Schema Implementation」。
+
+### 660.5 Hybrid Model C Prisma Schema Implementation（660.5 IMPLEMENTED）
+
+以下是 660.5 已在 `database/prisma/schema.prisma` 落库的 **Hybrid Model C Schema**（M28 Phase 1 首个子任务），作为 Phase 2 Migration 前唯一权威 Schema。
+
+**Future Database Domain Model（已落库）**：
+```
+Product (Platform Capability Node, NO ownership) 1:N SupplierProduct 1:N Offer(Option C 双绑) N:1 Organization
+```
+
+**Schema 新增（落在 schema.prisma）**：
+- `SupplierProductStatus`：DRAFT/SUBMITTED/REVIEWING/APPROVED/PUBLISHED/REJECTED
+- `SupplierProduct`：organizationId+platformProductId+brand/series/modelNumber/slug+description/technicalDescription/applicationInfo+governance；`@@unique([organizationId,platformProductId,modelNumber])`；platformProductId→Product Restrict
+- `SupplierProductMedia`：supplierProductId+fileAssetId?+mediaType+documentType?+title?+altText?+isPrimary+displayOrder（supplier Cascade）
+- `SupplierProductParameterValue`：supplierProductId+parameterDefinitionId+value+valueNumber?（`@@unique([supplierProductId,parameterDefinitionId])`）
+
+**Schema 扩展**：
+- `Offer`：+`supplierProductId String?`（双绑商业源）+ supplierProduct `onDelete: Restrict` + `@@index([supplierProductId])`；保留 `@@unique([organizationId,productId])`
+- `FileEntityType`：+`SUPPLIER_PRODUCT`
+- 反向关系字段（Organization/Product/User/FileAsset/ParameterDefinition，纯 Prisma 关系，无 DB 列）
+
+**Forbidden 验证**：Product 无 organizationId/ownerId/supplierId/supplierBrand；Demand/DemandMatch/RFQ/RFQResponse/Inquiry/Search/Content 未改；NO SupplierCustomKeyValue/SupplierProductDocument/SupplierStore/Marketplace/Order/Payment/ERP；NO API/Service/DTO/Frontend。
+
+**Validation**：`prisma validate` PASS + `prisma format` PASS（Prisma 5.22.0）。
+
+**Status**: **PASS — Schema Implemented**（Migration 未生成、Business Code 未动、Frontend 未动）。
+
+**Review Report**: `docs/_review/660.5_M28.0_Hybrid_Model_C_Prisma_Schema_Implementation_Report.md`
+**Next**: 660.6 Hybrid Model C Migration Planning（由冻结 Schema 生成迁移方案/依赖/回滚/回填策略，阶段0→1；不执行迁移直到单独 Gate）→ **660.6 已完成（Migration Planning PASS）**：见下「660.6 Hybrid Model C Migration Planning」。
+
+### 660.6 Hybrid Model C Migration Planning（660.6 PLANNED）
+
+以下是 660.6 已冻结的 **Phase 1 Database Migration Plan**（纯规划，Migration 未执行）。
+
+```text
+目标:  Model B → Hybrid Model C Database Foundation（M28 Phase 1）
+Change Set:
+  A  SupplierProductStatus enum (DRAFT/SUBMITTED/REVIEWING/APPROVED/PUBLISHED/REJECTED, append-only)
+  B  FileEntityType.SUPPLIER_PRODUCT
+  C  supplier_product（identity/product identity/content/governance/audit + unique(org,platform,model) + 4 index + slug）
+  D  supplier_product_media（supplier Cascade + fileAssetId? + mediaType/documentType/title/altText/isPrimary/displayOrder）
+  E  supplier_product_parameter_value（supplier Cascade + parameterDefinition + unique(SP,PD)）
+  F  offer +supplier_product_id nullable + index（保留 unique(org,product)）
+Execution Order: Enum → supplier_product → media → parameter_value → FK → Index → ALTER offer → Schema Validate → Verify
+FK: org RESTRICT / platformProduct RESTRICT / media CASCADE / paramValue CASCADE / offer.supplier_product RESTRICT
+Compatibility: 现存 Offer.supplier_product_id = NULL；禁止 Phase1 UPDATE；backfill 需 Org+Platform+Model 匹配（独立 M28.x 任务）；零 breaking change
+Rollback: NO destructive；受控 Reverse Migration 删新增表；禁直接删 offer.supplier_product_id（有数据时）；Migrate→Observe→Validate→Enable
+Risks: R1 Enum LOW / R2 双绑空值 MEDIUM / R3 FK LOW / R4 backfill MEDIUM（全可控）
+Impact: Offer/Org/FileAsset/ParameterDefinition LOW，其余 Domain NONE
+Status: PASS — Migration PLANNED, Execution NOT EXECUTED, Database/Schema/Runtime UNCHANGED
+```
+
+**Review Report**: `docs/_review/660.6_M28.0_Hybrid_Model_C_Migration_Planning_Report.md`
+**Next**: 660.7 Hybrid Model C Migration Execution（由本计划执行迁移；未到独立 Runtime Enablement Gate 前禁止开放业务写入）→ **660.7 已完成（Migration Execution PASS）**：见下「660.7 Hybrid Model C Migration Execution」。
+
+### 660.7 Hybrid Model C Migration Execution（660.7 MIGRATED）
+
+以下是 660.7 已应用的 **Phase 1 Database Migration**（Database Structure Activation; Runtime/Business 未开放）。
+
+```text
+Migration File:  database/prisma/migrations/20260822195411_hybrid_model_c_supplier_product/migration.sql
+生成方式:  prisma migrate dev 因 010_ai_data_preparation 依赖 vector 扩展（shadow 库缺失）报 P3006；
+          改用 prisma migrate diff(--from-schema-datasource→data-model) + prisma migrate deploy 应用（36 migrations all applied）
+SQL:  CREATE TYPE SupplierProductStatus / ALTER TYPE FileEntityType ADD SUPPLIER_PRODUCT /
+      CREATE TABLE supplier_product·media·parameter_value /
+      ALTER TABLE offer ADD supplier_product_id UUID（可空）/
+      11 Index + 8 FK（org·platformProduct·offer RESTRICT; media·paramValue CASCADE; reviewedBy·fileAsset SET NULL; paramDef RESTRICT）
+Forbidden:  无 DROP / ALTER NOT NULL / DELETE / UPDATE offer
+Validation:  prisma validate PASS + migrate status PASS（up to date）;
+     新表存在; offer.supplier_product_id=uuid is_nullable=YES; Offer 总数 7 不变; IS NOT NULL=0（未回填）
+Status:  PASS — Migration CREATED, Database UPDATED, Schema UNCHANGED, Existing Data UNCHANGED,
+         Backfill NOT EXECUTED, API UNCHANGED, Frontend UNCHANGED
+```
+
+**Review Report**: `docs/_review/660.7_M28.0_Hybrid_Model_C_Migration_Execution_Report.md`
+**Next**: 660.8 Hybrid Model C Backend Domain Service Implementation（前提 Migration PASS + Database Validation PASS 已满足）→ **660.8 已完成（Backend Domain Service PASS）**：见下「660.8 Hybrid Model C Backend Domain Service Implementation」。
+
+### 660.8 Hybrid Model C Backend Domain Service Implementation（660.8 IMPLEMENTED）
+
+以下是 660.8 已交付的 **Backend Domain Service Layer**（仅 service 层，API/Frontend 未暴露）。
+
+```text
+新增 Service:
+  supplier-products/supplier-products.service.ts   — createDraft / findOne(org-scoped) / findAllByOrganization /
+                                                    validateForOrganization / ensurePlatformProductExists（能力绑定）
+  discovery/discovery.service.ts                   — findCapabilityGraph(Product→SupplierProducts→Offers) /
+                                                    findSupplierProductCommercials(归属隔离)；纯内部读聚合
+  supplier-products.module.ts / discovery.module.ts — 导出 service（无 controller）
+扩展:
+  offers.service.ts   — create() 注入 validateSupplierBinding：offer.organizationId==sp.organizationId
+                        && offer.productId==sp.platformProductId，不一致 reject；legacy(无 spId) no-op；
+                        写入 supplierProductId ?? null（旧 Offer 兼容）
+  offers.module.ts / app.module.ts — DI 接线（SupplierProductsModule、DiscoveryModule）
+Boundary: Product/Model 未改（无 orgOwner）；Schema UNCHANGED；Migration NOT CREATED；Offer NO breaking；
+          RFQ/Search/Matching 未改；NO SupplierStore/Marketplace/Order/Payment/ERP
+Validation: prisma generate PASS + pnpm --filter @visndt/api build PASS（nest build exit 0）
+Status: PASS — Schema UNCHANGED, Migration NOT CREATED, Database UNCHANGED, API NOT EXPOSED, Frontend UNCHANGED
+```
+
+**Review Report**: `docs/_review/660.8_M28.0_Hybrid_Model_C_Backend_Domain_Service_Implementation_Report.md`
+**Next**: 660.9 Hybrid Model C API Controller and DTO Implementation（在 Service 层之上暴露 transport/validation）
+
+### 660.9 Hybrid Model C API Controller and DTO Implementation（660.9 IMPLEMENTED）
+
+以下是 660.9 已交付的 **API Transport Layer**（在 660.8 Service 之上暴露 controller + DTO；Frontend/Admin 未暴露）。
+
+```
+API Runtime Contract（660.9）:
+  SupplierProduct Governance（ADMIN 路由）
+    - POST   /admin/supplier-products            # 创建 DRAFT（能力绑定校验；orgId 由用户上下文派生）
+    - GET    /admin/supplier-products            # 按管理组织列出
+    - GET    /admin/supplier-products/:id        # 读取单个
+    - POST   /admin/supplier-products/:id/submit   # DRAFT → SUBMITTED
+    - POST   /admin/supplier-products/:id/review   # SUBMITTED → REVIEWING
+    - POST   /admin/supplier-products/:id/approve  # REVIEWING → APPROVED
+    - POST   /admin/supplier-products/:id/reject   # REVIEWING → REJECTED（必填 reviewedNote）
+    - POST   /admin/supplier-products/:id/publish  # APPROVED → PUBLISHED
+
+  Capability Discovery Read
+    - GET /capabilities/:id                      # CapabilityDetailDTO（platformProduct → supplierProducts[].offers[]）
+
+  Offer DTO Extension
+    - CreateOfferDto.supplierProductId?（可选双绑；旧 Offer NULL 兼容）
+
+DTO: CreateSupplierProductDto / RejectSupplierProductDto / CapabilityDetailDTO 家族
+Guard: JwtAuthGuard + RolesGuard + @Roles(Role.ADMIN)（Phase 1 禁止 Role.SUPPLIER）
+Boundary: Product=Capability Authority / SupplierProduct=Supplier Model Entity / Offer=Commercial Layer / API=Transport Only
+Validation: npm run build（apps/api）exit 0 PASS
+Status: PASS — Schema UNCHANGED, Migration NOT CREATED, Database UNCHANGED, API IMPLEMENTED, Frontend UNCHANGED
+```
+
+**Review Report**: `docs/_review/660.9_M28.0_Hybrid_Model_C_API_Controller_and_DTO_Implementation_Report.md`
+**Next**: 661.0_M28.0_Hybrid_Model_C_Admin_Supplier_Product_Pool_Implementation
+
+### 661.0 Admin Supplier Product Pool（661.0 IMPLEMENTED）
+
+完成 Hybrid Model C 的 **Admin Governance Layer 审核闭环**（主交付 apps/admin；apps/api 仅 660.9 Contract 适配）。
+
+```
+Admin Governance Interface（661.0）:
+  Pool  /supplier-products                List / Status Filter / Pagination / Status View
+         （DRAFT|SUBMITTED|REVIEWING|APPROVED|PUBLISHED|REJECTED）
+
+  Detail /supplier-products/:id           SupplierProduct Identity + Capability Binding
+                                          + Parameters + Media + Governance Status/Review History
+
+  Approval Workflow UI（状态机映射）:
+    DRAFT      → 提交（/submit）
+    SUBMITTED  → 开始审核（/review）
+    REVIEWING  → 通过（/approve）| 拒绝（/reject，Modal 必填 reviewedNote）
+    APPROVED   → 发布（/publish）
+    REJECTED/PUBLISHED → 终态
+
+API Client: apps/admin/src/api/supplier-product.service.ts（消费 /admin/supplier-products*）
+后端 Contract 适配: service findAllAdmin/findOneAdmin（Admin Pool org-agnostic）+ controller GET 改走
+Permission: ADMIN ONLY（禁止 Role.SUPPLIER）→ Field边界: Product=Capability Authority
+Validation: apps/api build exit 0 PASS；apps/admin build（tsc -b && vite build）exit 0 PASS
+Status: PASS — Schema UNCHANGED, Migration NOT CREATED, API CONSUMED,
+        SupplierProduct Governance IMPLEMENTED, Approval Workflow IMPLEMENTED,
+        Frontend ADMIN ONLY, Supplier Workspace NOT IMPLEMENTED
+```
+
+**Review Report**: `docs/_review/661.0_M28.0_Hybrid_Model_C_Admin_Supplier_Product_Pool_Implementation_Report.md`
+**Next**: 661.1_M28.0_Hybrid_Model_C_Public_Discovery_Integration
+
+### 661.1 Public Discovery Integration（661.1 IMPLEMENTED）
+
+完成 Hybrid Model C 的 **Buyer Discovery 公开接口集成**：将治理闭环后的 `PUBLISHED SupplierProduct` 接入公开 Discovery Layer。
+
+```
+Public Discovery Data Flow（661.1）:
+  GET /capabilities/:id
+        ↓
+  DiscoveryService
+        +--------------+--------------+
+        |              |              |
+        v              v              v
+  Product         SupplierProduct  Offer Summary
+  (Capability)    (PUBLISHED only) (ACTIVE price band)
+        ↓
+  CapabilityDetailDTO（含 CapabilityCommercialSummaryDTO）
+
+Frontend（apps/web）:
+  Product Detail 新增「供应商型号」Tab（SupplierModelsSection）:
+    Platform Product → Published Supplier Models → Supplier Offers Summary
+    展示: Brand / Series / Model Number / Technical Description / Commercial Availability
+    状态: PUBLISHED = Approved Supplier Model
+    不展示: Draft / Review Status / Rejected / 治理内部数据
+
+Backend: discovery.service select 补 description/technicalDescription；
+         controller 逐 SupplierProduct 计算 commercialSummary（仅 ACTIVE Offer 价格带）
+新 DTO: CapabilityCommercialSummaryDTO（offerCount / activeOfferCount / priceFrom / priceTo / currency）
+Validation: apps/api build exit 0 PASS；apps/web build (next build) exit 0 PASS；tsc --noEmit exit 0 PASS
+Status: PASS — Schema UNCHANGED, Migration NOT CREATED,
+        Backend UPDATED (apps/api/src/discovery/**), Frontend UPDATED (apps/web),
+        Published Discovery IMPLEMENTED
+```
+
+**Review Report**: `docs/_review/661.1_M28.0_Hybrid_Model_C_Public_Discovery_Integration_Report.md`
+**Next**: 661.2_M28.0_Hybrid_Model_C_Inquiry_Integration
+
+### 661.2 Inquiry Integration（661.2 IMPLEMENTED）
+
+完成 Hybrid Model C 的 **Buyer Inquiry Entry 集成**：将 661.1 公开 Discovery 的 `PUBLISHED SupplierProduct` 接入 Buyer Inquiry → 既有 RFQ/Response 流程。
+
+```
+Inquiry Flow（661.2）:
+  Published SupplierProduct（仅 PUBLISHED, Discovery 661.1）
+        ↓
+  Buyer Interest（Inquiry 携带 supplierProductId + platformProductId）
+        ↓
+  Inquiry 校验（存在 + PUBLISHED + Capability Binding）
+        ↓
+  既有 Inquiry/Notification + 既有 RFQ Workflow（零改动）
+
+Backend（apps/api/src/inquiries/**）:
+  create-inquiry.dto: 新增可选 supplierProductId（@IsUUID @IsOptional）
+  inquiries.service: Step 3.5 校验 supplierProductId → PUBLISHED=放行, 中间态=Forbidden;
+                    platformProductId===productId=放行; 通知/响应携带 supplierModelLabel
+  transport-only reference（不落库，无 schema 字段）
+
+Frontend（apps/web）:
+  SupplierModelsSection 每型号「咨询此型号」入口, 展示 品牌/型号/能力名 上下文;
+  InquiryForm 携带 supplierProductId + supplierModelLabel; types/inquiry 扩展
+Validation: apps/api build exit 0 PASS；apps/web next build exit 0 PASS；tsc --noEmit exit 0 PASS
+Status: PASS — Schema UNCHANGED, Migration NOT CREATED, Database UNCHANGED,
+        Backend UPDATED (apps/api/src/inquiries/**), Frontend UPDATED (apps/web),
+        RFQ Domain UNCHANGED, Order/Payment NOT IMPLEMENTED
+```
+
+**Review Report**: `docs/_review/661.2_M28.0_Hybrid_Model_C_Inquiry_Integration_Report.md`
+**Next**: M28.0 后续（型号级 Interest 持久化评估 / Supplier 工作区推进，超本任务范围）
+
+### 661.3 Supplier Runtime Preparation（661.3 IMPLEMENTED）
+
+完成 Hybrid Model C 的 **Supplier Capability Operation Boundary（Supplier Runtime）准备**：供应商能力操作边界（非 Store / Marketplace / Seller Center），只读查看自身 SupplierProduct / Buyer Interest / Inquiry Context，准备商业响应入口。
+
+```
+Supplier Runtime（661.3）:
+  Supplier Capability Operation Boundary（非 Store/Marketplace/Seller Center）
+        ↓
+  查看自身 SupplierProduct（Organization 隔离）
+        ↓
+  查看 Buyer Interest / Inquiry Context（只读）
+        ↓
+  准备商业响应入口（不负责 订单/支付/合同/库存/交易闭环）
+
+Backend（apps/api/src/workspace/**）:
+  Role.SUPPLIER 只读标记（未放宽 @Roles(ADMIN) 约束）
+  workspace-supplier-product.dto / workspace-supplier-inquiry-context.dto
+  workspace.service: getSupplierProducts / getSupplierInquiryContext
+  端点: GET /workspace/supplier/runtime/products
+        GET /workspace/supplier/runtime/products/:supplierProductId/inquiry-context
+
+Frontend（apps/web）:
+  lib/api/workspace + services/workspace.service 扩展
+  WorkspaceSidebar「运行时能力」; /workspace/supplier/runtime (+ inquiry-context 只读视图)
+Validation: apps/api build exit 0 PASS；apps/admin build exit 0 PASS；apps/web build exit 0 PASS
+Status: PASS — Schema UNCHANGED, Migration NOT CREATED, Product UNCHANGED, RFQ UNCHANGED,
+        Search/Matching UNCHANGED, Supplier Runtime IMPLEMENTED
+```
+
+**Review Report**: `docs/_review/661.3_M28.0_Hybrid_Model_C_Supplier_Runtime_Preparation_Report.md`
+**Next**: 661.4_M28.0_Hybrid_Model_C_Search_Facet_Enhancement
+
+### 661.4 Search Facet Enhancement（661.4 IMPLEMENTED）
+
+完成 Hybrid Model C 的 **Search Facet 增强**：`PUBLISHED SupplierProduct` 进入公开 Discovery Search，能力/品牌/系列/技术参数/商用可用性多维 Facet，独立端点 `GET /search/supplier-models`。
+
+```
+Search Facet Flow（661.4）:
+  Published SupplierProduct（仅 PUBLISHED, 服务端强制）
+        ↓
+  Facet 过滤（能力 category / 品牌 brand / 系列 series /
+              技术参数 parameterFilters(复用既有 Parameter System) / 商用可用性 hasOffer=ACTIVE Offer）
+        ↓
+  DTO Projection（capability + supplierProduct + facetSummary + commercialSummary + inquiryAvailable）
+
+Backend（apps/api/src/search/**）:
+  supplier-model-facet-search.service + dto 新增
+  search.controller: GET /search/supplier-models
+Frontend（apps/web）:
+  lib/api/search + services/search.service: supplierModelSearch
+  独立页面 /supplier-models（Facet 侧栏 + 结果 + 加载更多）
+  PublicHeader 新增「供应商型号」导航（661.5 收敛）
+Validation: apps/api build exit 0 PASS；apps/web build exit 0 PASS
+Status: PASS — Schema UNCHANGED, Migration NOT CREATED, Product UNCHANGED, RFQ UNCHANGED,
+        Matching UNCHANGED, Search Facet IMPLEMENTED, Inquiry PRESERVED
+```
+
+**Review Report**: `docs/_review/661.4_M28.0_Hybrid_Model_C_Search_Facet_Enhancement_Report.md`
+**Next**: 661.5_M28.0_Hybrid_Model_C_Unified_Discovery_Search_Consolidation
+
+### 661.5 Unified Discovery Search Consolidation（661.5 IMPLEMENTED）
+
+将 661.4 新增的 SupplierProduct Search **正式收敛进 Unified Search（/search）**，形成唯一主搜索入口 + 统一 Facet，避免第二套独立搜索入口。
+
+```
+Unified Search（661.5 收敛后）:
+  /search  （唯一主搜索入口）
+     |── Capability（products）
+     |── SupplierProduct（supplierProducts / type=supplier-product）
+     |── Supplier（suppliers）
+     |── Knowledge（knowledge）
+     |── Content（content）
+     |── Solution（solutions）
+     +── Unified Facets（category / brand / series / 技术参数 / commercial availability）
+
+Backend（apps/api/src/search/**）:
+  search.service.search() 并行检索 6 维度（新增 searchSupplierProducts 适配器）
+  UnifiedDiscoveryResponse 新增 supplierProducts 维度（既有 5 维度契约保持）
+  unified-search.dto: 新增 brand / series / hasOffer 统一 Facet 参数
+  GET /search/supplier-models（661.4 端点保留）
+
+Frontend（apps/web）:
+  lib/api/search + services/search.service: supplier-product domain + mapSupplierProduct
+  SearchPageContent: supplier-product Tab + SupplierProductResultCard + SupplierModelFacetPanel
+  SearchTypeTabs / GlobalSearchBar: 新增「供应商型号」类型切换（非独立入口）
+  /supplier-models → redirect('/search?type=supplier-product')（仅向后兼容, robots noindex）
+  PublicHeader: 移除「供应商型号」一级导航（Navigation = CONSOLIDATED）
+
+Boundary:
+  Published Boundary: status=PUBLISHED 服务端强制（Draft NOT FOUND / Published FOUND）
+  DTO Projection（不暴露裸 Prisma relation）；Product = Capability Authority UNCHANGED
+  Schema UNCHANGED / Migration NOT CREATED / Matching UNCHANGED / RFQ UNCHANGED / Inquiry PRESERVED
+Validation: apps/api tsc 类型检查 exit 0 PASS；apps/web next build exit 0 PASS（43 页, 仅既有 warnings）
+Status: PASS — Unified Search VERIFIED, SupplierProduct Search INTEGRATED, Facet UNIFIED,
+        Navigation CONSOLIDATED, Published Boundary VERIFIED, Schema UNCHANGED,
+        Migration NOT CREATED, Product UNCHANGED, Matching UNCHANGED, RFQ UNCHANGED, Inquiry PRESERVED
+```
+
+**Review Report**: `docs/_review/661.5_M28.0_Hybrid_Model_C_Unified_Discovery_Search_Consolidation_Report.md`
+**Next**: M28.0 后续（型号级 Interest 持久化评估 / Supplier 工作区推进，超本任务范围）
+
+### 661.6 Unified Search Runtime Consolidation（661.6 IMPLEMENTED）
+
+将 661.5 的 Unified Search Architecture 在**真实运行时**进一步收敛，消除 SupplierProduct 独立搜索运行路径，冻结 Unified Search Runtime。
+
+```
+Unified Search Runtime（661.6 冻结后）:
+  SearchPage
+     ↓
+  ONLY /search
+     ↓
+  supplierProducts + supplierProductFacets（唯一正式运行路径）
+
+  /supplier-models → meta refresh 重定向 → /search?type=supplier-product（HTTP 实测 200 + noindex）
+
+Backend（apps/api/src/search/**）:
+  /search 返回 supplierProductFacets（pagination-independent, 非阻塞 try/catch）
+  recordSearchAnalytics 纳入 supplierProducts（entityTypes + resultCounts, 非阻塞）
+  /search/supplier-models 保留为 Legacy Compatibility Endpoint（SearchPage 不消费）
+
+Frontend（apps/web）:
+  SearchPageContent: 唯一数据源 /search（searchUnified）; 无 searchSupplierModels 调用
+  统一分页: page 由 URL searchParams 派生（单一状态, pageSize=20 常量）
+  统一 Facet: sb/ss/sh + category/filters 全进 /search（URL = API = Rendered）
+  Query Persistence: q/type/category/sb/ss/sh/page 全部 URL 可恢复
+  search.service.ts supplierModelSearch wrapper 无 UI 消费（Future Deprecation Candidate）
+
+Analytics:
+  conversion_event 实测 SEARCH_SUBMITTED / RESULT_VIEWED 含 supplierProduct 维度
+  未新建 SupplierProductAnalyticsService（复用既有 recordSearchAnalytics）
+
+Boundary:
+  Schema UNCHANGED / Migration NOT CREATED / Product UNCHANGED / Matching UNCHANGED
+  RFQ UNCHANGED / Inquiry PRESERVED / No Paid Ranking / No Supplier Marketplace
+Validation: apps/api build exit 0 PASS；apps/web next build exit 0 PASS；
+        HTTP runtime：/search 200（supplierProducts+facets）、/search/supplier-models 200 legacy、
+        /search/context 200、/supplier-models redirect 页（meta refresh + noindex）
+Status: PASS — SearchPage ONLY /search, SupplierProduct Search UNIFIED,
+        Legacy Endpoint COMPATIBILITY ONLY, /supplier-models REDIRECT VERIFIED,
+        Pagination UNIFIED, Facet State UNIFIED, Query Persistence VERIFIED,
+        Search Analytics SUPPLIERPRODUCT INTEGRATED, Existing Search REGRESSION PASS,
+        Schema UNCHANGED, Migration NOT CREATED, Product UNCHANGED, Matching UNCHANGED,
+        RFQ UNCHANGED, Inquiry PRESERVED
+```
+
+**Review Report**: `docs/_review/661.6_M28.0_Hybrid_Model_C_Unified_Search_Runtime_Consolidation_Report.md`
+**Next**: M28.0 后续（型号级 Interest 持久化评估 / Supplier 工作区推进，超本任务范围）。**Unified Search Runtime = FROZEN**（661.5 Architecture Consolidation → 661.6 Runtime Consolidation）。
+
+### 661.7 Product Discovery Experience Audit（661.7 AUDITED）
+
+对 M28.0 Hybrid Model C 第一阶段能力执行「真实运行 + 三角色旅程 + 信息架构 + 产品体验」综合审查。**NO FEATURE DEVELOPMENT / NO CODE CHANGE**（Audit Before Improvement / Report Before Fix）。
+
+```
+Product Discovery Experience Audit（661.7 结论）:
+  状态: CONDITIONAL PASS（无 P0；P1=2 其中 1 项为数据准备缺口；若干 P2 产品化问题）
+  Buyer Journey:    CONDITIONAL（SupplierProduct 0 条 → 型号链路空态）
+  Supplier Journey: CONDITIONAL（无型号池数据可操作）
+  Admin Journey:    VERIFIED
+  Search:           VERIFIED（661.6 FROZEN 保持，SearchPage→ONLY /search→supplierProducts）
+
+  Runtime 数据（psql 实查）:
+    User=13 / Organization=11 / Product=7 / SupplierProduct=0 / Offer=7
+    Inquiry=6 / Rfq=11 / RfqResponse=12 / SupplierProductMedia=0
+
+  Defects:
+    P0 = 0
+    P1 = 2（D1 SupplierProduct 数据缺口——seed_demo.ts 无创建逻辑 / D2 /offers/mine 无独立路由 500）
+    P2 = 5（D3 ManufacturerInfo「制造商」命名与 Supplier 模型冲突 / D4 四个分析入口重叠
+            / D5 媒体中心无一级菜单 / D6 知识分类·域术语混用 / D7 Solution 无 Admin 入口）
+    P3 = 2（D8 型号无批量操作 / D9 空态无 CTA）
+    Future = 3（F1 Product Series 分层 / F2 供应商产品池 / F3 Media Folder·Owner 筛选）
+
+  Productization Score: 3.0 / 5（Discovery 4 / Search 4 / Product Understanding 3
+        / Supplier Model Understanding 3 / Inquiry 3 / Supplier Operation 3
+        / Admin Governance 3 / IA 3 / Naming 2 / Scalability 2）
+
+  Architecture Impact: Database/Schema/Migration/API/Matching/Search/RFQ/AI/Storage 全 UNCHANGED/NONE
+
+  三层关系（schema 实证）:
+    Product（平台能力 / Global Catalog）→ SupplierProduct（供应商型号, platformProductId 归属）
+      → Offer（商业能力, supplierProductId 双绑）
+```
+
+**Review Report**: `docs/_review/661.7_M28.0_Hybrid_Model_C_Product_Discovery_Experience_Audit_Report.md`
+**Next**: 662 Product Experience Refinement（先补 SupplierProduct 真实数据链 D1，再统一命名 D3）
+
+### 662 Product Experience Refinement（662 IMPLEMENTED）
+
+基于 661.7 真实审计结果，只处理已验证产品化缺口（D1 SupplierProduct 数据 / D2 Offer 入口 / D3 命名 / D6 知识术语 / D7 Solution 入口）。**Real Data Before UX / Terminology Before Expansion / No Scope Expansion**。
+
+```
+Product Experience Refinement（662 结论）:
+  状态: PASS
+  D1 SupplierProduct Demo Data: CREATED（真实数据链补齐）
+  D2 Offer Entry: CLARIFIED（/offers/mine = Legacy/Unused，正式入口 /workspace/supplier/offers）
+  D3 Manufacturer Terminology: FIXED（SupplierInfo 替换 ManufacturerInfo，核心页面术语=供应商）
+  D6 Knowledge Terminology: FIXED（Domain=知识领域 / Category=知识分类 / Entry=知识条目）
+  D7 Solution Management: DEFINED（Solution = Content 子类型 ContentType.SOLUTION，
+        Admin 路径=内容中心→内容管理→类型=解决方案，不新增独立 CRUD）
+
+  Demo Data（prisma 实查）:
+    supplier_product=13（PUBLISHED=6 / DRAFT=2 / SUBMITTED=2 / REVIEWING=1 / APPROVED=1 / REJECTED=1）
+    supplier_product_media=5 / supplier_product_parameter_value=13 / offer_with_supplier_product=6
+    组织: 明视 5 / 锐视 5 / 中科 3；Offer 绑定 6 条全 org/product 一致 + PUBLISHED
+
+  Runtime 验证:
+    Case A PUBLISHED 搜索可见 ✅  Case B DRAFT 不可见 ✅  Case C 详情数据链正确 ✅
+    Case D 型号 Inquiry 上下文 ✅（SupplierModelsSection→InquiryForm supplierProductId）
+    Case E Supplier→Offer ✅（/workspace/supplier/offers）  Case F Inquiry Context ✅
+    Case G Admin 治理 ✅（/admin/supplier-products* 全治理动作）
+    Case H /offers/mine 正式 UI 不依赖 ✅（零引用）  Case I 制造商命名 ✅（仅企业类型字典保留）
+    Case J 知识域/分类一致 ✅  Case K Solution 管理路径明确 ✅
+
+  Build: apps/api exit 0 / apps/admin exit 0 / apps/web exit 0（全 PASS）
+
+  Architecture Impact: Database/Schema/Migration/Product/SupplierProduct/Offer
+        /Search(FROZEN)/Matching/RFQ/AI/Storage 全 UNCHANGED/NONE
+```
+
+**Review Report**: `docs/_review/662_M28.0_Product_Experience_Refinement_Report.md`
+**Next**: 由实际验证结果决定 → 建议 663 Admin IA Optimization（D4 分析入口 / D5 媒体中心一级菜单） / 664 Supplier Product Management Scaling（D8 批量 / F1 Series / F2 产品池）
+
+### 662.1 Three Role Scale Validation（662.1 IMPLEMENTED）
+
+基于 662 PASS 基线，在真实数据规模开始增长时验证 Hybrid Model C 产品模型（Platform Product → SupplierProduct → Offer → Supplier Organization）是否仍可理解/可发现/可管理/可审核/可比较/可运营。**Validate Scale Before Designing Scale / Real Data Before New Feature / Report Before Refactor**。
+
+```
+Three Role Scale Validation（662.1 结论）:
+  状态: PASS（基线 3.0/5 → 3.8/5，Improved）
+
+  Runtime Data（DB 实查）:
+    supplier_product=13（基线）→ 21（+8 受控 Scale，全部 DRAFT / slug 前缀 scale- 可回滚）
+    status: DRAFT 10 / SUBMITTED 2 / REVIEWING 1 / APPROVED 1 / PUBLISHED 6 / REJECTED 1
+    supplier_product_media=5 / parameter_value=13 / offer=7（SP-bound=6）/ inquiry=8 / rfq=11 / rfq_response=12
+    明视 11 / 锐视 6 / 中科 4；VX-6000 = 7 型号 / 3 供应商（多 Supplier 竞争同 Capability）
+
+  三角色旅程: Buyer VERIFIED（Search/Facet/Capability/Compare/型号 Inquiry）
+              Supplier VERIFIED（Runtime 11 models + Offers + Inquiry Context + RFQ）
+              Admin VERIFIED（治理池 status 过滤 + 分页 + review/approve/publish）
+
+  决策门:
+    Supplier Product Pool  = NOT YET REQUIRED（100+ 投影 RECOMMENDED，F2 Future Candidate）
+    Batch Operation        = NOT YET REQUIRED（100 型号审核队列 15 时 RECOMMENDED，D8 Future Candidate）
+    Media Governance       = A（Current sufficient，entityType=SUPPLIER_PRODUCT 归属已具备）
+    Series Model           = KEEP AS STRING（18 组多 1:1，暂不成实体）
+
+  Review Interaction Cost: LOW（List→Detail→Review→Approve→Publish ≈ 6 次点击 / 7 次 API）
+
+  Defect: P0=0 / P1=0 / P2=5（Supplier Runtime 列表无分页/搜索/Series 分组、搜索卡无组织名、
+         offer 维度无价格列、Admin 无批量）/ P3=1
+
+  Architecture Impact: Database/Schema/Migration/Product/SupplierProduct/Offer
+        /Search(FROZEN)/Matching/RFQ/AI 全 UNCHANGED/NONE
+  Hybrid Model C: FROZEN（保持）
+```
+
+**Review Report**: `docs/_review/662.1_M28.0_Hybrid_Model_C_ThreeRole_Scale_Validation_Report.md`
+**Next**: 授权进入 663 Admin IA Optimization（D4 分析入口 / D5 媒体中心一级菜单）+ 664 Supplier Product Management Scaling（D8 批量 / F1 Series 分组 / F2 产品池）—— D 组为 20+ 型号规模前置治理
+
+### 663 Admin IA and Governance Optimization（663 IMPLEMENTED）
+
+基于 662.1 PASS 基线，只处理 Admin 信息架构与治理体验缺口（D4 Analytics 入口重叠 / D5 媒体中心一级入口缺失 / D6 Knowledge 术语 / D7 Solution 入口），**Information Architecture Before Feature Expansion / Governance Before Scale / No Schema Expansion / No Business Workflow Rewrite**。
+
+```
+Admin IA and Governance Optimization（663 结论）:
+  状态: PASS
+
+  D4 Analytics Entry: IA Decision = C（KEEP ROUTES BUT GROUP UNDER ONE ANALYTICS SECTION）
+    数据分析=指标趋势 / 业务分析=漏斗·生命周期·转化·匹配 / 运营监控=系统健康·业务风险
+    / 审计智能=审计概览·风险；data 组标签「数据与监控」→「数据与分析」；路由/breadcrumb/deep link 保留
+
+  D5 Media Center: 一级入口恢复（媒体中心→媒体管理 /media，PictureOutlined；此前隐藏）
+    /files GET 200，entityType 筛选正常；SUPPLIER_PRODUCT 实体标签补全（展示层）
+    架构事实: SupplierProductMedia 走独立 supplier_product_media 表（非 FileAsset），/files 以 FileAsset 体系为主
+    Media Governance = A（无 Folder/Collection）
+
+  D6 Knowledge Terminology: 全量复核一致（知识领域/知识分类/知识条目）Admin+Web+API 无混淆，无需再改
+
+  D7 Solution Entry: Solution = Content.type = SOLUTION；Admin ContentList「解决方案」筛选 Tab 已具备
+    创建/编辑/发布复用既有 Content CRUD；未新增 SolutionController/Service/Table/Model/Migration
+
+  Navigation: CONSOLIDATED —— 首页/产品中心/业务中心/用户与供应商/内容中心/媒体中心(新增一级)/数据与分析/系统管理
+    Task A /products ≤2 决策 ✅；Task B 产品中心→供应商型号审核 ✅；Task C 媒体中心一级可达 ✅
+    Task D 内容中心→内容管理→解决方案 ✅；Task E 数据与分析（数据/业务/监控/审计可分）✅
+
+  Naming: CONSISTENT —— Web/Admin/API 核心语义一致；「制造商」残留均为企业类型字典（662 D3 边界）
+
+  Build: apps/api exit 0 PASS；apps/admin exit 0 PASS（仅既有 chunk-size/dynamic-import 提示）
+         apps/web exit 0 PASS（43 页，仅既有 ESLint warnings）
+
+  Runtime: API 4000 / Admin 3001 / Web 3000 全 200；Admin 三角色全链路可达
+  Regression: Unified Search total=6 全 PUBLISHED（661.6 FROZEN 保持）；SearchPage//search/context//supplier-models 未改
+
+  Defect: P0=0 / P1=0 / P2=1（/files 媒体中心未覆盖 supplier_product_media 表，架构既有事实）/ P3=0
+
+  Architecture Impact: Database/Schema/Migration(NONE)/Product/SupplierProduct/Offer
+        /Search(FROZEN)/Matching/RFQ/AI/API 全 UNCHANGED；Admin UPDATED；Web UNCHANGED
+  Hybrid Model C: FROZEN（保持）
+```
+
+**Review Report**: `docs/_review/663_M28.0_Admin_IA_and_Governance_Optimization_Report.md`
+**Next**: 授权进入 664 Supplier Product Management Scaling（D8 批量 / F1 Series 分组 / F2 产品池 / Supplier Runtime 列表分页-搜索-分组 / 搜索 offer 价格列）—— Future Candidate（F1/F2/D8/F3）不得提前实现
+
+### 664 Supplier Product Management Scaling（664 IMPLEMENTED）
+
+基于 662.1 PASS（P2-A~E 实测缺口）+ 663 PASS Admin IA 基线，仅处理 Supplier Product 规模化可管理性问题，**Scale Evidence Before Scale Feature / Existing Model Before New Model / Runtime Before Schema Expansion / Selection Before Batch Workflow / No Scope Expansion**。
+
+```
+Supplier Product Management Scaling（664 结论）:
+  状态: PASS
+
+  P2-A Supplier Runtime Scaling: IMPLEMENTED + VERIFIED
+    GET /workspace/supplier/runtime/products（唯一入口，不新增 Pool API）
+    +page/pageSize(default=20)/q/status/series；skip/take+count 分页
+    实测: page2/page3 切页正确（total=11）；status=PUBLISHED→2；q=3DSC→2
+          series=精密扫描系列→2；status+series→1；pageSize=100 正常
+    Status 模型六档全保留; q 检索 brand/series/modelNumber/capability
+
+  P2-A UX: 搜索框/状态下拉/Series 下拉/分页(上页·下页·X/Y·共 total 条)/重置
+  P2-D URL 状态: page/q/status/series 写入地址栏 + parseUrlState 恢复
+          deep-link/refresh 存活；无第二套状态体系
+
+  P2-B 供应商组织展示: DTO projection supplierProduct.organization={id,name}
+    结果卡「供应商：名 / 品牌 / 系列 / 型号」；实测 org=明视工业检测设备有限公司
+    （仅公开必要字段，无内部/Member/权限数据）
+
+  P2-C 价格摘要: 复用既有 commercialSummary（offerCount/activeOfferCount/priceFrom/priceTo/currency）
+    结果卡「有效 Offer：N 个」+「价格：X~Y」+「可购/可询价」徽章
+    不新增 Ranking/Sponsored/Paid；价格仅信息展示不参与排序
+
+  P2-D 规模验证: 20+(库内 Total=21 实测切页正确)/50+(pageSize 至 100 skip/take 幂等确定性)
+    Admin Table pageSizeOptions=['10','20','50']+showSizeChanger
+
+  P2-E Admin Batch Preparation: Selection Model（rowSelection+selectedRowKeys+已选 N Alert+取消选择）
+    NO actual batch approve/reject/publish、NO batch API、NO batch workflow（D8 FROZEN）
+    判断: 队列<15 未触发 D8；选择模型低风险、保留 UI 扩展边界
+
+  P3 状态可视化: StatusTag/色阶徽章（PUBLISHED 绿/APPROVED 蓝/REJECTED 红/审核琥珀/DRAFT 灰）
+    中文六档（草稿/已提交/审核中/已通过/已发布/已拒绝）；Supplier Runtime + Admin 一致
+
+  Build: apps/api exit 0 PASS；apps/admin exit 0 PASS（仅既有 chunk-size 提示）
+         apps/web exit 0 PASS（43 页，仅既有 ESLint warnings）
+
+  Runtime: API 4000 全链路；三角色 login 201
+  Regression: Buyer(/search 明视 total=2 全 PUBLISHED+org+价格+可询价) PASS
+        Supplier(Runtime 分页/过滤/offer/inquiry-context 200) PASS
+        Admin(/supplier-products total=21 status 过滤 PUBLISHED→6；dashboard/stats 200 403修复) PASS
+
+  Defect: P0=0 / P1=0 / P2=0 / P3=0
+
+  Architecture Impact: Database/Schema/Migration(NONE)/Product/SupplierProduct/Offer
+        /Search(FROZEN)/Matching/RFQ/AI 全 UNCHANGED；API MINIMAL EXTENSION
+        （仅 /workspace/supplier/runtime/products 增可选 query+DTO 增 page/pageSize）
+        Frontend UPDATED；Admin UPDATED
+  Hybrid Model C: FROZEN（保持）；Unified Search: FROZEN（保持）
+```
+
+**Review Report**: `docs/_review/664_M28.0_Supplier_Product_Management_Scaling_Report.md`
+**Next**: 进入下一阶段 M28.x Supplier/Discovery 产品化优化；Future Candidate（F1 Series Entity / F2 Supplier Product Pool / D8 Batch Operation / F3 Media Folder）触发条件未达，不得提前实现
+
+### 665 Platform Productization End-to-End Experience Audit（665 COMPLETED）
+
+665 Platform Productization E2E Experience Audit（665 结论）:
+```text
+Status:                    PASS
+Demo Scale Fixture:        VERIFIED
+Buyer Journey:             VERIFIED
+Supplier Journey:          VERIFIED
+Admin Journey:             VERIFIED
+Business Loop:             VERIFIED
+Product Discovery:         VERIFIED
+Unified Search:            FROZEN
+Product Semantics:         VERIFIED
+Supplier Differentiation:  VERIFIED
+Inquiry:                   VERIFIED
+RFQ:                       VERIFIED
+Media Governance:          ASSESSED
+Information Architecture:  ASSESSED
+Scale:                     ASSESSED
+P0 / P1 / P2 / P3:         0 / 0 / 3 / 2
+Productization Score:      4.2 / 5
+M28.0 Productized Baseline:READY
+Hybrid Model C:            FROZEN
+Database / Schema:         UNCHANGED
+Migration:                 NONE
+API:                       UNCHANGED
+Matching / RFQ / AI:       UNCHANGED
+Documentation:             SYNCED
+M28.1 Recommendation:      Demo Fixture FORMALIZE（P2①）+ SupplierProduct 比较页深度验证（P2②）+ Admin IA 残余收敛（P3）；F1/F2/D8/F3 保持 Future Candidate
+```
+
+**Review Report**: `docs/_review/665_M28.0_Platform_Productization_End_to_End_Experience_Audit_Report.md`
+**Next**: **M28.1**（Demo Scale Fixture FORMALIZE → SupplierProduct 比较体验深度验证 → Admin IA/Media 治理收敛）；F1 Series Entity / F2 Supplier Product Pool / D8 Batch Operation / F3 Media Folder 触发条件未达，不得提前实现
+
+### 666 Demo Scale Fixture Formalization（666 COMPLETED）
+
+666 Demo Scale Fixture Formalization（666 结论）:
+```text
+Status:                    PASS
+Repository:                VERIFIED
+Fixture Architecture:      Option C（database/fixture/ master runner：seed / clean / reset）
+Fixture Identification:    slug 前缀 (scale|mingshi|ruishi|zhongke)-（21/21 命中，missing=0）
+Core Demo Data:            PRESERVED（offer=7 / inquiry=9 / rfq=12 / rfq_response=12 清理后不变）
+SupplierProduct Fixture:   VERIFIED（21 Models / 3 Orgs / 6 Capabilities / 6 PUBLISHED / 6 Offer-bound）
+Scale Fixture:             VERIFIED（+8 DRAFT scale 记录，idempotent）
+Idempotency:               PASS（Before == First Seed == Second Seed = 21/6/6）
+Rollback:                  SAFE（--clean 仅删 Fixture，Core Demo 保留；seed 可还原）
+Supplier Isolation:        PASS（s1=明视 n=11 / s2=锐视 n=6 / crossVisible=0）
+Published Boundary:        PASS（公开 /search 仅 PUBLISHED=6，onlyPublished=true）
+Admin Governance:          PASS（pool n=21 跨 3 组织 / detail / PUBLISHED 过滤）
+Buyer Discovery:           PASS（Keyword / Brand / Series / hasOffer / Pagination 全验证）
+Inquiry:                   PASS（inquiry-context=200）
+Multi-Supplier:            PASS（DB 级 6 Capability 多组织；Observed=3 orgs REAL，Projected=50+ QUERY-CAPABILITY）
+Media:                     PASS（5 Media：IMAGE 4 + SPEC_SHEET 1）
+Parameter:                 PASS（13 ParameterValues / 13 型号覆盖）
+Regression:                PASS（api/web/admin build exit 0；Unified Search/Product/Offer/Inquiry/Demand/RFQ/Matching/Dashboard 全 200）
+Observed Scale:            21 Models（REAL DATA VERIFIED）
+Projected Scale:           50+ Models（CONTRACT / QUERY CAPABILITY VERIFIED）
+P0 / P1 / P2 / P3:         0 / 0 / 1 / 0
+Hybrid Model C:            FROZEN
+Unified Search:            FROZEN
+Database / Schema:         UNCHANGED
+Migration:                 NONE
+API:                       UNCHANGED
+Matching / RFQ / Inquiry:  UNCHANGED
+Documentation:             SYNCED
+M28 Demo Scale Fixture:    = Controlled / Reproducible / Non-Production Dataset
+Next:                      667 M28.1 SupplierProduct Comparison Experience（P2②）
+```
+
+### 667 SupplierProduct Comparison Experience（667 COMPLETED）
+
+667 SupplierProduct Comparison Experience（667 结论）:
+```text
+Status:                    PASS
+Repository:                VERIFIED
+Comparison Architecture:   EXISTING + MINIMAL EXTENSION（复用 /products/compare URL 状态 + capability 图数据源）
+Buyer Comparison:          VERIFIED（Search → Capability → 勾选 → Compare → 参数差异 → 商业摘要 → Inquiry）
+Supplier Organization Identity: PASS（每列「供应商：组织名」；同 Brand 不同 Org 可区分）
+Brand / Series / Model:    PASS（第二/三层）
+Parameter Comparison:      PASS（Option B：共同参数 + 差异高亮 + 最优值绿标）
+Commercial Summary:        PASS（Offer 数 / 价格区间 / 货币 / 可询价状态；无 Ranking）
+Inquiry:                   PASS（每列「咨询此型号」，supplierProductId 上下文保持）
+Search → Compare:          PASS（/search?type=supplier-product → 详情页勾选 → /products/compare）
+Product Detail → Compare:  PASS（SupplierModelsSection 勾选 + 底部比较条）
+Compare State:             PASS（?ids&type=supplier-product&capability=，deep link / refresh / back-forward 稳定）
+Scale:                     ASSESSED（2/3/4/7 型号 + 3 Supplier × 7 SupplierProduct 全通过）
+Edge Cases:                ASSESSED（0/1/2/3/4+/unpublished/no-offer/different series/same brand 全验证）
+Supplier Regression:       PASS（Runtime 200 / inquiry-context 200 / 跨组织 403 正确阻断）
+Admin Regression:          PASS（Admin = UNCHANGED，仅 Audit）
+Build:                     PASS（api/web build exit 0；admin UNCHANGED）
+P0 / P1 / P2 / P3:         0 / 0 / 2 / 2
+F1 Series Entity:          FUTURE CANDIDATE
+F2 Supplier Product Pool:  FUTURE CANDIDATE
+D8 Batch Operation:        FUTURE CANDIDATE
+F3 Media Folder:           FUTURE CANDIDATE
+Hybrid Model C:            FROZEN
+Unified Search:            FROZEN
+Database / Schema:         UNCHANGED
+Migration:                 NONE
+API:                       MINIMAL EXTENSION（capability 图加载 parameterValues + CreateInquiryDto UUID loose）
+Matching / RFQ:            UNCHANGED
+Documentation:             SYNCED
+Review Report:             docs/_review/667_M28.1_SupplierProduct_Comparison_Experience_Report.md
+Next:                      668 M28.1 Admin / Media Residual Productization（不得提前实现）
+```
+
+### 668 Platform Productization Final Audit（668 COMPLETED）
+
+668_M28.2_Platform_Productization_Final_Audit（668 结论）:
+```text
+Status:                    PASS
+Repository:                VERIFIED（F:/Desktop/VISNDT，branch=main，Working Tree=PRESERVED）
+Baseline:                  667 = PASS / 666 = PASS / 665 = PASS / 664 = PASS / 663 = PASS / 662.1 = PASS / 661.6 = PASS
+Architecture:              STABLE（Hybrid Model C = FROZEN / Unified Search = FROZEN / Database-Schema-UNCHANGED / Migration-NONE）
+Architecture Drift:        NONE（无第二套 Search / Compare / Compare State；无新 Domain / 新 Model / 新 Migration）
+Buyer Runtime:             PASS（18/18：Search → Capability → Compare 2/3/4/7 → URL Restore → 参数差异 → 商业摘要 → Inquiry → Invalid SP 拒绝）
+Supplier Regression:       PASS（runtime 200 / own inquiry-context 200 / cross-org 403 / offers 200；Runtime UNCHANGED）
+Admin Regression:          PASS（dashboard stats/pending/supplier-products 200；Admin = UNCHANGED）
+Permission / Isolation:    PASS（无 Cross-org / Unpublished / Offer / Inquiry Context leakage）
+Scale:                     PASS（3 orgs / 7 SupplierProducts / 多品牌多系列多型号 / With-Offer=3 / No-Offer=4 / Published / Unpublished）
+Build:                     PASS（api nest build exit 0；web tsc exit 0 + next build exit 0；admin UNCHANGED）
+P0 / P1 / P2 / P3:         0 / 0 / 2 / 3（均非阻断）
+F1 Series Entity:          FUTURE CANDIDATE（最密同系列 4<5，未触发）
+F2 Supplier Product Pool:  FUTURE CANDIDATE（单供应商 ≤13<50，未触发）
+D8 Batch Operation:        FUTURE CANDIDATE（队列 <15，未触发）
+F3 Media Folder:           FUTURE CANDIDATE（entity 治理足够，未触发）
+Hybrid Model C:            FROZEN
+Unified Search:            FROZEN
+Database / Schema:         UNCHANGED
+Migration:                 NONE
+API:                       MINIMAL EXTENSION（仅 667 Read-only + UUID 兼容修正）
+Matching / RFQ / Inquiry:  UNCHANGED
+M28 Closeout:              CLOSED
+M29 Entry Gate:            READY（P2-1/P2-2/P3-3 优化项 + F1/F2/D8/F3 Future Candidate，仅 Readiness Assessment，不实施）
+Documentation:             SYNCED
+Review Report:             docs/_review/668_M28.2_Platform_Productization_Final_Audit_Report.md
+Next:                      M29（Entry Gate = READY，按候选分类正式规划）
+```
+
+### 700 M29.0 Search Function And UI Audit（700 COMPLETED / CONDITIONAL PASS）
+
+700_M29.0_Search_Function_And_UI_Audit（指令 646_M26.0，按用户要求以 700 M29 编号，700 结论）:
+```text
+Status:                    CONDITIONAL PASS
+Repository:                VERIFIED（F:/Desktop/VISNDT，branch=main，Working Tree=PRESERVED）
+Baseline:                  668 = PASS / M28 = CLOSED / M29 Entry Gate = READY；Unified Search = FROZEN
+Search Architecture:       VERIFIED（单一 /search + 统一响应契约；/search/context；/supplier-models 仅 legacy/redirect；无 Search Rewrite）
+Search Implementation:     ISSUES FOUND（核心链路 VERIFIED；F3 supplier 状态值缺陷）
+Search API:                UNCHANGED
+Search Ranking:            VERIFIED（确定性排序，无 AI/语义/Supplier 加权）
+Search Filter / Facet:     VERIFIED（Filter→URL→API→Refresh 闭环运行时复验：超声波 3→1 US-800；上下文 3 候选/1 分类/14 参数）
+Search UI:                 VERIFIED（搜索框/结果卡/空/加载/错误/移动端全通过）
+Header Navigation:         CROWDED（F2，P2：7 导航 + 内嵌搜索框 + 双 CTA 竞争 1200px 行宽，lg 下搜索框被压缩）
+Supplier Search:           FOUND / SCOPE VIOLATION（F1，P1：GlobalSearchBar 搜索域 + Tab + 结果卡 + 后端 searchSuppliers + 首页 CTA + /suppliers/[id] 直出；依指令 8.1 本任务不删除，仅 Removal Recommendation）
+Design System:             COMPLIANT（Token 同源；P3 观察：未直接复用 design-system 组件）
+Identity Contract:         ISSUES FOUND（P3：搜索结果未挂接 identity-contract；未修改契约）
+P0 / P1 / P2 / P3:         0 / 1 / 2 / 3
+M25 / M28:                 CLOSED / CLOSED
+M29:                       ACTIVE / SEARCH AUDIT
+Database / Migration:      UNCHANGED / NONE
+Matching / Storage / AI:   UNCHANGED
+Documentation:             SYNCED
+Review Report:             docs/_review/700_M29.0_Search_Function_And_UI_Audit_Report.md
+Next:                      701 M29.1 Search Supplier Removal And Header IA Optimization（独立实施任务）
+```
+
 ## Future Architecture Candidates
 
 以下为未来架构演进候选，当前 **FROZEN / NOT FOR DEVELOPMENT**，待满足触发条件后通过正式架构审计重新激活。
 
-### Supplier Product Model Architecture
+### Supplier Product Model Architecture（已分别由 659.2 / 660 冻结，见上「M28.0 Product Domain Model Decision」）
 
 | Field | Value |
 |-------|-------|
-| Status | **Candidate (Frozen / Not For Development)** |
-| Priority | Future |
-| Related Stage | M19.4+ / M20 Architecture Audit |
-| Design Document | `docs/_architecture/future/481_Supplier_Product_Model_Architecture_Future_Design_Candidate.md` |
+| Status | **660.5 IMPLEMENTED（Prisma Schema Implementation PASS）** |
+| Priority | M28.0 → Next: 660.6 Migration Planning |
+| Related Stage | M28.0 Product Domain Architecture Evolution |
+| Design Document | `docs/_review/660.5_M28.0_Hybrid_Model_C_Prisma_Schema_Implementation_Report.md` |
+| Schema Direction | 已落库 schema.prisma：SupplierProduct/Media/ParameterValue + SupplierProductStatus + FileEntityType+SUPPLIER_PRODUCT + Offer.supplierProductId 双绑；Product NO ownership |
 
-**Reason**: 工业检测行业存在供应商型号级能力表达需求——同一平台产品能力由多个供应商提供不同型号。当前架构 Product = Global Catalog + Offer = Supplier Capability 已满足当前能力表达，供应商型号体系为未来架构演进候选。
+**Reason**: 工业检测行业存在供应商型号级能力表达需求——同一平台产品能力由多个供应商提供不同型号。659.1 审计选定 **Hybrid Product Model C（限定版）**；659.2 冻结业务模型；660 完成 **Domain Architecture Design**：`Platform Product`（Capability Node，全局权威）+ `Supplier Product`（**Route A：Independent Domain Entity**）→ `Offer`（Commercial Capability Layer，`Offer != Product`，**架构建议双绑 SupplierProduct + PlatformProduct**）→ `Supplier Organization`。**领域边界已冻结，660 直接进入架构设计；660.1 做 Schema 设计。**
 
-**Constraint**: 必须保持 Product Global Catalog 架构，禁止 Product.organizationId / Product.supplierId / Supplier Product Catalog / Supplier Store / Marketplace。
-
-**Trigger Conditions**:
-- Supplier Capability 页面需求增强
-- RFQ 精准匹配需要型号级能力
-- AI Matching 需要型号参数
-- SEO 需要供应商型号页面
-- 供应商数据规模增长
+**Constraint（659.2/660 冻结）**: 必须保持 Product Global Catalog 架构，长期禁止 Product.organizationId / Supplier Marketplace / Supplier Store / Order System / Payment System / ERP。`Supplier Product` 为独立领域实体（避免 `Product.organizationId`），存储机制/审批流/Offer 双绑细节交由 660.1 数据库架构设计，不触碰冻结红线、不落地迁移。

@@ -13,12 +13,12 @@ export const metadata: Metadata = {
 // Legacy static content — fallback when no ARTICLE slug='about' exists
 const STATIC_FALLBACK = {
   title: '关于 VISNDT',
-  subtitle: '专业的工业检测设备信息平台 — 连接买家与优质检测设备制造商。',
+  subtitle: '专业的工业检测设备信息平台 — 连接买家与优质检测设备供应商。',
   sections: [
     {
       title: '我们的使命',
       content:
-        'VISNDT是一个专业的工业检测设备信息平台，致力于连接买家与优质检测设备制造商。我们提供全面的产品信息、详细的技术规格和高效的询价渠道，帮助您找到合适的设备。',
+        'VISNDT是一个专业的工业检测设备信息平台，致力于连接买家与优质检测设备供应商。我们提供全面的产品信息、详细的技术规格和高效的询价渠道，帮助您找到合适的设备。',
     },
     {
       title: '我们提供什么',
@@ -33,11 +33,11 @@ const STATIC_FALLBACK = {
         },
         {
           title: '直接询价',
-          description: '通过我们的平台直接向制造商提交询价，获取价格、库存和技术咨询。',
+          description: '通过我们的平台直接向供应商提交询价，获取价格、库存和技术咨询。',
         },
         {
-          title: '制造商信息',
-          description: '查看制造商信息，包括企业资质和产品来源详情，帮助您做出明智决策。',
+          title: '供应商信息',
+          description: '查看供应商信息，包括企业资质和产品来源详情，帮助您做出明智决策。',
         },
       ],
     },

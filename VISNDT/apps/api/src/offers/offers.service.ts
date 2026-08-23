@@ -10,7 +10,11 @@ import { UpdateOfferDto } from './dto/update-offer.dto';
 import { SearchParamsDto } from '../common/dto/search-params.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { WorkflowEventsService } from '../workflow-events/workflow-events.service';
+import { SupplierProductsService } from '../supplier-products/supplier-products.service';
 import { NotificationType, OfferStatus, WorkflowAction, WorkflowEntityType } from '@prisma/client';
+
+/** CreateOfferDto extended with the optional Hybrid Model C commercial source. */
+type CreateOfferWithSupplierInput = CreateOfferDto & { supplierProductId?: string };
 
 @Injectable()
 export class OffersService {
@@ -18,6 +22,7 @@ export class OffersService {
     private readonly prisma: PrismaService,
     private readonly notificationsService: NotificationsService,
     private readonly workflowEventsService: WorkflowEventsService,
+    private readonly supplierProductsService: SupplierProductsService,
   ) {}
 
   async findAll(params: SearchParamsDto) {
@@ -62,7 +67,7 @@ export class OffersService {
   }
 
   async create(
-    dto: CreateOfferDto,
+    dto: CreateOfferWithSupplierInput,
     user: { id: string; organizationId?: string | null },
   ) {
     if (!user.organizationId) {
@@ -71,10 +76,21 @@ export class OffersService {
       );
     }
 
+    // Hybrid Model C — validate optional commercial source binding.
+    // Rules:
+    //   offer.organizationId     == supplierProduct.organizationId
+    //   offer.productId          == supplierProduct.platformProductId
+    await this.validateSupplierBinding(
+      dto.supplierProductId,
+      user.organizationId,
+      dto.productId,
+    );
+
     const offer = await this.prisma.offer.create({
       data: {
         ...dto,
         organizationId: user.organizationId,
+        supplierProductId: dto.supplierProductId ?? null,
         createdBy: user.id,
       },
     });
@@ -285,6 +301,48 @@ export class OffersService {
       where: { id: { in: ids } },
       data: { status: status as OfferStatus },
     });
+  }
+
+  /**
+   * Validate optional SupplierProduct binding for an Offer (Hybrid Model C).
+   *
+   * When `supplierProductId` is provided, enforces:
+   *   offer.organizationId == supplierProduct.organizationId
+   *   offer.productId      == supplierProduct.platformProductId
+   * On mismatch the binding is rejected (BadRequest), never silently accepted.
+   * When `supplierProductId` is absent (legacy / plain offer), no-op.
+   */
+  private async validateSupplierBinding(
+    supplierProductId: string | undefined,
+    offerOrganizationId: string,
+    offerProductId: string,
+  ): Promise<void> {
+    if (!supplierProductId) return;
+
+    const sp = await this.prisma.supplierProduct.findUnique({
+      where: { id: supplierProductId },
+      select: {
+        organizationId: true,
+        platformProductId: true,
+        status: true,
+      },
+    });
+    if (!sp) {
+      throw new BadRequestException(
+        `SupplierProduct ${supplierProductId} not found; cannot bind to offer`,
+      );
+    }
+
+    if (sp.organizationId !== offerOrganizationId) {
+      throw new BadRequestException(
+        'SupplierProduct organization does not match offer organization',
+      );
+    }
+    if (sp.platformProductId !== offerProductId) {
+      throw new BadRequestException(
+        'SupplierProduct platformProduct does not match offer productId (capability binding mismatch)',
+      );
+    }
   }
 
   /**

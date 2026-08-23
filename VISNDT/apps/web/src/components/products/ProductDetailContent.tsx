@@ -4,10 +4,12 @@ import { useState } from 'react';
 import type { Product, ProductDetail, ParameterGroup } from '@/types/product';
 import type { RelatedKnowledgeItem } from '@/types/knowledge-base';
 import type { Content } from '@/types/content';
+import type { CapabilitySupplierProductWithOffers } from '@/types/capability';
 import ProductGallery from './ProductGallery';
 import ProductParameters from './ProductParameters';
-import ManufacturerInfo from './ManufacturerInfo';
+import SupplierInfo from './SupplierInfo';
 import SupplierInquirySection from '@/components/inquiry/SupplierInquirySection';
+import SupplierModelsSection from './SupplierModelsSection';
 import ProductDetailTabs from './ProductDetailTabs';
 import RelatedKnowledge from './RelatedKnowledge';
 import RelatedProductsSection from './RelatedProductsSection';
@@ -27,6 +29,8 @@ interface ProductDetailContentProps {
   relatedProducts?: Product[];
   /** Related solutions feed (deterministic public Content API, type=SOLUTION) */
   relatedSolutions?: Content[];
+  /** Public Capability Discovery — published Supplier Models with commercial summary (M28.0) */
+  supplierModels?: CapabilitySupplierProductWithOffers[];
 }
 
 export default function ProductDetailContent({
@@ -35,6 +39,7 @@ export default function ProductDetailContent({
   relatedKnowledge = [],
   relatedProducts = [],
   relatedSolutions = [],
+  supplierModels = [],
 }: ProductDetailContentProps) {
   const [descExpanded, setDescExpanded] = useState(false);
   const descShouldTruncate = (product.description?.length ?? 0) > 200;
@@ -133,7 +138,7 @@ export default function ProductDetailContent({
                     </div>
                   )}
 
-                  <ManufacturerInfo
+                  <SupplierInfo
                     offers={product.offers}
                     productName={product.name}
                   />
@@ -190,6 +195,17 @@ export default function ProductDetailContent({
                 offers={product.offers ?? []}
                 productModel={product.model ?? null}
                 productCategory={product.category ? translateCategoryName(product.category.name) : null}
+              />
+            </section>
+          )}
+
+          {/* Supplier Models Tab — published SupplierProduct models with commercial summary */}
+          {activeTab === 'supplier-models' && (
+            <section id="supplier-models">
+              <SupplierModelsSection
+                productId={product.id}
+                productName={product.name}
+                models={supplierModels}
               />
             </section>
           )}

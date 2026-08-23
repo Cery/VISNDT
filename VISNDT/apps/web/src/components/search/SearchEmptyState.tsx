@@ -12,6 +12,7 @@ interface SearchEmptyStateProps {
 
 const DOMAIN_LABELS: Record<string, string> = {
   product: '产品',
+  'supplier-product': '供应商型号',
   knowledge: '知识',
   solution: '方案',
   supplier: '供应商',

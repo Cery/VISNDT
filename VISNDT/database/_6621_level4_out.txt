@@ -1,0 +1,118 @@
+﻿=== A. 当前 SP 全景（21 = 13 基线 + 8 SCALE）===
+ brand |     series     |  modelNumber   |  status   |         platform_product_id          
+-------+----------------+----------------+-----------+--------------------------------------
+ 中科  | 专业探伤系列   | US-800-PLUS    | PUBLISHED | 7c192ada-d2d7-495d-9a7b-660d3a3b72f2
+ 中科  | 标准便携系列   | US-200-STD     | PUBLISHED | bf7e3031-5f4c-4f45-a2d1-a6fa166688ca
+ 中科  | 标准系列       | FB-3000M       | SUBMITTED | 1b2398ec-77fc-4a2a-aa71-713859b87bf7
+ 中科  | 标准系列       | VX-6000C       | DRAFT     | 933ed0db-08e7-4ede-a2c2-ebb1e8521cd1
+ 明视  | 便携系列       | US-800E        | REVIEWING | 7c192ada-d2d7-495d-9a7b-660d3a3b72f2
+ 明视  | 基础系列       | MIC-5000-BASE  | SUBMITTED | 09aa2dc2-74dc-493f-b47b-e02765c6ff83
+ 明视  | 基础系列       | VX-6000-BASE   | DRAFT     | 933ed0db-08e7-4ede-a2c2-ebb1e8521cd1
+ 明视  | 标准系列       | US-200M        | DRAFT     | bf7e3031-5f4c-4f45-a2d1-a6fa166688ca
+ 明视  | 标准高清系列   | VX-6000-HD     | APPROVED  | 933ed0db-08e7-4ede-a2c2-ebb1e8521cd1
+ 明视  | 精密扫描系列   | 3DSCAN-Pro-M   | DRAFT     | f38e185b-96aa-4653-867d-aadf505bb8ce
+ 明视  | 精密扫描系列   | 3DSCAN-Pro-S   | PUBLISHED | f38e185b-96aa-4653-867d-aadf505bb8ce
+ 明视  | 轻量系列       | VX-6000-LITE   | DRAFT     | 933ed0db-08e7-4ede-a2c2-ebb1e8521cd1
+ 明视  | 防护系列       | FB-3000-IP     | DRAFT     | 1b2398ec-77fc-4a2a-aa71-713859b87bf7
+ 明视  | 高清智能系列   | VX-6000-PRO    | PUBLISHED | 933ed0db-08e7-4ede-a2c2-ebb1e8521cd1
+ 明视  | 高级系列       | MIC-5000-ADV   | DRAFT     | 09aa2dc2-74dc-493f-b47b-e02765c6ff83
+ 锐视  | 便携系列       | US-200P        | REJECTED  | bf7e3031-5f4c-4f45-a2d1-a6fa166688ca
+ 锐视  | 光纤增强系列   | FB-3000-PLUS   | PUBLISHED | 1b2398ec-77fc-4a2a-aa71-713859b87bf7
+ 锐视  | 大尺寸扫描系列 | 3DSCAN-Pro-L   | DRAFT     | f38e185b-96aa-4653-867d-aadf505bb8ce
+ 锐视  | 经济系列       | VX-6000E       | DRAFT     | 933ed0db-08e7-4ede-a2c2-ebb1e8521cd1
+ 锐视  | 高端系列       | VX-6000-MAX    | DRAFT     | 933ed0db-08e7-4ede-a2c2-ebb1e8521cd1
+ 锐视  | 高端金相系列   | MIC-5000-ULTRA | PUBLISHED | 09aa2dc2-74dc-493f-b47b-e02765c6ff83
+(21 rows)
+
+=== B. Series 分组评估（Series as management dimension）===
+ brand |     series     | models | published 
+-------+----------------+--------+-----------
+ 中科  | 专业探伤系列   |      1 |         1
+ 中科  | 标准便携系列   |      1 |         1
+ 中科  | 标准系列       |      2 |         0
+ 明视  | 便携系列       |      1 |         0
+ 明视  | 基础系列       |      2 |         0
+ 明视  | 标准系列       |      1 |         0
+ 明视  | 标准高清系列   |      1 |         0
+ 明视  | 精密扫描系列   |      2 |         1
+ 明视  | 轻量系列       |      1 |         0
+ 明视  | 防护系列       |      1 |         0
+ 明视  | 高清智能系列   |      1 |         1
+ 明视  | 高级系列       |      1 |         0
+ 锐视  | 便携系列       |      1 |         0
+ 锐视  | 光纤增强系列   |      1 |         1
+ 锐视  | 大尺寸扫描系列 |      1 |         0
+ 锐视  | 经济系列       |      1 |         0
+ 锐视  | 高端系列       |      1 |         0
+ 锐视  | 高端金相系列   |      1 |         1
+(18 rows)
+
+=== C. 每 Supplier 型号数（Level 2: 明视 10+）===
+              name              | sp_count 
+--------------------------------+----------
+ 明视工业检测设备有限公司-D5reg |       11
+ 锐视检测技术有限公司           |        6
+ 中科检测设备有限公司           |        4
+(3 rows)
+
+=== D. 每 Platform Product 下 SupplierProduct 数（多供应商/多型号能力）===
+         capability          | total_sp | suppliers | published 
+-----------------------------+----------+-----------+-----------
+ VX-6000 高清视频内窥镜      |        7 |         3 |         1
+ 3DSCAN-Pro 结构光三维扫描仪 |        3 |         2 |         1
+ FB-3000 光纤内窥镜          |        3 |         3 |         1
+ MIC-5000 工业金相显微镜     |        3 |         2 |         1
+ US-200 便携式超声波探伤仪   |        3 |         3 |         1
+ US-800 超声波探伤仪         |        2 |         2 |         1
+(6 rows)
+
+=== E. Media 治理评估（SupplierProduct Media 数量与分布）===
+ total_supplier_media 
+----------------------
+                    5
+(1 row)
+
+         supplier_product_id          | brand | modelNumber  | media_count 
+--------------------------------------+-------+--------------+-------------
+ d271da81-35dd-41b8-80d4-c8c4632d9e1f | 中科  | US-800-PLUS  |           2
+ a9f9aca5-b387-4b0f-83a4-ff2a5b1ec896 | 明视  | VX-6000-PRO  |           1
+ 6abf8b36-a51f-4ff2-b9c0-633cbe87f302 | 明视  | 3DSCAN-Pro-S |           1
+ 658c47c3-7705-4c7a-96ff-5b2a852fcfd7 | 锐视  | FB-3000-PLUS |           1
+(4 rows)
+
+ product_media 
+---------------
+             1
+(1 row)
+
+ content_media 
+---------------
+             0
+(1 row)
+
+=== F. 审核队列规模（当前 + 投影）===
+docker : psql:/tmp/_6621_level4.sql:37: ERROR:  relation "organization_media" does not exist
+At line:15 char:2575
++ ... level4.sql; docker exec visndt-postgres psql -U visndt -d visndt -f / ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (psql:/tmp/_6621... does not exist:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+LINE 1: SELECT count(*) AS org_media FROM "organization_media";
+                                          ^
+  status   | count 
+-----------+-------
+ DRAFT     |    10
+ SUBMITTED |     2
+ REVIEWING |     1
+ APPROVED  |     1
+ PUBLISHED |     6
+ REJECTED  |     1
+(6 rows)
+
+--- 投影：若规模线性扩到 100（当前 21 -> x5）---
+                queue                | current_pending | projected_at_100 
+-------------------------------------+-----------------+------------------
+ pending_review(SUBMITTED+REVIEWING) |               3 |               15
+(1 row)
+

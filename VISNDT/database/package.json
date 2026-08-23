@@ -9,7 +9,13 @@
     "studio": "prisma studio",
     "seed": "tsx seed_admin.ts",
     "seed:content": "tsx seed_content.ts",
-    "seed:demo": "tsx seed_demo.ts"
+    "seed:demo": "tsx seed_demo.ts",
+    "seed:supplier-product": "tsx seed_supplier_product.ts",
+    "seed:scale": "tsx seed_scale_6621.ts",
+    "seed:scale:clean": "tsx seed_scale_6621.ts --clean",
+    "seed:m28-fixture": "tsx fixture/index.ts",
+    "seed:m28-fixture:clean": "tsx fixture/index.ts --clean",
+    "seed:m28-fixture:reset": "tsx fixture/index.ts --reset"
   },
   "devDependencies": {
     "prisma": "^5.22.0",

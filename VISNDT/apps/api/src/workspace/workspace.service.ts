@@ -3,6 +3,7 @@ import {
   DemandMatchStatus,
   DemandStatus,
   NotificationStatus,
+  OfferStatus,
   RFQStatus,
   RFQResponseStatus,
 } from '@prisma/client';
@@ -14,6 +15,12 @@ import { WorkspaceBuyerPendingResponseDto } from './dto/workspace-buyer-pending-
 import { WorkspaceSupplierOverviewDto } from './dto/workspace-supplier-overview.dto';
 import { WorkspaceSupplierResponseDto } from './dto/workspace-supplier-response.dto';
 import { WorkspaceSupplierRfqDto } from './dto/workspace-supplier-rfq.dto';
+import {
+  WorkspaceSupplierProductDto,
+  WorkspaceSupplierProductsDto,
+} from './dto/workspace-supplier-product.dto';
+import { WorkspaceSupplierProductsQueryDto } from './dto/workspace-supplier-products-query.dto';
+import { WorkspaceSupplierInquiryContextDto } from './dto/workspace-supplier-inquiry-context.dto';
 
 type BuyerWorkspaceUser = AuthRequest['user'];
 
@@ -449,6 +456,186 @@ export class WorkspaceService {
         type: response.rfq.demand.organization?.type,
       },
     }));
+  }
+
+  /**
+   * Supplier Runtime — SupplierProduct Overview.
+   *
+   * Predicate: organizationId → SupplierProduct List → Published / Active Context.
+   * Read-only. Exposes the supplier's own capability models with their lifecycle
+   * status and a summarized commercial availability (Offer = Commercial Layer).
+   */
+  async getSupplierProducts(
+    user: BuyerWorkspaceUser,
+    query?: WorkspaceSupplierProductsQueryDto,
+  ): Promise<WorkspaceSupplierProductsDto> {
+    const organizationId = this.getSupplierOrganizationId(user);
+
+    const page = Math.max(1, query?.page ?? 1);
+    const pageSize = Math.min(100, Math.max(1, query?.pageSize ?? 20));
+    const skip = (page - 1) * pageSize;
+
+    // Conditional filters: status (multi) / series / unified search (q).
+    const conditions: Record<string, unknown>[] = [{ organizationId }];
+
+    const rawQ = query?.q?.trim();
+    if (rawQ) {
+      conditions.push({
+        OR: [
+          { brand: { contains: rawQ, mode: 'insensitive' as const } },
+          { series: { contains: rawQ, mode: 'insensitive' as const } },
+          { modelNumber: { contains: rawQ, mode: 'insensitive' as const } },
+          {
+            platformProduct: {
+              OR: [
+                { name: { contains: rawQ, mode: 'insensitive' as const } },
+                { model: { contains: rawQ, mode: 'insensitive' as const } },
+              ],
+            },
+          },
+        ],
+      });
+    }
+
+    const rawStatus = query?.status?.trim();
+    const statusList = rawStatus
+      ? rawStatus.split(',').map((s) => s.trim()).filter(Boolean)
+      : [];
+    if (statusList.length > 0) {
+      conditions.push({ status: { in: statusList } });
+    }
+
+    const rawSeries = query?.series?.trim();
+    if (rawSeries) {
+      conditions.push({ series: { contains: rawSeries, mode: 'insensitive' as const } });
+    }
+
+    const where = conditions.length === 1 ? conditions[0] : { AND: conditions };
+
+    const [supplierProducts, total] = await Promise.all([
+      this.prisma.supplierProduct.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: pageSize,
+        select: {
+          id: true,
+          brand: true,
+          series: true,
+          modelNumber: true,
+          slug: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          publishedAt: true,
+          platformProduct: { select: { id: true, name: true } },
+          offers: { select: { id: true, status: true, price: true } },
+        },
+      }),
+      this.prisma.supplierProduct.count({ where }),
+    ]);
+
+    const data: WorkspaceSupplierProductDto[] = supplierProducts.map(
+      (item) => {
+        const offers = item.offers ?? [];
+        const activeOffers = offers.filter(
+          (offer) => offer.status === OfferStatus.ACTIVE,
+        );
+        const publishedPrices = activeOffers
+          .map((offer) => (offer.price !== null ? Number(offer.price) : null))
+          .filter((price): price is number => price !== null && !Number.isNaN(price));
+
+        return {
+          id: item.id,
+          brand: item.brand,
+          series: item.series,
+          modelNumber: item.modelNumber,
+          slug: item.slug,
+          status: item.status,
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+          publishedAt: item.publishedAt,
+          platformProduct: item.platformProduct,
+          commercialSummary: {
+            total: offers.length,
+            activeCount: activeOffers.length,
+            minPrice:
+              publishedPrices.length > 0
+                ? Math.min(...publishedPrices)
+                : null,
+            maxPrice:
+              publishedPrices.length > 0
+                ? Math.max(...publishedPrices)
+                : null,
+          },
+        };
+      },
+    );
+
+    return { data, total, page, pageSize };
+  }
+
+  /**
+   * Supplier Runtime — Inquiry Context View (read-only).
+   *
+   * Predicate: SupplierProduct → Related Inquiry Context.
+   * Buyer Interest is surfaced at the Platform Capability level (the Platform
+   * Product the SupplierProduct anchors on), preserving cross-model interest.
+   * Ownership of the SupplierProduct is enforced before any inquiry is read.
+   */
+  async getSupplierInquiryContext(
+    user: BuyerWorkspaceUser,
+    supplierProductId: string,
+  ): Promise<WorkspaceSupplierInquiryContextDto> {
+    const organizationId = this.getSupplierOrganizationId(user);
+
+    const supplierProduct = await this.prisma.supplierProduct.findFirst({
+      where: { id: supplierProductId, organizationId },
+      select: {
+        brand: true,
+        series: true,
+        modelNumber: true,
+        status: true,
+        platformProductId: true,
+        platformProduct: { select: { name: true } },
+      },
+    });
+    if (!supplierProduct) {
+      throw new ForbiddenException(
+        `SupplierProduct ${supplierProductId} does not belong to organization ${organizationId}`,
+      );
+    }
+
+    const inquiries = await this.prisma.inquiry.findMany({
+      where: { productId: supplierProduct.platformProductId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        status: true,
+        contactName: true,
+        message: true,
+        createdAt: true,
+      },
+    });
+
+    const supplierModelLabel =
+      `${supplierProduct.brand} ${supplierProduct.series ?? ''} ${supplierProduct.modelNumber}`.trim();
+
+    return {
+      supplierProductId,
+      supplierModelLabel,
+      status: supplierProduct.status,
+      platformProductId: supplierProduct.platformProductId,
+      platformProductName: supplierProduct.platformProduct?.name ?? '',
+      inquiries: inquiries.map((inquiry) => ({
+        id: inquiry.id,
+        status: inquiry.status,
+        contactName: inquiry.contactName,
+        message: inquiry.message,
+        createdAt: inquiry.createdAt,
+      })),
+      total: inquiries.length,
+    };
   }
 
   private getBuyerOrganizationId(user: BuyerWorkspaceUser): string {

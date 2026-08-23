@@ -1,0 +1,156 @@
+{
+  "health": {
+    "status": 200,
+    "body": {
+      "status": "ok",
+      "database": "connected"
+    }
+  },
+  "logins": {
+    "admin": {
+      "status": 201,
+      "hasCookie": true,
+      "email": null
+    },
+    "buyer": {
+      "status": 201,
+      "hasCookie": true,
+      "email": null
+    },
+    "supplier1": {
+      "status": 201,
+      "hasCookie": true,
+      "email": null
+    },
+    "supplier2": {
+      "status": 429,
+      "hasCookie": false,
+      "email": null
+    }
+  },
+  "buyer": {
+    "searchAll": {
+      "status": 200,
+      "spTotal": 5,
+      "spItems": 5,
+      "productsTotal": 6,
+      "hasFacets": true
+    },
+    "spSearch": {
+      "status": 200,
+      "total": 2,
+      "items": 2
+    },
+    "context": {
+      "status": 200,
+      "hasPollution": null
+    },
+    "firstSP": {
+      "orgName": "明视工业检测设备有限公司-D5reg",
+      "brand": "明视",
+      "series": "精密扫描系列",
+      "modelNumber": "3DSCAN-Pro-S",
+      "status": "PUBLISHED",
+      "commercial": {
+        "offerCount": 1,
+        "activeOfferCount": 1,
+        "priceFrom": 125000,
+        "priceTo": 125000,
+        "currency": "CNY"
+      },
+      "inquiryAvailable": true,
+      "orgId": "926d5a96-e1be-455c-8d58-8f4a79b6735d",
+      "spprodId": "6abf8b36-a51f-4ff2-b9c0-633cbe87f302",
+      "capId": "f38e185b-96aa-4653-867d-aadf505bb8ce",
+      "prodId": "f38e185b-96aa-4653-867d-aadf505bb8ce"
+    },
+    "productDetail": {
+      "status": 200,
+      "name": "3DSCAN-Pro 结构光三维扫描仪"
+    },
+    "capDetail": {
+      "status": 200
+    },
+    "offers": {
+      "status": 200
+    },
+    "inquiry": {
+      "status": 403,
+      "contextOk": null,
+      "id": null
+    }
+  },
+  "supplier": {
+    "runtimePaged": {
+      "status": 200,
+      "page": 2,
+      "pageSize": 5,
+      "total": 11,
+      "items": 5
+    },
+    "statusFilter": {
+      "status": 200,
+      "total": 2
+    },
+    "qSearch": {
+      "status": 200,
+      "total": 4
+    },
+    "seriesFilter": {
+      "status": 200,
+      "total": 2
+    },
+    "overview": {
+      "status": 200
+    },
+    "rfqsAvailable": {
+      "status": 200
+    },
+    "overview2": {
+      "status": 401
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "stats": 200,
+      "activities": 200,
+      "pending": 200,
+      "status": 200,
+      "trend": 200
+    },
+    "pool": {
+      "status": 200,
+      "total": 21,
+      "items": 10
+    },
+    "filterPublished": {
+      "status": 200,
+      "total": 6
+    },
+    "poolDetail": {
+      "status": 200,
+      "id": "59117fcc-98fc-45be-b7a8-5c8313a5a5e1"
+    },
+    "files": 200,
+    "content": 200,
+    "knowledgeDomains": 200,
+    "analytics": 200,
+    "monitoring": 200,
+    "audit": 200
+  },
+  "loop": {
+    "demands": {
+      "status": 200
+    },
+    "matches": {
+      "status": 404,
+      "count": null
+    },
+    "rfqs": {
+      "status": 200
+    },
+    "notifications": {
+      "status": 200
+    }
+  }
+}

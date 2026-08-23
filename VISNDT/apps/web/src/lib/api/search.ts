@@ -48,6 +48,40 @@ export interface SupplierDiscoveryItem {
   productNames: string[];
 }
 
+/** Capability (Platform Product = Capability Authority) projection in a supplier-product result */
+export interface SupplierProductCapability {
+  id: string;
+  name: string;
+  slug: string | null;
+  categoryId: string | null;
+}
+
+/** SupplierProduct projection (recall: Product = Capability Authority) */
+export interface SupplierProductDiscoveryItem {
+  capability: SupplierProductCapability | null;
+  supplierProduct: {
+    id: string;
+    brand: string;
+    series: string | null;
+    modelNumber: string;
+    slug: string | null;
+    status: string;
+    platformProductId: string;
+    organization: {
+      id: string;
+      name: string;
+    } | null;
+  };
+  commercialSummary: {
+    offerCount: number;
+    activeOfferCount: number;
+    priceFrom: number | null;
+    priceTo: number | null;
+    currency: string | null;
+  };
+  inquiryAvailable: boolean;
+}
+
 /** Per-entity search group */
 export interface EntitySearchGroup<T> {
   items: T[];
@@ -58,10 +92,17 @@ export interface EntitySearchGroup<T> {
 export interface UnifiedDiscoveryResponse {
   query: string;
   products: EntitySearchGroup<ProductDiscoveryItem>;
+  supplierProducts: EntitySearchGroup<SupplierProductDiscoveryItem>;
   knowledge: EntitySearchGroup<KnowledgeDiscoveryItem>;
   content: EntitySearchGroup<ContentDiscoveryItem>;
   solutions: EntitySearchGroup<ContentDiscoveryItem>;
   suppliers: EntitySearchGroup<SupplierDiscoveryItem>;
+  /**
+   * M28.0 M661.6 — SupplierProduct dimension facet bundle served directly by
+   * the unified `/search` response (pagination-independent). SearchPage only
+   * consumes `/search` and never the legacy `/search/supplier-models` endpoint.
+   */
+  supplierProductFacets?: SupplierProductFacetBundle;
 }
 
 // ============================================
@@ -123,6 +164,10 @@ export async function searchUnified(params: {
   pageSize?: number;
   category?: string;
   filters?: Record<string, string[]>;
+  /** M28.0 M661.5 — SupplierProduct dimension facet inputs (brand / series / hasOffer) */
+  brand?: string;
+  series?: string;
+  hasOffer?: boolean;
 }): Promise<UnifiedDiscoveryResponse> {
   const queryParams: Record<string, string | number | undefined> = {
     q: params.q,
@@ -130,6 +175,9 @@ export async function searchUnified(params: {
     pageSize: params.pageSize,
     category: params.category || undefined,
     filters: encodeProductFilters(params.filters),
+    brand: params.brand || undefined,
+    series: params.series || undefined,
+    hasOffer: params.hasOffer ? 'true' : undefined,
   };
 
   // Backend returns the unified discovery payload directly (no `{ data }` wrapper),
@@ -165,5 +213,138 @@ export async function getSearchContext(q: string): Promise<SearchContextResponse
   // Backend returns the search context payload directly (no `{ data }` wrapper).
   return apiClient<SearchContextResponse>('/search/context', {
     params: { q },
+  });
+}
+
+// ============================================
+// Supplier Model Facet Search — M28.0 M661.4
+// ============================================
+
+/** Capability (Platform Product) context in a supplier model result */
+export interface SupplierModelSearchCapabilityItem {
+  id: string;
+  name: string;
+  slug?: string | null;
+  categoryId?: string | null;
+}
+
+/** SupplierProduct projection (recall: Product = Capability Authority) */
+export interface SupplierModelSearchSupplierProductItem {
+  id: string;
+  brand: string;
+  series?: string | null;
+  modelNumber: string;
+  slug?: string | null;
+  status: string;
+  platformProductId: string;
+}
+
+/** Facet summary for a supplier model result */
+export interface SupplierModelSearchFacetSummary {
+  parameterCount: number;
+  primaryCategoryName?: string | null;
+}
+
+/** Commercial layer summary (Offer = Commercial Layer, summary only) */
+export interface SupplierModelSearchCommercialSummary {
+  offerCount: number;
+  activeOfferCount: number;
+  priceFrom?: number | null;
+  priceTo?: number | null;
+  currency?: string | null;
+}
+
+/** A single facet option */
+export interface SupplierModelFacetOption {
+  value: string;
+  label: string;
+  count: number;
+}
+
+/** A parameter-level facet with aggregated values */
+export interface SupplierModelParameterFacet {
+  parameterId: string;
+  parameterName: string;
+  parameterKey: string;
+  unit?: string | null;
+  values: SupplierModelFacetOption[];
+}
+
+/** Commercial availability facet */
+export interface SupplierModelCommercialFacet {
+  hasActiveOffer: number;
+  inquiryAvailable: number;
+}
+
+/** Aggregated facet bundle */
+export interface SupplierModelFacetBundle {
+  capabilities: SupplierModelFacetOption[];
+  brands: SupplierModelFacetOption[];
+  series: SupplierModelFacetOption[];
+  parameters: SupplierModelParameterFacet[];
+  commercial: SupplierModelCommercialFacet;
+}
+
+/**
+ * SupplierProduct dimension facet bundle — M28.0 M661.6.
+ *
+ * Served directly by the unified `/search` response (pagination-independent).
+ * Brand / series / commercial availability only; capability + technical
+ * parameter facets come from Search Context (shared ParameterFacet).
+ */
+export interface SupplierProductFacetBundle {
+  brands: SupplierModelFacetOption[];
+  series: SupplierModelFacetOption[];
+  commercial: SupplierModelCommercialFacet;
+}
+
+/** A single supplier model discovery result */
+export interface SupplierModelSearchResultItem {
+  capability: SupplierModelSearchCapabilityItem;
+  supplierProduct: SupplierModelSearchSupplierProductItem;
+  facetSummary: SupplierModelSearchFacetSummary;
+  commercialSummary: SupplierModelSearchCommercialSummary;
+  inquiryAvailable: boolean;
+}
+
+/** Supplier model facet search response */
+export interface SupplierModelFacetSearchResponse {
+  query: string;
+  items: SupplierModelSearchResultItem[];
+  total: number;
+  facets: SupplierModelFacetBundle;
+}
+
+/** Supplier model facet search params */
+export interface SupplierModelFacetSearchParams {
+  q?: string;
+  categoryId?: string;
+  brand?: string;
+  series?: string;
+  hasOffer?: boolean;
+  filters?: Record<string, string[]>;
+  page?: number;
+  pageSize?: number;
+}
+
+/**
+ * Execute supplier model facet search via GET /search/supplier-models.
+ * Only PUBLISHED SupplierProduct is indexed server-side.
+ */
+export async function searchSupplierModels(
+  params: SupplierModelFacetSearchParams,
+): Promise<SupplierModelFacetSearchResponse> {
+  const filters = encodeProductFilters(params.filters);
+  return apiClient<SupplierModelFacetSearchResponse>('/search/supplier-models', {
+    params: {
+      q: params.q || undefined,
+      categoryId: params.categoryId || undefined,
+      brand: params.brand || undefined,
+      series: params.series || undefined,
+      hasOffer: params.hasOffer ? 'true' : undefined,
+      filters,
+      page: params.page,
+      pageSize: params.pageSize,
+    },
   });
 }

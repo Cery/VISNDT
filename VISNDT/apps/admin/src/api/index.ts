@@ -10,6 +10,7 @@ export { rfqService } from './rfq.service';
 export { rfqResponseService } from './rfq-response.service';
 export { matchService } from './match.service';
 export { offerService } from './offer.service';
+export { supplierProductService } from './supplier-product.service';
 export { inquiryService } from './inquiry.service';
 export { parameterGroupService } from './parameter-group.service';
 export { parameterDefinitionService } from './parameter-definition.service';

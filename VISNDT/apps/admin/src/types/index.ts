@@ -89,6 +89,16 @@ export type {
   OfferDetail,
 } from './offer.types';
 export type {
+  SupplierProduct,
+  SupplierProductStatus,
+  SupplierProductListResponse,
+  SupplierProductDetail,
+  SupplierProductMedia,
+  SupplierProductParameterValue,
+  SupplierProductPlatformProduct,
+  SupplierProductOrganization,
+} from './supplier-product.types';
+export type {
   Inquiry,
   InquiryStatus,
   InquiryListResponse,

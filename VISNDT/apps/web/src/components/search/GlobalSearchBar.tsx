@@ -8,6 +8,7 @@ import SearchSuggestionDropdown from '@/components/search/SearchSuggestionDropdo
 const SEARCH_DOMAINS: { value: SearchDomain; label: string }[] = [
   { value: 'all', label: '全部' },
   { value: 'product', label: '产品' },
+  { value: 'supplier-product', label: '供应商型号' },
   { value: 'knowledge', label: '知识' },
   { value: 'solution', label: '方案' },
   { value: 'supplier', label: '供应商' },

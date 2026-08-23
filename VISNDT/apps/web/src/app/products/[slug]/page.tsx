@@ -1,4 +1,5 @@
 import { getProduct, getProductRelatedKnowledge, getProductRelatedProducts } from '@/services/product.service';
+import { getCapabilityDetail } from '@/services/capability.service';
 import { getContentList } from '@/services/content.service';
 import { getParameterGroups } from '@/services/parameter-group.service';
 import ProductDetailContent from '@/components/products/ProductDetailContent';
@@ -12,6 +13,7 @@ import TrackOnMount from '@/components/analytics/TrackOnMount';
 import type { RelatedKnowledgeItem } from '@/types/knowledge-base';
 import type { Product } from '@/types/product';
 import type { Content } from '@/types/content';
+import type { CapabilitySupplierProductWithOffers } from '@/types/capability';
 
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -99,6 +101,17 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     relatedSolutions = [];
   }
 
+  // Load public Capability Discovery (published Supplier Models + commercial summary).
+  // Backend enforces SupplierProduct.status = PUBLISHED only.
+  let supplierModels: CapabilitySupplierProductWithOffers[] = [];
+  try {
+    const capability = await getCapabilityDetail(product.id);
+    supplierModels = capability.supplierProducts ?? [];
+  } catch {
+    // Capability discovery failure must not block product detail — degrade to empty.
+    supplierModels = [];
+  }
+
   // Build structured data
   const productUrl = absoluteUrl(`/products/${slug}`);
   const productJsonLd = buildProductJsonLd({
@@ -173,6 +186,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             relatedKnowledge={relatedKnowledge}
             relatedProducts={relatedProducts}
             relatedSolutions={relatedSolutions}
+            supplierModels={supplierModels}
           />
         </div>
       </div>

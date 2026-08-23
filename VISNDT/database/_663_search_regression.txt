@@ -1,0 +1,4 @@
+=== 663 Regression: Unified Search (FROZEN) ===
+supplierProducts total=6
+status dist: {"PUBLISHED":6}  (expect only PUBLISHED)
+facets brands=3

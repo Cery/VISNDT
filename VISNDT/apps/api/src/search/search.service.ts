@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { ContentStatus, ContentType, KnowledgeEntryStatus } from '@prisma/client';
+import { ContentStatus, ContentType, KnowledgeEntryStatus, SupplierProductStatus } from '@prisma/client';
 
 // ============================================
 // Unified Search Service — M22.4.1 Unified Search Foundation
@@ -62,6 +62,39 @@ interface SupplierDiscoveryItem {
   productNames: string[];
 }
 
+/**
+ * SupplierProduct discovery item — M28.0 M661.5 Unified Discovery Consolidation.
+ *
+ * Capability-centric DTO projection (Product = Capability Authority).
+ * Only PUBLISHED SupplierProduct ever enters search (published boundary).
+ * Result shape: Capability + SupplierProduct + Commercial Summary + Inquiry.
+ */
+interface SupplierProductDiscoveryItem {
+  capability: {
+    id: string;
+    name: string;
+    slug: string | null;
+    categoryId: string | null;
+  } | null;
+  supplierProduct: {
+    id: string;
+    brand: string;
+    series: string | null;
+    modelNumber: string;
+    slug: string | null;
+    status: string;
+    platformProductId: string;
+  };
+  commercialSummary: {
+    offerCount: number;
+    activeOfferCount: number;
+    priceFrom: number | null;
+    priceTo: number | null;
+    currency: string | null;
+  };
+  inquiryAvailable: boolean;
+}
+
 /** Per-entity search result group */
 interface EntitySearchGroup<T> {
   items: T[];
@@ -72,6 +105,7 @@ interface EntitySearchGroup<T> {
 export interface UnifiedDiscoveryResponse {
   query: string;
   products: EntitySearchGroup<ProductDiscoveryItem>;
+  supplierProducts: EntitySearchGroup<SupplierProductDiscoveryItem>;
   knowledge: EntitySearchGroup<KnowledgeDiscoveryItem>;
   content: EntitySearchGroup<ContentDiscoveryItem>;
   solutions: EntitySearchGroup<ContentDiscoveryItem>;
@@ -103,12 +137,25 @@ export class SearchService {
     pageSize: number = 10,
     category?: string,
     filters?: string,
+    brand?: string,
+    series?: string,
+    hasActiveOffer?: boolean,
   ): Promise<UnifiedDiscoveryResponse> {
     const skip = (page - 1) * pageSize;
     const productFilters = this.parseFilters(filters);
 
-    const [products, knowledge, content, solutions, suppliers] = await Promise.all([
+    const [products, supplierProducts, knowledge, content, solutions, suppliers] = await Promise.all([
       this.searchProducts(query, skip, pageSize, category, productFilters),
+      this.searchSupplierProducts(
+        query,
+        skip,
+        pageSize,
+        category,
+        productFilters,
+        brand,
+        series,
+        hasActiveOffer,
+      ),
       this.searchKnowledgeEntries(query, skip, pageSize),
       this.searchContent(query, [ContentType.ARTICLE, ContentType.INSIGHT], skip, pageSize),
       this.searchContent(query, [ContentType.SOLUTION], skip, pageSize),
@@ -116,10 +163,18 @@ export class SearchService {
     ]);
 
     this.logger.log(
-      `Unified search "${query}": products=${products.total}, knowledge=${knowledge.total}, content=${content.total}, solutions=${solutions.total}, suppliers=${suppliers.total}`,
+      `Unified search "${query}": products=${products.total}, supplierProducts=${supplierProducts.total}, knowledge=${knowledge.total}, content=${content.total}, solutions=${solutions.total}, suppliers=${suppliers.total}`,
     );
 
-    return { query, products, knowledge, content, solutions, suppliers };
+    return {
+      query,
+      products,
+      supplierProducts,
+      knowledge,
+      content,
+      solutions,
+      suppliers,
+    };
   }
 
   // ============================================
@@ -207,6 +262,167 @@ export class SearchService {
     ]);
 
     return { items, total };
+  }
+
+  // ============================================
+  // SupplierProduct Search Adapter (M28.0 M661.5)
+  // ============================================
+
+  /**
+   * SupplierProduct search dimension integrated into the unified `/search`.
+   *
+   * Consolidation of 661.4 SupplierProduct search into the single unified
+   * discovery model. Search = Discovery Acceleration Layer, NOT Business
+   * Authority; Platform Product remains the Capability Authority.
+   *
+   * Published Boundary: only SupplierProductStatus.PUBLISHED ever enters search.
+   * Result Projection: Capability + SupplierProduct + Commercial Summary + Inquiry.
+   * Results are DTO projections — no raw Prisma relation is returned.
+   */
+  private async searchSupplierProducts(
+    keyword: string,
+    skip: number,
+    take: number,
+    category?: string,
+    filters: ProductFilter[] = [],
+    brand?: string,
+    series?: string,
+    hasActiveOffer?: boolean,
+  ): Promise<EntitySearchGroup<SupplierProductDiscoveryItem>> {
+    const ands: Record<string, unknown>[] = [];
+
+    // ─── Published boundary (M661.5 §5.1) ───
+    ands.push({ status: SupplierProductStatus.PUBLISHED });
+
+    // Keyword matches Capability (platform product) OR Supplier Model identity.
+    if (keyword) {
+      ands.push({
+        OR: [
+          { brand: { contains: keyword, mode: 'insensitive' as const } },
+          { series: { contains: keyword, mode: 'insensitive' as const } },
+          { modelNumber: { contains: keyword, mode: 'insensitive' as const } },
+          {
+            platformProduct: {
+              OR: [
+                { name: { contains: keyword, mode: 'insensitive' as const } },
+                { model: { contains: keyword, mode: 'insensitive' as const } },
+                { description: { contains: keyword, mode: 'insensitive' as const } },
+              ],
+            },
+          },
+        ],
+      });
+    }
+
+    // Capability facet (Product = Capability Authority).
+    if (category) {
+      ands.push({ platformProduct: { categoryId: category } });
+    }
+
+    // Supplier Model facet (brand / series).
+    if (brand) {
+      ands.push({ brand: { contains: brand, mode: 'insensitive' as const } });
+    }
+    if (series) {
+      ands.push({ series: { contains: series, mode: 'insensitive' as const } });
+    }
+
+    // Commercial availability facet: Has Active Offer.
+    if (hasActiveOffer === true) {
+      ands.push({ offers: { some: { status: 'ACTIVE' } } });
+    }
+
+    // Technical parameter facet: one AND per parameter, OR within values.
+    for (const f of filters) {
+      ands.push({
+        parameterValues: {
+          some: {
+            parameterDefinitionId: f.parameterId,
+            value: { in: f.values },
+          },
+        },
+      });
+    }
+
+    const where = ands.length === 1 ? ands[0] : { AND: ands };
+
+    const [items, total] = await Promise.all([
+      this.prisma.supplierProduct.findMany({
+        where,
+        skip,
+        take,
+        orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }, { id: 'asc' }],
+        select: {
+          id: true,
+          brand: true,
+          series: true,
+          modelNumber: true,
+          slug: true,
+          status: true,
+          platformProductId: true,
+          platformProduct: {
+            select: { id: true, name: true, slug: true, categoryId: true },
+          },
+          offers: {
+            select: { id: true, status: true, price: true, currency: true },
+          },
+          organization: {
+            select: { id: true, name: true },
+          },
+        },
+      }),
+      this.prisma.supplierProduct.count({ where }),
+    ]);
+
+    const projected: SupplierProductDiscoveryItem[] = items.map((sp) => {
+      const offers = sp.offers ?? [];
+      const activeOffers = offers.filter((o) => o.status === 'ACTIVE');
+      const prices = activeOffers
+        .map((o) => Number(o.price))
+        .filter((p) => Number.isFinite(p) && p > 0)
+        .sort((a, b) => a - b);
+
+      return {
+        capability: sp.platformProduct
+          ? {
+              id: sp.platformProduct.id,
+              name: sp.platformProduct.name,
+              slug: sp.platformProduct.slug,
+              categoryId: sp.platformProduct.categoryId,
+            }
+          : {
+              id: sp.platformProductId,
+              name: '',
+              slug: null,
+              categoryId: null,
+            },
+        supplierProduct: {
+          id: sp.id,
+          brand: sp.brand,
+          series: sp.series,
+          modelNumber: sp.modelNumber,
+          slug: sp.slug,
+          status: sp.status,
+          platformProductId: sp.platformProductId,
+          organization: sp.organization
+            ? { id: sp.organization.id, name: sp.organization.name }
+            : null,
+        },
+        commercialSummary: {
+          offerCount: offers.length,
+          activeOfferCount: activeOffers.length,
+          priceFrom: prices.length > 0 ? prices[0] : null,
+          priceTo: prices.length > 0 ? prices[prices.length - 1] : null,
+          currency:
+            activeOffers.find((o) => o.currency)?.currency ??
+            offers.find((o) => o.currency)?.currency ??
+            null,
+        },
+        inquiryAvailable: true,
+      };
+    });
+
+    return { items: projected, total };
   }
 
   // ============================================

@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNumber, IsEnum } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsUUID } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateOfferDto {
@@ -24,4 +24,13 @@ export class CreateOfferDto {
   @IsOptional()
   @IsString()
   currency?: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Hybrid Model C commercial source. Optional SupplierProduct (supplier model entity) this offer is bound to.',
+    example: 'uuid',
+  })
+  @IsOptional()
+  @IsUUID()
+  supplierProductId?: string;
 }

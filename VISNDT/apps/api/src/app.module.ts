@@ -36,6 +36,8 @@ import { SemanticModule } from './semantic/semantic.module';
 import { AIModule } from './ai/ai.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { SearchModule } from './search/search.module';
+import { SupplierProductsModule } from './supplier-products/supplier-products.module';
+import { DiscoveryModule } from './discovery/discovery.module';
 
 @Module({
   imports: [
@@ -80,6 +82,8 @@ import { SearchModule } from './search/search.module';
     AIModule,
     KnowledgeModule,
     SearchModule,
+    SupplierProductsModule,
+    DiscoveryModule,
   ],
   providers: [
     {

@@ -76,12 +76,15 @@ export class DiscoveryAnalyticsService {
           metadata: {
             searchEventId,
             products: resultCounts.products,
+            // M28.0 M661.6 — SupplierProduct dimension in unified analytics
+            supplierProducts: resultCounts.supplierProducts,
             knowledge: resultCounts.knowledge,
             content: resultCounts.content,
             solutions: resultCounts.solutions,
             suppliers: resultCounts.suppliers,
             total:
               resultCounts.products +
+              resultCounts.supplierProducts +
               resultCounts.knowledge +
               resultCounts.content +
               resultCounts.solutions +
@@ -165,6 +168,8 @@ export class DiscoveryAnalyticsService {
    */
   extractResultCounts(result: {
     products?: { total?: number };
+    // M28.0 M661.6 — SupplierProduct dimension in unified result counts
+    supplierProducts?: { total?: number };
     knowledge?: { total?: number };
     content?: { total?: number };
     solutions?: { total?: number };
@@ -172,6 +177,7 @@ export class DiscoveryAnalyticsService {
   }): SearchResultCount {
     return {
       products: result.products?.total ?? 0,
+      supplierProducts: result.supplierProducts?.total ?? 0,
       knowledge: result.knowledge?.total ?? 0,
       content: result.content?.total ?? 0,
       solutions: result.solutions?.total ?? 0,

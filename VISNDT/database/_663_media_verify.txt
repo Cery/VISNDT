@@ -1,0 +1,11 @@
+=== 663 D5 Media Center Runtime Verification ===
+
+1) GET /files → total=1
+   entityType distribution: {"PRODUCT":1}
+
+2) GET /files?entityType=SUPPLIER_PRODUCT → total=0
+
+3) GET /files?entityType=PRODUCT → total=1
+     d4-verify.txt | type=OTHER | org=VISNDT 平台运营中心
+
+4) GET /files?entityType=CONTENT → total=0

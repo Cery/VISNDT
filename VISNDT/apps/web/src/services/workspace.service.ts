@@ -8,6 +8,8 @@ import {
   getSupplierWorkspaceOverview as fetchSupplierWorkspaceOverview,
   getSupplierWorkspaceRfqs as fetchSupplierWorkspaceRfqs,
   getSupplierWorkspaceResponses as fetchSupplierWorkspaceResponses,
+  getSupplierRuntimeProducts as fetchSupplierRuntimeProducts,
+  getSupplierRuntimeInquiryContext as fetchSupplierRuntimeInquiryContext,
 } from '@/lib/api/workspace';
 import type {
   WorkspaceBuyerDemandItem,
@@ -16,6 +18,9 @@ import type {
   WorkspaceSupplierOverview,
   WorkspaceSupplierResponseItem,
   WorkspaceSupplierRfqItem,
+  WorkspaceSupplierProducts,
+  WorkspaceSupplierProductsQuery,
+  WorkspaceSupplierInquiryContext,
 } from '@/lib/api/workspace';
 
 export async function getBuyerWorkspaceOverview(): Promise<WorkspaceBuyerOverview> {
@@ -40,4 +45,16 @@ export async function getSupplierWorkspaceRfqs(): Promise<WorkspaceSupplierRfqIt
 
 export async function getSupplierWorkspaceResponses(): Promise<WorkspaceSupplierResponseItem[]> {
   return fetchSupplierWorkspaceResponses();
+}
+
+export async function getSupplierRuntimeProducts(
+  query?: WorkspaceSupplierProductsQuery,
+): Promise<WorkspaceSupplierProducts> {
+  return fetchSupplierRuntimeProducts(query);
+}
+
+export async function getSupplierRuntimeInquiryContext(
+  supplierProductId: string,
+): Promise<WorkspaceSupplierInquiryContext> {
+  return fetchSupplierRuntimeInquiryContext(supplierProductId);
 }

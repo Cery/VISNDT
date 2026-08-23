@@ -144,6 +144,68 @@ export interface WorkspaceSupplierResponseItem {
   buyerOrganization: WorkspaceSupplierBuyerOrganization;
 }
 
+// ── Supplier Runtime ──────────────────────────────────────────────────────
+// 661.3 M28.0 — read-only Supplier Capability Operation Boundary.
+
+export interface WorkspaceSupplierCommercialSummary {
+  total: number;
+  activeCount: number;
+  minPrice?: number | null;
+  maxPrice?: number | null;
+}
+
+export interface WorkspaceSupplierPlatformProduct {
+  id: string;
+  name: string;
+}
+
+export interface WorkspaceSupplierProductItem {
+  id: string;
+  brand: string;
+  series?: string | null;
+  modelNumber: string;
+  slug?: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt?: string | null;
+  platformProduct: WorkspaceSupplierPlatformProduct;
+  commercialSummary: WorkspaceSupplierCommercialSummary;
+}
+
+export interface WorkspaceSupplierProducts {
+  data: WorkspaceSupplierProductItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface WorkspaceSupplierProductsQuery {
+  page?: number;
+  pageSize?: number;
+  q?: string;
+  status?: string;
+  series?: string;
+}
+
+export interface WorkspaceSupplierInquiryItem {
+  id: string;
+  status?: string | null;
+  contactName?: string | null;
+  message: string;
+  createdAt: string;
+}
+
+export interface WorkspaceSupplierInquiryContext {
+  supplierProductId: string;
+  supplierModelLabel: string;
+  status: string;
+  platformProductId: string;
+  platformProductName: string;
+  inquiries: WorkspaceSupplierInquiryItem[];
+  total: number;
+}
+
 /**
  * Get buyer workspace overview aggregates.
  * GET /workspace/buyer/overview (JWT)
@@ -198,6 +260,33 @@ export async function getSupplierWorkspaceRfqs(): Promise<WorkspaceSupplierRfqIt
 export async function getSupplierWorkspaceResponses(): Promise<WorkspaceSupplierResponseItem[]> {
   const res = await apiClient<ApiResponse<WorkspaceSupplierResponseItem[]>>(
     '/workspace/supplier/responses',
+  );
+  return res.data;
+}
+
+/**
+ * Supplier Runtime — SupplierProduct Overview for the current supplier org.
+ * GET /workspace/supplier/runtime/products (JWT, SUPPLIER)
+ */
+export async function getSupplierRuntimeProducts(
+  query?: WorkspaceSupplierProductsQuery,
+): Promise<WorkspaceSupplierProducts> {
+  const res = await apiClient<ApiResponse<WorkspaceSupplierProducts>>(
+    '/workspace/supplier/runtime/products',
+    { params: query ? { ...query } : undefined },
+  );
+  return res.data;
+}
+
+/**
+ * Supplier Runtime — Buyer Inquiry context for a SupplierProduct (read-only).
+ * GET /workspace/supplier/runtime/products/:id/inquiry-context (JWT, SUPPLIER)
+ */
+export async function getSupplierRuntimeInquiryContext(
+  supplierProductId: string,
+): Promise<WorkspaceSupplierInquiryContext> {
+  const res = await apiClient<ApiResponse<WorkspaceSupplierInquiryContext>>(
+    `/workspace/supplier/runtime/products/${supplierProductId}/inquiry-context`,
   );
   return res.data;
 }

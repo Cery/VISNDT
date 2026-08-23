@@ -6,6 +6,7 @@ import type { ProductTab } from './ProductDetailTabs';
 const NAV_ITEMS: { id: ProductTab; label: string }[] = [
   { id: 'overview', label: '产品概览' },
   { id: 'specifications', label: '技术参数' },
+  { id: 'supplier-models', label: '供应商型号' },
   { id: 'suppliers', label: '供应商' },
   { id: 'documents', label: '文档证书' },
   { id: 'knowledge', label: '相关知识' },
@@ -15,6 +16,7 @@ const NAV_ITEMS: { id: ProductTab; label: string }[] = [
 const ANCHOR_MAP: Record<ProductTab, string> = {
   overview: '#overview',
   specifications: '#specifications',
+  'supplier-models': '#supplier-models',
   suppliers: '#suppliers',
   documents: '#documents',
   knowledge: '#knowledge',

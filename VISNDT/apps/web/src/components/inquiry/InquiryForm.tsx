@@ -13,6 +13,10 @@ interface InquiryFormProps {
   organizationId: string;
   /** 供应商名称（用于展示询价对象） */
   organizationName?: string;
+  /** 可选：特定已上架供应商型号引用（Buyer Interest → Specific Supplier Model Context, M28.0） */
+  supplierProductId?: string;
+  /** 可选：型号展示标签（如 "Acme X9-200"） */
+  supplierModelLabel?: string;
 }
 
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error';
@@ -37,6 +41,8 @@ export default function InquiryForm({
   offerId,
   organizationId,
   organizationName,
+  supplierProductId,
+  supplierModelLabel,
 }: InquiryFormProps) {
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM);
   const [status, setStatus] = useState<FormStatus>('idle');
@@ -64,6 +70,7 @@ export default function InquiryForm({
         email: formData.email,
         phone: formData.phone || undefined,
         message: formData.message,
+        supplierProductId: supplierProductId || undefined,
       });
 
       setResult(res);
@@ -152,6 +159,16 @@ export default function InquiryForm({
           ? `请填写以下信息，${organizationName} 将为您提供 ${productName} 的技术方案与报价建议。`
           : `请填写以下信息，我们将为您提供 ${productName} 的技术方案与报价建议。`}
       </p>
+
+      {/* Supplier Model Context — shown only when a specific published model is referenced */}
+      {supplierModelLabel && (
+        <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+          您的咨询已关联供应商型号：{' '}
+          <span className="font-mono font-medium text-slate-800">
+            {supplierModelLabel}
+          </span>
+        </div>
+      )}
 
       {/* Error Banner */}
       {status === 'error' && (
