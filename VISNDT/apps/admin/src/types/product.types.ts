@@ -43,6 +43,7 @@ export interface ProductParameterValue {
     code: string;
     dataType: string;
     unit?: string;
+    options?: Array<{ value: string; label: string }>;
   };
 }
 

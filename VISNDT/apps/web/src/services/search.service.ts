@@ -14,7 +14,6 @@ import type {
   ProductDiscoveryItem,
   KnowledgeDiscoveryItem,
   ContentDiscoveryItem,
-  SupplierDiscoveryItem,
   SupplierProductDiscoveryItem,
   SupplierModelFacetSearchParams,
   SupplierModelFacetSearchResponse,
@@ -29,7 +28,6 @@ export type SearchDomain =
   | 'product'
   | 'knowledge'
   | 'solution'
-  | 'supplier'
   | 'supplier-product';
 
 /** Unified search params */
@@ -51,16 +49,6 @@ export interface DomainSearchResult<T> {
   items: T[];
   total: number;
   searched: boolean;
-}
-
-/** Supplier result derived from aggregated offers */
-export interface SupplierSearchResult {
-  organizationId: string;
-  organizationName: string;
-  organizationType: string;
-  offerCapabilities: string[];
-  offerCount: number;
-  matchingOfferIds: string[];
 }
 
 /** SupplierProduct (published supplier model) discovery result — capability-centric */
@@ -102,7 +90,6 @@ export interface UnifiedSearchResults {
   supplierProducts: DomainSearchResult<SupplierProductSearchResult>;
   knowledge: DomainSearchResult<Content>;
   solutions: DomainSearchResult<Content>;
-  suppliers: DomainSearchResult<SupplierSearchResult>;
   /** M28.0 M661.6 — SupplierProduct dimension facets from unified /search */
   supplierProductFacets?: SupplierProductFacetBundle;
 }
@@ -170,18 +157,6 @@ function mapContent(item: ContentDiscoveryItem): Content {
     createdAt: '',
     updatedAt: '',
   } as Content;
-}
-
-/** Map backend SupplierDiscoveryItem to frontend SupplierSearchResult */
-function mapSupplier(item: SupplierDiscoveryItem): SupplierSearchResult {
-  return {
-    organizationId: item.organizationId,
-    organizationName: item.organizationName,
-    organizationType: '',
-    offerCapabilities: item.offerTitles,
-    offerCount: item.offerCount,
-    matchingOfferIds: [],
-  };
 }
 
 /** Map backend SupplierProductDiscoveryItem to frontend SupplierProductSearchResult */
@@ -253,11 +228,6 @@ export async function unifiedSearch(
     solutions: {
       items: response.solutions.items.map(mapContent),
       total: response.solutions.total,
-      searched: true,
-    },
-    suppliers: {
-      items: response.suppliers.items.map(mapSupplier),
-      total: response.suppliers.total,
       searched: true,
     },
     // M28.0 M661.6 — pass through the SupplierProduct dimension facet bundle

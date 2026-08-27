@@ -43,13 +43,24 @@ export class OffersService {
       where.organizationId = organizationId;
     }
 
+    // Projection extension (713/M30.5): surface the Offer ↔ SupplierProduct
+    // binding so frontends can render Capability / Capability Model / Provider.
+    const offerInclude: Prisma.OfferInclude = {
+      organization: true,
+      product: true,
+      supplierProduct: {
+        include: { platformProduct: true, organization: true },
+      },
+      createdByUser: { select: { id: true, email: true, name: true } },
+    };
+
     const [data, total] = await Promise.all([
       this.prisma.offer.findMany({
         where,
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
-        include: { organization: true, product: true, createdByUser: { select: { id: true, email: true, name: true } } },
+        include: offerInclude,
       }),
       this.prisma.offer.count({ where }),
     ]);
@@ -57,12 +68,35 @@ export class OffersService {
     return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
   }
 
-  async findOne(id: string) {
+  async findOne(
+    id: string,
+    user?: { id: string; organizationId?: string | null; organizationMember?: { role: string } | null },
+  ) {
     const offer = await this.prisma.offer.findUnique({
       where: { id },
-      include: { organization: true, product: true, createdByUser: { select: { id: true, email: true, name: true } } },
+      include: {
+        organization: true,
+        product: true,
+        supplierProduct: {
+          include: { platformProduct: true, organization: true },
+        },
+        createdByUser: { select: { id: true, email: true, name: true } },
+      },
     });
     if (!offer) throw new NotFoundException(`Offer ${id} not found`);
+
+    // M31.1 role-boundary hardening: offer detail (commercial data) is only
+    // readable by the owning organization or an ADMIN. Foreign orgs / guests
+    // are denied with 404 (no existence leak). Public capability discovery
+    // continues via the public offer list (findAll), not the detail.
+    if (user) {
+      const isAdmin = user.organizationMember?.role === 'ADMIN';
+      const isOwner = Boolean(user.organizationId) && offer.organizationId === user.organizationId;
+      if (!isAdmin && !isOwner) {
+        throw new NotFoundException(`Offer ${id} not found`);
+      }
+    }
+
     return offer;
   }
 

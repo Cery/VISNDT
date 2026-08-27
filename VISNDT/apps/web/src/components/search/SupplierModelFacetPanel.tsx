@@ -85,7 +85,7 @@ export default function SupplierModelFacetPanel({
   return (
     <div className="bg-white border border-slate-200 rounded-xl p-4">
       <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-slate-700">供应商型号筛选</h3>
+        <h3 className="text-sm font-semibold text-slate-700">能力型号筛选</h3>
         {hasActive && (
           <button
             type="button"

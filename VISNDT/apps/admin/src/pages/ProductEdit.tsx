@@ -26,7 +26,7 @@ export default function ProductEdit() {
       const data = await productService.getById(id);
       setPageState({ status: 'ready', data });
     } catch (err) {
-      const message = err instanceof Error ? err.message : '加载产品失败';
+      const message = err instanceof Error ? err.message : '加载能力失败';
       setPageState({ status: 'error', message });
     }
   }, [id]);
@@ -59,7 +59,7 @@ export default function ProductEdit() {
     return (
       <Alert
         type="error"
-        message="加载产品失败"
+        message="加载能力失败"
         description={pageState.message}
         showIcon
         action={
@@ -87,17 +87,17 @@ export default function ProductEdit() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>Edit Capability</Title>
+          <Title level={4} style={{ margin: 0 }}>编辑能力</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          Update product capability information and parameters
+          更新能力信息与参数
         </Text>
       </div>
       <ProductForm
         initialValues={initialValues}
         onSubmit={handleSubmit}
-        submitLabel="更新产品"
-        title="编辑产品"
+        submitLabel="更新能力"
+        title="编辑能力"
         productId={id}
       />
     </div>

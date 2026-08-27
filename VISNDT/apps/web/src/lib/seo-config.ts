@@ -23,7 +23,7 @@ import {
 export const SEO_CONFIG = {
   siteName: SITE_NAME,
   siteUrl: SITE_URL,
-  defaultTitle: `${SITE_NAME} – 工业检测设备平台`,
+  defaultTitle: `${SITE_NAME} – 工业检测能力发现平台`,
   defaultDescription: SITE_DESCRIPTION,
   defaultKeywords: SITE_KEYWORDS,
 };

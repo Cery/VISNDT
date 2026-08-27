@@ -67,13 +67,13 @@ export default function SupplierModelsSection({
       <section id="supplier-models">
         <CapabilitySection
           eyebrow="Supplier Models"
-          title="供应商型号"
-          subtitle="已上架并通过审核的供应商型号"
+          title="能力型号"
+          subtitle="已上架并通过审核的能力型号"
         >
           <EmptyState
             icon="document"
-            message="暂无已上架供应商型号"
-            description="该平台产品尚未有已发布的供应商型号公开上架。"
+            message="暂无已上架能力型号"
+            description="该平台产品尚未有已发布的能力型号公开上架。"
           />
         </CapabilitySection>
       </section>
@@ -84,8 +84,8 @@ export default function SupplierModelsSection({
     <section id="supplier-models">
       <CapabilitySection
         eyebrow="Supplier Models"
-        title="供应商型号"
-        subtitle="已上架并通过审核（Approved Supplier Model）的公开供应商型号、商业可购与询价入口"
+        title="能力型号"
+        subtitle="已上架并通过审核（Approved Supplier Model）的公开能力型号、商业可购与询价入口"
       >
         <div className="divide-y divide-slate-100 rounded-xl border border-slate-200/80 shadow-industrial-sm bg-white">
           {models.map(({ supplierProduct, offers }) => {
@@ -258,7 +258,7 @@ export default function SupplierModelsSection({
                   <div className="mt-5 rounded-lg border border-slate-200/80 bg-slate-50/60 p-4">
                     <div className="mb-3">
                       <p className="text-sm font-medium text-slate-800">
-                        咨询供应商型号
+                        咨询能力型号
                       </p>
                       <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
                         <span>
@@ -293,7 +293,7 @@ export default function SupplierModelsSection({
         </div>
 
         <p className="mt-3 text-xs text-slate-400">
-          勾选 2–7 个供应商型号，比较技术参数与商业信息（同一检测能力下）。
+          勾选 2–7 个能力型号，比较技术参数与商业信息（同一检测能力下）。
         </p>
       </CapabilitySection>
 

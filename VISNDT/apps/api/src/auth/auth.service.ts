@@ -247,15 +247,26 @@ export class AuthService {
       return null;
     }
 
+    const normalized = organizationType.trim().toUpperCase();
+
     if (
-      organizationType === 'SUPPLIER' ||
-      organizationType === 'MANUFACTURER' ||
-      organizationType === 'DISTRIBUTOR'
+      normalized === 'SUPPLIER' ||
+      normalized === 'MANUFACTURER' ||
+      normalized === 'DISTRIBUTOR'
     ) {
       return 'SUPPLIER';
     }
 
-    if (organizationType === 'BUYER') {
+    if (normalized === 'BUYER') {
+      return 'BUYER';
+    }
+
+    // 兼容历史/脏数据里的中文组织类型，避免供应商/采购方被误判为无角色
+    if (['供应商', '制造商', '经销商', '生产商'].includes(organizationType)) {
+      return 'SUPPLIER';
+    }
+
+    if (['采购方', '采购商', '买方'].includes(organizationType)) {
       return 'BUYER';
     }
 

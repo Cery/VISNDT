@@ -1,8 +1,8 @@
 /**
  * Shared search utility functions.
  *
- * Used by ProductResultCard, KnowledgeResultCard, SolutionResultCard,
- * and SupplierResultCard for consistent keyword highlighting and date formatting.
+ * Used by ProductResultCard, KnowledgeResultCard, and SolutionResultCard
+ * for consistent keyword highlighting and date formatting.
  */
 
 /**

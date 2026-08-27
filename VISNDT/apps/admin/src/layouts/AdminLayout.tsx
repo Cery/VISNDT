@@ -36,7 +36,7 @@ const { Header, Sider, Content } = Layout;
 // Sectioned Menu Configuration — Operational IA
 // ============================================
 // 目标结构（M26.3 Extension + 663 Optimization）：
-// 首页 / 产品中心 / 业务中心 / 用户与供应商 / 内容中心 / 媒体中心 / 数据与分析 / 系统管理
+// 首页 / 能力中心 / 业务中心 / 用户与供应商 / 内容中心 / 媒体中心 / 数据与分析 / 系统管理
 // 媒体中心：恢复一级入口（663 D5），页面基于既有 FileAsset entityType/entityId 归属展示。
 type MenuGroup = 'home' | 'product' | 'business' | 'permission' | 'content' | 'media' | 'data' | 'system';
 
@@ -49,11 +49,11 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
     ],
   },
   product: {
-    label: '产品中心',
+    label: '能力中心',
     items: [
-      { key: '/products', icon: <AppstoreOutlined />, label: '产品管理' },
-      { key: '/supplier-products', icon: <ExperimentOutlined />, label: '供应商型号审核' },
-      { key: '/product-categories', icon: <TagsOutlined />, label: '产品分类' },
+      { key: '/products', icon: <AppstoreOutlined />, label: '能力管理' },
+      { key: '/supplier-products', icon: <ExperimentOutlined />, label: '能力型号审核' },
+      { key: '/product-categories', icon: <TagsOutlined />, label: '能力分类' },
       {
         key: 'parameters',
         icon: <SettingOutlined />,
@@ -71,7 +71,7 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
       { key: '/demands', icon: <FileTextOutlined />, label: '需求管理' },
       { key: '/rfqs', icon: <SnippetsOutlined />, label: 'RFQ 管理' },
       { key: '/offers', icon: <TagsOutlined />, label: '报价管理' },
-      { key: '/inquiries', icon: <MailOutlined />, label: '产品询价' },
+      { key: '/inquiries', icon: <MailOutlined />, label: '能力询价' },
       { key: '/matching', icon: <NodeIndexOutlined />, label: '匹配管理' },
     ],
   },
@@ -131,15 +131,15 @@ const breadcrumbMap: Record<string, string> = {
   '/business-analytics': '业务分析',
   '/monitoring': '运营监控',
   '/audit-intelligence': '审计智能',
-  '/products': '产品管理',
-  '/product-categories': '产品分类',
+  '/products': '能力管理',
+  '/product-categories': '能力分类',
   '/content': '内容管理',
   '/content/tags': '标签管理',
-  '/inquiries': '产品询价',
+  '/inquiries': '能力询价',
   '/demands': '需求管理',
   '/rfqs': 'RFQ 管理',
   '/offers': '报价管理',
-  '/supplier-products': '供应商型号审核',
+  '/supplier-products': '能力型号审核',
   '/matching': '匹配管理',
   '/users': '用户管理',
   '/organizations': '企业管理',

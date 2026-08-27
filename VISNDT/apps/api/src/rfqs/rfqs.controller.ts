@@ -77,10 +77,15 @@ export class RfqsController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get RFQ by ID' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get RFQ by ID (authenticated, role-scoped projection)' })
   @ApiParam({ name: 'id', description: 'RFQ UUID' })
-  async findOne(@Param('id') id: string) {
-    return ApiResponse.ok(await this.service.findOne(id));
+  async findOne(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.findOne(id, user));
   }
 
   @Post()

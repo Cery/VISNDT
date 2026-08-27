@@ -218,6 +218,47 @@ function OfferEditContent() {
           </div>
         </section>
 
+        {/* Capability Binding (Offer ↔ SupplierProduct ↔ Provider) */}
+        {offer.product || offer.supplierProduct ? (
+          <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-900">报价对象</h2>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-lg bg-slate-50 p-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">能力</p>
+                <p className="mt-1 text-sm font-medium text-slate-900">
+                  {offer.product?.name || offer.productId}
+                </p>
+              </div>
+              <div className="rounded-lg bg-slate-50 p-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">能力型号</p>
+                <p className="mt-1 text-sm font-medium text-slate-900">
+                  {offer.supplierProduct
+                    ? `${offer.supplierProduct.brand} ${offer.supplierProduct.modelNumber}${
+                        offer.supplierProduct.series ? ` · ${offer.supplierProduct.series}` : ''
+                      }`
+                    : '未绑定能力型号'}
+                </p>
+              </div>
+              <div className="rounded-lg bg-slate-50 p-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">能力提供商</p>
+                <p className="mt-1 text-sm font-medium text-slate-900">
+                  {offer.supplierProduct?.organization?.name ||
+                    offer.organization?.name ||
+                    '未命名组织'}
+                </p>
+              </div>
+              <div className="rounded-lg bg-slate-50 p-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">报价</p>
+                <p className="mt-1 text-sm font-medium text-slate-900">
+                  {offer.price != null
+                    ? `${offer.currency ?? 'CNY'} ${Number(offer.price).toLocaleString()}`
+                    : '—'}
+                </p>
+              </div>
+            </div>
+          </section>
+        ) : null}
+
         {/* Edit Form */}
         <form onSubmit={handleSave} className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
           <h2 className="text-lg font-semibold text-slate-900">报价信息</h2>

@@ -10,12 +10,18 @@ import {
   deleteDemand as apiDeleteDemand,
   publishDemand as apiPublishDemand,
   closeDemand as apiCloseDemand,
+  getDemandParameters as apiGetDemandParameters,
+  addDemandParameter as apiAddDemandParameter,
+  updateDemandParameter as apiUpdateDemandParameter,
+  deleteDemandParameter as apiDeleteDemandParameter,
 } from '@/lib/api/demands';
 import type { PaginatedResponse } from '@/types/api';
 import type {
   CreateDemandParams,
   DemandItem,
   DemandDetailItem,
+  DemandParameter,
+  UpsertDemandParameterParams,
 } from '@/lib/api/demands';
 
 export async function getDemands(
@@ -53,3 +59,31 @@ export async function closeDemand(id: string): Promise<DemandDetailItem> {
 }
 
 export { getDemandMatches };
+
+export async function getDemandParameters(
+  demandId: string,
+): Promise<DemandParameter[]> {
+  return apiGetDemandParameters(demandId);
+}
+
+export async function addDemandParameter(
+  demandId: string,
+  params: UpsertDemandParameterParams,
+): Promise<DemandParameter> {
+  return apiAddDemandParameter(demandId, params);
+}
+
+export async function updateDemandParameter(
+  demandId: string,
+  paramId: string,
+  params: Partial<UpsertDemandParameterParams>,
+): Promise<DemandParameter> {
+  return apiUpdateDemandParameter(demandId, paramId, params);
+}
+
+export async function deleteDemandParameter(
+  demandId: string,
+  paramId: string,
+): Promise<{ deleted: boolean }> {
+  return apiDeleteDemandParameter(demandId, paramId);
+}

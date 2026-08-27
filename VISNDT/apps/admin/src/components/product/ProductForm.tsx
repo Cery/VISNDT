@@ -1,13 +1,15 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Form, Input, Select, Button, Space, Spin, Alert, message, Upload, Card, Divider, InputNumber } from 'antd';
+import { Form, Input, Select, Button, Space, Spin, Alert, message, Upload, Card, Divider, InputNumber, Image, Row, Col, Tag, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeftOutlined, UploadOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, UploadOutlined, PictureOutlined } from '@ant-design/icons';
 import { categoriesService, parameterDefinitionService, productParameterService, productMediaService } from '../../api';
 import type { ProductFormData } from '../../types';
 import type { ParameterDefinition } from '../../types/parameter-definition.types';
+import type { ProductMediaItem } from '../../types/product-media.types';
 import type { UploadFile } from 'antd/es/upload/interface';
 
 const { TextArea } = Input;
+const { Text } = Typography;
 const { Dragger } = Upload;
 
 interface ProductCategory {
@@ -36,6 +38,7 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
   const [submitting, setSubmitting] = useState(false);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [parameterValues, setParameterValues] = useState<Record<string, { value: string; valueNumber?: number }>>({});
+  const [existingMedia, setExistingMedia] = useState<ProductMediaItem[]>([]);
 
   const loadFormData = useCallback(async () => {
     setFormState({ status: 'loading' });
@@ -93,6 +96,19 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
     };
   }, [productId, form]);
 
+  // Load existing media in edit mode so they are visible alongside the upload area
+  useEffect(() => {
+    if (!productId) return;
+    productMediaService
+      .list(productId)
+      .then((media) => {
+        setExistingMedia(media ?? []);
+      })
+      .catch(() => {
+        // silently fail — upload remains available
+      })
+  }, [productId]);
+
   const handleParameterChange = (defId: string, value: string, dataType: string) => {
     const numValue = dataType === 'NUMBER' ? parseFloat(value) : undefined;
     setParameterValues((prev) => ({
@@ -134,10 +150,10 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
         await Promise.all(uploadPromises);
       }
 
-      message.success(submitLabel === '创建产品' ? '产品创建成功' : '产品更新成功');
+      message.success(submitLabel === '创建能力' ? '能力创建成功' : '能力更新成功');
       navigate('/products');
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '保存产品失败';
+      const errorMessage = err instanceof Error ? err.message : '保存能力失败';
       message.error(errorMessage);
     } finally {
       setSubmitting(false);
@@ -201,9 +217,9 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
           <Form.Item
             label="名称"
             name="name"
-            rules={[{ required: true, message: '请输入产品名称' }]}
+            rules={[{ required: true, message: '请输入能力名称' }]}
           >
-            <Input placeholder="请输入产品名称" />
+            <Input placeholder="请输入能力名称" />
           </Form.Item>
 
           <Form.Item label="型号" name="model">
@@ -235,7 +251,7 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
           </Form.Item>
 
           <Form.Item label="描述" name="description">
-            <TextArea rows={4} placeholder="请输入产品描述" />
+            <TextArea rows={4} placeholder="请输入能力描述" />
           </Form.Item>
         </Card>
 
@@ -290,6 +306,58 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
         )}
 
         <Card title="媒体资源" style={{ marginBottom: 16 }}>
+          {/* Existing Media Display (edit mode) */}
+          {productId && existingMedia.length > 0 && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <Text strong style={{ fontSize: 13 }}>现有媒体资源</Text>
+                <Button
+                  size="small"
+                  icon={<PictureOutlined />}
+                  onClick={() => navigate(`/products/${productId}/media`)}
+                >
+                  管理媒体
+                </Button>
+              </div>
+              <Row gutter={[12, 12]}>
+                {existingMedia.map((item) => (
+                  <Col xs={12} sm={8} md={6} key={item.id}>
+                    <Card
+                      size="small"
+                      hoverable
+                      cover={
+                        item.fileAssetId ? (
+                          <Image
+                            alt={item.title || '媒体'}
+                            src={`/api/v1/files/${item.fileAssetId}/download`}
+                            height={120}
+                            style={{ objectFit: 'cover' }}
+                            fallback="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iI2Y1ZjVmNSIvPjx0ZXh0IHg9IjEwMCIgeT0iNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjOTk5IiBmb250LXNpemU9IjEyIj5JbWFnZTwvdGV4dD48L3N2Zz4="
+                          />
+                        ) : (
+                          <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fafafa' }}>
+                            <PictureOutlined style={{ fontSize: 24, color: '#bbb' }} />
+                          </div>
+                        )
+                      }
+                    >
+                      <Card.Meta
+                        title={item.title || '未命名'}
+                        description={
+                          <Space size={4} wrap>
+                            <Tag>{item.mediaType}</Tag>
+                            {item.isPrimary && <Tag color="gold">主图</Tag>}
+                          </Space>
+                        }
+                      />
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+              <Divider style={{ margin: '12px 0' }} />
+              <Text type="secondary" style={{ fontSize: 12 }}>新增上传</Text>
+            </div>
+          )}
           <Dragger
             multiple
             fileList={fileList}

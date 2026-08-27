@@ -50,4 +50,9 @@ export class CreateDemandDto {
   @IsOptional()
   @IsBoolean()
   contactVisible?: boolean;
+
+  @ApiPropertyOptional({ description: 'Demand category id (ProductCategory relation)', example: 'uuid' })
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
 }

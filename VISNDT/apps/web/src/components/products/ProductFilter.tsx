@@ -196,7 +196,7 @@ export default function ProductFilter({
       <div>
         <h3 className="font-semibold text-sm mb-3">分类</h3>
         <div className="space-y-1">
-          {/* Root Node：全部产品 */}
+          {/* Root Node：全部能力 */}
           <button
             onClick={() => onCategoryChange(undefined)}
             className={`block w-full text-left px-3 py-1.5 text-sm rounded-lg transition-colors ${
@@ -205,7 +205,7 @@ export default function ProductFilter({
                 : 'text-muted-foreground hover:bg-muted'
             }`}
           >
-            全部产品
+            全部能力
           </button>
           {tree.map((cat) => renderNode(cat, 0))}
         </div>

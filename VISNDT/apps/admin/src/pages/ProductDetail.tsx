@@ -114,8 +114,19 @@ const PARAM_COLUMNS = [
   {
     title: '值',
     key: 'value',
-    render: (_: unknown, record: ProductParameterValue) =>
-      record.value ?? record.valueNumber ?? '-',
+    render: (_: unknown, record: ProductParameterValue) => {
+      if (record.value !== undefined && record.value !== null) {
+        // ENUM 参数展示用户可读 label（后端详情投影已返回 options）
+        if (record.parameterDefinition?.dataType === 'ENUM') {
+          const option = (record.parameterDefinition.options ?? []).find(
+            (o) => o.value === record.value,
+          );
+          if (option?.label) return option.label;
+        }
+        return record.value;
+      }
+      return record.valueNumber ?? '-';
+    },
   },
 ];
 
@@ -131,7 +142,7 @@ export default function ProductDetailPage() {
       const data = await productService.getById(id);
       setPageState({ status: 'success', data });
     } catch (err) {
-      const message = err instanceof Error ? err.message : '加载产品详情失败';
+      const message = err instanceof Error ? err.message : '加载能力详情失败';
       setPageState({ status: 'error', message });
     }
   }, [id]);
@@ -152,7 +163,7 @@ export default function ProductDetailPage() {
     return (
       <Alert
         type="error"
-        message="加载产品失败"
+        message="加载能力失败"
         description={pageState.message}
         showIcon
         action={
@@ -181,7 +192,7 @@ export default function ProductDetailPage() {
           <a onClick={() => navigate('/')}><HomeOutlined /> 首页</a>
         </Breadcrumb.Item>
         <Breadcrumb.Item>
-          <a onClick={() => navigate('/products')}>产品管理</a>
+          <a onClick={() => navigate('/products')}>能力管理</a>
         </Breadcrumb.Item>
         {product.category && (
           <Breadcrumb.Item>{product.category.name}</Breadcrumb.Item>
@@ -192,11 +203,11 @@ export default function ProductDetailPage() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>Product Capability Profile</Title>
+          <Title level={4} style={{ margin: 0 }}>能力详情</Title>
           <StatusTag status={product.status} label={STATUS_LABEL_MAP[product.status] || product.status} />
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          View capability details, parameters and media
+          查看能力详情、参数与媒体
         </Text>
       </div>
 
@@ -209,7 +220,7 @@ export default function ProductDetailPage() {
           type="primary"
           onClick={() => navigate(`/products/${id}/edit`)}
         >
-          编辑产品
+          编辑能力
         </Button>
         <Button
           icon={<PictureOutlined />}
@@ -228,7 +239,7 @@ export default function ProductDetailPage() {
         </Col>
         <Col xs={12} sm={6}>
           <Card size="small">
-            <Statistic title="产品参数" value={paramCount} prefix={<SettingOutlined />} />
+            <Statistic title="能力参数" value={paramCount} prefix={<SettingOutlined />} />
           </Card>
         </Col>
         <Col xs={12} sm={6}>
@@ -238,7 +249,7 @@ export default function ProductDetailPage() {
         </Col>
         <Col xs={12} sm={6}>
           <Card size="small">
-            <Tooltip title="产品治理状态">
+            <Tooltip title="能力治理状态">
               <Statistic title="治理状态" value={STATUS_LABEL_MAP[product.status] || product.status} prefix={<AppstoreOutlined />} valueStyle={{ color: TONE_TO_HEX[resolveStatusTone(product.status)] }} />
             </Tooltip>
           </Card>
@@ -272,7 +283,7 @@ export default function ProductDetailPage() {
         )}
       </Card>
 
-      <Card title="产品参数" style={{ marginBottom: 16 }}>
+      <Card title="能力参数" style={{ marginBottom: 16 }}>
         {product.parameterValues && product.parameterValues.length > 0 ? (
           <Table
             dataSource={product.parameterValues}
@@ -286,7 +297,7 @@ export default function ProductDetailPage() {
         )}
       </Card>
 
-      <Card title="产品媒体">
+      <Card title="能力媒体">
         {product.media && product.media.length > 0 ? (
           (() => {
             const mediaItems = product.media as MediaItem[];
@@ -315,7 +326,7 @@ export default function ProductDetailPage() {
                 {images.length > 0 && (
                   <div style={{ marginBottom: documents.length > 0 ? 24 : 0 }}>
                     <Title level={5} style={{ marginBottom: 12 }}>
-                      <FileImageOutlined /> 产品图片 ({images.length})
+                      <FileImageOutlined /> 能力图片 ({images.length})
                     </Title>
                     <Image.PreviewGroup>
                       <Row gutter={[16, 16]}>
@@ -327,7 +338,7 @@ export default function ProductDetailPage() {
                               cover={
                                 item.url ? (
                                   <Image
-                                    alt={item.title || '产品图片'}
+                                    alt={item.title || '能力图片'}
                                     src={item.url}
                                     preview={{ mask: '预览' }}
                                     height={160}
@@ -380,7 +391,7 @@ export default function ProductDetailPage() {
                 {documents.length > 0 && (
                   <div>
                     <Title level={5} style={{ marginBottom: 12 }}>
-                      <FileTextOutlined /> 产品文档 ({documents.length})
+                      <FileTextOutlined /> 能力文档 ({documents.length})
                     </Title>
                     <List
                       dataSource={documents}

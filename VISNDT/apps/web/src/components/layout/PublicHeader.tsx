@@ -45,7 +45,7 @@ export default function PublicHeader() {
               <span className="text-foreground">VIS</span>
               <span className="bg-gradient-to-r from-primary to-industrial-cyan bg-clip-text text-transparent">NDT</span>
             </span>
-            <span className="hidden sm:inline-flex text-xs text-slate-400 font-medium tracking-wide">
+            <span className="hidden xl:inline-flex text-xs text-slate-400 font-medium tracking-wide">
               工业检测平台
             </span>
           </Link>
@@ -58,7 +58,7 @@ export default function PublicHeader() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  className={`relative whitespace-nowrap px-2 py-2 text-sm font-medium rounded-md transition-colors ${
                     active
                       ? 'text-primary bg-primary/5'
                       : 'text-muted-foreground hover:text-foreground hover:bg-slate-50'
@@ -74,7 +74,7 @@ export default function PublicHeader() {
           </nav>
 
           {/* Desktop Search Bar */}
-          <div className="hidden lg:flex flex-1 max-w-md mx-4">
+          <div className="hidden lg:flex flex-1 min-w-[220px] max-w-xl mx-2">
             <GlobalSearchBar />
           </div>
 
@@ -111,13 +111,6 @@ export default function PublicHeader() {
                         className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                       >
                         工作台
-                      </Link>
-                      <Link
-                        href="/workspace"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
-                      >
-                        工作区
                       </Link>
                       <hr className="my-1 border-slate-100" />
                       <button

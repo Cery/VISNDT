@@ -223,7 +223,11 @@ export class ProductsService {
       where: isUuid ? { id: idOrSlug } : { slug: idOrSlug },
       include: {
         category: true,
-        parameterValues: { include: { parameterDefinition: true } },
+        // M31.2 projection extension: surface parameter options so Admin/Web can
+        // render ENUM values as readable labels (existing relation, backward compatible).
+        parameterValues: {
+          include: { parameterDefinition: { include: { options: true } } },
+        },
         media: true,
         createdBy: { include: { organization: true } },
         // 公开询价链路：产品详情页需根据 offers 推导询价对象（offer + 组织）

@@ -122,10 +122,10 @@ export default function InquiryDetailPage() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>Inquiry Details</Title>
+          <Title level={4} style={{ margin: 0 }}>询价详情</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          View inquiry details, supplier responses and status
+          查看询价详情、能力提供商响应与状态
         </Text>
       </div>
 
@@ -166,7 +166,7 @@ export default function InquiryDetailPage() {
       <Card title="关联信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
           {inquiry.product && (
-            <Descriptions.Item label="产品">
+            <Descriptions.Item label="能力">
               {inquiry.product.name}
             </Descriptions.Item>
           )}

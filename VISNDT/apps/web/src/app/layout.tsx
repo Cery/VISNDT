@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     template: `%s | ${SITE_NAME}`,
-    default: `${SITE_NAME} – 工业检测设备平台`,
+    default: `${SITE_NAME} – 工业检测能力发现平台`,
   },
   description: SITE_DESCRIPTION,
   keywords: SITE_KEYWORDS,
@@ -51,12 +51,12 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: SITE_NAME,
-    title: `${SITE_NAME} – 工业检测设备平台`,
+    title: `${SITE_NAME} – 工业检测能力发现平台`,
     description: SITE_DESCRIPTION,
   },
   twitter: {
     card: 'summary',
-    title: `${SITE_NAME} – 工业检测设备平台`,
+    title: `${SITE_NAME} – 工业检测能力发现平台`,
     description: SITE_DESCRIPTION,
   },
 };

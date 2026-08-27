@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Button, Spin, Alert, Typography, Input, Space, message, Modal, Card, Row, Col, Statistic } from 'antd';
+import { Table, Button, Spin, Alert, Typography, Input, Space, App, Card, Row, Col, Statistic } from 'antd';
 import { PlusOutlined, ReloadOutlined, ApartmentOutlined, NodeIndexOutlined, FileTextOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { categoryService, extractErrorMessage } from '../../api';
@@ -17,6 +17,7 @@ type PageState =
 
 function ProductCategoryList() {
   const navigate = useNavigate();
+  const { modal, message } = App.useApp();
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [batchLoading, setBatchLoading] = useState(false);
@@ -126,7 +127,7 @@ function ProductCategoryList() {
   }, []);
 
   const handleDelete = useCallback((id: string) => {
-    Modal.confirm({
+    modal.confirm({
       title: '确认删除',
       content: '确定要删除此分类吗？此操作不可撤销。',
       okText: '确认删除',

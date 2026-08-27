@@ -63,7 +63,9 @@ function MatchesContent() {
     try {
       await updateMatchStatus(match.demandId, matchId, newStatus);
       setMatches((prev) =>
-        prev.map((m) => (m.id === matchId ? { ...m, status: newStatus } : m)),
+        prev.map((m) =>
+          m.id === matchId ? { ...m, matchStatus: newStatus } : m,
+        ),
       );
     } catch {
       setError('更新匹配状态失败，请重试。');

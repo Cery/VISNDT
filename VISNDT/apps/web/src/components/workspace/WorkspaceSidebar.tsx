@@ -30,6 +30,7 @@ const NAV_CONFIG: Record<NavigableWorkspaceRole, NavItem[]> = {
     { label: 'RFQ 机会', href: '/workspace/supplier/rfqs', icon: 'file' },
     { label: '我的响应', href: '/workspace/supplier/responses', icon: 'send' },
     { label: '我的报价', href: '/workspace/supplier/offers', icon: 'package' },
+    { label: '收到的询价', href: '/workspace/supplier/inquiries', icon: 'inbox' },
     { label: '商机', href: '/workspace/supplier/opportunities', icon: 'target' },
     { label: '运行时能力', href: '/workspace/supplier/runtime', icon: 'link' },
     { label: '企业资料', href: '/workspace/supplier/profile', icon: 'building' },

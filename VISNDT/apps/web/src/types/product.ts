@@ -127,6 +127,7 @@ export interface Offer {
   id: string;
   organizationId: string;
   productId: string;
+  supplierProductId?: string | null;
   title: string;
   description: string | null;
   price: string | null;
@@ -135,6 +136,21 @@ export interface Offer {
   createdAt: string;
   updatedAt: string;
   organization: Organization;
+  /** Platform Capability this offer references (721 projection extension). */
+  product?: { id: string; name?: string | null } | null;
+  /** Capability Model (SupplierProduct) binding — provider's concrete model. */
+  supplierProduct?: {
+    id: string;
+    brand: string;
+    series?: string | null;
+    modelNumber: string;
+    status?: string | null;
+    /** Platform Capability the model is derived from. */
+    platformProduct?: { id: string; name?: string | null } | null;
+    /** Capability Provider (Organization). */
+    organization?: Organization | null;
+  } | null;
+  createdByUser?: { id: string; email: string; name?: string | null } | null;
 }
 
 /** Single parameter filter for GET /products (exact value OR numeric range, mutually exclusive) */

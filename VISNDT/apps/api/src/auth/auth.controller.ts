@@ -75,7 +75,7 @@ export class AuthController {
     const result = await this.authService.register(dto);
     this.setAuthCookies(res, result.accessToken, result.refreshToken);
     return ApiResponseClass.ok(
-      { user: result.user },
+      { accessToken: result.accessToken, user: result.user },
       'Registration successful',
     );
   }
@@ -90,7 +90,7 @@ export class AuthController {
     const result = await this.authService.login(dto);
     this.setAuthCookies(res, result.accessToken, result.refreshToken);
     return ApiResponseClass.ok(
-      { user: result.user },
+      { accessToken: result.accessToken, user: result.user },
       'Login successful',
     );
   }
@@ -110,7 +110,7 @@ export class AuthController {
     const result = await this.authService.refreshTokens(refreshToken);
     this.setAuthCookies(res, result.accessToken, result.refreshToken);
     return ApiResponseClass.ok(
-      { user: result.user },
+      { accessToken: result.accessToken, user: result.user },
       'Token refreshed successfully',
     );
   }

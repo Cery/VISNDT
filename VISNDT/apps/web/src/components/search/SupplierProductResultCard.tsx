@@ -31,7 +31,7 @@ export default function SupplierProductResultCard({
             href={capabilityHref}
             className="text-base font-semibold text-slate-900 hover:text-primary transition-colors"
           >
-            {capability?.name ?? '供应商型号'}
+            {capability?.name ?? '能力型号'}
           </Link>
           <p className="mt-1 text-sm text-slate-700">
             {supplierProduct.brand}
@@ -76,7 +76,7 @@ export default function SupplierProductResultCard({
         <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-400">
           {supplierProduct.organization?.name && (
             <span title={supplierProduct.organization.name}>
-              <span className="text-slate-500">供应商：</span>
+              <span className="text-slate-500">能力提供商：</span>
               <span className="text-slate-700">{supplierProduct.organization.name}</span>
             </span>
           )}

@@ -207,6 +207,10 @@ export class InquiriesService {
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
+        include: {
+          product: { select: { id: true, name: true } },
+          organization: { select: { id: true, name: true } },
+        },
       }),
       this.prisma.inquiry.count({ where }),
     ]);
@@ -227,6 +231,10 @@ export class InquiriesService {
   async getInquiryById(id: string, user: RequestUser) {
     const inquiry = await this.prisma.inquiry.findUnique({
       where: { id },
+      include: {
+        product: { select: { id: true, name: true } },
+        organization: { select: { id: true, name: true } },
+      },
     });
 
     if (!inquiry) {
@@ -248,6 +256,7 @@ export class InquiriesService {
 
   /**
    * Map an Inquiry entity to a response shape.
+   * `product` / `organization` are optional nested projection extensions (713/M30.5).
    */
   private mapToInquiryResponse(inquiry: {
     id: string;
@@ -261,11 +270,15 @@ export class InquiriesService {
     status: string;
     createdAt: Date;
     updatedAt: Date;
+    product?: { id: string; name: string | null } | null;
+    organization?: { id: string; name: string | null } | null;
   }) {
     return {
       id: inquiry.id,
       productId: inquiry.productId,
+      productName: inquiry.product?.name ?? null,
       organizationId: inquiry.organizationId,
+      organizationName: inquiry.organization?.name ?? null,
       createdById: inquiry.createdById,
       contactName: inquiry.contactName,
       contactEmail: inquiry.contactEmail,

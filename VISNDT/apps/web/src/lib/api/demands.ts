@@ -26,11 +26,51 @@ export interface DemandDetailItem extends DemandItem {
   matchesCount?: number;
 }
 
-export interface DemandParameter {
+export type ParameterDataType = 'STRING' | 'NUMBER' | 'BOOLEAN' | 'ENUM';
+
+export interface DemandParameterOption {
+  id: string;
+  parameterDefinitionId: string;
+  value: string;
+  label: string;
+  sortOrder: number;
+}
+
+export interface DemandParameterDefinition {
   id: string;
   name: string;
-  value: string;
+  code: string;
+  dataType: ParameterDataType;
   unit?: string | null;
+  required: boolean;
+  parameterGroupId?: string | null;
+  group?: {
+    id: string;
+    name: string;
+    code?: string | null;
+  } | null;
+  options?: DemandParameterOption[];
+}
+
+export interface DemandParameter {
+  id: string;
+  demandId: string;
+  parameterDefinitionId: string;
+  value?: string | null;
+  valueMin?: number | null;
+  valueMax?: number | null;
+  required: boolean;
+  priority: number;
+  parameterDefinition: DemandParameterDefinition;
+}
+
+export interface UpsertDemandParameterParams {
+  parameterDefinitionId: string;
+  value?: string;
+  valueMin?: number;
+  valueMax?: number;
+  required?: boolean;
+  priority?: number;
 }
 
 /**
@@ -70,6 +110,7 @@ export interface CreateDemandParams {
   contactPhone?: string;
   contactEmail?: string;
   contactVisible?: boolean;
+  categoryId?: string;
 }
 
 /**
@@ -146,6 +187,85 @@ export async function getDemandMatches(
   const res = await apiClient<ApiResponse<PaginatedResponse<unknown>>>(
     `/demands/${demandId}/matches`,
     { params: { page, pageSize } },
+  );
+  return res.data;
+}
+
+/**
+ * Get a single match detail by demand + match id.
+ * GET /demands/:id/matches/:matchId (JWT)
+ */
+export async function getDemandMatchDetail(
+  demandId: string,
+  matchId: string,
+): Promise<unknown> {
+  const res = await apiClient<ApiResponse<unknown>>(
+    `/demands/${demandId}/matches/${matchId}`,
+  );
+  return res.data;
+}
+
+/**
+ * Get parameters for a demand.
+ * GET /demands/:id/parameters (JWT)
+ */
+export async function getDemandParameters(
+  demandId: string,
+): Promise<DemandParameter[]> {
+  const res = await apiClient<ApiResponse<DemandParameter[]>>(
+    `/demands/${demandId}/parameters`,
+  );
+  return res.data;
+}
+
+/**
+ * Add a demand parameter.
+ * POST /demands/:id/parameters (JWT)
+ */
+export async function addDemandParameter(
+  demandId: string,
+  params: UpsertDemandParameterParams,
+): Promise<DemandParameter> {
+  const res = await apiClient<ApiResponse<DemandParameter>>(
+    `/demands/${demandId}/parameters`,
+    {
+      method: 'POST',
+      body: JSON.stringify(params),
+    },
+  );
+  return res.data;
+}
+
+/**
+ * Update a demand parameter.
+ * PATCH /demands/:id/parameters/:paramId (JWT)
+ */
+export async function updateDemandParameter(
+  demandId: string,
+  paramId: string,
+  params: Partial<UpsertDemandParameterParams>,
+): Promise<DemandParameter> {
+  const res = await apiClient<ApiResponse<DemandParameter>>(
+    `/demands/${demandId}/parameters/${paramId}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(params),
+    },
+  );
+  return res.data;
+}
+
+/**
+ * Delete a demand parameter.
+ * DELETE /demands/:id/parameters/:paramId (JWT)
+ */
+export async function deleteDemandParameter(
+  demandId: string,
+  paramId: string,
+): Promise<{ deleted: boolean }> {
+  const res = await apiClient<ApiResponse<{ deleted: boolean }>>(
+    `/demands/${demandId}/parameters/${paramId}`,
+    { method: 'DELETE' },
   );
   return res.data;
 }

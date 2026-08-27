@@ -1,4 +1,5 @@
 import type { DemandMatch } from './match.types';
+import type { ParameterDataType, ParameterOption } from './parameter-definition.types';
 
 export type DemandStatus =
   | 'DRAFT'
@@ -21,8 +22,11 @@ export interface DemandParameter {
     id: string;
     name: string;
     code: string;
-    dataType: string;
+    dataType: ParameterDataType;
     unit?: string;
+    required?: boolean;
+    parameterGroupId?: string;
+    options?: ParameterOption[];
   };
 }
 

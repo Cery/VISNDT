@@ -7,15 +7,33 @@ import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
-import { getDemand, updateDemand } from '@/services/demand.service';
-import type { DemandDetailItem } from '@/lib/api/demands';
+import DemandParameterEditor, {
+  type DemandParameterDraft,
+} from '@/components/demand/DemandParameterEditor';
+import {
+  getDemand,
+  updateDemand,
+  getDemandParameters,
+  addDemandParameter,
+  updateDemandParameter,
+  deleteDemandParameter,
+} from '@/services/demand.service';
+import { getFilterParameterDefinitions } from '@/services/parameter-definition.service';
+import { getParameterGroups } from '@/lib/api/parameter-groups';
+import { getCategories } from '@/lib/api/categories';
+import type { DemandDetailItem, DemandParameter } from '@/lib/api/demands';
+import type { FilterParameterDefinition } from '@/services/parameter-definition.service';
+import type { ParameterGroup } from '@/types/product';
+import type { ProductCategory } from '@/types/category';
 
 interface DemandEditFormState {
   title: string;
   description: string;
   budgetRange: string;
   quantity: string;
+  quantityUnit: string;
   expectedDeliveryDate: string;
+  categoryId: string;
   contactName: string;
   contactPhone: string;
   contactEmail: string;
@@ -40,12 +58,27 @@ function toFormState(demand: DemandDetailItem): DemandEditFormState {
     description: demand.description ?? '',
     budgetRange: demand.budgetRange ?? '',
     quantity: demand.quantity != null ? String(demand.quantity) : '',
+    quantityUnit: demand.quantityUnit ?? '',
     expectedDeliveryDate: toDateInputValue(demand.expectedDeliveryDate),
+    categoryId: demand.category?.id ?? '',
     contactName: demand.contactName ?? '',
     contactPhone: sanitizeProtectedContactValue(demand.contactPhone),
     contactEmail: sanitizeProtectedContactValue(demand.contactEmail),
     contactVisible: Boolean(demand.contactVisible),
   };
+}
+
+function toParameterDrafts(parameters?: DemandParameter[]): DemandParameterDraft[] {
+  return (parameters ?? []).map((p) => ({
+    key: p.id,
+    id: p.id,
+    parameterDefinitionId: p.parameterDefinitionId,
+    value: p.value ?? '',
+    valueMin: p.valueMin ?? null,
+    valueMax: p.valueMax ?? null,
+    required: p.required,
+    priority: p.priority,
+  }));
 }
 
 function DemandEditContent({ id }: { id: string }) {
@@ -60,13 +93,30 @@ function DemandEditContent({ id }: { id: string }) {
   const [loadError, setLoadError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
+  const [definitions, setDefinitions] = useState<FilterParameterDefinition[]>([]);
+  const [groups, setGroups] = useState<ParameterGroup[]>([]);
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [originalParameters, setOriginalParameters] = useState<DemandParameter[]>([]);
+  const [parameterDrafts, setParameterDrafts] = useState<DemandParameterDraft[]>([]);
+
   const loadDemand = useCallback(async () => {
     setIsLoading(true);
     setLoadError('');
     try {
-      const result = await getDemand(id);
+      const [result, defs, groupRes, categoryRes] = await Promise.all([
+        getDemand(id),
+        getFilterParameterDefinitions(),
+        getParameterGroups(1, 100),
+        getCategories(1, 100),
+      ]);
+      const params = await getDemandParameters(id).catch(() => []);
       setDemand(result);
       setForm(toFormState(result));
+      setDefinitions(defs);
+      setGroups(groupRes.data ?? []);
+      setCategories(categoryRes.data ?? []);
+      setOriginalParameters(params);
+      setParameterDrafts(toParameterDrafts(params));
     } catch {
       setLoadError('加载需求失败，可能不存在或无权访问。');
     } finally {
@@ -86,17 +136,51 @@ function DemandEditContent({ id }: { id: string }) {
         throw new Error('需求表单未初始化。');
       }
 
-      return updateDemand(id, {
+      await updateDemand(id, {
         title: form.title.trim(),
         description: form.description.trim() || undefined,
         budgetRange: form.budgetRange.trim() || undefined,
         quantity: form.quantity ? Number(form.quantity) : undefined,
+        quantityUnit: form.quantityUnit.trim() || undefined,
         expectedDeliveryDate: form.expectedDeliveryDate || undefined,
+        categoryId: form.categoryId || undefined,
         contactName: form.contactName.trim() || undefined,
         contactPhone: form.contactPhone.trim() || undefined,
         contactEmail: form.contactEmail.trim() || undefined,
         contactVisible: form.contactVisible,
       });
+
+      // Parameter diff: add / update / delete
+      const originalById = new Map(
+        originalParameters.map((p) => [p.id, p]),
+      );
+      const draftIds = new Set(
+        parameterDrafts.map((d) => d.id).filter((x): x is string => Boolean(x)),
+      );
+
+      for (const draft of parameterDrafts) {
+        const payload = {
+          value: draft.value?.trim() || undefined,
+          valueMin: draft.valueMin ?? undefined,
+          valueMax: draft.valueMax ?? undefined,
+          required: draft.required,
+          priority: draft.priority,
+        };
+        if (draft.id && originalById.has(draft.id)) {
+          await updateDemandParameter(id, draft.id, payload);
+        } else {
+          await addDemandParameter(id, {
+            parameterDefinitionId: draft.parameterDefinitionId,
+            ...payload,
+          });
+        }
+      }
+
+      for (const original of originalParameters) {
+        if (!draftIds.has(original.id)) {
+          await deleteDemandParameter(id, original.id);
+        }
+      }
     },
     onSuccess: () => {
       router.push(`/workspace/demands/${id}`);
@@ -272,27 +356,70 @@ function DemandEditContent({ id }: { id: string }) {
 
                 <div>
                   <label
-                    htmlFor="quantity"
+                    htmlFor="categoryId"
                     className="block text-sm font-medium text-slate-700 mb-1"
                   >
-                    数量
+                    需求分类
                   </label>
-                  <input
-                    id="quantity"
-                    type="number"
-                    min={1}
-                    value={form.quantity}
-                    onChange={(e) => handleChange('quantity', e.target.value)}
-                    placeholder="例如：100"
-                    className={`w-full rounded-md border px-3 py-2 text-sm outline-none transition-colors focus:ring-2 focus:ring-slate-400 ${
-                      errors.quantity
-                        ? 'border-red-400 focus:ring-red-400'
-                        : 'border-slate-300'
-                    }`}
-                  />
-                  {errors.quantity && (
-                    <p className="text-xs text-red-500 mt-1">{errors.quantity}</p>
-                  )}
+                  <select
+                    id="categoryId"
+                    value={form.categoryId}
+                    onChange={(e) => handleChange('categoryId', e.target.value)}
+                    className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition-colors focus:ring-2 focus:ring-slate-400"
+                  >
+                    <option value="">请选择检测能力分类</option>
+                    {categories.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-slate-400 mt-1">
+                    用于帮助系统与供应商理解需求所属的检测能力领域。
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="quantity"
+                      className="block text-sm font-medium text-slate-700 mb-1"
+                    >
+                      数量
+                    </label>
+                    <input
+                      id="quantity"
+                      type="number"
+                      min={1}
+                      value={form.quantity}
+                      onChange={(e) => handleChange('quantity', e.target.value)}
+                      placeholder="例如：100"
+                      className={`w-full rounded-md border px-3 py-2 text-sm outline-none transition-colors focus:ring-2 focus:ring-slate-400 ${
+                        errors.quantity
+                          ? 'border-red-400 focus:ring-red-400'
+                          : 'border-slate-300'
+                      }`}
+                    />
+                    {errors.quantity && (
+                      <p className="text-xs text-red-500 mt-1">{errors.quantity}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="quantityUnit"
+                      className="block text-sm font-medium text-slate-700 mb-1"
+                    >
+                      单位
+                    </label>
+                    <input
+                      id="quantityUnit"
+                      type="text"
+                      value={form.quantityUnit}
+                      onChange={(e) => handleChange('quantityUnit', e.target.value)}
+                      placeholder="例如：pcs, sets, 台"
+                      className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none transition-colors focus:ring-2 focus:ring-slate-400"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -393,6 +520,25 @@ function DemandEditContent({ id }: { id: string }) {
                     </p>
                   </div>
                 </label>
+
+                {/* Technical Parameters */}
+                <div className="border-t border-slate-100 pt-4">
+                  <div className="mb-3">
+                    <h3 className="text-base font-semibold text-slate-800">
+                      技术参数
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-1">
+                      填写需求的检测技术要求，将用于能力匹配与询价展示。
+                    </p>
+                  </div>
+                  <DemandParameterEditor
+                    definitions={definitions}
+                    groups={groups}
+                    value={parameterDrafts}
+                    onChange={setParameterDrafts}
+                    disabled={!canEdit}
+                  />
+                </div>
 
                 {mutation.isError && (
                   <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">

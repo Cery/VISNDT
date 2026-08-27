@@ -11,13 +11,13 @@ interface TabDefinition {
 }
 
 const TABS: TabDefinition[] = [
-  { id: 'overview', label: '产品概览', anchor: '#overview' },
+  { id: 'overview', label: '能力概览', anchor: '#overview' },
   { id: 'specifications', label: '技术参数', anchor: '#specifications' },
-  { id: 'supplier-models', label: '供应商型号', anchor: '#supplier-models' },
-  { id: 'suppliers', label: '供应商', anchor: '#suppliers' },
+  { id: 'supplier-models', label: '能力型号', anchor: '#supplier-models' },
+  { id: 'suppliers', label: '能力提供商', anchor: '#suppliers' },
   { id: 'documents', label: '文档证书', anchor: '#documents' },
   { id: 'knowledge', label: '相关知识', anchor: '#knowledge' },
-  { id: 'related', label: '相关产品', anchor: '#related' },
+  { id: 'related', label: '相关能力', anchor: '#related' },
 ];
 
 interface ProductDetailTabsProps {
@@ -58,7 +58,7 @@ export default function ProductDetailTabs({
     <div>
       {/* Tab Bar — desktop: horizontal tabs, mobile: horizontal scroll */}
       <div className="sticky top-0 z-10 bg-white border-b border-slate-200 mb-8 overflow-x-auto">
-        <nav className="flex gap-0 min-w-max" role="tablist" aria-label="产品详情导航">
+        <nav className="flex gap-0 min-w-max" role="tablist" aria-label="能力详情导航">
           {TABS.map((tab) => (
             <button
               key={tab.id}

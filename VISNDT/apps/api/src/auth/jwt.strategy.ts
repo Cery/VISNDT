@@ -8,16 +8,23 @@ import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 /**
  * Custom JWT extractor:
- * 1. Priority: HttpOnly cookie `access_token`
- * 2. Fallback: Authorization Bearer header (backward compatibility)
+ * 1. Priority: explicit Authorization Bearer header.
+ *    Each frontend sends its own token in the header (e.g. admin stores its
+ *    access token in localStorage), which is immune to the HttpOnly cookie
+ *    that is SHARED across localhost ports (cookies ignore ports). Relying on
+ *    the cookie first caused cross-role 403: logging into web (buyer/supplier)
+ *    overwrote the shared `access_token` cookie, and admin requests were then
+ *    rejected by RolesGuard despite carrying a valid admin Bearer header.
+ * 2. Fallback: HttpOnly cookie `access_token` (cookie-based clients such as web).
  */
 const cookieAndBearerExtractor = (req: Request): string | null => {
-  // Priority: cookie
-  if (req?.cookies?.access_token) {
-    return req.cookies.access_token;
+  // Priority: Bearer header
+  const bearer = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+  if (bearer) {
+    return bearer;
   }
-  // Fallback: Bearer token
-  return ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+  // Fallback: cookie
+  return req?.cookies?.access_token ?? null;
 };
 
 @Injectable()

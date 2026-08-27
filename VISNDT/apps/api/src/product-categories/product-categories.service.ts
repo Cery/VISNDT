@@ -119,7 +119,10 @@ export class ProductCategoriesService {
           });
         }
 
-        await this.prisma.productCategory.delete({ where: { id } });
+        await this.prisma.$transaction(async (tx) => {
+          await tx.productCategoryKnowledgeMapping.deleteMany({ where: { productCategoryId: id } });
+          await tx.productCategory.delete({ where: { id } });
+        });
         return { id };
       }),
     );
@@ -165,7 +168,14 @@ export class ProductCategoriesService {
       });
     }
 
-    await this.prisma.productCategory.delete({ where: { id } });
+    // Knowledge-category association rows depend on the category via a RESTRICT
+    // foreign key (product_category_knowledge_mapping_product_category_id_fkey).
+    // Delete them first so the category can be removed without a raw FK error.
+    await this.prisma.$transaction(async (tx) => {
+      await tx.productCategoryKnowledgeMapping.deleteMany({ where: { productCategoryId: id } });
+      await tx.productCategory.delete({ where: { id } });
+    });
+
     return { id };
   }
 }

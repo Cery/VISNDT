@@ -46,10 +46,15 @@ export class OffersController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get offer by ID' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get offer by ID (owner org or ADMIN only)' })
   @ApiParam({ name: 'id', description: 'Offer UUID' })
-  async findOne(@Param('id') id: string) {
-    return ApiResponse.ok(await this.service.findOne(id));
+  async findOne(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(await this.service.findOne(id, user));
   }
 
   @Post()

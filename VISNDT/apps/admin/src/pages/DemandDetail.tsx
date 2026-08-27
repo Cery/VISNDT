@@ -65,7 +65,16 @@ const PARAM_COLUMNS = [
     title: '值',
     key: 'value',
     render: (_: unknown, record: DemandParameter) => {
-      if (record.value) return record.value;
+      if (record.value !== undefined && record.value !== null) {
+        // ENUM 参数展示用户可读 label（后端详情投影已返回 options）
+        if (record.parameterDefinition?.dataType === 'ENUM') {
+          const option = (record.parameterDefinition.options ?? []).find(
+            (o) => o.value === record.value,
+          );
+          if (option?.label) return option.label;
+        }
+        return record.value;
+      }
       if (record.valueMin !== undefined && record.valueMax !== undefined) {
         return `${record.valueMin} - ${record.valueMax}`;
       }
@@ -209,7 +218,7 @@ export default function DemandDetailPage() {
 
   const matchColumns = [
     {
-      title: '产品',
+      title: '能力',
       dataIndex: ['product', 'name'],
       key: 'product',
       render: (name: string, record: DemandMatch) => (
@@ -259,7 +268,7 @@ export default function DemandDetailPage() {
             size="small"
             onClick={() => navigate(`/products/${record.productId}`)}
           >
-            查看产品
+            查看能力
           </Button>
           <Button
             type="link"

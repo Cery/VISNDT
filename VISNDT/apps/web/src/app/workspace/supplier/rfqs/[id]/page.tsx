@@ -12,30 +12,17 @@ import RFQResponseStatusBadge from '@/components/rfq/RFQResponseStatusBadge';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import { BusinessIdentityBadge } from '@visndt/design-system';
+import { useAuth } from '@/auth/AuthProvider';
 import { getRfq, createRfqResponse, getMyRfqResponses } from '@/services/rfq.service';
+import { getOffers } from '@/services/offer.service';
 import { ApiError } from '@/lib/api-client';
+import DemandParameters, { formatDemandParameterValue } from '@/components/demand/DemandParameters';
+import type { DemandParameter } from '@/lib/api/demands';
+import type { Offer } from '@/types/product';
 
 type BaseRfqDetail = Awaited<ReturnType<typeof getRfq>>;
 
-interface SupplierDemandParameter {
-  id: string;
-  name: string;
-  value: string;
-  unit?: string | null;
-}
-
-interface SupplierDemandOrganization {
-  id: string;
-  name?: string | null;
-  type?: string | null;
-  status?: string | null;
-}
-
-type SupplierDemandSummary = NonNullable<BaseRfqDetail['demand']> & {
-  organization?: SupplierDemandOrganization | null;
-  parameters?: SupplierDemandParameter[] | null;
-  parameterValues?: SupplierDemandParameter[] | null;
-};
+type SupplierDemandSummary = NonNullable<BaseRfqDetail['demand']>;
 
 type SupplierRfqDetail = Omit<BaseRfqDetail, 'demand'> & {
   demand?: SupplierDemandSummary | null;
@@ -49,7 +36,25 @@ function formatDateTime(value?: string | null) {
   return new Date(value).toLocaleString('zh-CN');
 }
 
-function getDemandParameters(rfq: SupplierRfqDetail) {
+const OFFER_STATUS_LABELS: Record<string, string> = {
+  DRAFT: '草稿',
+  SUBMITTED: '已提交',
+  ACCEPTED: '已接受',
+  REJECTED: '已拒绝',
+  WITHDRAWN: '已撤回',
+};
+
+/** 生成可关联到 RFQ 响应的能力型号展示文案（能力 / 型号 / 报价）。 */
+function formatOfferOption(offer: Offer) {
+  const model = offer.supplierProduct?.modelNumber;
+  const capability = offer.supplierProduct?.platformProduct?.name || offer.product?.name || '未命名能力';
+  const price = offer.price ? `${offer.price}${offer.currency ? ` ${offer.currency}` : ''}` : '未定价';
+  const statusLabel = OFFER_STATUS_LABELS[offer.status] ?? offer.status;
+  const label = model ? `${capability} / ${model}（${statusLabel}）` : `${capability}（${statusLabel}）`;
+  return { label, price, status: statusLabel, capability, model: model ?? '未指定型号' };
+}
+
+function getDemandParameters(rfq: SupplierRfqDetail): DemandParameter[] {
   return rfq.demand?.parameters || rfq.demand?.parameterValues || [];
 }
 
@@ -87,12 +92,16 @@ function mapRfqResponseError(err: unknown): string {
 
 function SupplierRfqDetailContent({ id }: { id: string }) {
   const router = useRouter();
+  const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const toggleSidebar = useCallback(() => setSidebarOpen((value) => !value), []);
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   const [rfq, setRfq] = useState<SupplierRfqDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [offersLoading, setOffersLoading] = useState(false);
 
   const [responseMessage, setResponseMessage] = useState('');
   const [responseOfferId, setResponseOfferId] = useState('');
@@ -147,6 +156,31 @@ function SupplierRfqDetailContent({ id }: { id: string }) {
     void loadRfq();
     void checkExistingResponse();
   }, [loadRfq, checkExistingResponse]);
+
+  useEffect(() => {
+    if (!user?.organizationId) {
+      return;
+    }
+    let cancelled = false;
+    setOffersLoading(true);
+    getOffers({ organizationId: user.organizationId, page: 1, pageSize: 100 })
+      .then((res) => {
+        if (!cancelled) {
+          setOffers(res.data ?? []);
+        }
+      })
+      .catch(() => {
+        // Non-critical: 保持空列表，用户仍可直接填写 Offer ID
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setOffersLoading(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.organizationId]);
 
   const handleSubmitResponse = useCallback(async () => {
     setSubmitError('');
@@ -289,43 +323,10 @@ function SupplierRfqDetailContent({ id }: { id: string }) {
                     <h2 className="text-lg font-semibold text-slate-900">Demand 参数</h2>
                     <div className="mt-4">
                       {demandParameters.length > 0 ? (
-                        <div className="overflow-hidden rounded-lg border border-slate-200">
-                          <table className="w-full text-sm">
-                            <thead className="bg-slate-50">
-                              <tr>
-                                <th className="w-1/3 px-4 py-2.5 text-left font-medium text-slate-600">
-                                  参数
-                                </th>
-                                <th className="px-4 py-2.5 text-left font-medium text-slate-600">
-                                  值
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                              {demandParameters.map((parameter) => (
-                                <tr
-                                  key={parameter.id}
-                                  className="transition-colors hover:bg-slate-50"
-                                >
-                                  <td className="px-4 py-2.5 font-medium text-slate-700">
-                                    {parameter.name}
-                                  </td>
-                                  <td className="px-4 py-2.5 text-slate-600">
-                                    {parameter.value}
-                                    {parameter.unit ? (
-                                      <span className="ml-1 text-slate-400">
-                                        {parameter.unit}
-                                      </span>
-                                    ) : null}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+                        <DemandParameters parameters={demandParameters} />
                       ) : (
                         <p className="text-sm text-slate-500">
-                          当前详情接口未返回需求参数，页面不额外扩展 API。
+                          该需求未提供技术参数。
                         </p>
                       )}
                     </div>
@@ -392,8 +393,8 @@ function SupplierRfqDetailContent({ id }: { id: string }) {
                           <div className="mt-2 grid gap-2 sm:grid-cols-2">
                             {demandParameters.map((p) => (
                               <div key={p.id} className="flex items-center gap-2 rounded bg-white px-3 py-2">
-                                <span className="text-sm font-medium text-slate-700">{p.name}:</span>
-                                <span className="text-sm text-slate-600">{p.value}{p.unit ? ` ${p.unit}` : ''}</span>
+                                <span className="text-sm font-medium text-slate-700">{p.parameterDefinition.name}:</span>
+                                <span className="text-sm text-slate-600">{formatDemandParameterValue(p)}</span>
                               </div>
                             ))}
                           </div>
@@ -403,6 +404,45 @@ function SupplierRfqDetailContent({ id }: { id: string }) {
                       )}
                     </div>
                   </section>
+
+                  {rfq.sourceMatch ? (
+                    <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                      <h2 className="text-lg font-semibold text-slate-900">匹配来源</h2>
+                      <p className="mt-1 text-sm text-slate-500">
+                        该 RFQ 由匹配结果发起，以下信息帮助您理解为何收到此询价。
+                      </p>
+                      <div className="mt-4 grid gap-4 md:grid-cols-2">
+                        <div className="rounded-lg bg-slate-50 p-4">
+                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                            匹配产品
+                          </p>
+                          <p className="mt-2 text-sm font-medium text-slate-900">
+                            {rfq.sourceMatch.product?.name || '暂无'}
+                          </p>
+                          {rfq.sourceMatch.product?.category?.name ? (
+                            <p className="mt-1 text-xs text-slate-500">
+                              分类：{rfq.sourceMatch.product.category.name}
+                            </p>
+                          ) : null}
+                        </div>
+                        <div className="rounded-lg bg-slate-50 p-4">
+                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                            匹配得分
+                          </p>
+                          <p className="mt-2 text-sm font-medium text-slate-900">
+                            {rfq.sourceMatch.matchScore != null
+                              ? `${rfq.sourceMatch.matchScore}%`
+                              : '暂无'}
+                          </p>
+                          {rfq.sourceMatch.matchStatus ? (
+                            <p className="mt-1 text-xs text-slate-500">
+                              状态：{rfq.sourceMatch.matchStatus}
+                            </p>
+                          ) : null}
+                        </div>
+                      </div>
+                    </section>
+                  ) : null}
 
                   {!isCheckingResponse && existingResponse ? (
                     <section className="rounded-xl border border-blue-200 bg-blue-50 p-6 shadow-sm">
@@ -484,20 +524,42 @@ function SupplierRfqDetailContent({ id }: { id: string }) {
                             htmlFor="response-offer-id"
                             className="block text-sm font-medium text-slate-700"
                           >
-                            Offer ID（可选）
+                            关联报价（可选）
                           </label>
                           <p className="mt-1 text-xs text-slate-500">
-                            如果您希望关联已发布的 Offer，请填写 Offer ID；留空则不绑定 Offer。
+                            选择您已创建的报价，用于快速响应此 RFQ；如无合适报价可留空。
                           </p>
-                          <input
-                            id="response-offer-id"
-                            type="text"
-                            value={responseOfferId}
-                            onChange={(e) => setResponseOfferId(e.target.value)}
-                            disabled={isSubmitting}
-                            placeholder="例如：off_xxxxxx"
-                            className="mt-2 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
-                          />
+                          {offersLoading ? (
+                            <div className="mt-2 flex h-10 items-center justify-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm">
+                              <svg className="h-4 w-4 animate-spin text-slate-400" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                              </svg>
+                            </div>
+                          ) : (
+                            <select
+                              id="response-offer-id"
+                              value={responseOfferId}
+                              onChange={(e) => setResponseOfferId(e.target.value)}
+                              disabled={isSubmitting}
+                              className="mt-2 block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                            >
+                              <option value="">请选择报价（可选）</option>
+                              {offers.map((offer) => {
+                                const option = formatOfferOption(offer);
+                                return (
+                                  <option key={offer.id} value={offer.id}>
+                                    {option.label} - {option.price}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                          )}
+                          {!offersLoading && offers.length === 0 ? (
+                            <p className="mt-1 text-xs text-amber-600">
+                              当前暂无可用报价，可先前往“创建报价”提交能力报价后再关联。
+                            </p>
+                          ) : null}
                         </div>
 
                         <div>

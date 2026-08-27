@@ -121,7 +121,7 @@ export default function ProductDetailContent({
                   {product.description && (
                     <div>
                       <h2 className="font-semibold text-sm text-slate-700 mb-2">
-                        产品描述
+                        能力描述
                       </h2>
                       <p className="text-sm text-slate-500 whitespace-pre-wrap leading-relaxed">
                         {displayDescription}
@@ -176,7 +176,7 @@ export default function ProductDetailContent({
                   <EmptyState
                     icon="document"
                     message="暂无技术参数"
-                    description="该产品尚未录入技术参数信息。"
+                    description="该能力尚未录入技术参数信息。"
                   />
                 )}
               </div>
@@ -187,7 +187,7 @@ export default function ProductDetailContent({
           {activeTab === 'suppliers' && (
             <section id="suppliers">
               <h2 className="text-2xl font-extrabold text-foreground mb-6">
-                供应商
+                能力提供商
               </h2>
               <SupplierInquirySection
                 productId={product.id}
@@ -253,7 +253,7 @@ export default function ProductDetailContent({
                 <EmptyState
                   icon="document"
                   message="暂无文档与证书"
-                  description="该产品尚未上传相关文档或证书。"
+                  description="该能力尚未上传相关文档或证书。"
                 />
               )}
             </section>
@@ -273,7 +273,7 @@ export default function ProductDetailContent({
           {activeTab === 'related' && (
             <section id="related">
               <h2 className="text-2xl font-extrabold text-foreground mb-6">
-                相关产品
+                相关能力
               </h2>
               <RelatedProductsSection
                 currentProductId={product.id}

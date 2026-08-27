@@ -27,6 +27,11 @@ export interface RfqResponse {
       id: string;
       name: string;
     };
+    supplierProduct?: {
+      id: string;
+      modelNumber: string;
+      brand?: string | null;
+    } | null;
   };
 }
 

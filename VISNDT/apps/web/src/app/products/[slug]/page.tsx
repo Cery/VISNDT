@@ -31,7 +31,7 @@ export async function generateMetadata({
       title: product.name,
       description:
         (product.description?.slice(0, 160) ?? '') ||
-        `VISNDT产品详情：${product.name}`,
+        `VISNDT能力详情：${product.name}`,
       alternates: { canonical: productUrl },
       openGraph: {
         title: product.name,
@@ -49,7 +49,7 @@ export async function generateMetadata({
     };
   } catch {
     return {
-      title: '产品详情',
+      title: '能力详情',
       description: SITE_DESCRIPTION,
     };
   }
@@ -128,7 +128,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
   const breadcrumbItems = [
     { name: '首页', url: absoluteUrl('/') },
-    { name: '产品列表', url: absoluteUrl('/products') },
+    { name: '能力列表', url: absoluteUrl('/products') },
   ];
   if (product.category) {
     breadcrumbItems.push({
@@ -158,7 +158,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         </Link>
         <span className="text-slate-300">/</span>
         <Link href="/products" className="hover:text-primary transition-colors whitespace-nowrap">
-          产品列表
+          能力列表
         </Link>
         {product.category && (
           <>

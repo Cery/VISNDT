@@ -262,13 +262,67 @@ export class RfqsService {
     return { data, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
   }
 
-  async findOne(id: string) {
+  async findOne(
+    id: string,
+    user?: {
+      id: string;
+      organizationId?: string | null;
+      organizationMember?: { role?: string } | null;
+    },
+  ) {
+    const baseInclude = {
+      createdByUser: true,
+      demand: {
+        include: {
+          organization: true,
+          parameters: {
+            include: { parameterDefinition: { include: { options: true } } },
+          },
+        },
+      },
+    };
+
     const rfq = await this.prisma.rFQ.findUnique({
       where: { id },
-      include: { demand: true, createdByUser: true },
+      include: baseInclude,
     });
     if (!rfq) throw new NotFoundException(`RFQ ${id} not found`);
-    return rfq;
+
+    // 可见性裁剪：仅 buyer 组织 / 目标供应商组织 / 创建者 / 管理员
+    // 可见补充交易上下文（sourceMatch / targetOrganization / responses）。
+    // 其它请求者仅返回基础需求信息，保持既有报价能力且不扩大权限。
+    const canViewFull =
+      Boolean(user) &&
+      (user!.id === rfq.createdBy ||
+        (Boolean(user!.organizationId) &&
+          user!.organizationId === rfq.demand?.organizationId) ||
+        (Boolean(user!.organizationId) &&
+          user!.organizationId === rfq.targetOrganizationId &&
+          rfq.targetOrganizationId != null) ||
+        user!.organizationMember?.role === 'ADMIN');
+
+    if (!canViewFull) {
+      return rfq;
+    }
+
+    return this.prisma.rFQ.findUnique({
+      where: { id },
+      include: {
+        ...baseInclude,
+        sourceMatch: {
+          include: { product: true, offer: true },
+        },
+        targetOrganization: true,
+        responses: {
+          include: {
+            organization: true,
+            offer: {
+              include: { supplierProduct: { include: { platformProduct: true } } },
+            },
+          },
+        },
+      },
+    });
   }
 
   async create(

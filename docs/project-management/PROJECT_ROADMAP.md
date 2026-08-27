@@ -1024,6 +1024,403 @@ Review Report:             docs/_review/700_M29.0_Search_Function_And_UI_Audit_R
 Next:                      701 M29.1 Search Supplier Removal And Header IA Optimization（独立实施任务）
 ```
 
+### 701 M29.1 Search Boundary Cleanup（701 COMPLETED / PASS）
+
+701_M29.1_Search_Boundary_Cleanup（指令 V3.2.3，Frontend Boundary Cleanup + Search Scope Correction + Architecture Compliance Fix）:
+```text
+Status:                    PASS
+Repository:                VERIFIED（F:/Desktop/VISNDT，branch=main，Working Tree=PRESERVED）
+Baseline:                  700 = CONDITIONAL PASS / M25 = CLOSED / M28 = CLOSED / M29 = ACTIVE / SEARCH
+Search Boundary:           RESTORED（Industrial Inspection Capability Discovery）
+Supplier Search:           REMOVED FROM SEARCH ENTRY（GlobalSearchBar 搜索域 + SearchTypeTabs Tab + SupplierResultCard + 首页 CTA）
+Supplier Domain:           PRESERVED（Capability Provider 上下文；supplier-product 能力发现保留）
+Frontend:                  UPDATED（1 删除 + 7 修改）
+API:                       UNCHANGED（后端 searchSuppliers / UnifiedSearchDto 未改，仅前端收窄读取类型）
+Database / Migration:      UNCHANGED / NONE
+Mobile:                    VERIFIED（375 / 768 / 1440 三断点无 Supplier Search Entry）
+Build:                     Web tsc exit 0 + next build exit 0（43 pages）
+P0 / P1:                   0 / 0
+Documentation:             SYNCED
+Review Report:             docs/_review/701_M29.1_Search_Boundary_Cleanup_Report.md
+Next:                      702 M29.2 Search Entry And Hero Optimization
+```
+
+### 702 M29.2 Search Entry And Hero Optimization（702 COMPLETED / PASS）
+
+702_M29.2_Search_Entry_And_Hero_Optimization（指令 V3.2.3，Search Entry Visual Weight + Search Hero + Responsive Verification）:
+```text
+Status:                    PASS
+Repository:                VERIFIED（F:/Desktop/VISNDT，branch=main，Working Tree=PRESERVED）
+Baseline:                  701 = PASS（Supplier Search REMOVED / SupplierProduct PRESERVED）
+Search Hero:               ADDED（/search 无关键词首屏独立 Hero，复用 GlobalSearchBar，无新 API/DB）
+Search Entry:              IMPROVED（GlobalSearchBar 新增 variant=hero 大尺寸响应式变体）
+Search Core:               FROZEN（query/filter/pagination/ranking/entity scope 语义不变）
+API / Service:             UNCHANGED（GET /search + /search/context 零改动）
+Database / Migration:      UNCHANGED / NONE
+Supplier Search:           STILL REMOVED（无 supplier 搜索域回归）
+SupplierProduct:           PRESERVED（supplier-product 能力发现保留）
+Frontend:                  UPDATED（1 新增 SearchHero + 2 修改 GlobalSearchBar/SearchPageContent）
+Mobile:                    VERIFIED（375/390/768/1024/1440；Hero 响应式 + Header 移动搜索入口保留）
+Build:                     Web tsc exit 0 + next build exit 0（43 pages）
+P0 / P1:                   0 / 0
+Documentation:             SYNCED
+Review Report:             docs/_review/702_M29.2_Search_Entry_And_Hero_Optimization_Report.md
+Next:                      703 M29.3 Search Result Presentation Optimization
+```
+
+### 703 M29.3 Search Result Presentation Optimization（703 COMPLETED / CONDITIONAL PASS）
+
+703_M29.3_Search_Result_Presentation_Optimization（指令 V3.2.3，Search Result IA + Capability Discovery Presentation + Responsive UI + Search Regression Verification）:
+```text
+Status:                    CONDITIONAL PASS（完整浏览器交互 E2E 待补，与 702 同口径）
+Repository:                VERIFIED（F:/Desktop/VISNDT，branch=main，Working Tree=PRESERVED）
+Baseline:                  702 = PASS；701 = PASS（Supplier Search ABSENT / SupplierProduct PRESENT）
+Result Summary:            ADDED（SearchResultSummary：发现 N 项相关检测能力 + 产品/检测方案/能力型号/知识，基于既有 /search counts）
+Result IA:                 REORDERED（Product Capability → Solution → SupplierProduct → Knowledge；Presentation Only）
+Product Card:              ENHANCED（检测能力 badge + 型号 + 摘要 + 分类 + CTA 查看能力 + 高亮）
+Solution Card:             ELEVATED（检测方案 badge + 摘要 + 适用场景 tags + CTA 查看方案）
+Knowledge / Content:       AUXILIARY（相关知识，权重不压过核心能力）
+Terminology:               CONVERGED（搜索域 供应商型号 → 能力型号；内部模型/DB/API/Identity 未改）
+Search Core:               FROZEN（Search API/Service/Ranking/Matching/AI/DB/Storage 全 UNCHANGED）
+Filter / Pagination / URL: PRESERVED（category/fc/f_*/sb/ss/sh/page 链路无回归）
+Supplier Search:           STILL ABSENT（前端 UnifiedDiscoveryResponse 无 suppliers；SupplierResultCard 不存在）
+SupplierProduct:           PRESERVED（能力型号 discovery 保留）
+Frontend:                  UPDATED（新增 SearchResultSummary；修改 SearchPageContent/ProductResultCard/SolutionResultCard/SearchTypeTabs/GlobalSearchBar/SearchEmptyState/SupplierModelFacetPanel）
+Build:                     Web tsc exit 0 + next build exit 0（清理 .next 缓存冲突后）
+P0 / P1 / P2 / P3:         0 / 0 / 0 / 0（Observation 3 条 + Future Candidate 1 条，无缺陷）
+Documentation:             SYNCED
+Review Report:             docs/_review/703_M29.3_Search_Result_Presentation_Optimization_Report.md
+Next:                      704 M29.4 Search Final Productization Audit
+```
+
+### 704 M29.4 Search Final Productization Audit（704 COMPLETED / CONDITIONAL PASS）
+
+704_M29.4_Search_Final_Productization_Audit（指令 V3.2.3，M29 Search Experience 最终收口审计）:
+```text
+Status:                    CONDITIONAL PASS（AUDIT ONLY，零代码改动）
+Repository:                VERIFIED（F:/Desktop/VISNDT，branch=main，Working Tree=PRESERVED）
+700-703 Evidence Chain:     VERIFIED（700 CONDITIONAL PASS → 701 PASS → 702 PASS → 703 CONDITIONAL PASS）
+Search Boundary:            VERIFIED（Product/SupplierProduct/Knowledge/Content/Solution；No supplier domain）
+Supplier Search:            ABSENT（SupplierResultCard 已删 / 无 searchSuppliers / 无供应商 Tab / CTA）
+SupplierProduct:            PRESERVED（能力型号 discovery）
+Search Entry + Hero:        VERIFIED（GlobalSearchBar + SearchHero 工业检测能力发现定位）
+Result Summary:             VERIFIED（情况 A：检测能力语义，不含 content，未暗示全部结果）
+Result Presentation:        VERIFIED（Product → Solution → SupplierProduct → Knowledge；Presentation ≠ Ranking）
+Filter / Pagination / URL:  VERIFIED（category/fc/f_*/sb/ss/sh/page 无回归；supplier 参数不存在）
+Mobile / Desktop:           VERIFIED / PARTIAL（代码级多断点；浏览器视觉未跑）
+Accessibility / Design:     VERIFIED(PARTIAL 静态) / COMPLIANT（复用 Tailwind token，无独立 Search 体系）
+Build:                      Web tsc --noEmit exit 0 + pnpm --filter @visndt/web build exit 0（43 页）
+Architecture:               DB/API/Search Service/Ranking/Matching/Storage/AI 全 UNCHANGED，Migration NONE
+Browser E2E:                UNAVAILABLE（无浏览器驱动工具，不伪造）
+P0 / P1 / P2 / P3:          0 / 0 / 0 / 0（Observation 3 条 + Future Candidate 4 条）
+M29:                        CONDITIONAL（Implementation COMPLETED / Validation CONDITIONAL PASS）
+Documentation:              SYNCED
+Review Report:              docs/_review/704_M29.4_Search_Final_Productization_Audit_Report.md
+Next:                       M30 Candidate Review（本任务不自行进入）
+```
+
+### 705 M30.1 Capability Semantic Productization P0 Fix Implementation（705 COMPLETED / PASS）
+
+705_M30.1_Capability_Semantic_Productization_P0_Fix_Implementation（指令 V3.2.3，M30 Capability Productization 第一阶段）:
+```text
+Status:                    PASS（Frontend Semantic Alignment / SEO Productization Fix）
+Repository:                VERIFIED（F:/Desktop/VISNDT，branch=main，Commit=2143efc）
+Modified Files:             3（seo.tsx / seo-config.ts / HeroBanner.tsx）
+SEO Description:            FIXED（工业无损检测设备平台 → 工业检测能力发现平台）
+SEO Keywords:               FIXED（移除设备品类，新增 Capability 语义）
+Default Title:              FIXED（VISNDT – 工业检测设备平台 → VISNDT – 工业检测能力发现平台）
+HeroBanner:                 FIXED（h1/副标题/CTA 全部收敛为 Capability Discovery 语义）
+M29.5 P0 Closure:           CLOSED（P0-01/P0-02/P0-03 全部修复）
+Build:                      Web tsc --noEmit exit 0 + next build exit 0（43 页）
+Architecture:               DB/API/Schema/Search Service/Matching/AI 全 UNCHANGED，Migration NONE
+P0 / P1:                    0 / 0
+M30.1:                      PASS
+Documentation:              SYNCED
+Review Report:              docs/_review/705_M30.1_Capability_Semantic_Productization_P0_Fix_Implementation_Report.md
+Next:                       706 M30.2 Capability Vocabulary Unification And Admin Web Alignment
+```
+
+### 706 M30.2 Capability Vocabulary Unification And Admin Web Alignment（706 COMPLETED / PASS）
+
+706_M30.2_Capability_Vocabulary_Unification_And_Admin_Web_Alignment（指令 V3.2.3，M30 Capability Productization 第二阶段）:
+```text
+Status:                    PASS（Frontend Semantic Unification + Admin UX Alignment + CRUD Completion）
+Repository:                VERIFIED（F:/Desktop/VISNDT，branch=main，Commit=2143efc）
+Web Vocabulary:            UNIFIED（Search / Product Catalog / SupplierProduct / Home，全部 Capability 术语）
+Admin Vocabulary:          UNIFIED（Navigation / Product Management / SupplierProduct / Demand / Category）
+Capability Vocabulary:     产品→能力 / 供应商型号→能力型号 / 产品分类→能力分类 / 产品参数→能力参数 / 产品询价→能力询价
+ProductForm CRUD:          VERIFIED（slug/seoTitle/seoDescription: API DTO 不支持 → Future Candidate 4 项）
+Product Media:             VERIFIED（编辑模式现有媒体回显 + 主图识别 + 管理入口）
+DemandEdit:                VERIFIED（contactVisible + status 合法转换；categoryId: API DTO 不支持 → Future Candidate）
+Search Regression:         VERIFIED（Supplier Search=ABSENT / SupplierProduct=PRESENT）
+SEO Safety:                VERIFIED（705 语义未回退 / 行业关键词保留）
+Mobile:                    VERIFIED（375/390/768）
+Accessibility:             VERIFIED
+Build:                     Web tsc --noEmit exit 0 + next build exit 0（43 pages）；Admin tsc --noEmit exit 0 + build exit 0（5944 modules）
+Architecture:              DB/API/Schema/Search/Matching/Storage/AI 全 UNCHANGED，Migration NONE
+P0 / P1 / P2 / P3:        0 / 0 / 0 / 0（Future Candidate 4 项）
+P1-16:                     CLOSED / FIXED（705 已完成）
+Gates:                     20/20 PASS
+M30.2:                     PASS
+Documentation:             SYNCED
+Review Report:             docs/_review/706_M30.2_Capability_Vocabulary_Unification_And_Admin_Web_Alignment_Report.md
+Next:                      707 M30.3 Capability Productization Validation Audit
+```
+
+### 707 M30.3 Capability Productization Validation Audit（707 COMPLETED / CONDITIONAL PASS）
+
+707_M30.3_Capability_Productization_Validation_Audit（指令 V3.2.3，M30.3 Productization Validation / Audit Only / 零代码变更）:
+```text
+Status:                    CONDITIONAL PASS（M30 Gate Review / Audit Only / 零代码变更）
+Repository:                VERIFIED（F:/Desktop/VISNDT，branch=main，Commit=2143efc）
+Evidence Chain:            704 CONDITIONAL PASS → 704-R1 PASS → 705 PASS → 706 PASS → 707 CONDITIONAL PASS
+Capability Domain:         VERIFIED（Product = Platform Capability in code behavior）
+Capability Identity:       VERIFIED（Full chain Search → Product → SupplierProduct → Offer → Inquiry intact）
+Capability Model:          VERIFIED（SupplierProduct = Capability Model；Supplier = Capability Provider）
+Commercial Closure:        VERIFIED（Offer lifecycle / Inquiry immutable / RFQ Demand-derived）
+Search:                    VERIFIED（Supplier Search ABSENT / SupplierProduct PRESENT / API UNCHANGED）
+Web:                       VERIFIED（Core Capability pages aligned；2 P1 metadata residuals）
+Admin:                     VERIFIED（UX = Capability Operation Center）
+SEO:                       VERIFIED（705 P0 preserved；root layout P1 residual）
+Mobile:                    VERIFIED（375/390/768）
+Accessibility:             VERIFIED
+Design System:             VERIFIED（No drift）
+Architecture:              FROZEN（DB/API/Schema/Search/Matching/Storage/AI 全 UNCHANGED）
+Scope Compliance:          PASS（No Schema/API/Search/Matching/AI/Storage changes in 705/706）
+P0 / P1 / P2 / P3:        0 / 2 / 8 / 1（Future Candidate 4 + 704-FC FROZEN）
+P1 Details:                R-707-01 layout.tsx root metadata / R-707-02 products/layout.tsx metadata
+M30 Completion:             11/13 PASS, 2/13 CONDITIONAL
+M30 Gate:                  CONDITIONAL（READY，2 P1 Frontend-only metadata fixes）
+M31 Gate:                  CONDITIONAL（P1 fixes required before M31 entry）
+Documentation:             SYNCED
+Review Report:             docs/_review/707_M30.3_Capability_Productization_Validation_Audit_Report.md
+Next:                      M30 Final Closeout（含 P1 metadata fixes）→ M31 Entry
+```
+
+### 708 M30.4 P1 Metadata Residual Fix（708 COMPLETED / PASS）
+
+708_M30.4_P1_Metadata_Residual_Fix（指令 V3.2.3，M30 Final Closeout Preparation / Frontend Semantic Alignment）:
+```text
+Status:                    PASS（P1 Metadata Closure / M30 Closeout Preparation）
+R-707-01:                  CLOSED（layout.tsx 3 处 工业检测设备平台→工业检测能力发现平台）
+R-707-02:                  CLOSED（products/layout.tsx 产品中心→能力目录 / 工业检测设备产品目录→工业检测能力目录）
+Root Metadata:             ALIGNED（title/description/OG/twitter 全部 Capability 语义）
+Products Metadata:         ALIGNED（title/description/OG 全部 Capability Catalog 语义）
+705 Baseline:              PRESERVED（SITE_DESCRIPTION/defaultTitle/SITE_KEYWORDS/HeroBanner）
+Industry Keywords:         PRESERVED（NDT/无损检测/工业检测/内窥镜/超声/射线/测量系统）
+Global Residual Scan:      PASS（核心 metadata 零残余；P2=9 deferred / P3=1 deferred）
+Build:                     Web tsc --noEmit exit 0 + next build exit 0（43 pages）
+Architecture:              DB/API/Schema/Search/Matching/Storage/AI 全 UNCHANGED，Migration NONE
+P0 / P1 / P2 / P3:        0 / 0 / 9 / 1（existing deferred）
+M30 Closeout:              READY
+M31:                       PENDING FINAL CLOSEOUT
+Review Report:             docs/_review/708_M30.4_P1_Metadata_Residual_Fix_Report.md
+Next:                      709_M30_Final_Closeout
+```
+
+### 709 Trirole Data Compliance E2E And Defect Fix（709 COMPLETED / PASS）
+
+709_Trirole_Data_Compliance_E2E_And_Defect_Fix（指令 4 连任务：1 数据合规修复 / 2 三角色 E2E / 3 缺陷修复）:
+```text
+Status:                    PASS（Test Data Compliance + Trirole E2E + Defect Fix）
+任务 1 数据合规:          PASS（组织名违规后缀清理；admin@visndt.com / admin123456 组织与密码修复）
+任务 2 三角色 E2E:        PASS（81/81，_trirole_m30_e2e.mjs，TC_M30 数据运行后清理）
+Admin E2E:                PASS（分类/参数/能力/组织/用户/内容/标签/知识/能力型号/报价/需求/RFQ CRUD）
+Buyer E2E:                PASS（浏览 + inquiries + demands + rfqs）
+Supplier E2E:             PASS（响应 RFQ + 报价 + 工作台 + 能力型号自助创建 403=设计内只读）
+真实缺陷:                 1（GET /content/tags 路由被 :id 抢占 → app.module.ts 模块顺序修复）
+设计内约束:               8 项（无 DELETE 路由/无 PATCH/供应商 403/约束保护 400/404）非缺陷
+供应商自助创建能力型号:    Future（self-service=Future，冻结设计，不新增 API/入口）
+Build:                    api build exit 0 + /content/tags 200 + /health 200
+Architecture:             DB/API/Schema/Search/Matching/Storage/AI 全 UNCHANGED
+P0 / P1:                  0 / 0
+Review Report:            docs/_review/709_Trirole_Data_Compliance_E2E_And_Defect_Fix_Report.md
+Next:                     710_Trirole_Manuals_Optimization
+```
+
+### 710 Trirole Manuals Optimization（710 COMPLETED / PASS）
+
+710_Trirole_Manuals_Optimization（指令任务 4：优化完善管理员/用户/供应商手册）:
+```text
+Status:                    PASS（Documentation Optimization，零代码/零DB/零API/零架构变更）
+管理员手册 05:             V2.0→V2.1（导航对齐 Admin 实际菜单；能力型号治理；术语统一）
+用户手册 06:               V1.0→V1.1（能力目录/搜索域对齐/能力询价）
+供应商手册 07:             V1.0→V2.0（运行时能力只读修正；能力型号由平台治理；FAQ 补充）
+Validation:               旧术语扫描通过；手册与系统行为一致
+Review Report:            docs/_review/710_Trirole_Manuals_Optimization_Report.md
+Next:                     M30 Final Closeout → M31 Entry
+```
+
+### 711 Demand RFQ Parameter Chain Audit（711 COMPLETED / AUDIT ONLY）
+
+711_Demand_RFQ_Parameter_Chain_Audit（指令：Demand Technical Parameter 数据链断裂识别，仅审计不改代码）:
+```text
+Status:                    AUDIT ONLY（零代码/零 Schema/零 API 变更）
+核心结论:                  需求技术参数链路三处断裂（录入缺失→接口不含参数→展示缺失且结构不匹配）
+D-1｜P1·Defect:            需求参数录入能力前端完全缺失（后端 /demands/:id/parameters 已存在未消费）
+D-2｜P1·Defect:            RFQ 详情接口不返回需求参数（findOne 未 include demand.parameters）
+D-3｜P2·Defect:            需求参数展示缺失（需求详情 / Buyer RFQ / Supplier RFQ 均无）
+D-4｜P2·UX Issue:          前后端 DemandParameter 结构不匹配（平铺 vs value/valueMin/valueMax+嵌套 definition）
+Repair Option:            前端优先（复用既有 API）+ 最小 API projection 扩展 → 授权 712
+Review Report:            docs/_review/711_Demand_RFQ_Parameter_Chain_Audit_Report.md
+Next:                     712_M30.4_Demand_RFQ_Matching_Data_Closure
+```
+
+### 712 M30.4 Demand RFQ Matching Data Closure（712 COMPLETED / PASS）
+
+712_M30.4_Demand_RFQ_Matching_Data_Closure（指令 V3.2.3 M30.4：修复并贯通 Demand Technical Parameter 数据链）:
+```text
+Status:                    PASS（D-1~D-4 CLOSED / 数据链 Web→API→Matching→RFQ 贯通）
+D-1 录入:                  CLOSED（Web create/edit + Admin DemandEdit 参数录入/回显/增量 diff，DemandParameterEditor 复用组件）
+D-2 RFQ projection:        CLOSED（rfqs.service.ts findOne include demand.parameters 含 options；demands.service.ts 同）
+D-3 展示:                  CLOSED（Buyer RFQ + Supplier RFQ 复用 DemandParameters；修复空态/格式化）
+D-4 结构对齐:              CLOSED（Web/Admin 统一后端嵌套结构，区间/ENUM/BOOLEAN 正确映射）
+契约:                     Web demands.ts 参数 CRUD API + rfqs.ts RfqDemandSummary.parameters + Admin demand.service.ts CRUD
+Build:                    API nest build exit 0 + Admin tsc&&vite build exit 0 + Web next build exit 0（43 pages）
+Runtime:                  API /health 200 / Web 路由 200 / Admin 3001 / PostgreSQL 5432
+参数链路 E2E:             11/11 PASS（verify_712_param_chain.ts，临时 ENUM 定义运行后清理）
+三角色回归:               81/81 PASS（_trirole_m30_e2e.mjs，无回归 + 残留 CLEAN）
+Matching:                 publish 触发匹配无回归；matches 200 分页结构（temp ENUM 下 total=0 预期）
+Architecture:             DB/Schema/Migration NONE；Matching/Search/AI/Storage/SupplierProduct/Offer UNCHANGED
+Defect:                   P0=0 / P1=0 / P2=0 / P3=0
+Review Report:            docs/_review/712_M30.4_Demand_RFQ_Matching_Data_Closure_Report.md
+Next:                     M30.4 Closure 后按既有路线推进 M30 Closeout → M31 Entry
+```
+
+### 713 M30.5 Transaction Data Surface Completion（713 COMPLETED / CONDITIONAL PASS）
+
+713_M30.5_Transaction_Data_Surface_Completion（指令 V3.2.3 M30.5：核心交易数据面收口）:
+```text
+Status:                    CONDITIONAL PASS（Match Explanation / RFQ Context / Offer↔SupplierProduct / Supplier Inquiry 数据面 / Transaction Detail 收口；P0=0 P1=0）
+Match Explanation:         Web Buyer 详情消费真实 matchDetails（algorithm/factors/parameterScores/hardFail/matchScore），无 matchDetails 诚实空态；MatchScore 0-100 直接映射；MatchItem 类型对齐
+RFQ Context:               rfqs.service.ts findOne projection + sourceMatch/targetOrganization/responses（角色权限控制）；Admin RfqDetail 来源匹配/需求参数卡片
+Offer↔SupplierProduct:     offers.service.ts findAll/findOne include supplierProduct；Web Offer 编辑页报价对象区块；validateSupplierBinding 组织一致性守卫
+Inquiry Tracking:          Supplier「收到的询价」列表+详情补齐（能力/能力型号/提供商/状态/时间/联系人）；Inquiry 按接收方组织归属无 Buyer 所有权字段 → Buyer「我的询价」= Future Candidate（禁止 schema/migration，非当前缺陷）
+一致性/契约:               Demand→Match→RFQ→SupplierProduct→Offer→Inquiry 逐链无空区块/未消费字段；API 变更均 projection-only（PROJECTION-EXTENDED）
+Build:                    API nest build exit 0 + Admin tsc&&vite build exit 0 + Web next build exit 0
+Runtime:                  verify_713_surface.ts 36/36 PASS（Match state machine / Offer ownership guard / RFQ/Offer/Inquiry 边界 / 跨链 X01-X05）
+三角色回归:               81/81 PASS（712 baseline 继承，无回归）
+移动端+无障碍:             overflow-x-auto 参数表 / 响应式 grid / 状态色对比度 / 空态/错误态齐全
+Architecture:             DB/Schema/Migration NONE；Matching/Search/AI/Storage UNCHANGED；API PROJECTION-EXTENDED
+Defect:                   P0=0 / P1=0 / P2=0 / P3=0；Future Candidate=1（Buyer 询价所有权视图）；Observation 若干
+Review Report:            docs/_review/713_M30.5_Transaction_Data_Surface_Completion_Report.md
+Next:                     M30 Final Validation / Final Closeout
+```
+
+### 714 M30 Final Validation And M31 Entry Baseline Audit（714 COMPLETED / PASS）
+
+714_M30_Final_Validation_And_M31_Entry_Baseline_Audit（指令 V3.2.3 M30 Final Closeout / Transition M30→M31 Entry / Architecture Audit + Final Validation / Audit Only）:
+```text
+Status:                    PASS（M30 Phase CLOSED / READY；M31 Entry APPROVED）
+M30 Task Matrix:           704 CONDITIONAL → 705 PASS → 706 PASS → 707 CONDITIONAL(2 P1) → 708 PASS(707 P1 CLOSED) → 709 PASS(81/81) → 710 PASS → 711 AUDIT ONLY → 712 PASS(D-1~D-4 CLOSED) → 713 CONDITIONAL(FC=1 非缺陷)
+Capability Closure:        Demand Parameter Chain(712) / Matching Explanation(713) / RFQ Context(713) / SupplierProduct Binding(713) / Offer Surface(713) / Inquiry Surface(Supplier 侧, Buyer=FC) 全 CLOSED；Role Boundary VERIFIED；Runtime VERIFIED（712 11/11+713 36/36+709 81/81）；Doc SYNCED
+Architecture:              FROZEN（DB/Schema UNCHANGED、Migration NONE、API Projection-only、Matching/Search/AI/Storage UNCHANGED；十项边界全 MUST HOLD）
+Impact:                   Frontend 无 fake data / 无前端重算 / 无隐藏 fallback / 无权限绕过；Inquiry 组织域+归属校验 403；RFQ 角色投影
+Future Candidate Register: 5 项（Buyer 询价所有权视图 / 供应商自助能力型号 / 供应商搜索 / Search V2·AI·Vector·RAG / ProductForm 4 字段 API DTO）— 仅登记不实现
+M31 Entry:                APPROVED（架构保持 FROZEN；FC 仅登记；后续遵守 V3.2.3 边界）
+Review Report:            docs/_review/714_M30_Final_Validation_And_M31_Entry_Baseline_Audit_Report.md
+Next:                     M31 Entry
+```
+
+### 715 M31.1 Core User Experience Hardening（715 COMPLETED / PASS）
+
+715_M31.1_Core_User_Experience_Hardening（指令 V3.2.3 M31 主任务之 1 / Development + UX Hardening + Frontend Data Surface Verification + Runtime Validation）:
+```text
+Status:                    PASS
+Buyer Experience:          VERIFIED（Demand Create/Edit/Detail + Parameters + Contact Visibility + Match Detail + RFQ）
+Supplier Experience:       VERIFIED（RFQ「为什么收到+如何响应」+ Offer 对象 + Inquiry 收口）
+Demand:                    VERIFIED（categoryId / quantityUnit / 联系人 + contactVisible 掩码 / NUMBER·ENUM·BOOLEAN 参数展示）
+Matching Explanation:      VERIFIED（真实 matchDetails：factors/parameterScores/hardFail，仅映射不重算，无详情诚实空态）
+RFQ:                       VERIFIED（Supplier sourceMatch 仅目标组织 + Offer 下拉响应 + 已有响应状态）
+Offer:                     VERIFIED（能力/型号/提供商/价格/币种/状态/生命周期；GET /offers/:id 新增所有者组织校验 404）
+Inquiry:                   LIMITED（Supplier 收到询价完成；Buyer 所有权 = Future Candidate 713-FC-01）
+Role Boundary:             VERIFIED（Buyer 读供应商 Offer 详情 404；sourceMatch 无跨组织泄漏）
+Runtime:                   verify_715_surface.ts 36/36 PASS；verify_713_surface.ts 回归 40/40 PASS
+Build:                     API nest build exit 0 + Web tsc --noEmit exit 0 + Admin tsc -b exit 0
+Mobile+Accessibility:      代码级多断点 375/390/768/1024/1440 响应式 + overflow-x-auto 参数表 + label/focus/aria-hidden 齐全
+Architecture:              Schema UNCHANGED / Migration NONE；Matching/Search/AI/Storage UNCHANGED；API PROJECTION-EXTENDED（Role Safe）
+Defect:                    P0=0 / P1=0 / P2=0 / P3=0；Observation 4；Future Candidate=5（继承 714，未新增未实现）
+Review Report:            docs/_review/715_M31.1_Core_User_Experience_Hardening_Report.md
+Next:                     716_M31.2_Admin_Data_Governance_Hardening
+```
+
+### 716 M31.2 Admin / Data Governance Hardening（716 COMPLETED / PASS）
+
+716_M31.2_Admin_Data_Governance_Hardening（指令 V3.2.3 M31 主任务之 2 / Development + Admin Governance Hardening + CRUD Consistency + Lifecycle / Permission Surface Verification + Runtime Validation）:
+```text
+Status:                    PASS
+Product Governance:        VERIFIED（List↔Detail↔Edit 字段一致 + createdBy/status/category 投影 + ENUM label；slug/SEO=706-FC 复核）
+Parameter Governance:      VERIFIED（products findOne 投影 parameterDefinition.options；712 回归 11/11）
+SupplierProduct:           VERIFIED（DRAFT→…→PUBLISHED + REJECT；非法跃迁 400；审核字段完整）
+Demand:                    VERIFIED（categoryId/contact/contactVisible/quantity·unit/org/createdBy List=Detail=Edit；Edit 补齐分类）
+Offer:                     VERIFIED（能力/型号/提供商/价格/币种/状态/生命周期；foreign org 404）
+Inquiry:                   VERIFIED（Admin 列表/详情上下文完整；Buyer 所有权 = 713-FC-01）
+RFQ:                       VERIFIED（sourceMatch/targetOrganization/demand.parameters 上下文完整）
+Content/Article/Solution/Knowledge: VERIFIED（SOLUTION=ContentType；slug/SEO/author；lifecycle DRAFT→REVIEW→PUBLISHED）
+List Detail Edit Symmetry: VERIFIED（八模块全对称）
+Lifecycle:                 VERIFIED（无非法跃迁/Bypass/UI-only/Stale Label/Missing Guard）
+Permission:                VERIFIED（buyer/supplier 读 Admin 端点 403；无权限扩大）
+Auditability:              VERIFIED（createdBy/reviewedBy/reviewedAt/reviewedNote/publishedAt 正确展示）
+Data Surface:              CONSISTENT（Backend + Admin）
+API:                       PROJECTION-EXTENDED（1 处：products findOne parameterDefinition.options）
+Schema:                    UNCHANGED / Migration: NONE
+Matching/Search/AI/Storage: UNCHANGED
+Mobile+Accessibility:      代码级多断点 375/390/768/1024/1440 + AntD 响应式 + label/状态/错误/空/禁用态
+Runtime:                   verify_716_admin_governance.ts 65/65 PASS
+Regression:                87/87 PASS（712 11/11 + 713 40/40 + 715 36/36）
+Build:                     API nest build exit 0 + Web next build exit 0 + Admin tsc -b && vite build exit 0
+Defect:                    P0=0 / P1=0 / P2=0 / P3=0；Observation 3；Future Candidate=5（继承，未实现）
+Review Report:            docs/_review/716_M31.2_Admin_Data_Governance_Hardening_Report.md
+Next:                     717_M31.3_Productization_QA_Stability_Validation
+```
+
+### 717 M31.3 Productization QA / Stability Validation（717 COMPLETED / PASS）
+
+717_M31.3_Productization_QA_Stability_Validation（指令 V3.2.3 M31 主任务之 3 / Productization QA / Stability Validation + Golden Path + Cross-Domain + Runtime Verification + 真实 Web 渲染 Boundary）:
+
+```text
+Status:                    PASS（M31 产品化最终质量验收）
+Golden Path (Buyer/Supplier/Admin): VERIFIED（Buyer 建需求→发布→匹配→RFQ→View→Accept；Supplier 接收→需求上下文→响应→关联报价；Admin 治理各实体）
+Match Details:             VERIFIED（真实 matchDetails，无 AI/LLM/语义/embedding 渗入；F8 正修无误报）
+Domain Data Consistency:   VERIFIED（Demand/Matching/RFQ/Offer/Inquiry/Content/Knowledge 逐域一致）
+Cross-Domain Consistency:  VERIFIED（DB truth vs API truth；J2 sourceMatchId 校正；J4 Inquiry 无 offerId 列=J4x 边界）
+Error/Empty/Boundary:      VERIFIED（加载/空/错误/404/401/403 全态正确引导）
+Permission:                VERIFIED（角色边界无越权；No Marketplace surface）
+Mobile+Accessibility:      VERIFIED（CDP 真实渲染 375/390/768/1024/1440 无溢出；Workspace 诚实边界）
+Production Build:          PASS（API nest build / Web next build / Admin tsc -b && vite build exit 0）
+Runtime:                   verify_717_productization_qa.ts 108/108 PASS（A–K，临时数据清理）
+Regression:                152/152 PASS（712 11/11 + 713 40/40 + 715 36/36 + 716 65/65）
+Schema:                    UNCHANGED / Migration: NONE
+Matching/Search/AI/Storage: UNCHANGED
+API:                       UNCHANGED（业务代码变更 = 0，仅新增验证脚本）
+Defect:                    P0=0 / P1=0 / P2=0 / P3=0；Observation 3；Future Candidate=5（继承，未实现）
+Review Report:            docs/_review/717_M31.3_Productization_QA_Stability_Validation_Report.md
+Next:                     718_M31_Final_Closeout
+```
+
+### 718 M31 Final Closeout（718 COMPLETED / CLOSED）
+
+718_M31_Final_Closeout（指令 V3.2.3 M31 最终关闭 / Architecture Audit + Productization Closeout + Release Readiness Final Validation）:
+
+```text
+Status:                    PASS（M31 Final Closeout）
+M31:                       CLOSED（M31 Productization Stability And Core Experience Closeout 全阶段完成）
+M30→M31 汇总:              M30 = Capability + Transaction Data Closure / 715 = UX Closure / 716 = Admin Governance Closure / 717 = Productization QA / 718 = Final Closeout
+Release Readiness:         APPROVED
+Architecture:              FROZEN
+Schema:                    UNCHANGED
+Migration:                 NONE
+Matching:                  FROZEN
+Search:                    FROZEN
+AI:                        FROZEN
+Marketplace/Supplier Store/Transaction Engine: NONE
+Catalog:                   Capability Management / Demand / Matching / RFQ / Offer / Inquiry / Content Center / Knowledge Surface / Admin Governance / Productization QA 全 CLOSED
+Defect:                    P0=0 / P1=0 / P2=0 / P3=0
+Future Candidate:          REGISTERED（5 项，继承 714/715/716/717，未实施）
+Review Report:            docs/_review/718_M31_Final_Closeout_Report.md
+Next:                     M32 Planning
+```
+
 ## Future Architecture Candidates
 
 以下为未来架构演进候选，当前 **FROZEN / NOT FOR DEVELOPMENT**，待满足触发条件后通过正式架构审计重新激活。

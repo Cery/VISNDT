@@ -34,6 +34,8 @@ const STATUS_OPTIONS = [
   { value: 'ACCEPTED', label: '已接受' },
   { value: 'REJECTED', label: '已拒绝' },
   { value: 'WITHDRAWN', label: '已撤回' },
+  { value: 'ACTIVE', label: '活跃' },
+  { value: 'INACTIVE', label: '不活跃' },
 ];
 
 const BATCH_STATUS_OPTIONS = [
@@ -192,15 +194,15 @@ function OfferList() {
         <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>Offer Operations</Title>
+          <Title level={4} style={{ margin: 0 }}>报价管理</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          Manage supplier capability offerings and status
+          管理能力提供商报价与状态
         </Text>
       </div>
         <Space style={{ marginBottom: 16 }} wrap>
           <Input.Search
-            placeholder="搜索产品/描述..."
+            placeholder="搜索报价/描述..."
             allowClear
             onSearch={handleSearch}
             style={{ width: 240 }}
@@ -235,13 +237,17 @@ function OfferList() {
       render: (title: string | undefined) => title || '-',
     },
     {
-      title: '产品',
+      title: '能力',
       dataIndex: 'product',
       key: 'product',
-      render: (product: Offer['product']) => product?.name || '-',
+      render: (product: Offer['product'], record: Offer) => {
+        const base = product?.name || '-';
+        const model = record.supplierProduct?.modelNumber;
+        return model ? `${base}（${model}）` : base;
+      },
     },
     {
-      title: '供应商',
+      title: '能力提供商',
       dataIndex: 'organization',
       key: 'supplier',
       render: (org: Offer['organization']) => org?.name || '-',
@@ -310,16 +316,16 @@ function OfferList() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>Offer Operations</Title>
+          <Title level={4} style={{ margin: 0 }}>报价管理</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          Manage supplier capability offerings and status
+          管理能力提供商报价与状态
         </Text>
       </div>
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search
-          placeholder="搜索产品/描述..."
+          placeholder="搜索报价/描述..."
           allowClear
           onSearch={handleSearch}
           style={{ width: 240 }}

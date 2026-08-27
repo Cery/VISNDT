@@ -8,10 +8,9 @@ import SearchSuggestionDropdown from '@/components/search/SearchSuggestionDropdo
 const SEARCH_DOMAINS: { value: SearchDomain; label: string }[] = [
   { value: 'all', label: '全部' },
   { value: 'product', label: '产品' },
-  { value: 'supplier-product', label: '供应商型号' },
+  { value: 'supplier-product', label: '能力型号' },
   { value: 'knowledge', label: '知识' },
   { value: 'solution', label: '方案' },
-  { value: 'supplier', label: '供应商' },
 ];
 
 interface GlobalSearchBarProps {
@@ -25,6 +24,8 @@ interface GlobalSearchBarProps {
   onSearch?: (keyword: string, type: SearchDomain) => void;
   /** Show type selector dropdown */
   showTypeSelector?: boolean;
+  /** Visual variant — `hero` enlarges the entry for the search-page hero */
+  variant?: 'default' | 'hero';
 }
 
 export default function GlobalSearchBar({
@@ -33,8 +34,12 @@ export default function GlobalSearchBar({
   initialType = 'all',
   onSearch,
   showTypeSelector = true,
+  variant = 'default',
 }: GlobalSearchBarProps) {
   const router = useRouter();
+  const isHero = variant === 'hero';
+  const controlHeight = isHero ? 'h-14 sm:h-16' : 'h-11';
+  const controlText = isHero ? 'text-base' : 'text-sm';
   const [keyword, setKeyword] = useState(initialKeyword);
   const [searchType, setSearchType] = useState<SearchDomain>(initialType);
   const [typeMenuOpen, setTypeMenuOpen] = useState(false);
@@ -117,7 +122,7 @@ export default function GlobalSearchBar({
             <button
               type="button"
               onClick={() => setTypeMenuOpen(!typeMenuOpen)}
-              className="flex items-center gap-1 h-11 px-3 text-sm font-medium text-slate-600 bg-slate-50 border border-r-0 border-slate-200 rounded-l-lg hover:bg-slate-100 transition-colors"
+              className={`flex items-center gap-1 ${controlHeight} ${isHero ? 'px-3.5' : 'px-3'} ${controlText} font-medium text-slate-600 bg-slate-50 border border-r-0 border-slate-200 rounded-l-lg hover:bg-slate-100 transition-colors`}
             >
               <span className="truncate max-w-[48px]">{currentTypeLabel}</span>
               <svg
@@ -164,7 +169,8 @@ export default function GlobalSearchBar({
             onChange={handleInputChange}
             onFocus={handleInputFocus}
             placeholder={placeholder}
-            className={`w-full h-11 px-3.5 text-sm border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors ${
+            aria-label="搜索关键词"
+            className={`w-full ${controlHeight} ${isHero ? 'px-4' : 'px-3.5'} ${controlText} border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors ${
               showTypeSelector ? 'rounded-r-lg' : 'rounded-lg'
             }`}
           />
@@ -196,7 +202,8 @@ export default function GlobalSearchBar({
       {/* Submit Button */}
       <button
         type="submit"
-        className="flex-shrink-0 h-11 px-5 ml-2 bg-gradient-to-r from-primary to-industrial-cyan text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity flex items-center gap-1.5 shadow-industrial-sm"
+        aria-label="搜索"
+        className={`flex-shrink-0 ${controlHeight} ${isHero ? 'px-6 sm:px-7' : 'px-5'} ml-2 bg-gradient-to-r from-primary to-industrial-cyan text-white rounded-lg ${controlText} font-medium hover:opacity-90 transition-opacity flex items-center gap-1.5 ${isHero ? 'shadow-industrial-lg' : 'shadow-industrial-sm'}`}
       >
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="11" cy="11" r="8" />

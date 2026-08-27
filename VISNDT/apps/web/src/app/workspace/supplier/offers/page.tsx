@@ -162,6 +162,11 @@ function OfferListContent() {
                   <p className="mt-2 text-sm text-slate-500 line-clamp-2">{offer.description}</p>
                 )}
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                  {offer.supplierProduct && (
+                    <span className="rounded bg-slate-50 px-2 py-0.5 font-medium text-slate-600">
+                      能力型号 · {offer.supplierProduct.brand} {offer.supplierProduct.modelNumber}
+                    </span>
+                  )}
                   {offer.price && (
                     <span className="rounded bg-slate-50 px-2 py-0.5 font-medium text-slate-600">
                       {offer.currency ?? 'CNY'} {Number(offer.price).toLocaleString()}

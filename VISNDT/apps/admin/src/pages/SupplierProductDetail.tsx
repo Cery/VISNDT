@@ -50,7 +50,7 @@ export default function SupplierProductDetailPage() {
       setPageState({ status: 'success', data });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : '加载供应商产品失败';
+        err instanceof Error ? err.message : '加载能力型号失败';
       setPageState({ status: 'error', message });
     }
   }, [id]);
@@ -79,10 +79,10 @@ export default function SupplierProductDetailPage() {
 
   const handleSubmit = () => {
     Modal.confirm({
-      title: '提交供应商产品',
+      title: '提交能力型号',
       content: '确认提交（DRAFT → SUBMITTED）？',
       okText: '提交',
-      onOk: () => runAction(() => supplierProductService.submit(id!), '供应商产品已提交'),
+      onOk: () => runAction(() => supplierProductService.submit(id!), '能力型号已提交'),
     });
   };
 
@@ -100,16 +100,16 @@ export default function SupplierProductDetailPage() {
       title: '通过审核',
       content: '确认通过（REVIEWING → APPROVED）？',
       okText: '通过',
-      onOk: () => runAction(() => supplierProductService.approve(id!), '供应商产品已通过'),
+      onOk: () => runAction(() => supplierProductService.approve(id!), '能力型号已通过'),
     });
   };
 
   const handlePublish = () => {
     Modal.confirm({
-      title: '发布供应商产品',
+      title: '发布能力型号',
       content: '确认发布（APPROVED → PUBLISHED）？',
       okText: '发布',
-      onOk: () => runAction(() => supplierProductService.publish(id!), '供应商产品已发布'),
+      onOk: () => runAction(() => supplierProductService.publish(id!), '能力型号已发布'),
     });
   };
 
@@ -118,7 +118,7 @@ export default function SupplierProductDetailPage() {
       message.warning('请填写拒绝原因（reviewedNote）');
       return;
     }
-    runAction(() => supplierProductService.reject(id!, rejectNote.trim()), '供应商产品已拒绝')
+    runAction(() => supplierProductService.reject(id!, rejectNote.trim()), '能力型号已拒绝')
       .then(() => setRejectOpen(false))
       .catch(() => undefined);
   };
@@ -135,7 +135,7 @@ export default function SupplierProductDetailPage() {
     return (
       <Alert
         type="error"
-        message="加载供应商产品失败"
+        message="加载能力型号失败"
         description={pageState.message}
         showIcon
         action={
@@ -167,15 +167,15 @@ export default function SupplierProductDetailPage() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>Supplier Product Detail</Title>
+          <Title level={4} style={{ margin: 0 }}>能力型号详情</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          供应商型号审核详情 — Review / Approve / Publish / Govern
+          能力型号审核详情 — 审核 / 通过 / 发布 / 治理
         </Text>
       </div>
 
       {/* Card: SupplierProduct Identity */}
-      <Card title="供应商产品身份（SupplierProduct）" style={{ marginBottom: 16 }}>
+      <Card title="能力型号身份（Capability Model）" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
           <Descriptions.Item label="品牌">{sp.brand}</Descriptions.Item>
           <Descriptions.Item label="系列">{sp.series || '-'}</Descriptions.Item>
@@ -311,7 +311,7 @@ export default function SupplierProductDetailPage() {
       </Card>
 
       <Modal
-        title="拒绝供应商产品"
+        title="拒绝能力型号"
         open={rejectOpen}
         okText="拒绝"
         okType="danger"

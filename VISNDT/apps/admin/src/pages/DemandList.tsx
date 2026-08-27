@@ -309,10 +309,10 @@ function DemandList() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>Demand Operations</Title>
+          <Title level={4} style={{ margin: 0 }}>需求管理</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          Manage buyer demand submissions, status and lifecycle
+          管理买方需求提交、状态与生命周期
         </Text>
       </div>
 

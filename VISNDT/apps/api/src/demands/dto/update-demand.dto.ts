@@ -57,4 +57,9 @@ export class UpdateDemandDto {
   @IsOptional()
   @IsBoolean()
   contactVisible?: boolean;
+
+  @ApiPropertyOptional({ description: 'Demand category id (ProductCategory relation)' })
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
 }

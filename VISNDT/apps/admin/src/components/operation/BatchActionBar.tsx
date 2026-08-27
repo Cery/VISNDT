@@ -1,4 +1,4 @@
-import { Button, Modal, message, Space } from 'antd';
+import { Button, App, Space } from 'antd';
 
 interface BatchAction {
   key: string;
@@ -29,6 +29,7 @@ export default function BatchActionBar({
   loading = false,
   placeholder = '勾选数据行后，可进行批量操作',
 }: BatchActionBarProps) {
+  const { modal, message } = App.useApp();
   const count = selectedRowKeys.length;
 
   if (count === 0) {
@@ -56,7 +57,7 @@ export default function BatchActionBar({
     const confirmContent =
       action.confirmContent || `确定要对选中的 ${count} 项执行「${action.label}」操作吗？`;
 
-    Modal.confirm({
+    modal.confirm({
       title: confirmTitle,
       content: confirmContent,
       okText: '确认',

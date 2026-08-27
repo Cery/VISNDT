@@ -29,6 +29,7 @@ const SUPPLIER_QUICK_ITEMS = [
   { title: '商机中心', description: '发现公开 RFQ 机会', href: '/workspace/supplier/opportunities', icon: 'target' },
   { title: '我的响应', description: '跟踪响应状态与历史', href: '/workspace/supplier/responses', icon: 'send' },
   { title: '我的报价', description: '管理供应能力报价', href: '/workspace/supplier/offers', icon: 'package' },
+  { title: '收到的询价', description: '查看潜客询价线索与跟进', href: '/workspace/supplier/inquiries', icon: 'inbox' },
   { title: '企业资料', description: '维护企业身份与公开资料', href: '/workspace/supplier/profile', icon: 'building' },
   { title: '展示管理', description: '管理能力展示', href: '/workspace/supplier/display', icon: 'list' },
 ] as const;

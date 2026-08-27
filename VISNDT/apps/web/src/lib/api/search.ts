@@ -39,15 +39,6 @@ export interface ContentDiscoveryItem {
   tags: Array<{ tag: { id: string; name: string; slug: string; type: string } }>;
 }
 
-/** Supplier discovery item from backend */
-export interface SupplierDiscoveryItem {
-  organizationId: string;
-  organizationName: string;
-  offerCount: number;
-  offerTitles: string[];
-  productNames: string[];
-}
-
 /** Capability (Platform Product = Capability Authority) projection in a supplier-product result */
 export interface SupplierProductCapability {
   id: string;
@@ -96,7 +87,6 @@ export interface UnifiedDiscoveryResponse {
   knowledge: EntitySearchGroup<KnowledgeDiscoveryItem>;
   content: EntitySearchGroup<ContentDiscoveryItem>;
   solutions: EntitySearchGroup<ContentDiscoveryItem>;
-  suppliers: EntitySearchGroup<SupplierDiscoveryItem>;
   /**
    * M28.0 M661.6 — SupplierProduct dimension facet bundle served directly by
    * the unified `/search` response (pagination-independent). SearchPage only

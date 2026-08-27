@@ -282,7 +282,7 @@ function RfqList() {
       },
     },
     {
-      title: '目标供应商',
+      title: '目标能力提供商',
       key: 'targetOrganization',
       width: 160,
       render: (_: unknown, record: Rfq) => {

@@ -98,6 +98,7 @@ export class DemandsService {
       contactPhone: dto.contactPhone,
       contactEmail: dto.contactEmail,
       contactVisible: dto.contactVisible,
+      categoryId: dto.categoryId,
     };
   }
 
@@ -252,6 +253,7 @@ export class DemandsService {
         include: {
           organization: true,
           createdByUser: true,
+          category: true,
           parameters: { include: { parameterDefinition: true } },
           matches: {
             include: { product: { include: { category: true } } },
@@ -297,6 +299,7 @@ export class DemandsService {
         include: {
           organization: true,
           createdByUser: true,
+          category: true,
           parameters: { include: { parameterDefinition: true } },
         },
       }),
@@ -312,7 +315,10 @@ export class DemandsService {
       include: {
         organization: true,
         createdByUser: true,
-        parameters: { include: { parameterDefinition: true } },
+        category: true,
+        parameters: {
+          include: { parameterDefinition: { include: { options: true } } },
+        },
         matches: {
           include: { product: { include: { category: true } } },
         },
@@ -345,6 +351,7 @@ export class DemandsService {
         contactPhone: dto.contactPhone,
         contactEmail: dto.contactEmail,
         contactVisible: dto.contactVisible ?? false,
+        categoryId: dto.categoryId,
         organizationId: user.organizationId,
         createdBy: user.id,
       },
@@ -601,7 +608,7 @@ export class DemandsService {
 
     return this.prisma.demandParameter.findMany({
       where: { demandId },
-      include: { parameterDefinition: true },
+      include: { parameterDefinition: { include: { options: true } } },
       orderBy: { priority: 'desc' },
     });
   }

@@ -4,6 +4,7 @@ export interface Offer {
   id: string;
   organizationId: string;
   productId: string;
+  supplierProductId?: string | null;
   title: string;
   description?: string;
   price?: number;
@@ -24,6 +25,17 @@ export interface Offer {
     model?: string;
     status?: string;
   };
+
+  /** Capability Model (SupplierProduct) binding — M30.5 projection extension. */
+  supplierProduct?: {
+    id: string;
+    brand: string;
+    series?: string | null;
+    modelNumber: string;
+    status?: string | null;
+    platformProduct?: { id: string; name?: string | null } | null;
+    organization?: { id: string; name?: string | null } | null;
+  } | null;
 
   createdByUser?: {
     id: string;

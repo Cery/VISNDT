@@ -59,13 +59,13 @@ export default function ProductGrid({
     return (
       <EmptyState
         icon={hasActiveFilters ? 'search' : 'package'}
-        message={hasActiveFilters ? '未找到匹配产品' : '暂无产品'}
+        message={hasActiveFilters ? '未找到匹配能力' : '暂无能力'}
         description={
           hasActiveFilters
             ? searchKeyword
-              ? `未找到与「${searchKeyword}」相关的产品。请尝试调整关键词或清除筛选条件后重新搜索。`
-              : '当前筛选条件没有匹配的产品。请尝试调整筛选条件或清除筛选后重新搜索。'
-            : '产品目录正在建设中，敬请期待更多产品上线。'
+              ? `未找到与「${searchKeyword}」相关的能力。请尝试调整关键词或清除筛选条件后重新搜索。`
+              : '当前筛选条件没有匹配的能力。请尝试调整筛选条件或清除筛选后重新搜索。'
+            : '能力目录正在建设中，敬请期待更多能力上线。'
         }
       />
     );
@@ -83,13 +83,13 @@ export default function ProductGrid({
             <>
               {searchContext}，共{' '}
               <span className="font-medium text-slate-700">{totalCount}</span>{' '}
-              个产品
+              个能力
             </>
           ) : (
             <>
               共{' '}
               <span className="font-medium text-slate-700">{totalCount}</span>{' '}
-              个产品
+              个能力
             </>
           )}
           {currentPage && totalCount > 0 && (

@@ -170,7 +170,7 @@ export default function RfqDetailPage() {
   const rfq = pageState.data;
   const allowedTransitions = RFQ_TRANSITIONS[rfq.status] || [];
 
-  const formatDate = (date: string | undefined) =>
+  const formatDate = (date: string | null | undefined) =>
     date ? new Date(date).toLocaleString() : '-';
 
   const responseColumns = [
@@ -184,7 +184,11 @@ export default function RfqDetailPage() {
       title: '报价',
       dataIndex: 'offer',
       key: 'offer',
-      render: (offer: RfqResponse['offer']) => offer?.product?.name || '-',
+      render: (offer: RfqResponse['offer']) => {
+        const base = offer?.product?.name || '-';
+        const model = offer?.supplierProduct?.modelNumber;
+        return model ? `${base}（${model}）` : base;
+      },
     },
     {
       title: '状态',
@@ -234,10 +238,10 @@ export default function RfqDetailPage() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>RFQ Analysis</Title>
+          <Title level={4} style={{ margin: 0 }}>询价单详情</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          View RFQ details, responses and matching results
+          查看询价单详情、响应与匹配结果
         </Text>
       </div>
 
@@ -251,6 +255,12 @@ export default function RfqDetailPage() {
           </Descriptions.Item>
           <Descriptions.Item label="需求">
             {rfq.demand?.title || '-'}
+          </Descriptions.Item>
+          <Descriptions.Item label="买方组织">
+            {rfq.demand?.organization?.name || '-'}
+          </Descriptions.Item>
+          <Descriptions.Item label="目标能力提供方">
+            {rfq.targetOrganization?.name || '-'}
           </Descriptions.Item>
           <Descriptions.Item label="创建者">
             {rfq.createdByUser?.name || rfq.createdByUser?.email || '-'}
@@ -280,6 +290,77 @@ export default function RfqDetailPage() {
               style={{ minWidth: 160 }}
             />
           </Space>
+        </Card>
+      )}
+
+      {rfq.sourceMatch && (
+        <Card title="来源匹配" style={{ marginBottom: 16 }}>
+          <Descriptions bordered column={{ xs: 1, sm: 2 }}>
+            <Descriptions.Item label="匹配能力">
+              {rfq.sourceMatch.product?.name || '-'}
+            </Descriptions.Item>
+            <Descriptions.Item label="匹配得分">
+              {rfq.sourceMatch.matchScore != null ? Math.round(rfq.sourceMatch.matchScore) : '-'}
+            </Descriptions.Item>
+            <Descriptions.Item label="匹配状态">
+              {rfq.sourceMatch.matchStatus || '-'}
+            </Descriptions.Item>
+            <Descriptions.Item label="匹配时间">
+              {formatDate(rfq.sourceMatch.matchedAt)}
+            </Descriptions.Item>
+          </Descriptions>
+        </Card>
+      )}
+
+      {rfq.demand?.parameters && rfq.demand.parameters.length > 0 && (
+        <Card title="需求技术参数" style={{ marginBottom: 16 }}>
+          <Table
+            rowKey="id"
+            size="small"
+            pagination={false}
+            dataSource={rfq.demand.parameters}
+            columns={[
+              {
+                title: '参数',
+                dataIndex: ['parameterDefinition', 'name'],
+                key: 'name',
+              },
+              {
+                title: '需求值',
+                key: 'value',
+                render: (_: unknown, rec) => {
+                  if (rec.value != null) {
+                    if (rec.parameterDefinition?.dataType === 'ENUM') {
+                      const option = (rec.parameterDefinition.options ?? []).find(
+                        (o) => o.value === rec.value,
+                      );
+                      if (option?.label) return option.label;
+                    }
+                    return String(rec.value);
+                  }
+                  if (rec.valueMin != null && rec.valueMax != null) {
+                    return `${rec.valueMin} ~ ${rec.valueMax}`;
+                  }
+                  if (rec.valueMin != null) return `≥ ${rec.valueMin}`;
+                  if (rec.valueMax != null) return `≤ ${rec.valueMax}`;
+                  if (rec.valueNumber != null) return String(rec.valueNumber);
+                  return '-';
+                },
+              },
+              {
+                title: '单位',
+                key: 'unit',
+                render: (_: unknown, rec) => rec.parameterDefinition?.unit || '-',
+              },
+              {
+                title: '必填',
+                key: 'required',
+                width: 80,
+                render: (_: unknown, rec) =>
+                  rec.parameterDefinition?.required ? '是' : '否',
+              },
+            ]}
+          />
         </Card>
       )}
 

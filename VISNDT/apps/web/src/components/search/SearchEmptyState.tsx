@@ -11,8 +11,8 @@ interface SearchEmptyStateProps {
 }
 
 const DOMAIN_LABELS: Record<string, string> = {
-  product: '产品',
-  'supplier-product': '供应商型号',
+  product: '检测能力',
+  'supplier-product': '能力型号',
   knowledge: '知识',
   solution: '方案',
   supplier: '供应商',
@@ -41,7 +41,7 @@ export default function SearchEmptyState({ type, keyword, domain }: SearchEmptyS
           请输入搜索关键词
         </h3>
         <p className="text-sm text-slate-400 max-w-md">
-          搜索工业检测设备、技术知识、解决方案或供应商能力
+          搜索工业检测能力、技术知识、解决方案或能力型号
         </p>
       </div>
     );
@@ -113,7 +113,7 @@ export default function SearchEmptyState({ type, keyword, domain }: SearchEmptyS
           href="/products"
           className="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
         >
-          浏览产品分类
+          浏览能力分类
         </Link>
         <Link
           href="/knowledge"

@@ -193,10 +193,10 @@ function InquiryList() {
         <div style={{ marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-            <Title level={4} style={{ margin: 0 }}>Inquiry Operations</Title>
+            <Title level={4} style={{ margin: 0 }}>询价管理</Title>
           </div>
           <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-            Manage buyer inquiries, supplier selection and conversion
+            管理买方询价、能力提供商响应与状态
           </Text>
         </div>
         <Space style={{ marginBottom: 16 }} wrap>
@@ -248,7 +248,7 @@ function InquiryList() {
       render: (org: Inquiry['organization']) => org?.name || '-',
     },
     {
-      title: '产品',
+      title: '能力',
       dataIndex: 'product',
       key: 'product',
       render: (product: Inquiry['product']) => product?.name || '-',
@@ -298,10 +298,10 @@ function InquiryList() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>Inquiry Operations</Title>
+          <Title level={4} style={{ margin: 0 }}>询价管理</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          Manage buyer inquiries, supplier selection and conversion
+          管理买方询价、能力提供商响应与状态
         </Text>
       </div>
 

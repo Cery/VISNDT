@@ -108,7 +108,7 @@ function ProductList() {
       });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : '加载产品失败';
+        err instanceof Error ? err.message : '加载能力失败';
       setPageState({ status: 'error', message });
     }
   }, [query]);
@@ -181,7 +181,7 @@ function ProductList() {
     let forceDelete = false;
     const content = (
       <div>
-        <p>确定要删除此产品吗？此操作不可撤销。</p>
+        <p>确定要删除此能力吗？此操作不可撤销。</p>
         <Checkbox onChange={(e) => { forceDelete = e.target.checked; }}>
           同时删除关联数据（报价、匹配记录等）
         </Checkbox>
@@ -196,7 +196,7 @@ function ProductList() {
       onOk: async () => {
         try {
           await productService.remove(id, forceDelete);
-          message.success('产品已删除');
+          message.success('能力已删除');
           fetchProducts();
         } catch (err) {
           const errorMsg = extractErrorMessage(err, '删除失败');
@@ -217,9 +217,9 @@ function ProductList() {
       const result = await productService.batchDelete(ids);
       hideLoading();
       if (result.count === ids.length) {
-        message.success(`成功删除 ${result.count} 个产品`);
+        message.success(`成功删除 ${result.count} 个能力`);
       } else {
-        message.warning(`成功删除 ${result.count} / ${ids.length} 个产品（部分因有关联数据无法删除）`);
+        message.warning(`成功删除 ${result.count} / ${ids.length} 个能力（部分因有关联数据无法删除）`);
       }
       setSelectedRowKeys([]);
       fetchProducts();
@@ -242,7 +242,7 @@ function ProductList() {
     try {
       await productService.batchStatus(ids, status);
       hideLoading();
-      message.success(`成功更新 ${ids.length} 个产品状态`);
+      message.success(`成功更新 ${ids.length} 个能力状态`);
       setSelectedRowKeys([]);
       fetchProducts();
     } catch (err) {
@@ -265,7 +265,7 @@ function ProductList() {
     return (
       <Alert
         type="error"
-        message="加载产品失败"
+        message="加载能力失败"
         description={pageState.message}
         showIcon
         action={
@@ -377,10 +377,10 @@ function ProductList() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>产品能力管理</Title>
+          <Title level={4} style={{ margin: 0 }}>能力管理</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          管理工业检测产品能力、状态与分类
+          管理工业检测能力、状态与分类
         </Text>
       </div>
 
@@ -389,7 +389,7 @@ function ProductList() {
         <Row gutter={16} style={{ marginBottom: 16 }}>
           <Col xs={12} sm={6} md={4}>
             <Card size="small">
-              <Statistic title="产品总数" value={governanceStats.total} prefix={<AppstoreOutlined />} />
+              <Statistic title="能力总数" value={governanceStats.total} prefix={<AppstoreOutlined />} />
             </Card>
           </Col>
           <Col xs={12} sm={6} md={4}>
@@ -409,7 +409,7 @@ function ProductList() {
           </Col>
           <Col xs={12} sm={6} md={4}>
             <Card size="small">
-              <Statistic title="产品分类" value={governanceStats.categoryCount} prefix={<TagsOutlined />} />
+              <Statistic title="能力分类" value={governanceStats.categoryCount} prefix={<TagsOutlined />} />
             </Card>
           </Col>
         </Row>
@@ -417,13 +417,13 @@ function ProductList() {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
         <Button type="primary" onClick={() => navigate('/products/create')}>
-          创建产品
+          创建能力
         </Button>
         <Space>
           <ExportButton<Product>
             data={pageState.status === 'success' ? pageState.data : []}
             columns={PRODUCT_EXPORT_COLUMNS}
-            fileName="产品列表"
+            fileName="能力列表"
             onExportAll={async () => {
               const all = await productService.getList({ page: 1, pageSize: 10000 });
               return all.data;
@@ -434,7 +434,7 @@ function ProductList() {
 
       <AdvancedFilterPanel
         fields={[
-          { key: 'keyword', label: '产品', type: 'keyword', placeholder: '按名称、型号或描述搜索', width: 320 },
+          { key: 'keyword', label: '能力名称', type: 'keyword', placeholder: '按名称、型号或描述搜索', width: 320 },
           { key: 'status', label: '状态', type: 'select', options: STATUS_OPTIONS, width: 160 },
           { key: 'categoryId', label: '分类', type: 'select', options: categories.map((c) => ({ value: c.id, label: c.name })), width: 200 },
         ]}
@@ -455,7 +455,7 @@ function ProductList() {
             confirmTitle: '确认状态变更',
             confirmContent: `确定要将选中的 ${selectedRowKeys.length} 项状态变更为「${opt.label}」吗？`,
           })),
-          { key: 'delete', label: '批量删除', danger: true, icon: undefined, confirmTitle: '确认删除', confirmContent: `确定要删除选中的 ${selectedRowKeys.length} 个产品吗？此操作不可撤销。` },
+          { key: 'delete', label: '批量删除', danger: true, icon: undefined, confirmTitle: '确认删除', confirmContent: `确定要删除选中的 ${selectedRowKeys.length} 个能力吗？此操作不可撤销。` },
         ]}
         onAction={async (actionKey, ids) => {
           if (actionKey === 'delete') {

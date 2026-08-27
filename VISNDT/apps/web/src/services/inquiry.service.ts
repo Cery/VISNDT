@@ -3,7 +3,7 @@
  *
  * Encapsulates inquiry API calls for page-level consumption.
  */
-import { createInquiry as postInquiry, getMyInquiries as fetchMyInquiries } from '@/lib/api/inquiries';
+import { createInquiry as postInquiry, getMyInquiries as fetchMyInquiries, getInquiryById as fetchInquiryById } from '@/lib/api/inquiries';
 import type { CreateInquiryDto, InquiryResponse } from '@/types/inquiry';
 
 /**
@@ -25,4 +25,12 @@ export async function getMyInquiries(
   pageSize = 20,
 ): ReturnType<typeof fetchMyInquiries> {
   return fetchMyInquiries(page, pageSize);
+}
+
+/**
+ * Get a single inquiry by ID (org-scoped).
+ * GET /inquiries/:id (JWT)
+ */
+export async function getInquiryById(id: string) {
+  return fetchInquiryById(id);
 }

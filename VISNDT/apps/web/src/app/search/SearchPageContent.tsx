@@ -12,12 +12,13 @@ import SearchTypeTabs from '@/components/search/SearchTypeTabs';
 import SearchFilter from '@/components/search/SearchFilter';
 import type { SearchFilterState, ContentTypeFilter } from '@/components/search/SearchFilter';
 import SearchResultSection from '@/components/search/SearchResultSection';
+import SearchResultSummary from '@/components/search/SearchResultSummary';
 import SearchEmptyState from '@/components/search/SearchEmptyState';
+import SearchHero from '@/components/search/SearchHero';
 import ErrorState from '@/components/common/ErrorState';
 import ProductResultCard from '@/components/search/ProductResultCard';
 import KnowledgeResultCard from '@/components/search/KnowledgeResultCard';
 import SolutionResultCard from '@/components/search/SolutionResultCard';
-import SupplierResultCard from '@/components/search/SupplierResultCard';
 import SupplierProductResultCard from '@/components/search/SupplierProductResultCard';
 import SupplierModelFacetPanel from '@/components/search/SupplierModelFacetPanel';
 import { useSearchContext } from '@/hooks/useSearchContext';
@@ -25,7 +26,7 @@ import { useFacetFilterState } from '@/hooks/useFacetFilterState';
 import type { FilterValues, FacetFilterState } from '@/hooks/useFacetFilterState';
 import ParameterFacet from '@/components/search/ParameterFacet';
 
-const VALID_TYPES: SearchDomain[] = ['all', 'product', 'knowledge', 'solution', 'supplier', 'supplier-product'];
+const VALID_TYPES: SearchDomain[] = ['all', 'product', 'knowledge', 'solution', 'supplier-product'];
 const PAGE_SIZE = 20;
 
 function parseType(raw: string | null): SearchDomain {
@@ -309,7 +310,7 @@ export default function SearchPageContent() {
         if (!append) {
           trackEvent(buildEvent('search', {
             source: '/search',
-            metadata: { query: query.trim(), type, totalResults: data.products.total + data.supplierProducts.total + data.knowledge.total + data.solutions.total + data.suppliers.total },
+            metadata: { query: query.trim(), type, totalResults: data.products.total + data.supplierProducts.total + data.knowledge.total + data.solutions.total },
           }));
         }
 
@@ -338,10 +339,6 @@ export default function SearchPageContent() {
             solutions: {
               ...data.solutions,
               items: [...results.solutions.items, ...data.solutions.items],
-            },
-            suppliers: {
-              ...data.suppliers,
-              items: [...results.suppliers.items, ...data.suppliers.items],
             },
           });
         } else {
@@ -457,7 +454,6 @@ export default function SearchPageContent() {
         'supplier-product': results.supplierProducts.total,
         knowledge: results.knowledge.total,
         solution: results.solutions.total,
-        supplier: results.suppliers.total,
       }
     : undefined;
 
@@ -465,8 +461,7 @@ export default function SearchPageContent() {
     ? results.products.total > 0 ||
       results.supplierProducts.total > 0 ||
       results.knowledge.total > 0 ||
-      results.solutions.total > 0 ||
-      results.suppliers.total > 0
+      results.solutions.total > 0
     : false;
 
   const hasKeyword = query.trim().length > 0;
@@ -475,8 +470,7 @@ export default function SearchPageContent() {
     ? results.products.items.length < results.products.total ||
       results.supplierProducts.items.length < results.supplierProducts.total ||
       results.knowledge.items.length < results.knowledge.total ||
-      results.solutions.items.length < results.solutions.total ||
-      results.suppliers.items.length < results.suppliers.total
+      results.solutions.items.length < results.solutions.total
     : false;
 
   const shouldRenderSection = (domainType: SearchDomain, count: number): boolean => {
@@ -491,6 +485,16 @@ export default function SearchPageContent() {
   // the supplier-product tab (capability category + tech params + brand/series).
   const showFacet =
     hasKeyword && (type === 'product' || type === 'supplier-product' || type === 'all') && !error;
+
+  // 702_M29.2 — Search Hero: when no keyword is present, the first screen is the
+  // Hero (the core capability-discovery entry). Results render only after a query.
+  if (!hasKeyword) {
+    return (
+      <div className="min-h-screen bg-slate-50/50">
+        <SearchHero />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50/50">
@@ -523,8 +527,7 @@ export default function SearchPageContent() {
                     {results.products.total +
                       results.supplierProducts.total +
                       results.knowledge.total +
-                      results.solutions.total +
-                      results.suppliers.total}
+                      results.solutions.total}
                   </strong>{' '}
                   条结果
                 </span>
@@ -536,11 +539,7 @@ export default function SearchPageContent() {
 
       {/* Search Content */}
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
-        {!hasKeyword ? (
-          <SearchEmptyState type="no-keyword" />
-        ) : (
-          <>
-            {/* Tabs + Filter Area */}
+        {/* Tabs + Filter Area */}
             <div className="space-y-3">
               <SearchTypeTabs
                 activeType={type}
@@ -555,6 +554,25 @@ export default function SearchPageContent() {
                 onChange={setFilter}
               />
             </div>
+
+            {/* 703_M29.3 — Result Summary: immediately communicate discovered
+                capability counts, grounded in existing /search response counts. */}
+            {!loading && !error && results && hasAnyResults && (
+              <SearchResultSummary
+                total={
+                  results.products.total +
+                  results.supplierProducts.total +
+                  results.knowledge.total +
+                  results.solutions.total
+                }
+                counts={[
+                  { label: '产品', value: results.products.total },
+                  { label: '检测方案', value: results.solutions.total },
+                  { label: '能力型号', value: results.supplierProducts.total },
+                  { label: '知识', value: results.knowledge.total },
+                ]}
+              />
+            )}
 
             {/* M24.1.4: Two-column layout — Facet Sidebar + Results */}
             <div className={`mt-4 sm:mt-6 ${showFacet ? 'lg:flex lg:gap-6' : ''}`}>
@@ -602,7 +620,11 @@ export default function SearchPageContent() {
                   />
                 )}
 
-                {/* Product Section */}
+                {/* 703_M29.3 — Capability Discovery IA ordering:
+                    Product Capability → Solution → SupplierProduct Capability →
+                    Knowledge. Presentation order only; backend ranking unchanged. */}
+
+                {/* Product Capability Section */}
                 {shouldRenderSection('product', results?.products.total ?? 0) && (
                   <SearchResultSection
                     title="产品"
@@ -620,45 +642,10 @@ export default function SearchPageContent() {
                   </SearchResultSection>
                 )}
 
-                {/* SupplierProduct Section — M28.0 M661.5 unified discovery */}
-                {shouldRenderSection('supplier-product', results?.supplierProducts.total ?? 0) && (
-                  <SearchResultSection
-                    title="供应商型号"
-                    count={displayResults?.supplierProducts.total ?? 0}
-                    loading={loading}
-                    error={error}
-                  >
-                    {displayResults?.supplierProducts.items.map((item) => (
-                      <SupplierProductResultCard
-                        key={item.supplierProduct.id}
-                        item={item}
-                      />
-                    ))}
-                  </SearchResultSection>
-                )}
-
-                {/* Knowledge Section */}
-                {shouldRenderSection('knowledge', results?.knowledge.total ?? 0) && (
-                  <SearchResultSection
-                    title="知识"
-                    count={displayResults?.knowledge.total ?? 0}
-                    loading={loading}
-                    error={error}
-                  >
-                    {displayResults?.knowledge.items.map((content) => (
-                      <KnowledgeResultCard
-                        key={content.id}
-                        content={content}
-                        highlight={query}
-                      />
-                    ))}
-                  </SearchResultSection>
-                )}
-
-                {/* Solution Section */}
+                {/* Solution Section — elevated to 检测方案 */}
                 {shouldRenderSection('solution', results?.solutions.total ?? 0) && (
                   <SearchResultSection
-                    title="解决方案"
+                    title="检测方案"
                     count={displayResults?.solutions.total ?? 0}
                     loading={loading}
                     error={error}
@@ -673,18 +660,36 @@ export default function SearchPageContent() {
                   </SearchResultSection>
                 )}
 
-                {/* Supplier Section */}
-                {shouldRenderSection('supplier', results?.suppliers.total ?? 0) && (
+                {/* SupplierProduct Section — M28.0 M661.5 unified discovery,
+                    frontend label converged to 能力型号 */}
+                {shouldRenderSection('supplier-product', results?.supplierProducts.total ?? 0) && (
                   <SearchResultSection
-                    title="供应商"
-                    count={displayResults?.suppliers.total ?? 0}
+                    title="能力型号"
+                    count={displayResults?.supplierProducts.total ?? 0}
                     loading={loading}
                     error={error}
                   >
-                    {displayResults?.suppliers.items.map((supplier) => (
-                      <SupplierResultCard
-                        key={supplier.organizationId}
-                        supplier={supplier}
+                    {displayResults?.supplierProducts.items.map((item) => (
+                      <SupplierProductResultCard
+                        key={item.supplierProduct.id}
+                        item={item}
+                      />
+                    ))}
+                  </SearchResultSection>
+                )}
+
+                {/* Knowledge Section — auxiliary layer, below core capability */}
+                {shouldRenderSection('knowledge', results?.knowledge.total ?? 0) && (
+                  <SearchResultSection
+                    title="相关知识"
+                    count={displayResults?.knowledge.total ?? 0}
+                    loading={loading}
+                    error={error}
+                  >
+                    {displayResults?.knowledge.items.map((content) => (
+                      <KnowledgeResultCard
+                        key={content.id}
+                        content={content}
                         highlight={query}
                       />
                     ))}
@@ -721,8 +726,6 @@ export default function SearchPageContent() {
                 )}
               </div>
             </div>
-          </>
-        )}
       </div>
     </div>
   );

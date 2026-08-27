@@ -1,0 +1,168 @@
+0:18:32 Tab3 PageLoad
+0:18:32 Tab3 StartNav20 #renderer-script #link
+0:18:32 Tab3 FinishNav20
+0:18:35 Tab3 StartNav21 #typed
+0:18:36 Tab3 FinishNav21
+0:18:36 Memory Pressure: Critical
+0:18:37 Tab3 PageLoad
+0:18:37 Tab3 StartNav22 #renderer-script #link
+0:18:37 Tab3 FinishNav22
+0:18:39 Tab3 StartNav23 #typed
+0:18:41 Memory Pressure: Moderate
+0:18:42 Tab3 FinishNav23
+0:18:42 Tab3 PageLoad
+0:18:42 Tab3 StartNav24 #renderer-script #link
+0:18:42 Tab3 FinishNav24
+0:18:45 Tab3 StartNav25 #typed
+0:18:46 Memory Pressure: Critical
+0:18:48 Tab3 FinishNav25
+0:18:49 Tab3 PageLoad
+0:18:49 Tab3 StartNav26 #renderer-script #link
+0:18:49 Tab3 FinishNav26
+0:18:51 Memory Pressure: None
+0:18:51 Tab3 StartNav27 #typed
+0:18:54 Tab3 FinishNav27
+0:18:55 Tab3 PageLoad
+0:18:55 Tab3 StartNav28 #renderer-script #link
+0:18:55 Tab3 FinishNav28
+0:18:56 Memory Pressure: Moderate
+0:18:57 Tab3 StartNav29 #typed
+0:18:59 Tab3 FinishNav29
+0:19:00 Tab3 PageLoad
+0:19:00 Tab3 StartNav30 #renderer-script #link
+0:19:00 Tab3 FinishNav30
+0:19:02 Tab3 StartNav31 #typed
+0:19:04 Tab3 FinishNav31
+0:19:05 Tab3 PageLoad
+0:19:05 Tab3 StartNav32 #renderer-script #link
+0:19:05 Tab3 FinishNav32
+0:19:06 Memory Pressure: Moderate
+0:19:07 Tab3 StartNav33 #typed
+0:19:11 Tab3 FinishNav33
+0:19:11 Tab3 PageLoad
+0:19:11 Tab3 StartNav34 #renderer-script #link
+0:19:11 Tab3 FinishNav34
+0:19:14 Tab3 StartNav35 #typed
+0:19:16 Memory Pressure: Moderate
+0:19:16 Tab3 FinishNav35
+0:19:26 Memory Pressure: None
+0:20:48 Tab3 RenderProcessGone
+0:27:12 Memory Pressure: Moderate
+0:27:22 Memory Pressure: Moderate
+0:27:32 Memory Pressure: Moderate
+0:27:42 Memory Pressure: Moderate
+0:27:52 Memory Pressure: Moderate
+0:28:02 Memory Pressure: Moderate
+0:28:12 Memory Pressure: Moderate
+0:28:22 Memory Pressure: Moderate
+0:28:32 Memory Pressure: Moderate
+0:28:42 Memory Pressure: Moderate
+0:28:52 Memory Pressure: Moderate
+0:28:57 Memory Pressure: None
+0:29:27 Memory Pressure: Moderate
+0:29:32 Memory Pressure: None
+0:29:42 Memory Pressure: Moderate
+0:29:52 Memory Pressure: Moderate
+0:30:02 Memory Pressure: Moderate
+0:30:12 Memory Pressure: Moderate
+0:30:22 Memory Pressure: Moderate
+0:30:32 Memory Pressure: Moderate
+0:30:42 Memory Pressure: Moderate
+0:30:52 Memory Pressure: Moderate
+0:31:03 Memory Pressure: Moderate
+0:31:13 Memory Pressure: Moderate
+0:31:23 Memory Pressure: Moderate
+0:31:33 Memory Pressure: Moderate
+0:31:43 Memory Pressure: Moderate
+0:31:53 Memory Pressure: Moderate
+0:32:03 Memory Pressure: Moderate
+0:32:13 Memory Pressure: Moderate
+0:32:23 Memory Pressure: Moderate
+0:32:33 Memory Pressure: Moderate
+0:32:43 Memory Pressure: Moderate
+0:32:48 Memory Pressure: None
+0:33:18 Memory Pressure: Moderate
+0:33:28 Memory Pressure: Moderate
+0:33:38 Memory Pressure: Moderate
+0:33:48 Memory Pressure: Moderate
+0:33:58 Memory Pressure: Moderate
+0:34:08 Memory Pressure: None
+0:35:48 Memory Pressure: Moderate
+0:35:53 Memory Pressure: None
+0:36:03 Memory Pressure: Moderate
+0:36:08 Tab4 StartNav36 #auto_toplevel
+0:36:08 Browser1 Insert active Tab4 at 3
+0:36:13 Memory Pressure: None
+0:36:36 Tab5 StartNav37 #auto_toplevel
+0:36:36 Browser1 Insert active Tab5 at 4
+0:36:36 Tab5 FinishNav37 ERR_ABORTED
+0:36:36 Tab5 StartNav38 #typed
+0:36:42 Tab5 FinishNav38 ERR_ABORTED
+0:36:42 Tab5 StartNav39 #typed
+0:37:18 Memory Pressure: Moderate
+0:37:28 Memory Pressure: Moderate
+0:37:33 Memory Pressure: None
+0:38:05 Tab6 StartNav40 #auto_toplevel
+0:38:05 Browser1 Insert active Tab6 at 5
+0:38:08 Tab7 StartNav41 #auto_toplevel
+0:38:08 Browser1 Insert active Tab7 at 6
+0:38:08 Memory Pressure: Moderate
+0:38:11 Tab8 StartNav42 #auto_toplevel
+0:38:11 Browser1 Insert active Tab8 at 7
+0:38:13 Memory Pressure: None
+0:38:15 Tab9 StartNav43 #auto_toplevel
+0:38:15 Browser1 Insert active Tab9 at 8
+0:38:18 Tab10 StartNav44 #auto_toplevel
+0:38:18 Browser1 Insert active Tab10 at 9
+0:38:18 Memory Pressure: Moderate
+0:38:21 Tab11 StartNav45 #auto_toplevel
+0:38:21 Browser1 Insert active Tab11 at 10
+0:38:25 Tab12 StartNav46 #auto_toplevel
+0:38:25 Browser1 Insert active Tab12 at 11
+0:38:29 Memory Pressure: Moderate
+0:38:29 Tab13 StartNav47 #auto_toplevel
+0:38:29 Browser1 Insert active Tab13 at 12
+0:38:32 Tab14 StartNav48 #auto_toplevel
+0:38:32 Browser1 Insert active Tab14 at 13
+0:38:36 Tab15 StartNav49 #auto_toplevel
+0:38:36 Browser1 Insert active Tab15 at 14
+0:38:39 Memory Pressure: Moderate
+0:38:39 Tab16 StartNav50 #auto_toplevel
+0:38:39 Browser1 Insert active Tab16 at 15
+0:38:42 Tab17 StartNav51 #auto_toplevel
+0:38:42 Browser1 Insert active Tab17 at 16
+0:38:49 Memory Pressure: None
+0:38:54 Memory Pressure: Moderate
+0:39:04 Memory Pressure: Moderate
+0:39:14 Memory Pressure: Moderate
+0:39:24 Memory Pressure: Moderate
+0:39:34 Memory Pressure: Moderate
+0:39:42 Tab18 StartNav52 #auto_toplevel
+0:39:42 Browser1 Insert active Tab18 at 17
+0:39:44 Memory Pressure: Moderate
+0:39:47 Tab19 StartNav53 #auto_toplevel
+0:39:47 Browser1 Insert active Tab19 at 18
+0:39:50 Tab20 StartNav54 #auto_toplevel
+0:39:50 Browser1 Insert active Tab20 at 19
+0:39:54 Memory Pressure: Moderate
+0:39:54 Tab21 StartNav55 #auto_toplevel
+0:39:54 Browser1 Insert active Tab21 at 20
+0:39:58 Tab22 StartNav56 #auto_toplevel
+0:39:58 Browser1 Insert active Tab22 at 21
+0:40:01 Tab23 StartNav57 #auto_toplevel
+0:40:01 Browser1 Insert active Tab23 at 22
+0:40:04 Memory Pressure: Moderate
+0:40:05 Tab24 StartNav58 #auto_toplevel
+0:40:05 Browser1 Insert active Tab24 at 23
+0:40:09 Memory Pressure: None
+0:40:09 Tab25 StartNav59 #auto_toplevel
+0:40:09 Browser1 Insert active Tab25 at 24
+0:40:12 Tab26 StartNav60 #auto_toplevel
+0:40:12 Browser1 Insert active Tab26 at 25
+0:40:16 Tab27 StartNav61 #auto_toplevel
+0:40:16 Browser1 Insert active Tab27 at 26
+0:40:20 Tab28 StartNav62 #auto_toplevel
+0:40:20 Browser1 Insert active Tab28 at 27
+0:40:23 Tab29 StartNav63 #auto_toplevel
+0:40:23 Browser1 Insert active Tab29 at 28
+0:40:49 Memory Pressure: Moderate

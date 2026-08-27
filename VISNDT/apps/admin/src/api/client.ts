@@ -4,6 +4,7 @@ import { authStore } from '../stores/auth.store';
 export const apiClient = axios.create({
   baseURL: '/api/v1',
   timeout: 10000,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -28,26 +29,61 @@ export function extractErrorMessage(err: unknown, fallback = '操作失败'): st
 }
 
 /**
- * In-memory CSRF token — fetched once on app init and reused.
- * Cookie-based fallback is less reliable through Vite proxy.
+ * In-memory CSRF token — fetched on demand via GET /auth/csrf.
+ * Double-submit cookie pattern: the backend sets the same token both as the
+ * `csrf_token` cookie and in the response body; the client must echo it back
+ * via the X-CSRF-Token header on state-changing requests.
  */
 let _csrfToken: string | null = null;
+let _csrfFetchPromise: Promise<string | null> | null = null;
 
 export function setCsrfToken(token: string | null) {
   _csrfToken = token;
 }
 
-function getCsrfToken(): string | null {
-  // Primary: in-memory token set by initCsrfToken()
-  if (_csrfToken) return _csrfToken;
-
-  // Fallback: try reading the cookie (set by GET /auth/csrf)
+function getCsrfTokenFromCookie(): string | null {
   const match = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/);
   return match ? decodeURIComponent(match[1]) : null;
 }
 
+function getCsrfToken(): string | null {
+  if (_csrfToken) return _csrfToken;
+  const cookieToken = getCsrfTokenFromCookie();
+  if (cookieToken) _csrfToken = cookieToken;
+  return cookieToken;
+}
+
+/**
+ * Ensure a CSRF token is available, fetching from /auth/csrf if needed.
+ * Deduplicated: concurrent callers share a single fetch (avoids header/cookie
+ * diverging under React StrictMode double-invocation of effects).
+ */
+export async function ensureCsrfToken(): Promise<string | null> {
+  const existing = getCsrfToken();
+  if (existing) return existing;
+
+  if (_csrfFetchPromise) return _csrfFetchPromise;
+
+  _csrfFetchPromise = (async () => {
+    try {
+      const res = (await apiClient.get('/auth/csrf')) as {
+        data?: { csrfToken?: string };
+      };
+      const token = res?.data?.csrfToken ?? null;
+      setCsrfToken(token);
+      return token;
+    } catch {
+      return null;
+    } finally {
+      _csrfFetchPromise = null;
+    }
+  })();
+
+  return _csrfFetchPromise;
+}
+
 // Request interceptor: inject Authorization header + CSRF token
-apiClient.interceptors.request.use((config) => {
+apiClient.interceptors.request.use(async (config) => {
   const { accessToken } = authStore.getState();
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
@@ -55,7 +91,7 @@ apiClient.interceptors.request.use((config) => {
 
   // Inject CSRF token for state-changing requests
   if (config.method && ['post', 'put', 'patch', 'delete'].includes(config.method.toLowerCase())) {
-    const csrfToken = getCsrfToken();
+    const csrfToken = (await ensureCsrfToken()) ?? getCsrfToken();
     if (csrfToken) {
       config.headers['X-CSRF-Token'] = csrfToken;
     }

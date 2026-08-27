@@ -5,8 +5,9 @@ import type { CreateInquiryDto, InquiryResponse } from '@/types/inquiry';
 export interface InquiryItem {
   id: string;
   productId: string;
-  productName?: string;
+  productName?: string | null;
   organizationId: string;
+  organizationName?: string | null;
   contactName: string;
   contactEmail: string;
   contactPhone?: string | null;
@@ -47,5 +48,14 @@ export async function getMyInquiries(
       totalPages: number;
     }>
   >('/inquiries/mine', { params: { page, pageSize } });
+  return res.data;
+}
+
+/**
+ * Get a single inquiry by ID (must belong to the user's organization).
+ * GET /inquiries/:id (JWT)
+ */
+export async function getInquiryById(id: string): Promise<InquiryItem> {
+  const res = await apiClient<ApiResponse<InquiryItem>>(`/inquiries/${id}`);
   return res.data;
 }

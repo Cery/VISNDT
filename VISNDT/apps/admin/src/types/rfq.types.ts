@@ -16,7 +16,43 @@ export interface Rfq {
     title: string;
     status?: string;
     organizationId?: string;
+    organization?: {
+      id: string;
+      name?: string | null;
+    };
+    /** Demand technical parameters (M30.4 / M30.5 RFQ context). */
+    parameters?: Array<{
+      id: string;
+      value?: string | null;
+      valueNumber?: number | null;
+      valueMin?: number | null;
+      valueMax?: number | null;
+      parameterDefinition?: {
+        name: string;
+        required?: boolean;
+        unit?: string | null;
+        dataType?: string;
+        options?: Array<{ value: string; label: string }>;
+      };
+    }>;
   };
+
+  /** Target Capability Provider (RH5). */
+  targetOrganization?: {
+    id: string;
+    name?: string | null;
+    type?: string | null;
+    status?: string | null;
+  } | null;
+
+  /** Source deterministic Match that produced this RFQ (M30.5 context). */
+  sourceMatch?: {
+    id: string;
+    matchScore?: number | null;
+    matchStatus?: string | null;
+    matchedAt?: string | null;
+    product?: { id: string; name?: string | null } | null;
+  } | null;
 
   createdByUser?: {
     id: string;

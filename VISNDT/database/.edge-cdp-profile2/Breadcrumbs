@@ -1,0 +1,130 @@
+0:07:59 Tab15 FinishNav44
+0:08:00 Memory Pressure: Moderate
+0:08:00 Tab15 StartNav45 #typed
+0:08:02 Tab15 FinishNav45
+0:08:03 Tab15 PageLoad
+0:08:03 Tab15 StartNav46 #renderer-script #link
+0:08:03 Tab15 FinishNav46
+0:08:04 Tab15 StartNav47 #typed
+0:08:06 Tab15 FinishNav47
+0:08:07 Tab15 PageLoad
+0:08:07 Tab15 StartNav48 #renderer-script #link
+0:08:07 Tab15 FinishNav48
+0:08:10 Memory Pressure: Moderate
+0:08:20 Memory Pressure: None
+0:08:40 Memory Pressure: Moderate
+0:08:50 Memory Pressure: None
+0:09:00 Memory Pressure: Moderate
+0:09:05 Memory Pressure: None
+0:09:10 Memory Pressure: Moderate
+0:09:15 Memory Pressure: None
+0:09:20 Memory Pressure: Moderate
+0:09:30 Memory Pressure: Moderate
+0:09:35 Memory Pressure: None
+0:10:01 Memory Pressure: Moderate
+0:10:04 Browser1 Replaced Tab2 with Tab16 at 1
+0:10:04 Tab2 WebContentsDestroyed
+0:10:04 Browser1 Replaced Tab3 with Tab17 at 2
+0:10:04 Tab3 WebContentsDestroyed
+0:10:04 Browser1 Replaced Tab4 with Tab18 at 3
+0:10:04 Tab4 WebContentsDestroyed
+0:10:11 Memory Pressure: Moderate
+0:10:21 Memory Pressure: None
+0:13:51 Memory Pressure: Moderate
+0:13:56 Memory Pressure: None
+0:14:11 Memory Pressure: Moderate
+0:14:21 Memory Pressure: Moderate
+0:14:26 Memory Pressure: None
+0:14:30 Tab15 StartNav49 #renderer-script #link
+0:14:30 Tab15 FinishNav49
+0:14:31 Memory Pressure: Moderate
+0:14:41 Memory Pressure: Moderate
+0:14:51 Memory Pressure: Moderate
+0:15:01 Memory Pressure: Moderate
+0:15:11 Memory Pressure: Moderate
+0:15:21 Memory Pressure: Moderate
+0:15:31 Memory Pressure: Moderate
+0:15:41 Memory Pressure: Moderate
+0:15:51 Memory Pressure: Moderate
+0:16:01 Memory Pressure: Moderate
+0:16:11 Browser1 Replaced Tab5 with Tab19 at 4
+0:16:11 Tab5 WebContentsDestroyed
+0:16:11 Memory Pressure: Critical
+0:16:16 Memory Pressure: Moderate
+0:16:26 Memory Pressure: None
+0:16:31 Memory Pressure: Moderate
+0:16:36 Memory Pressure: None
+0:21:12 Memory Pressure: Moderate
+0:21:22 Memory Pressure: Moderate
+0:21:32 Memory Pressure: Moderate
+0:21:42 Memory Pressure: Moderate
+0:21:52 Memory Pressure: Moderate
+0:22:02 Memory Pressure: Moderate
+0:22:12 Memory Pressure: Moderate
+0:22:22 Memory Pressure: Moderate
+0:22:32 Memory Pressure: Moderate
+0:22:42 Memory Pressure: Moderate
+0:22:52 Memory Pressure: Moderate
+0:23:02 Memory Pressure: Moderate
+0:23:12 Memory Pressure: Moderate
+0:23:22 Memory Pressure: Moderate
+0:23:32 Memory Pressure: Moderate
+0:23:42 Memory Pressure: Moderate
+0:23:52 Memory Pressure: Moderate
+0:24:02 Memory Pressure: Moderate
+0:24:12 Memory Pressure: Moderate
+0:24:22 Memory Pressure: Moderate
+0:24:32 Memory Pressure: Moderate
+0:24:37 Browser1 Replaced Tab6 with Tab20 at 5
+0:24:37 Tab6 WebContentsDestroyed
+0:24:37 Memory Pressure: Critical
+0:24:42 Memory Pressure: Moderate
+0:24:52 Memory Pressure: Moderate
+0:25:02 Memory Pressure: Moderate
+0:25:12 Memory Pressure: Moderate
+0:25:22 Memory Pressure: Moderate
+0:25:32 Memory Pressure: Moderate
+0:25:37 Browser1 Replaced Tab7 with Tab21 at 6
+0:25:37 Tab7 WebContentsDestroyed
+0:25:37 Memory Pressure: Critical
+0:25:42 Memory Pressure: Moderate
+0:25:52 Memory Pressure: Moderate
+0:26:02 Memory Pressure: Moderate
+0:26:12 Memory Pressure: Moderate
+0:26:22 Memory Pressure: Moderate
+0:26:32 Memory Pressure: Moderate
+0:26:42 Memory Pressure: Moderate
+0:26:52 Memory Pressure: Moderate
+0:27:02 Memory Pressure: Moderate
+0:27:12 Memory Pressure: Moderate
+0:27:17 Memory Pressure: None
+0:27:27 Memory Pressure: Moderate
+0:27:37 Memory Pressure: Moderate
+0:27:47 Memory Pressure: Moderate
+0:27:57 Memory Pressure: Moderate
+0:28:07 Memory Pressure: Moderate
+0:28:17 Memory Pressure: Moderate
+0:28:27 Memory Pressure: Moderate
+0:28:37 Memory Pressure: Moderate
+0:28:47 Memory Pressure: Moderate
+0:28:58 Memory Pressure: Moderate
+0:29:08 Memory Pressure: Moderate
+0:29:18 Memory Pressure: Moderate
+0:29:28 Memory Pressure: Moderate
+0:29:38 Memory Pressure: Moderate
+0:29:48 Memory Pressure: Moderate
+0:29:53 Browser1 Replaced Tab8 with Tab22 at 7
+0:29:53 Tab8 WebContentsDestroyed
+0:29:53 Memory Pressure: Critical
+0:29:58 Memory Pressure: Moderate
+0:30:08 Memory Pressure: Moderate
+0:30:18 Memory Pressure: Moderate
+0:30:28 Memory Pressure: Moderate
+0:30:38 Memory Pressure: Moderate
+0:30:48 Memory Pressure: Moderate
+0:30:58 Memory Pressure: Moderate
+0:31:08 Memory Pressure: Moderate
+0:31:18 Memory Pressure: Moderate
+0:31:18 Browser1 Replaced Tab9 with Tab23 at 8
+0:31:18 Tab9 WebContentsDestroyed
+0:31:28 Memory Pressure: Moderate

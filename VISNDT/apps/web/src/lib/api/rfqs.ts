@@ -1,11 +1,20 @@
 import { apiClient } from '../api-client';
 import type { ApiResponse, PaginatedResponse } from '@/types/api';
+import type { DemandParameter } from './demands';
 
 export interface RfqDemandSummary {
   id: string;
   title: string;
   description?: string | null;
   organizationId: string;
+  organization?: {
+    id: string;
+    name?: string | null;
+    type?: string | null;
+    status?: string | null;
+  } | null;
+  parameters?: DemandParameter[];
+  parameterValues?: DemandParameter[];
 }
 
 export interface RfqItem {
@@ -23,7 +32,31 @@ export interface RfqItem {
   createdByUser?: { id: string; name?: string | null; email: string } | null;
 }
 
-export type RfqDetailItem = RfqItem;
+export type RfqDetailItem = RfqItem & {
+  sourceMatch?: {
+    id: string;
+    matchScore?: number | null;
+    matchStatus?: string | null;
+    matchedAt?: string | null;
+    product?: {
+      id: string;
+      name?: string | null;
+      category?: { id: string; name: string; slug?: string } | null;
+    } | null;
+    offer?: {
+      id: string;
+      title?: string | null;
+      organizationId: string;
+    } | null;
+  } | null;
+  targetOrganization?: {
+    id: string;
+    name?: string | null;
+    type?: string | null;
+    status?: string | null;
+  } | null;
+  responses?: RfqResponseItem[];
+};
 
 export interface AvailableRfqItem {
   id: string;

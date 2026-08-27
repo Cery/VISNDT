@@ -15,9 +15,11 @@ interface MatchCardProps {
 export default function MatchCard({ match, onStatusUpdate, onRematch }: MatchCardProps) {
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const canAccept = match.status === 'REVIEWED';
-  const canReject = match.status === 'REVIEWED' || match.status === 'MATCHED';
-  const canRematch = match.status === 'REJECTED' || match.status === 'EXPIRED';
+  const canAccept = match.matchStatus === 'REVIEWED';
+  const canReject =
+    match.matchStatus === 'REVIEWED' || match.matchStatus === 'MATCHED';
+  const canRematch =
+    match.matchStatus === 'REJECTED' || match.matchStatus === 'EXPIRED';
 
   const handleStatusUpdate = async (newStatus: string) => {
     setIsUpdating(true);
@@ -43,16 +45,16 @@ export default function MatchCard({ match, onStatusUpdate, onRematch }: MatchCar
             需求 #{match.demandId.slice(0, 8)}
           </p>
         </div>
-        <MatchStatusBadge status={match.status} />
+        <MatchStatusBadge status={match.matchStatus} />
       </div>
 
       {/* Score and details */}
       <div className="flex items-center justify-between mt-3">
         <div className="flex items-center gap-4">
-          <MatchScore score={match.score} />
-          {match.score != null && (
+          <MatchScore score={match.matchScore} />
+          {match.matchScore != null && (
             <span className="text-xs text-slate-500">
-              匹配度: {Math.round(match.score * 100)}%
+              匹配度: {Math.round(match.matchScore)}%
             </span>
           )}
         </div>

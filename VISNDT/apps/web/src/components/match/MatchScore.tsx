@@ -8,7 +8,8 @@ export default function MatchScore({ score, className = '' }: MatchScoreProps) {
     return <span className={`text-xs text-slate-400 ${className}`}>—</span>;
   }
 
-  const pct = Math.round(score * 100);
+  // 后端 matchScore 为 0-100 加权总分，直接映射为百分比宽度。
+  const pct = Math.round(score);
   const width = Math.min(100, Math.max(0, pct));
 
   const barColor =

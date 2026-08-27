@@ -73,10 +73,10 @@ export default function CapabilityProviderSection() {
 
         <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/search?type=supplier"
+            href="/search?type=supplier-product"
             className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-primary to-industrial-cyan text-white rounded-lg font-semibold shadow-industrial-sm hover:opacity-95 hover:-translate-y-0.5 transition-all"
           >
-            发现能力提供商
+            发现检测能力
           </Link>
           <Link
             href="/register?role=SUPPLIER"
