@@ -230,6 +230,17 @@ export class EvaluationsService {
         select: {
           id: true,
           name: true,
+          // Connection authority source per M34 Contract §1.5 / §16.1 / §10:
+          //   Supplier = Organization(type=SUPPLIER) derived from PUBLISHED
+          //   SupplierProduct → Organization (SupplierProduct.platformProductId
+          //   → Product). Offer is OPTIONAL / COMMERCIAL CONTEXT / LEGACY and is
+          //   NOT a core connection authority.
+          supplierProducts: {
+            where: { status: SupplierProductStatus.PUBLISHED },
+            select: { id: true, organizationId: true },
+            orderBy: { createdAt: 'asc' },
+            take: 1,
+          },
           offers: { select: { id: true, organizationId: true } },
         },
       });
@@ -238,15 +249,19 @@ export class EvaluationsService {
           `Evaluated Product ${evaluation.targetId} no longer exists`,
         );
       }
-      // A Buyer may reference the platform Product with an organization that
-      // legally offers it. Prefer the first active offer's organization.
+      // Prefer the SUPPLIER Organization bound via a PUBLISHED SupplierProduct
+      // (canonical connection authority); fall back to an Offer only if no
+      // published SupplierProduct bound to this Product exists.
+      const primarySupplier = product.supplierProducts[0];
       const primaryOffer = product.offers[0];
       return {
         evaluationId: evaluation.id,
         targetType: evaluation.targetType,
         productId: product.id,
         productName: product.name,
-        organizationId: primaryOffer?.organizationId ?? null,
+        organizationId:
+          primarySupplier?.organizationId ?? primaryOffer?.organizationId ?? null,
+        supplierProductId: primarySupplier?.id ?? null,
         offerId: primaryOffer?.id ?? null,
       };
     }
