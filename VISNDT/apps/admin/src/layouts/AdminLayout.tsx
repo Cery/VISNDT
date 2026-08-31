@@ -423,7 +423,9 @@ function AdminLayout() {
             minHeight: 280,
           }}
         >
-          <Outlet />
+          <div key={location.pathname} className="admin-route-enter">
+            <Outlet />
+          </div>
         </Content>
       </Layout>
     </Layout>

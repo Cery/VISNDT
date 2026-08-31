@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Space, Spin, Alert, Button, Typography, message, Modal, Checkbox, Card, Row, Col, Statistic } from 'antd';
+import { Table, Space, Spin, Alert, Button, message, Modal, Checkbox, Row, Col } from 'antd';
 import { AppstoreOutlined, CheckCircleOutlined, EditOutlined, StopOutlined, TagsOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { SorterResult } from 'antd/es/table/interface';
@@ -11,8 +11,7 @@ import { ExportButton, BatchActionBar, AdvancedFilterPanel } from '../components
 import type { ExportColumn } from '../utils/export';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
-
-const { Title, Text } = Typography;
+import { KpiCard } from '../components/dashboard';
 
 type PageState =
   | { status: 'loading' }
@@ -374,62 +373,134 @@ function ProductList() {
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>能力管理</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          管理工业检测能力、状态与分类
-        </Text>
-      </div>
-
-      {/* Governance Statistics Dashboard */}
-      {(governanceStats.total > 0) && (
-        <Row gutter={16} style={{ marginBottom: 16 }}>
-          <Col xs={12} sm={6} md={4}>
-            <Card size="small">
-              <Statistic title="能力总数" value={governanceStats.total} prefix={<AppstoreOutlined />} />
-            </Card>
-          </Col>
-          <Col xs={12} sm={6} md={4}>
-            <Card size="small">
-              <Statistic title="已上架" value={governanceStats.active} valueStyle={{ color: '#52c41a' }} prefix={<CheckCircleOutlined />} />
-            </Card>
-          </Col>
-          <Col xs={12} sm={6} md={4}>
-            <Card size="small">
-              <Statistic title="草稿" value={governanceStats.draft} valueStyle={{ color: '#faad14' }} prefix={<EditOutlined />} />
-            </Card>
-          </Col>
-          <Col xs={12} sm={6} md={4}>
-            <Card size="small">
-              <Statistic title="已下架" value={governanceStats.inactive} valueStyle={{ color: VISNDT_COLORS.error }} prefix={<StopOutlined />} />
-            </Card>
-          </Col>
-          <Col xs={12} sm={6} md={4}>
-            <Card size="small">
-              <Statistic title="能力分类" value={governanceStats.categoryCount} prefix={<TagsOutlined />} />
-            </Card>
-          </Col>
-        </Row>
-      )}
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
-        <Button type="primary" onClick={() => navigate('/products/create')}>
-          创建能力
-        </Button>
-        <Space>
-          <ExportButton<Product>
-            data={pageState.status === 'success' ? pageState.data : []}
-            columns={PRODUCT_EXPORT_COLUMNS}
-            fileName="能力列表"
-            onExportAll={async () => {
-              const all = await productService.getList({ page: 1, pageSize: 10000 });
-              return all.data;
+      {/* Industrial masthead — 复用 730/731 受控深色锚点 + tech grid + mono 元数据 */}
+      <header
+        style={{
+          position: 'relative',
+          overflow: 'hidden',
+          borderRadius: 14,
+          background: '#0f172a',
+          marginBottom: 16,
+          border: '1px solid rgba(255,255,255,0.08)',
+        }}
+      >
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage:
+              'linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px)',
+            backgroundSize: '28px 28px',
+          }}
+        />
+        <div style={{ position: 'relative', padding: '20px clamp(16px, 3vw, 24px)' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              flexWrap: 'wrap',
+              gap: 12,
             }}
-          />
-        </Space>
+          >
+            <div style={{ minWidth: 0 }}>
+              <div
+                style={{
+                  fontFamily: "'JetBrains Mono','SFMono-Regular',Consolas,monospace",
+                  fontSize: 11,
+                  letterSpacing: '0.22em',
+                  textTransform: 'uppercase',
+                  color: VISNDT_COLORS.industrialCyan,
+                }}
+              >
+                Capability / Governance · Registry
+              </div>
+              <h1 style={{ margin: '10px 0 6px', fontSize: '22px', lineHeight: 1.2, color: '#fff', fontWeight: 800 }}>
+                能力管理
+              </h1>
+              <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.62)', maxWidth: 620, lineHeight: 1.6 }}>
+                管理工业检测能力、状态与分类 · 能力资产全生命周期治理
+              </p>
+            </div>
+            <Button type="primary" onClick={() => navigate('/products/create')}>
+              创建能力
+            </Button>
+          </div>
+
+          {/* Telemetry — mono 遥测快照 */}
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', marginTop: 16, paddingTop: 14 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, alignItems: 'center' }}>
+              {[
+                { label: '能力总数', value: governanceStats.total, color: '#fff' },
+                { label: '已上架', value: governanceStats.active, color: VISNDT_COLORS.success },
+                { label: '草稿', value: governanceStats.draft, color: VISNDT_COLORS.warning },
+                { label: '已下架', value: governanceStats.inactive, color: VISNDT_COLORS.error },
+                { label: '能力分类', value: governanceStats.categoryCount, color: VISNDT_COLORS.industrialCyan },
+              ].map((it) => (
+                <span key={it.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                  <span aria-hidden="true" style={{ width: 7, height: 7, borderRadius: '50%', background: it.color, flexShrink: 0 }} />
+                  <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>{it.label}</span>
+                  <span
+                    style={{
+                      fontFamily: "'JetBrains Mono','SFMono-Regular',Consolas,monospace",
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: '#fff',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {it.value}
+                  </span>
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Controlled accent divider */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 3,
+            background: `linear-gradient(90deg, ${VISNDT_COLORS.primary}, ${VISNDT_COLORS.industrialCyan})`,
+          }}
+        />
+      </header>
+
+      {/* Governance Statistics — 728 KpiCard Executive Grid */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+        <Col xs={12} sm={8} lg={5}>
+          <KpiCard title="能力总数" value={governanceStats.total} icon={<AppstoreOutlined />} tone="primary" hint="平台能力资产总量" />
+        </Col>
+        <Col xs={12} sm={8} lg={5}>
+          <KpiCard title="已上架" value={governanceStats.active} icon={<CheckCircleOutlined />} tone="success" hint="当前在售能力规格" />
+        </Col>
+        <Col xs={12} sm={8} lg={5}>
+          <KpiCard title="草稿" value={governanceStats.draft} icon={<EditOutlined />} tone="warning" hint="待完善能力条目" />
+        </Col>
+        <Col xs={12} sm={8} lg={5}>
+          <KpiCard title="已下架" value={governanceStats.inactive} icon={<StopOutlined />} tone="error" hint="已停售能力条目" />
+        </Col>
+        <Col xs={12} sm={8} lg={4}>
+          <KpiCard title="能力分类" value={governanceStats.categoryCount} icon={<TagsOutlined />} tone="cyan" hint="分类目录节点数" />
+        </Col>
+      </Row>
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
+        <ExportButton<Product>
+          data={pageState.status === 'success' ? pageState.data : []}
+          columns={PRODUCT_EXPORT_COLUMNS}
+          fileName="能力列表"
+          onExportAll={async () => {
+            const all = await productService.getList({ page: 1, pageSize: 10000 });
+            return all.data;
+          }}
+        />
       </div>
 
       <AdvancedFilterPanel

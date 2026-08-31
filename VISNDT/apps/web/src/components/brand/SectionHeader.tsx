@@ -1,8 +1,8 @@
 /**
  * VISNDT Visual Language v1 — Section Header.
- * Unifies the homepage section heading hierarchy:
- *   eyebrow (overline) → title → subtitle
- * Server-compatible (no client directive); safe under both RSC and client trees.
+ * M33.2：消费 727 Typography Foundation + mono eyebrow（TG-05 技术字段）；
+ * 结构：eyebrow(overline) → title → inline accent 分隔 → subtitle。
+ * Server-compatible（无 client directive）；RSC 与 client 树均安全。
  */
 
 interface SectionHeaderProps {
@@ -24,11 +24,25 @@ export default function SectionHeader({
   return (
     <div className={`${isCenter ? 'text-center' : 'text-left'} ${className}`}>
       {eyebrow && (
-        <p className="text-sm font-semibold text-primary tracking-widest uppercase mb-3">{eyebrow}</p>
+        <p className="font-mono text-xs font-medium tracking-[0.22em] uppercase text-primary mb-3">
+          {eyebrow}
+        </p>
       )}
-      <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-4">{title}</h2>
+      <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">{title}</h2>
+      {/* structural accent divider（替代纯萌发，提供视觉层级锚点） */}
+      <div
+        className={`mt-3 flex items-center gap-2 ${isCenter ? 'justify-center' : ''}`}
+        aria-hidden="true"
+      >
+        <span className="h-0.5 w-8 rounded-full bg-primary" />
+        <span className="h-px w-6 rounded-full bg-slate-300" />
+      </div>
       {subtitle && (
-        <p className={`text-muted-foreground text-base ${isCenter ? 'max-w-xl mx-auto' : 'max-w-2xl'}`}>
+        <p
+          className={`text-muted-foreground text-base mt-4 ${
+            isCenter ? 'max-w-xl mx-auto' : 'max-w-2xl'
+          }`}
+        >
           {subtitle}
         </p>
       )}

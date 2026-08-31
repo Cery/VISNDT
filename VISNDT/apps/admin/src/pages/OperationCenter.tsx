@@ -581,43 +581,157 @@ export default function OperationCenter() {
 
   return (
     <div style={{ padding: 8 }}>
-      <div
+      {/* Industrial masthead — 复用 730 Home 受控深色锚点 + tech grid + mono 元数据 + 遥测 */}
+      <header
         style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          marginBottom: 20,
-          flexWrap: 'wrap',
-          gap: 12,
+          position: 'relative',
+          overflow: 'hidden',
+          borderRadius: 14,
+          background: '#0f172a', // Controlled Dark Anchor（Slate-900）
+          marginBottom: 16,
+          border: '1px solid rgba(255,255,255,0.08)',
         }}
       >
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-            <div
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: 8,
-                background: `linear-gradient(135deg, ${VISNDT_COLORS.primary}, ${VISNDT_COLORS.industrialCyan})`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <AppstoreOutlined style={{ color: '#fff', fontSize: 16 }} />
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage:
+              'linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px)',
+            backgroundSize: '28px 28px',
+          }}
+        />
+        <div style={{ position: 'relative', padding: '20px clamp(16px, 3vw, 24px)' }}>
+          {/* Identity row */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              flexWrap: 'wrap',
+              gap: 12,
+            }}
+          >
+            <div style={{ minWidth: 0 }}>
+              <div
+                style={{
+                  fontFamily: "'JetBrains Mono','SFMono-Regular',Consolas,monospace",
+                  fontSize: 11,
+                  letterSpacing: '0.22em',
+                  textTransform: 'uppercase',
+                  color: VISNDT_COLORS.industrialCyan,
+                }}
+              >
+                Operation / Center · Five Views
+              </div>
+              <h1 style={{ margin: '10px 0 6px', fontSize: '22px', lineHeight: 1.2, color: '#fff', fontWeight: 800 }}>
+                运营中心
+              </h1>
+              <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.62)', maxWidth: 620, lineHeight: 1.6 }}>
+                管理运营中心 · 产品 / 内容 / 供应商 / 商业 四大运营域统一管理入口，待办队列与确定性匹配快照
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 14 }}>
+                <span
+                  style={{
+                    fontFamily: "'JetBrains Mono','SFMono-Regular',Consolas,monospace",
+                    fontSize: 12,
+                    color: '#e2e8f0',
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: 6,
+                    padding: '3px 8px',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  产品 <b style={{ color: '#fff' }}>{overview?.stats.products.total ?? 0}</b>
+                </span>
+                <span
+                  style={{
+                    fontFamily: "'JetBrains Mono','SFMono-Regular',Consolas,monospace",
+                    fontSize: 12,
+                    color: '#e2e8f0',
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: 6,
+                    padding: '3px 8px',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  内容 <b style={{ color: '#fff' }}>{overview?.stats.content.total ?? 0}</b>
+                </span>
+                <span
+                  style={{
+                    fontFamily: "'JetBrains Mono','SFMono-Regular',Consolas,monospace",
+                    fontSize: 12,
+                    color: '#e2e8f0',
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: 6,
+                    padding: '3px 8px',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  组织 <b style={{ color: '#fff' }}>{overview?.stats.organizations.total ?? 0}</b>
+                </span>
+                <span
+                  style={{
+                    fontFamily: "'JetBrains Mono','SFMono-Regular',Consolas,monospace",
+                    fontSize: 12,
+                    color: '#e2e8f0',
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: 6,
+                    padding: '3px 8px',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  匹配 <b style={{ color: VISNDT_COLORS.industrialCyan }}>{overview?.matchingStats.totalMatches ?? 0}</b>
+                </span>
+              </div>
             </div>
-            <Typography.Title level={4} style={{ margin: 0 }}>
-              运营中心
-            </Typography.Title>
+            <Button icon={<ReloadOutlined />} onClick={() => { fetchOverview(); loadProduct(); }} size="small">
+              刷新
+            </Button>
           </div>
-          <Text type="secondary" style={{ fontSize: 13, marginLeft: 42 }}>
-            管理运营中心 · CRUD 管理之上的统一运营体验入口
-          </Text>
+
+          {/* Telemetry row */}
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', marginTop: 16, paddingTop: 14 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20, alignItems: 'center' }}>
+              <TelemetryDot label="待处理用户" value={overview?.pending.usersPending ?? 0} color={VISNDT_COLORS.warning} />
+              <TelemetryDot label="待处理询价" value={overview?.pending.inquiriesPending ?? 0} color={VISNDT_COLORS.warning} />
+              <TelemetryDot label="待处理需求" value={overview?.pending.demandsPending ?? 0} color={VISNDT_COLORS.warning} />
+              <TelemetryDot label="待处理RFQ" value={overview?.pending.rfqPending ?? 0} color={VISNDT_COLORS.warning} />
+              <TelemetryDot label="未读通知" value={overview?.pending.unreadNotifications ?? 0} color={VISNDT_COLORS.industrialCyan} />
+              <span
+                style={{
+                  marginLeft: 'auto',
+                  fontFamily: "'JetBrains Mono','SFMono-Regular',Consolas,monospace",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: VISNDT_COLORS.industrialCyan,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                TOT {overview ? overview.pending.usersPending + overview.pending.inquiriesPending + overview.pending.demandsPending + overview.pending.rfqPending + overview.pending.unreadNotifications : 0}
+              </span>
+            </div>
+          </div>
         </div>
-        <Button icon={<ReloadOutlined />} onClick={() => { fetchOverview(); loadProduct(); }} size="small">
-          刷新
-        </Button>
-      </div>
+
+        {/* Controlled accent divider */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 3,
+            background: `linear-gradient(90deg, ${VISNDT_COLORS.primary}, ${VISNDT_COLORS.industrialCyan})`,
+          }}
+        />
+      </header>
 
       <Tabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} />
 
@@ -780,5 +894,37 @@ function BusinessQueueBlock({
         />
       </Card>
     </Spin>
+  );
+}
+
+// 工业遥测指示点：受控色点 + mono 标签 + mono 值（复用 730 Home 遥测语言）
+function TelemetryDot({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: number;
+  color: string;
+}) {
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+      <span
+        aria-hidden="true"
+        style={{ width: 7, height: 7, borderRadius: '50%', background: color, flexShrink: 0 }}
+      />
+      <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>{label}</span>
+      <span
+        style={{
+          fontFamily: "'JetBrains Mono','SFMono-Regular',Consolas,monospace",
+          fontSize: 14,
+          fontWeight: 700,
+          color: '#fff',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {value}
+      </span>
+    </span>
   );
 }

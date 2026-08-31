@@ -5,6 +5,8 @@ import PublicFooter from "@/components/layout/PublicFooter";
 import Providers from "./providers";
 import PageViewTracker from "@/components/analytics/PageViewTracker";
 import ServiceWorkerRegistration from "@/components/pwa/ServiceWorkerRegistration";
+import { ToastViewport } from "@/components/common/Toast";
+import BackToTop from "@/components/common/BackToTop";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, SITE_KEYWORDS } from "@/lib/seo";
 import { Inter, JetBrains_Mono } from "next/font/google";
 
@@ -76,6 +78,8 @@ export default function RootLayout({
         <Providers>
           <PageViewTracker />
           <ServiceWorkerRegistration />
+          <ToastViewport />
+          <BackToTop />
           <PublicHeader />
           <main className="flex-1">{children}</main>
           <PublicFooter />

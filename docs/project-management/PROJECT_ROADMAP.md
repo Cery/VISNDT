@@ -1418,8 +1418,1192 @@ Catalog:                   Capability Management / Demand / Matching / RFQ / Off
 Defect:                    P0=0 / P1=0 / P2=0 / P3=0
 Future Candidate:          REGISTERED（5 项，继承 714/715/716/717，未实施）
 Review Report:            docs/_review/718_M31_Final_Closeout_Report.md
-Next:                     M32 Planning
+Next:                     720_M32.0_Foundation_DesignToken_Freeze_And_RuntimeGate
 ```
+
+```text
+Status:                    PASS（720 M32.0 Foundation Design Token Freeze And Runtime Gate）
+M32.0：                    M32 Frontend Platform Productization Foundation 完成（Design Token Freeze + Design System Baseline + Admin Mobile Runtime Gate + Scope Gate）
+M32 定位:                  Frontend Platform Productization ≠ Pure Visual Redesign；让前端从「工业企业网站 + 产品目录 + 管理后台」收口为「工业检测能力发现 + 能力/型号展示 + 需求匹配 + RFQ/Offer 撮合平台」
+M32 固定路线:              6 主任务 + 1 最终验收（720 Foundation → 721 Confirmed Blocker+Platform Identity → 722 Brand System → 723 Core Page UX → 724 Interaction+Final Polish → 725 Final QA/M32 Closeout），不拆 M32.3–M32.6
+Repository Root:          F:/Desktop/VISNDT（代码根 F:/Desktop/VISNDT/VISNDT）
+Working Tree:             PRESERVED（704–719 未提交变更未被覆盖）
+Design Token:             FROZEN（唯一规范源 docs/design-system/：COLOR_SYSTEM / TYPOGRAPHY / SPACING / COMPONENT_RULE / UI_GUIDE；Primary #2563EB / Secondary #0EA5E9 / Accent #F59E0B / Success #10B981 / Warning #F59E0B / Error #EF4444 + Neutral 灰阶 + Radius + Spacing + Elevation + CTA hierarchy + Status semantics）
+Cross-App Principle:       Same Design Tokens + Same Semantic Language + Same Interaction Principles + Different Application Theme（统一品牌 ≠ 统一组件库）
+Admin Mobile Runtime:     VERIFIED（375px/768px：Login/Nav/List/Detail/Filter/Edit/Save/Pagination 0 横向溢出、0 确认阻断；review/publish = NOT APPLICABLE；modal 路由式创建流 = 探针假阴性非缺陷）
+Mobile Triage:            Confirmed Blocker(P0-F)=0 / UX Issue(P1/P2)=0 / Acceptable=modal 路由流
+Backend:                  UNCHANGED
+Schema:                   UNCHANGED / FROZEN
+Migration:                NONE
+Matching / Search / AI:   FROZEN
+New Runtime Dependency:   NONE（无 framer-motion / styled-components / 新 UI 库 / 新图标库 / 新图表系统；无 packages/design-system —— docs/design-system 唯一规范源 → Web/Admin manual consumption）
+Finding Matrix:           P0-G=0 / P0-F=0 / P0-S=0 / P1=0 / P2=0；Observation 1（Admin modal 路由式创建流，探针假阴性）；Deferred = token-vs-code 对齐（722）、719 设计审计 UX 项（722/723/724 分期收敛）
+Documentation:            UPDATED（PROJECT_STATUS / PROJECT_ROADMAP / MODULE_COMPLETION_MATRIX / 720 Review Report）
+M32.0:                    COMPLETED
+Progress Snapshot:        M31=CLOSED / 719=M32 BASELINE APPROVED / 720=FOUNDATION COMPLETE / 721=NEXT
+Review Report:            docs/_review/720_M32.0_Foundation_DesignToken_Freeze_And_RuntimeGate_Report.md
+Next:                     721_M32.0_Confirmed_Blocker_And_Platform_Identity
+```
+
+```text
+Status:                    PASS（721 M32.1 Core Page UX And Platform Identity Implementation）
+M32.1：                    M32 Frontend Core Page UX 落地（Design Token Consumption + Platform Identity + Product Discovery UX + Product Detail UX + Content Surface UX + Admin UX + Runtime Validation）
+M32 定位:                  Frontend Platform Productization；收口为「工业检测能力发现 + 能力/型号展示 + 需求匹配 + RFQ/Offer 撮合平台」
+Repository Root:          F:/Desktop/VISNDT（代码根 F:/Desktop/VISNDT/VISNDT）
+Baseline:                 720 = PASS / M32.0 = COMPLETED / M32 = IN PROGRESS（不提前 M32 CLOSED）
+Design Token:             ALIGNED（DEF-1 token-vs-code：design-tokens 语义色+industrialCyan；Web globals.css industrial-cyan/amber；Admin Login 品牌化；--primary=#2563EB 已一致）
+Platform Identity:        PASS（Hero 主 CTA Primary 实底、Secondary/outline 分层；Home 平台能力表达完整）
+Home UX:                  PASS（结构 + CTA 层级，Runtime 0 溢出）
+Product Discovery UX:     PASS（P0-F1 移动筛选 Drawer；P1-1 栅格 1/2/3 列降密度；P1-6 CompareBar 底部占位+safe-area）
+Product Detail UX:        PASS（Tabs 移动横滚 sticky / Nav 结构完备，无阻断）
+Content Surface UX:       PASS（VISNDT prose + 表格 overflow 防护；静态 TOC 因无稳定 heading id → Deferred）
+Admin UX:                 PASS（Login P0-S2 平台治理身份 + 共享语义状态；未改造 AntD→Tailwind）
+Mobile:                   PASS（375/768/1024 Runtime via Edge CDP：0 溢出、Drawer 开合、栅格 1/2/3 列）
+Accessibility:            PASS（focus/aria 保留；Drawer role=dialog/aria-modal/ESc）
+Interaction:              PASS（Drawer 开合/Esc/遮罩；hover/focus/active 保留）
+Production Build:         Web exit 0（8GB flag OOM → 4096 heap 重跑通过）/ Admin exit 0
+Runtime:                  PASS
+Regression:               PASS（后端/Schema/Migration/API 未触碰）
+Schema:                   UNCHANGED
+Migration:                NONE
+Backend:                  UNCHANGED
+Matching / Search / AI:   FROZEN
+New Runtime Dependency:   NONE
+Finding Matrix:           P0-G=0 / P0-F=0 / P0-S=0 / P1=0 / P2=0；Deferred = Content Detail 静态 TOC（无稳定 heading id）；Observations 见 721 报告
+M32:                      IN PROGRESS
+Progress Snapshot:        720=PASS / 721=PASS(M32.1 Core Page UX) / 722=NEXT
+Review Report:            docs/_review/721_M32.1_Core_Page_UX_And_Platform_Identity_Implementation_Report.md
+Next:                     722_M32.2_Interaction_And_Final_Polish
+```
+
+```text
+Status:                    PASS（722 M32.2 Interaction And Final Polish）
+M32.2：                    M32 Interaction & Final Polish（轻量页面过渡 + 按钮反馈 + 卡片反馈 + Toast/Message + Loading/Success/Error + Pagination/Tab scroll + Back To Top + CSS stagger + Reduced Motion + 品牌微动效 + Runtime QA）
+M32 定位:                  Frontend Platform Productization；CSS First / Native React First / Existing Dependency First；不追求世界级动画
+Repository Root:          F:/Desktop/VISNDT（代码根 F:/Desktop/VISNDT/VISNDT）
+Baseline:                 720 = PASS / 721 = PASS（M32.1 Core Page UX）/ M32 = IN PROGRESS（不提前 M32 CLOSED）
+Web Interaction:          PASS（template.tsx page-enter 路由过渡；globals.css 统一 Reduced Motion 基础 + card-lift/btn-press/stagger-item/hero-enter 工具类；Toast/ToastViewport 零依赖 + aria-live；BackToTop >480px smooth；Pagination 激活态纯 Primary；ProductGrid stagger 入场）
+Admin Interaction:        PASS（AdminLayout Outlet key=pathname admin-route-enter 路由淡入；index.css admin-route-enter/admin-btn-press + 统一 Reduced Motion；login 保留 loading/AntD Alert）
+Animation / Reduced Motion: PASS（CSS First：transition/transform/opacity/shadow/color + keyframes，无 JS 循环/无重型运行时；CDP 实测 reduced-motion 下动画时长 1e-05s）
+Toast / Message / State:  PASS（Web 零依赖 Toast；Admin AntD message/Alert/Button loading；Loading/Empty/Error/骨架屏沿承）
+Scroll / Pagination / Tab: PASS（Back To Top；Pagination 激活态纯 Primary；Table/Content 表格 overflow-x-auto 横滚）
+Mobile:                   PASS（375/768 Runtime via Chrome Headless + CDP：Web Home/Products + Admin Login 全 overflowXpx=0、无溢出/裁剪/遮挡）
+Accessibility:            PASS（focus/focus-visible 可见；ToastViewport role=status + aria-live=polite；BackToTop aria-label；Pagination 语义化 nav/button）
+Production Build:         Web exit 0（NODE_OPTIONS=--max-old-space-size=4096 构建堆规避；.next 增量残留删除后全新构建通过）/ Admin exit 0
+Runtime:                  PASS（真实浏览器 CDP 375/768 + Loading/Success/Error + Reduced Motion 探针）
+Regression:               PASS（720 Runtime Gate + 721 Core UX 无回归：MobileFilterDrawer/CompareBar/ProductGrid/ProductCard/Admin Login/Product Detail/Content Surface/Home CTA 全保留）
+Schema:                   UNCHANGED
+Migration:                NONE
+Backend:                  UNCHANGED
+Matching / Search / AI:   FROZEN
+New Runtime Dependency:   NONE（未新增任何 package/library/runtime）
+Finding Matrix:           P0=0 / New P1=0 / New P2=0 / New P3=0；Observation 若干；Deferred/Future Candidate 若干（Content TOC / Advanced Content UX / Advanced Recommendation / Dark Mode / Advanced Animation / Advanced Analytics / Advanced CMS / Search V2 / AI/RAG/Vector / Supplier Search / Supplier Self-Service / Buyer Inquiry Ownership / ProductForm DTO expansion 全继承注册，不重包装）
+Documentation:            UPDATED（PROJECT_STATUS / PROJECT_ROADMAP / MODULE_COMPLETION_MATRIX / 722 Review Report）
+M32:                      IN PROGRESS
+Progress Snapshot:        720=PASS / 721=PASS(M32.1 Core Page UX) / 722=PASS(M32.2 Interaction & Final Polish) / Final QA=NEXT / M32=IN PROGRESS
+Review Report:            docs/_review/722_M32.2_Interaction_And_Final_Polish_Report.md
+Next:                     Final QA / Release Validation（不创建 M32.3–M32.6）
+```
+
+### 723 M32 Final QA / Release Validation And Closeout — PASS（M32 唯一最终发布级门禁 / Frontend Productization Baseline Completion / 审计型关闭）
+
+```yaml
+Task:                     723_M32_Final_QA_Release_Validation_And_Closeout
+Status:                   PASS
+M32 定位:                  Frontend Productization Baseline Completion（非 Infinite UI Optimization）
+Baseline:                 719=BASELINE APPROVED / 720=PASS / 721=PASS / 722=PASS / 723=PASS
+Repository:               VERIFIED（repo root F:\Desktop\VISNDT / code root VISNDT / branch main / 工作树无 backend·schema·migration）
+Architecture:             FROZEN（Schema UNCHANGED / Migration NONE / Backend UNCHANGED / Matching/Search/AI FROZEN）
+Design Token:             ALIGNED（Web/Admin 品牌 token 与 design-system 冻结规范全对齐）
+Web Build:                PASS（`.next` 全清后 next build exit 0，无 MODULE_NOT_FOUND chunk）
+Admin Build:              PASS（tsc -b && vite build exit 0，28.2s，既有 >500kB 告警非错误）
+Web Runtime:              PASS（:3100 核心路由全 200 OK）
+Admin Runtime:            PASS（:4100 就绪，Login 渲染正常）
+Mobile 375:               PASS
+Mobile 768:               PASS
+Interaction:              PASS（btn-press / page-enter / BackToTop / Toast aria-live）
+Reduced Motion:           PASS（Web CDP 实测 1e-05s；Admin 全局 CSS reduce 规则）
+Console / Runtime Error:  PASS（EXC=0；仅 API :4000 断连 NETFAIL = 环境性，非前端缺陷）
+Visual Regression:        PASS（720/721/722 无回归，仅前端展示层）
+Performance Sanity:       PASS（Web shared 102kB/page ~130kB；Admin main 2.6MB 非阻断）
+Release Blocker:          0
+P1:                       0
+P2:                       0
+P3:                       1（Admin main 2.6MB >500kB 体积，打磨非阻断）
+Observation:              1（Admin login 首帧无 .admin-route-enter 节点，reduced-motion 由全局 CSS 保证）
+Deferred:                 1（DEF-1 实时认证核心流 E2E 需 Postgres+API；本环境未拉起，非前端缺陷，719-722 基线已 PASS）
+Future Candidate:         2（Admin bundle 代码分包 / M33 更广 interaction·a11y 增强）
+Documentation:            UPDATED（PROJECT_STATUS / PROJECT_ROADMAP / MODULE_COMPLETION_MATRIX / 723 Review Report）
+M32:                      CLOSED（Frontend Productization Baseline Completion）
+Final Stop Line:          719=BASELINE APPROVED / 720=PASS / 721=PASS / 722=PASS / 723=PASS / M32=CLOSED
+Next:                     724 M33 Runtime Environment E2E Readiness And Entry Baseline
+```
+
+### 724 M33 Runtime Environment E2E Readiness And Entry Baseline（724 COMPLETED / PASS）
+
+724_M33_Runtime_Environment_E2E_Readiness_And_Entry_Baseline（指令 V3.2.3，M33 Planning Entry Runtime Baseline / Architecture Audit + Real Runtime E2E + Environment Readiness / 仅补证零业务代码变更）:
+```text
+Task:                      724_M33_Runtime_Environment_E2E_Readiness_And_Entry_Baseline
+Type:                      Runtime Environment E2E Readiness / M33 Entry Baseline（补充 723 DEF-1 唯一缺失的真实运行证据）
+M32:                      CLOSED（保持，未重开）
+Repository:                VERIFIED（F:/Desktop/VISNDT，branch=main，Working Tree=PRESERVED）
+Baseline:                  719=BASELINE APPROVED / 720=PASS / 721=PASS / 722=PASS / 723=PASS / M32=CLOSED
+Environment:               PASS（PostgreSQL 5432 / MinIO 9000-9001 / API 4000 / Web 3000 / Admin 3001 五端在线）
+PostgreSQL:                READY（真实 DB 读写全通过；/api/v1/health 200 database connected；No migration/schema mutation）
+API:                       READY（NestJS 启动无异常，health 200；err.log 全为 HttpExceptionFilter 预期边界响应）
+Authentication:            PASS（Buyer/Supplier/Admin 三账号 cookie+Bearer 登录 201；/auth/me 200；未认证 401）
+Buyer E2E:                 PASS（REAL，API+DB：登录→浏览→Inquiry→Demand→RFQ→Publish(触发匹配)；Web /products 真浏览器渲染 25 卡片）
+Supplier E2E:              PASS（REAL，API+DB：登录→响应 RFQ→Create Offer→Workspace/Supplier/Overview；SupplierProduct 写入 403=冻结只读边界）
+Admin E2E:                 PASS（REAL，API+DB：登录→全实体 CRUD→SupplierProduct submit/review/approve/publish 生命周期→Offer/Demand/RFQ 治理）
+HTTP Boundary:             PASS（401/403/404/200 全符合权限设计；未认证/错误角色/不存在路由/授权成功）
+Browser Runtime:           PASS（Edge headless + CDP：Web /products 真实 API 数据入页 + Admin 登录/auth 态；无 fatal runtime error）
+Console / Runtime Error:   PASS（Unhandled/Fatal/Hydration/Chunk/Unexpected500/Unexpected404=0；exceptionThrown=0；network_loading_failed=0）
+E2E Classification:        Category A REAL E2E PASS（三角色 81/81 + Boundary 14/14 + Browser 8/8；临时数据 TC_M30/tc-m30 清理无残留）
+Schema:                    UNCHANGED
+Migration:                 NONE
+Backend Business Logic:    UNCHANGED
+Matching / Search / AI:    FROZEN / FROZEN / FROZEN
+New Runtime Dependency:    NONE
+Defect:                    Release Blocker=0 / P1=0 / P2=0 / P3=0
+Observation:               3（登录 429 限流=throttler 预期 / content·supplier-products PATCH·DELETE 404=设计内无路由 / Admin 主包>500kB=723 P3 既有项）
+Deferred:                  NONE（723 遗留 DEF-1 已解决 CLOSED）
+Environment Blocked:       NONE
+Future Candidate:          14 项继承注册未实现（Admin Bundle 分包 / Dark Mode / Advanced Animation / Advanced Accessibility / Advanced Recommendation / Advanced CMS / Search V2 / AI / RAG / Vector / Supplier Search / Supplier Self-Service / Buyer Inquiry Ownership / ProductForm DTO expansion）
+M33 Entry:                 APPROVED（PASS）
+Next:                      M33 Planning（本任务已 STOP，不自动进入 M33 implementation）
+Review Report:             docs/_review/724_M33_Runtime_Environment_E2E_Readiness_And_Entry_Baseline_Report.md
+```
+
+### 725 M33.0 Frontend Visual Redesign Audit And Design Direction（725 COMPLETED / PASS）
+
+725_M33.0_Frontend_Visual_Redesign_Audit_And_Design_Direction（指令 V3.2.3，M33.0 Frontend Visual Redesign Audit / Architecture Audit + Visual Design Audit + Runtime Evidence + Redesign Planning / 审计型零代码变更）:
+```text
+Task:                      725_M33.0_Frontend_Visual_Redesign_Audit_And_Design_Direction
+Type:                      Architecture Audit + Visual Design Audit + Runtime Evidence + Redesign Planning（M33 Visual Redesign 前置审计，产出 M33 Visual Design Contract 唯一审计输入之一）
+Repository:                VERIFIED（F:/Desktop/VISNDT，code root VISNDT，branch=main，工作树保留 719-723 + _725_shots/*.png Before-State 证据）
+Baseline:                  719=BASELINE APPROVED / 720-723=PASS / M32=CLOSED（保持未重开） / 724=M33 Entry APPROVED
+M32:                      CLOSED
+Runtime:                   VERIFIED（API 4000 health 200 / Web 3000 200 / Admin 3001 200）
+Web Visual Audit:          PARTIAL
+Admin Visual Audit:        PARTIAL
+Design Token Utilization:  4
+Typography:                3
+Color:                     4
+Component System:          3
+Layout Composition:        3
+Brand Expression:          3
+Responsive Visual:         4
+Overall Visual Score:      67
+Visual Redesign Gap:       C（Significant Visual Redesign Required）
+Visual Transformation:     NOT CONFIRMED（本阶段仅审计，未经实施）
+Web Redesign:              REQUIRED
+Admin Redesign:            REQUIRED
+Core Page Redesign:        REQUIRED
+Component Redesign:        REQUIRED
+M33 Visual Direction:      DEFINED（Industrial Precision + Technical Professional + Modern B2B；Layout 留白/节奏；Surface 分层；Typography 四级节奏；KPI emoji→图标）
+Visual Transformation Gate: DEFINED（G1-G7：P0 页 Before 对比显著差异 + KPI 图标化 + P0 组件 Token 化表面分层 + 响应式无溢出 + 零硬编码 hex + 对比度≥4.5/reduced-motion + 零范围扩张/后端/schema/migration/matching/search/AI）
+Schema:                    UNCHANGED
+Migration:                 NONE
+Backend Business Logic:    UNCHANGED
+Matching / Search / AI:    FROZEN / FROZEN / FROZEN
+New Runtime Dependency:    NONE
+New UI Library:            NONE
+Defect:                    Release Blocker=0 / P1=0 / P2=0 / P3=0
+Observation:               3（双端组件语汇依赖 token 中枢无共享可视契约 / Non-content 页排版节奏不统一 / Admin>500kB=723 P3 既有不重开）
+Deferred:                  0
+Future Candidate:          14 项继承注册未实现（Admin Bundle 分包 / Dark Mode / Advanced Animation / Advanced Accessibility / Advanced Recommendation / Advanced CMS / Search V2 / AI / RAG / Vector / Supplier Search / Supplier Self-Service / Buyer Inquiry Ownership / ProductForm DTO expansion）
+Documentation:             UPDATED
+M32:                      CLOSED
+M33:                      PLANNING
+Next:                     M33 Visual Design Contract（本任务已 STOP After Audit，不进入 M33 implementation）
+Review Report:             docs/_review/725_M33.0_Frontend_Visual_Redesign_Audit_And_Design_Direction_Report.md
+```
+
+### 726 M33.0 Frontend Visual Design Contract And Redesign Specification（726 COMPLETED / PASS）
+
+726_M33.0_Frontend_Visual_Design_Contract_And_Redesign_Specification（指令 V3.2.3，M33.0 Visual Design Contract / Architecture+Design Contract / Visual Specification+Planning / 契约型零代码变更，M33 Implementation=NOT STARTED）:
+```text
+Task:                      726_M33.0_Frontend_Visual_Design_Contract_And_Redesign_Specification
+Type:                      Architecture / Design Contract / Visual Specification / Planning（M33 Visual Design Contract，产出 725 Direction→可执行视觉合同）
+Repository:                VERIFIED（F:/Desktop/VISNDT，code root VISNDT，branch=main，工作树保留 719-725 改动+文档+QA 脚本+_725_shots/*.png，无 reset/checkout/clean/stash/restore/commit）
+Baseline:                  719=BASELINE APPROVED / 720-723=PASS / M32=CLOSED（保持未重开） / 724=M33 Entry APPROVED / 725=Visual Audit PASS（Overall 67/100、Gap=C、Redesign=REQUIRED、Visual Transformation=NOT CONFIRMED）
+M32:                      CLOSED
+M33:                      PLANNING
+Visual Direction:         DEFINED
+Visual Design Contract:   DEFINED（docs/design-system/VISNDT_M33_FRONTEND_VISUAL_DESIGN_CONTRACT_V1.md，交付物 25 项全满足）
+Brand Contract:           DEFINED（Industrial Precision × Technical Professional × Modern B2B）
+Typography Contract:      DEFINED（四级信息层级 + 角色化排印 + 跨页 rhythm；数字 Mono）
+Surface Contract:         DEFINED（Surface 0/1/2/Elevated/Overlay）
+Layout Contract:          DEFINED（业务页通用模板 + Home Narrative Flow，非 Component Stack）
+Component Contract:       DEFINED（21 组件含 ProductCard→Industrial Capability Card）
+Web Page Contract:        DEFINED（P0 Home/Products/Search、P1 Detail/Knowledge/Workspace）
+Admin Page Contract:      DEFINED（Industrial Operations Console；P0 Login/Dashboard + P1 List·Detail·Operation）
+Responsive Contract:      DEFINED（375/768/1024/1440 Responsive Transformation 非 Desktop Shrink）
+Accessibility Contract:   DEFINED（Contrast≥4.5 / Focus / Keyboard / aria / Reduced Motion 全保留，不牺牲 a11y）
+Before/After Gate:        DEFINED（725 _725_shots/ 基线；Before→After→Difference→Acceptance）
+Visual Transformation Gate: DEFINED（VT-1..VT-12，全满足才 CONFIRMED）
+Anti-Cosmetic Gate:       DEFINED（只改颜色/圆角/阴影/字体/padding/icon/hover/Button 不算；页面构成无变化→NOT CONFIRMED）
+Token Gap Register:       5 项（TG-01..TG-05，命名化/语义化，不引入新色值，未改 core token）
+Scope Expansion:          NONE
+Backend:                  UNCHANGED
+Schema:                   UNCHANGED
+Migration:                NONE
+API:                      UNCHANGED
+Matching:                 UNCHANGED
+Search:                   UNCHANGED
+AI:                       UNCHANGED
+Runtime Dependency:       UNCHANGED
+UI Library:               UNCHANGED
+Implementation:           NOT STARTED
+Visual Transformation:    NOT CONFIRMED（尚未实施）
+Documentation:            UPDATED
+M32:                      CLOSED
+M33:                      PLANNING
+Next:                     M33 Visual Redesign Implementation — P0 Foundation（本任务已 STOP After Contract，不进入 M33 implementation）
+Review Report:             docs/_review/726_M33.0_Frontend_Visual_Design_Contract_And_Redesign_Specification.md
+```
+
+### 727 M33.1 Frontend Visual Redesign Foundation Implementation（727 CONDITIONAL PASS）
+
+727_M33.1_Frontend_Visual_Redesign_Foundation_Implementation（指令 V3.2.3，M33.1 Frontend Visual Foundation / Architecture-Constrained Implementation + Runtime Verification + Documentation Sync / 仅前端 Foundation，后端零修改）:
+```text
+Task:                      727_M33.1_Frontend_Visual_Redesign_Foundation_Implementation
+Type:                      Frontend Visual Foundation Implementation（将 726 Contract 的 Foundation 视觉规则落入 Web/Admin；非 Home/Products/Search/Admin Dashboard 完整重设计）
+Repository:                VERIFIED（F:/Desktop/VISNDT，code root VISNDT，branch=main，无 reset/checkout/stash/commit）
+Baseline:                  725=PASS（Visual Audit）/ 726=CONTRACT（Visual Design Contract）/ M32=CLOSED（保持未重开）
+M32:                      CLOSED
+M33:                      IMPLEMENTATION IN PROGRESS
+Foundation:                COMPLETED
+Surface Foundation:        IMPLEMENTED（surface-0/1/2/elevated/overlay，design-tokens+双端 CSS）
+Typography Foundation:     IMPLEMENTED（H1-H4 base 基线，双端）
+Container Foundation:      IMPLEMENTED（content 1280 / wide 1480 / reading 760-820 + PageContainer.tsx）
+Spacing Foundation:        IMPLEMENTED（8px rhythm 语义工具类 vds-space-y-*）
+Border / Focus Foundation: IMPLEMENTED（focus-visible 复用 primary #2563eb）
+Icon Foundation:           IMPLEMENTED（复用既有 lucide-react + @ant-design/icons，无新依赖）
+Emoji P0 Scope:            NO NEW EMOJI（未引入 emoji 换图标）
+Responsive Foundation:     IMPLEMENTED（375/768/1024+/1440 + clamp 留白，无横向溢出）
+Core Visual Primitive:     IMPLEMENTED（PageContainer.tsx 单一事实源容器原语）
+Token Gap TG-01:           IMPLEMENTED（Surface）
+Token Gap TG-02:           REUSED（Focus ring 复用 primary）
+Token Gap TG-03:           IMPLEMENTED（Container）
+Token Gap TG-04:           IMPLEMENTED（Responsive padding）
+Token Gap TG-05:           IMPLEMENTED（Typography）
+New Runtime Dependency:    NONE
+New UI Library:            NONE
+New Icon Runtime:          NONE
+New Animation Runtime:     NONE
+packages/design-system:    NOT CREATED（F14 合规）
+Second Token System:       NOT CREATED（F13 合规）
+Backend:                   UNCHANGED
+API:                       UNCHANGED
+Schema:                    UNCHANGED
+Migration:                 NONE
+Matching:                  UNCHANGED
+Search:                    UNCHANGED
+AI / RAG / Vector:         UNCHANGED
+Business Workflow:         UNCHANGED
+TypeScript:                PASS（Web build 含 tsc / Admin tsc -b，均 exit 0）
+Lint:                      Web PASS（exit 0，仅既有 warnings）；Admin NOT RUNNABLE（eslint.config.* 缺失=722/723 既有限制，非本任务）
+Build:                     Web PASS（exit 0）/ Admin PASS（exit 0，仅既有 chunk-size warning）
+Runtime:                   Web 3000=HTTP 200 / Admin 3001=HTTP 200；API 4000 本会话不可运行（Postgres:5432+Docker 未就绪，P1001，环境限制、API UNCHANGED、724 已 E2E）
+Visual Runtime:            PASS（Edge Headless+CDP 375/1440 无溢出，shots 存 database/_727_shots/，未覆盖 _725_shots）
+Visual Transformation:     NOT CONFIRMED（Foundation PASS ≠ Visual Transformation CONFIRMED）
+Documentation:             UPDATED
+M32:                      CLOSED
+M33:                      IMPLEMENTATION IN PROGRESS
+Status:                   CONDITIONAL PASS（Condition= 重启 PostgreSQL+API 后复核 API 运行态；前端全部 Acceptance 条件已满足）
+Next:                     M33.2 Core Visual Components / P0 Implementation（本任务已 STOP，等待下一轮审计）
+Review Report:             docs/_review/727_M33.1_Frontend_Visual_Redesign_Foundation_Implementation_Report.md
+```
+
+### 728 M33.2 Core Visual Components P0 Implementation（728 COMPLETED / PASS）
+
+```
+728_M33.2_Core_Visual_Components_P0_Implementation（指令 V3.2.3，M33.2 Core Visual Components / Frontend Visual Component Redesign + Architecture-Constrained Implementation + Runtime Visual QA / 仅前端 Core P0 组件重设计，后端零修改）
+```
+
+| Field | Value |
+|-------|-------|
+| Status | **728 COMPLETED / PASS** |
+| M32 | CLOSED（保持未重开） |
+| M33 | **IMPLEMENTATION IN PROGRESS** |
+| 725 / 726 / 727 | VERIFIED（Audit / Contract / Foundation） |
+| 728 Deliverable | P0 Core Visual Components = COMPLETED：ProductCard / ProductGrid / HeroSection / SectionHeader / Core Surface / Admin KPI（KpiCard + OverviewCards） |
+| KPI Emoji | 0（OverviewCards/KpiCard 无 emoji；CDP emojiOnPage=false；复用 @ant-design/icons） |
+| Responsive | 375 / 768 / 1024 / 1440 全 VERIFIED；无横向溢出（CDP 8 页全 overflow=false）；ProductGrid 源码 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3（375/1·768/2·1024/3·1440/3） |
+| Anti-Cosmetic | PASS（Component Structure / Visual Hierarchy / Surface Strategy / Responsive Composition 四类结构性变化） |
+| Build / Type | Web build exit 0（PASS）/ Admin tsc -b + vite build exit 0（PASS） |
+| Lint | Web PASS（exit 0，仅既有 warnings）；Admin NOT RUNNABLE（既有 eslint.config 缺失，如实记录不伪造 PASS） |
+| Runtime | Web :3000=200 / Admin :3001=200；API :4000 /api/v1/health=200（本会话已拉起 PostgreSQL:5432+Docker）；截图存 database/_728_shots/（10 张，未覆盖 _725/_727） |
+| Accessibility | PASS（Contrast≥4.5 / focus-visible 保留 / keyboard / semantic / aria / reduced-motion） |
+| Architecture / Impact | Backend·API·Schema·Migration·Matching·Search·AI·Business Workflow 全 UNCHANGED；New Runtime Dependency=NONE；packages/design-system=NOT CREATED |
+| Scope Audit | Task-728 Files=6 组件+_728_shots.mjs+截图+文档；Pre-existing=721-727 已提交工作树 PRESERVED；Unexpected=无 |
+| Foundation Follow-up | 登记 ADMIN-FOCUS-TOKEN-01（Admin styles/index.css focus 直写 #2563eb，建议后续消费 border.focus Token，不在 728 修复） |
+| Documentation | UPDATED（PROJECT_STATUS / PROJECT_ROADMAP / MODULE_COMPLETION_MATRIX / 728 报告） |
+| Review Report | docs/_review/728_M33.2_Core_Visual_Components_P0_Implementation_Report.md |
+| Next | **M33.3 Web P0 Redesign**（本任务已 STOP，不自动进入页面级 Redesign） |
+
+明确：**728 = Core Visual Components Only**；**Component Redesign ≠ Page Redesign**；**Visual Transformation = NOT CONFIRMED**（尚未进入 M33.3 页面级重设计）。
+
+### 729 M33.3 Web P0 Industrial Tech Visual Redesign（729 CONDITIONAL PASS）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `729_M33.3_Web_P0_Industrial_Tech_Visual_Redesign`（指令 V3.2.3，M33.3 Web P0 页面级视觉重设计 / Frontend Page Redesign + Industrial Technical Visual Language + Runtime + Accessibility / 仅前端展示层，后端零修改） |
+| Baseline | 725=Audit PASS + 726=Contract + 727=Foundation COMPLETED + 728=Core Visual Components COMPLETED；**M32=CLOSED（保持未重开）**；**M33=IMPLEMENTATION IN PROGRESS** |
+| Home | IMPLEMENTED（Hero 延续 + Classification 左右分栏「能力数组视觉锚 + 分类 rail」+ Solutions「特色方案深色档案 + 方案技术 rail」；Card Stack → 空间化技术展示） |
+| Product Center | IMPLEMENTED（白 intro 盒 → Dark Industrial Capability Header 带 + mono 能力总数数据锚 + 分类能力 rail；功能/Search/Filter/Pagination/CompareBar 保留） |
+| Product Category | IMPLEMENTED（平铺列表 → 工业分类体验 Dark Header + 分类/子类 mono 数据锚 + 分类 rail mono 序号/技术刻度/子类 chip） |
+| Industrial Tech Visual Language | IMPLEMENTED（Precision/Engineering/Technical；Surface 分层 + 受控 Technical Grid/分隔线/测量刻度；Glow/Gradient 受控；无新品牌主色） |
+| Information Hierarchy | IMPLEMENTED（Primary/Secondary/Technical/Meta/CTA 可辨，杜绝均匀等权） |
+| 728/727 Consumption | ProductGrid / ProductCard / Hero / IndustrialBadge / SectionHeader / PageContainer（727）/ surface-* / bg-grid / mono-tabular 全消费；无第二套 Design System |
+| Anti-Cosmetic Gate | Gate A-F：A/B/C/D/F=PASS；E=内容区四视口无溢出，1024 横向溢出为既有共享 Header（`/about` 复测同值）非本任务引入 |
+| Responsive | 375/768/1024/1440 CDP 实测；内容区全无溢出；gridCols：Home 2/2/4/4、Products 2/2/3/3、Categories 2/2/3/3（探针）；移动端为真 Stack/Reorder 非 Desktop 缩小 |
+| Accessibility | PASS（emptyA11yName=0 / imgsNoAlt=0 / focusVisibleDefined=true / emoji=false / Contrast≥4.5 / reduced-motion 保留） |
+| Build / Type / Lint | Web Build exit 0（44/44 路由）/ Web TS PASS / Web Lint exit 0（仅既有 warnings） |
+| Runtime | Web `:3000` `/`=200；CDP 截图 12 张存 `database/_729_shots/`（未覆盖 `_725/_727/_728`） |
+| Architecture / Impact | Backend·API·Schema·Migration·Matching·Search·AI·Business Workflow 全 UNCHANGED；New Runtime Dependency=NONE；UI/Icon/Animation/Chart Library=NONE；packages/design-system=NOT CREATED |
+| Scope Audit | Task-729 Files=3 P0 页 + Home 依赖组件 + `_729_shots.mjs` + `_729_probe.mjs` + 截图 + 文档；Pre-existing=721-728 PRESERVED；Unexpected=无 |
+| Documentation | UPDATED（PROJECT_STATUS / PROJECT_ROADMAP / MODULE_COMPLETION_MATRIX / 729 报告） |
+| Review Report | docs/_review/729_M33.3_Web_P0_Industrial_Tech_Visual_Redesign_Report.md |
+| Status | **CONDITIONAL PASS（M33.3 Web P0 Redesign = COMPLETED）** |
+| M33 | **IMPLEMENTATION IN PROGRESS** |
+| M33.3 | **COMPLETED** |
+| Visual Transformation | **NOT CONFIRMED** |
+| Next | **M33.4 Admin P0 Industrial Tech Visual Redesign** |
+
+明确：**729 = Web P0 页面级视觉重设计**；**Page Redesign ≠ Visual Transformation CONFIRMED**（页面级重构完成，但整体 Visual Transformation 需 M33.4-33.7 全部推进后才可判定）；1024 横向溢出为既有共享 Site Header，归因 721 前既有，Defer 不擅自扩大。
+
+### 730 M33.4 Admin P0 Industrial Tech Visual Redesign（730 CONDITIONAL PASS）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `730_M33.4_Admin_P0_Industrial_Tech_Visual_Redesign`（指令 V3.2.3，M33.4 Admin P0 页面级视觉重设计 / Admin Dashboard → Industrial Operations Center / 仅 Admin 前端展示层，后端零修改） |
+| Baseline | 725=Audit PASS + 726=Contract + 727=Foundation COMPLETED + 728=Core Visual Components COMPLETED + 729=Web P0 CONDITIONAL PASS；**M32=CLOSED（保持未重开）**；**M33=IMPLEMENTATION IN PROGRESS** |
+| Admin P0 Route | **`/home` = `apps/admin/src/pages/Home.tsx`**（确认真实导航入口；`/operation-center` 为非入口备选） |
+| Visual Redesign | IMPLEMENTED（普通 AntD Dashboard 信息堆叠 → Industrial Operations Center；Masthead 深色锚点 + Tech Grid + mono 遥测 + 受控 accent 分隔线；KPI Zone + Operational Context + Surface 0/1/2 层级） |
+| Industrial Tech Visual Language | IMPLEMENTED（Precision/Operations/Technical；受控深色锚点 + 技术网格 + mono 元数据 + 受控增强线 + 测量/坐标语言；无 Cyberpunk/Neon/Glassmorphism 泛化、无渐变泛滥、无巨字号噪声） |
+| 728 Consumption | `KpiCard` + `SectionHeader`（`@components/dashboard`）全量消费；21 张 KpiCard（能力总览 / 业务流转 / 匹配引擎 / 待处理事项）；无第二套 KPI/Card/Token/Container/Icon System |
+| Information Hierarchy | IMPLEMENTED（Industrial Operations Masthead(H1) → Executive KPI → Operational Meaning(hint/meta) → Technical Signals → Action/Status；杜绝标题→KPI→白卡堆叠） |
+| Anti-Cosmetic Gate | Gate A-F：A(结构重组)/B(Hierarchy)/C(工业语言)/D(内容呈现)/E(Responsive)/F(无业务回归) 全已满足；非换色/换圆角/换字体/换 padding 类表层改动 |
+| Responsive | 375/768/1024/1440 CDP 实测；**admin 内容区全视口无横向溢出**（sw: 375/753/1009/1425 ≤ iw）；移动端真 Stack/Reorder（KpiGrid xs=12 单列、sm/lg 分栏）；1024 Web 既有 Header overflow 按指令不擅自修复 |
+| Accessibility | PASS（hierarchy h1=1/h=6；focusVisibleDefined=true；无 emoji；装饰 SVG aria-hidden；emptyA11yName=3 均为既有布局 chrome——AdminLayout 折叠钮 ×2 + AntD Tabs more 触发钮（具 aria-haspopup/aria-controls），非 730 引入） |
+| Build / Type / Lint | Admin Build exit 0（tsc -b + vite build 通过，仅既有 P3 chunk>500kB 告警）；Admin Lint **NOT RUNNABLE**（`eslint.config.js|mjs|cjs` 缺失，792/728 同因；按指令未新建 ESLint 架构） |
+| Runtime | Admin `:3001` `/home`=200 真实运行态数据（demo.admin 登录；既有 API）：`sw:screens/sections/ability总览·业务流转·匹配引擎·待处理·快捷操作`；截图 5 张存 `database/_730_shots/`（未覆盖 `_725/_727/_728`） |
+| Before/After Evidence | 生成 `admin_p0_{375,768,1024,1440}.png` + `admin_p0_full_1440.png`（After）；Before 参照 728 普通面板基线 `_728_shots/admin_analytics_375.png` + 725 Audit + Home.tsx git 结构性 diff（728/729 无 admin_home 专用基线，如实登记） |
+| Architecture / Impact | Backend·API·Schema·Migration·Matching·Search·AI·Business Workflow 全 UNCHANGED；New Runtime Dependency=NONE；UI/Icon/Animation/Chart Library=NONE；packages/design-system=NOT CREATED |
+| Scope Audit | Task-730 Files=`apps/admin/src/pages/Home.tsx`（P0 页视觉层）+ `_730_shots.mjs` + `_730_a11y_probe.mjs` + 截图 + 文档；Pre-existing=721-729 PRESERVED；Unexpected=无（apps/api / prisma / migration 零改动） |
+| Documentation | UPDATED（PROJECT_STATUS / PROJECT_ROADMAP / MODULE_COMPLETION_MATRIX / 730 报告） |
+| Review Report | docs/_review/730_M33.4_Admin_P0_Industrial_Tech_Visual_Redesign_Report.md |
+| Status | **CONDITIONAL PASS（M33.4 Admin P0 Redesign = COMPLETED）** |
+| M33 | **IMPLEMENTATION IN PROGRESS** |
+| M33.4 | **COMPLETED** |
+| Visual Transformation | **NOT CONFIRMED** |
+| Next | **M33.5 Web/Admin P1 Redesign** |
+
+明确：**730 = Admin P0 页面级视觉重设计**；Admin P0 `Home.tsx`（Dashboard）已升级为 Industrial Operations Center，视觉结构/信息层级/工业技术语境落地，728 KpiCard/SectionHeader 全量消费；但整体 **Visual Transformation 仍需 M33.5-33.7 推进后才能判定 CONFIRMED**；1024 Web 既有 Shared Header overflow 按指令维持 Deferred（不擅自修复 Web/Admin Layout）。
+
+### 731 M33.5 P1 Industrial Tech Visual Redesign First Batch（731 PASS）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `731_M33.5_P1_Industrial_Tech_Visual_Redesign_First_Batch`（指令 V3.2.3，M33.5 Web/Admin P1 页面级视觉重设计 · 第一批 / 仅前端展示层，后端零修改） |
+| Baseline | 725=Audit PASS + 726=Contract + 727=Foundation COMPLETED + 728=Core Visual Components COMPLETED + 729=Web P0 CONDITIONAL PASS + 730=Admin P0 CONDITIONAL PASS；**M32=CLOSED（保持未重开）**；**M33=IMPLEMENTATION IN PROGRESS** |
+| P1 Selection | VERIFIED（从 725 P1 优先级 + 726 契约恢复，经真实 Route Tree 核对为实际存在） |
+| Web P1 | Web `/products/[slug]`（能力详情，`ProductDetailNav` 动态导航 + `ProductDetailContent`）+ Web `/articles`（文章中心，`ContentListLayout`） |
+| Admin P1 | Admin `/operation-center`（运营中心，`OperationCenter`）+ Admin `/products`（能力管理，`ProductList`） |
+| Page Structural Redesign | IMPLEMENTED（Understand 唯一目标，Anti-Cosmetic 满足：区域结构重组/信息层级重组/视觉锚点/技术信息模块化/P·S·T·M·A 分层） |
+| Industrial Tech Visual Language | IMPLEMENTED（延续 P0：precise/technical/industrial operations；Industrial Dark Masthead + mono 元数据 + Tech Grid + 受控 accent/Cyan + 测量语言；无第二套视觉语言） |
+| Component Consumption | 728 `KpiCard`/`SectionHeader` 全量消费；SectionTitle/GroupHeader/SpecTable/ContentCard /TypeMarker 均复用既有 Token；无第二套 Card/Container/Icon/Animation System |
+| Information Hierarchy | VERIFIED（各页 H1 唯一 + 工业 SectionTitle 编组 + Primary·Secondary·Technical·Meta 分层；能力详情 01-07 mono 编组） |
+| Anti-Cosmetic Gate | PASS（各页 Before→结构变化→After 证据链成立；非换色/换圆角/换字体/换 padding/换 icon 表层改动） |
+| Responsive | 375/768/1024/1440 CDP 实测；4 页自身无横向溢出；Web 1024 `sw=1047`=既有共享 Site Header 溢出 = DEFERRED（前登记，非本任务引入）；Admin 全视口 `overscroll=false` |
+| Accessibility | PASS（各页 h1=1；focusVisibleDefined=true；emoji=0；Web emptyA11yName=0；reduced-motion 保持；Admin emptyA11yName=3/+6=表格/图标按钮 AntD 既有基线，非 731 引入） |
+| Build / Type / Lint | Web `next build` exit 0（Type 0 Error；Lint 仅既有基线 Warning）；Admin `tsc -b && vite build` exit 0（>500kB chunk=723 既有 P3 Defer）；Admin Lint NOT RUNNABLE（既有基线，无 eslint config，Defer） |
+| Runtime | Web `:3000` `/products/[slug]`+`/articles`=200 真实数据（TC716 能力/真实文章）；Admin `:3001` `/operation-center`+`/products`=200 真实 demo.admin 数据；截图 16 张存 `database/_731_shots/`（Before 锚点沿用 `_725_shots/web_articles_1440.png`） |
+| Architecture / Impact | Backend·API·Schema·Migration·Matching·Search·AI·Business Workflow 全 UNCHANGED；New Dependency=NONE；UI/Icon/Animation/Chart Library=NONE；packages/design-system=NOT CREATED |
+| Scope Audit | Task-731 Files=`apps/web`（ProductDetailContent/ProductParameters/ContentCard/ContentListLayout）+ `apps/admin`（OperationCenter/ProductList）+ `_731_probe.mjs`+`_731_shots.mjs` + 截图 + 文档；Pre-existing=721-730 PRESERVED；Unexpected=无（apps/api/prisma/migration 零改动） |
+| Documentation | UPDATED（PROJECT_STATUS / PROJECT_ROADMAP / MODULE_COMPLETION_MATRIX / 731 报告） |
+| Review Report | docs/_review/731_M33.5_P1_Industrial_Tech_Visual_Redesign_First_Batch_Report.md |
+| Status | **PASS（M33.5 P1 First Batch Redesign = COMPLETED）** |
+| M33 | **IMPLEMENTATION IN PROGRESS** |
+| M33.5 | **COMPLETED** |
+| Visual Transformation | **NOT CONFIRMED** |
+| Next | **M33.6 Responsive + Accessibility Visual QA / Regression Gate** |
+
+明确：**731 = M33.5 Web/Admin P1 第一批页面级视觉重设计**（能力详情 / 文章中心 / 运营中心 / 能力管理 共 4 页，Web≤2 + Admin≤2）；各页完成结构性重设计 + 真实运行态 + 375/768/1024/1440 + Accessibility + Before/After 证据；但整体 **Visual Transformation 仍需 M33.6-33.7 推进后才能判定 CONFIRMED**；1024 Web 既有 Shared Header overflow 按指令维持 Deferred（不擅自修复 Web/Admin Layout）。
+
+### 732 M33.6 Responsive + Accessibility Visual QA / Regression Gate（732 PASS）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `732_M33.6_Responsive_Accessibility_Visual_QA_And_Regression_Gate`（指令 V3.2.3，M33.6 质量门禁 / Audit + Runtime Visual QA + Responsive + Accessibility + Regression Gate / 审计型零代码变更） |
+| Baseline | 725=Audit + 726=Contract + 727=Foundation + 728=Core + 729=Web P0 + 730=Admin P0 + 731=P1 First Batch；**M32=CLOSED（保持未重开）**；**M33=IMPLEMENTATION IN PROGRESS** |
+| Task Type | Audit + Runtime Visual QA + Responsive Verification + Accessibility Verification + Regression Gate + Documentation Sync；**非新视觉/页面/组件/能力** |
+| M33 Verified Page Set | VERIFIED（7 页 × 375/768/1024/1440 = 28 次真实抓取，真实 Edge Headless+CDP Edg/151.0.4129.93） |
+| Web P0 | `/`（Home）+ `/products`（能力目录）+ `/categories`（能力分类导航）— 729 |
+| Web P1 | `/products/[slug]`（能力详情）+ `/articles`（文章中心）— 731 |
+| Admin P0 | `/home`（Industrial Operations Center）— 730 |
+| Admin P1 | `/operation-center`（运营中心）+ `/products`（能力管理）— 731 |
+| Responsive | 375/768/1440 PASS（无意外溢出/裁剪/碰撞/破格/异常换行，tableOverflow=0 navOverflow=0）；Admin 全视口 sw≤iw（1024 sw=1024）；**Web 1024 sw=1047=既有共享 Site Header 溢出 = EXISTING BASELINE / DEFERRED / NOT M33.6 INTRODUCED** |
+| Accessibility | PASS（各页 h1=1；Web emptyA11yName=0；Admin emptyA11yName=3/+6=既有 AntD Layout chrome；imgsNoAlt=0；focusVisibleDefined 各页 true；ARIA/aria-hidden/reduced-motion/主文本 Contrast≥4.5；headingSkips 为设计内结构性层级；<4.5:1 为设计内受控减弱 mono 元数据） |
+| Runtime | Web `:3000` 5 路由=200 真实数据；Admin `:3001` 3 路由=200 真实 demo.admin+既有 API；`runtimeErrors=[]` 全 28 抓取；Hydration/ChunkLoad/Uncaught/Console Error=NONE |
+| Build / Type / Lint | Web `next build` exit 0（Type 0 Error，44/44 路由）；Admin `tsc -b && vite build` exit 0（>500kB=既有 P3 Defer）；Web Lint exit 0=既有基线 Warning；**Admin Lint NOT RUNNABLE**=eslint.config.* 缺失既有基线 Defer |
+| Regression | New Regression=0 / New P1=0 / New P2=0 / New P3=0；721-731 累积修改完整、7 页 After State 稳定；既有 Deferred 正确隔离 |
+| Minimal Repair Record | NONE（不需进入修复闭环，零代码变更） |
+| Scope Audit | In Scope=7 页×4 视口验证+`_732_gate.mjs`+`_732_probe.mjs`+截图（`database/_732_shots/` 32 PNG + `measure.jsonl` 28 条）+文档；Pre-existing=721-731 PRESERVED；Unexpected=无（apps/api/prisma/migration 零改动） |
+| Architecture / Impact | NONE/FROZEN——本任务零代码变更；Schema/Backend/API/Prisma/Migration/Matching/Search/AI/RAG/Vector/Auth/RBAC/Workflow/Business Rules 全 UNCHANGED；无新依赖/UI/Icon/Animation/Chart Library/packages/design-system |
+| Documentation | UPDATED（PROJECT_STATUS / PROJECT_ROADMAP / MODULE_COMPLETION_MATRIX / 732 报告） |
+| Review Report | docs/_review/732_M33.6_Responsive_Accessibility_Visual_QA_And_Regression_Gate_Report.md |
+| Status | **PASS（M33.6 = COMPLETED）** |
+| M33 | **IMPLEMENTATION IN PROGRESS** |
+| M33.6 | **COMPLETED / PASS** |
+| Visual Transformation | **NOT CONFIRMED** |
+| M33.7 Readiness | **READY** |
+| Next | **M33.7 Before/After Verification** |
+
+明确：**732 = M33.6 统一质量门禁**（Responsive / Accessibility / Visual Regression / Interaction / Runtime Stability），对 M33.3/33.4/33.5 全部 P0/P1 重设计页面建立 M33.7 Before/After 统一闸门；各页 After 状态/响应式/可访问性/回归稳定性全 PASS、无新增回归、无需修复闭环；但整体 **Visual Transformation 仍需 M33.7 判定后才能 CONFIRMED**；1024 Web 既有 Shared Header overflow 按指令继续 Deferred（非 M33.6 引入）；任务完成后 STOP，不自行进入 M33.7。
+
+### 733 M33.7 Before/After Visual Transformation Verification（733 CONDITIONAL）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `733_M33.7_Before_After_Visual_Transformation_Verification`（指令 V3.2.3，M33.7 Before/After Visual Transformation Verification / Architecture Audit + Runtime Visual Verification + Before-After Gate / VERIFY ONLY 零代码变更） |
+| Baseline | 725=Audit + 726=Contract + 727=Foundation + 728=Core + 729=Web P0 + 730=Admin P0 + 731=P1 First Batch + 732=QA PASS；**M32=CLOSED（保持未重开）**；**M33=IMPLEMENTATION IN PROGRESS** |
+| Task Type | Before/After Visual Transformation Verification；判定 M33 可否 CONFIRMED；**非新视觉设计 / 非新页面；原则 Code Modification = FORBIDDEN** |
+| Route Verification | VERIFIED（**8 Route** = Web 5 `/`、`/products`、`/categories`、`/products/[slug]`、`/articles` + Admin 3 `/home`、`/operation-center`、`/products`）× 4 Viewport = **32 Runtime Visual Captures** |
+| 732 Consistency | **CORRECTED（REPORT STATISTICAL ERROR）**：732 报告「7 pages/28 captures」实测为 **8×4=32 PNG**，与 M33.7 理论矩阵一致（非 Execution Failure） |
+| Before Evidence | **PARTIAL**（Home/Products/Articles/AdminHome = `_725_shots` 真实截图 VALID；Categories/Detail/OperationCenter/AdminProducts = 报告描述 PARTIAL；未伪造 Before） |
+| After Evidence | **PASS**（`_732_shots` 8×4=32 截图） |
+| Structural Change | **PARTIAL（强度不均）**：`/products` = **STRONG**（营销商品网格→Industrial Capability Discovery）；Admin `/home` = MODERATE（→工业运营 masthead，内容区仍 ~60% 白卡）；Home `/` = **WEAK（首屏）**（首屏结构同构、`monoMeta=1`、白营销卡片） |
+| Home Transformation | **NOT CONFIRMED**（Homepage Gate Q3 NO / Q7 WEAK / Q8 YES / Q10=NO → FIRST-SCREEN WEAK，Core P0 Anchor 未达显著转型） |
+| Cross-Page Consistency | **CONDITIONAL**（统一 tokens/masthead/mono/分区已成形，Industrial Tech 认同度不均：Products 强、Home 首屏/AdminHome 内容区弱） |
+| Visual Transformation Gate | V1 PARTIAL / V2 PASS / V6 PASS / V7 PASS / V8 PASS / V9 PASS / V10 PASS / V11 PASS / **V12 FAIL（Home 首屏）** |
+| Responsive / Accessibility / Runtime | **PASS**（375/768/1440 无新溢出；1024 Web Header 既有 Defer；h1=1/img alt=0/focus/ARIA/reduced-motion 保留、contrast 区分 Ess/Supp/Deco 必要信息合格；HTTP Web `/`=200 + Admin `/login`=200；732 全 32 抓取 runtimeErrors=[]） |
+| Regression | **NONE**（Business/API/Schema/Route/Auth/RBAC/Workflow/Search/Matching 全 UNCHANGED；New P1/P2/P3=0） |
+| Minimal Repair Candidates | **REGISTERED（本任务不实施）**：VT-R1（Home 首屏 Hero Industrial Tech 锚点，A）/ VT-R2（Home 首屏脱离营销 Banner，A）/ VT-R3（Admin Home 内容区→IOC 深化，B）/ VT-R4（补 4 Route Before Evidence，C）/ VT-R5（Home 首屏 mono 元数据注入，B）；未自动扩 P2/加页面/入 M33.8/重设组件/改 Header/建第二 Design System |
+| Architecture / Impact | **NONE/FROZEN**——本任务零代码变更；Schema/Backend/API/Matching/Search/AI/RAG/Vector/Auth/RBAC/Workflow 全 UNCHANGED；无新依赖/UI/Icon/Animation/Chart/`packages/design-system` |
+| Documentation | UPDATED（PROJECT_STATUS / PROJECT_ROADMAP / MODULE_COMPLETION_MATRIX / 733 报告） |
+| Review Report | docs/_review/733_M33.7_Before_After_Visual_Transformation_Verification_Report.md |
+| Status | **CONDITIONAL（M33.7 = COMPLETED / CONDITIONAL）** |
+| M33 | **IMPLEMENTATION IN PROGRESS** |
+| M33.7 | **COMPLETED / CONDITIONAL** |
+| Visual Transformation | **NOT CONFIRMED** |
+| Next | **Minimal Visual Repair（等待下一步审查，本任务强制 STOP；未进入 M33 Final Closeout，未修复任何页面，未将 VT 标记 CONFIRMED）** |
+
+明确：**733 = M33.7 Before/After 证据验证**，遵循 `Build PASS ≠ Visual Transformation CONFIRMED`；Evidence=PARTIAL（Before）+ 结构性变换不均（Home 首屏 WEAK）→ **Visual Transformation = NOT CONFIRMED**（Home 核心 P0 页视觉转型不足，未落入 CONDITIONALLY CONFIRMED）；已登记 5 项 Minimal Repair Candidates（优先 Home 首屏 Industrial Tech 锚点/脱离营销 Banner），本任务不实施；任务完成后 STOP，不自动进入 M33 Final Closeout。
+
+### 734 M33.8 Home Industrial Tech Visual Repair（734 COMPLETED）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `734_M33.8_Home_Industrial_Tech_Visual_Repair`（指令 V3.2.3，M33.8 Home Industrial Tech Visual Repair / Development + Visual Repair + Runtime Visual QA + Documentation Synchronization / 仅 Web Home `/` 首屏最小视觉修复） |
+| Baseline | 725=Audit + 726=Contract + 727=Foundation + 728=Core + 729=Web P0 + 730=Admin P0 + 731=P1 First Batch + 732=QA PASS + **733=Before-After Verification（CONDITIONAL）**；**M32=CLOSED（保持未重开）**；**M33=IMPLEMENTATION IN PROGRESS** |
+| Task Type | 修复 733 已确认的核心阻断问题——Home `/` 首屏 Generic B2B / Marketing Banner Residue；对首屏视觉构成做最小必要修复；**非 Home 重设计 / 非扩大 M33 / 非 Closeout** |
+| Scope | In=Home `/` 首屏视觉构成（`apps/web/src/components/home/HeroSection.tsx` 为唯一被修改源码文件）+ 既有 visual components/tokens/CSS/Tailwind/icon/asset 复用；Out=Admin Home/Admin Products/Operation Center/Categories/Product Detail/Articles/Header 全局重设计/Footer/全局导航/M33 Final Closeout |
+| Repair Targets | **VT-R1（Home 首屏 Hero Industrial Tech 锚点，PRIMARY）/ VT-R2（Home 首屏脱离营销 Banner，PRIMARY）/ VT-R5（Home 首屏 mono 技术元数据语言增强，SUPPORTING）** |
+| Home Visual Changes | 1) 顶部 mono 遥测带 `SYSTEM: ONLINE` / `NDT BASE: UT / RT / PT` / `VISNDT.SYS / 2026`；2) 坐标标签 `[ +00.000° / 123.456E , 45.678N ]`；3) 非对称信息组织（左文本+技术能力 chips mono 代码 `DSC-01 / CNX-02 / MCH-03`、右工业仪器面板）；4) VT-R1 工业检测仪器视觉锚点（SVG gauge 量程弧+24 刻度+指针读数+坐标十字线 `AX:28.7°`+探伤信号线性波形+`INSTRUMENT / NDT` 面板标题+`GAIN:42dB`+`SIG/BASE/MODE` 遥测格）；5) VT-R2 脱离营销 Banner——CTA 收敛为技术平台入口（mono `ENTER`/`SCAN`），业务入口（/products /solutions /register?role）全保留；首屏收束由白营销卡片改为模块化测量轴 rail（01 DISCOVER / 02 CONNECT / 03 MATCH） |
+| Technical Metadata | **CONFIRMED（VT-R5）**：`monoMeta`（同 733 探针口径）由 **733=1** 提升至 **375=5 / 768=9 / 1024=9 / 1440=9**（`_734_shots/measure.jsonl` 实测）；mono / measurement / coordinate 语言实质增强 |
+| Information Hierarchy | **CHANGED**：首屏由居中式营销 Hero → 非对称工业技术构成 + 空间化/模块化技术信息组织；测量轴 rail 取代白卡作为首屏收束（Anti-Cosmetic / 结构变化） |
+| Before Evidence | **VALID**（Home 沿用 `_725_shots/web_home_1440` / `web_home_375`；733 客观记录为首屏营销 Banner 且 `monoMeta=1`；未伪造 Before） |
+| After Evidence | **PASS**（`database/_734_shots/`：home_1440 / home_1024 / home_768 / home_375 + measure.jsonl；真实运行 Edge Headless+CDP） |
+| Responsive / Accessibility / Runtime | **PASS**（375/768/1024/1440 无新溢出/横向滚动/裁剪/碰撞/破格/堆叠塌陷；**1024 Web Header sw=1047=EXISTING BASELINE/DEFERRED**；h1=1、装饰 SVG/遥测点 `aria-hidden`、焦点/reduced-motion 保留；Web `/`=200、`runtimeErrors=[]`） |
+| Regression | **NONE**（Business/API/Schema/Route/Auth/RBAC/Workflow/Search/Matching 全 UNCHANGED；URL/route/API/业务语义未改；New P1/P2/P3=0） |
+| Home Special Gate（733 复测，仅首屏） | **Q1=YES Q2=YES Q3=YES Q4=YES Q5=YES Q6=YES Q7=YES Q8=YES(首屏) Q9=YES Q10=YES**（目标达成：Q10=YES 且 Q2/Q3/Q5/Q7=YES；截图脱离代码即可识别为工业检测技术平台） |
+| Architecture / Impact | **NONE/FROZEN**——仅 Home 首屏展示层修复；Schema/Backend/API/DTO/Migration/Matching/Search/AI/RAG/Vector/Auth/RBAC/Workflow/Business Rules 全 UNCHANGED；无新依赖/UI/Icon/Animation/Chart Library/`packages/design-system`；无第二套视觉语言 |
+| Documentation | UPDATED（PROJECT_STATUS / PROJECT_ROADMAP / MODULE_COMPLETION_MATRIX / 734 报告） |
+| Review Report | docs/_review/734_M33.8_Home_Industrial_Tech_Visual_Repair_Report.md |
+| Status | **COMPLETED（M33.8 = COMPLETED）** |
+| Home Visual Repair | **CONFIRMED（首屏，Q10=YES；VT-R1/VT-R2/VT-R5 证据成立）** |
+| M33 | **IMPLEMENTATION IN PROGRESS** |
+| M33.7 | **COMPLETED / CONDITIONAL** |
+| Visual Transformation（全局） | **NOT CONFIRMED（严禁在 735 复证前提前声明 CONFIRMED）** |
+| Next | **735 Visual Transformation Verification（本任务完成后强制 STOP，未自动执行 735 / Closeout / Admin / Header / 全局 Design System 修改）** |
+
+明确：**734 = M33.8 Home 首屏最小视觉修复**，遵循 `Minimal Repair > Scope Expansion` / `Build PASS ≠ Visual Transformation PASS`；唯一改动源码文件 `HeroSection.tsx`（首屏视觉构成）→ **Home 首屏 Visual Repair = CONFIRMED**（Q10=YES、工业仪器视觉锚点、mono/measurement/coordinate 语言、测量轴 rail 替代白卡）；但**全局 Visual Transformation 不因单页 Repair 自动 CONFIRMED**，严格交由 735 复证后判定；`M33 = IMPLEMENTATION IN PROGRESS（保持）`；任务完成后 STOP，不自动执行 735/Closeout/其他页面/Admin/Header/全局 Design System 修改。
+
+### 735 M33.9 Global Visual Transformation Verification（735 PASS / Global NOT CONFIRMED / CASE B）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `735_M33.9_Global_Visual_Transformation_Verification`（指令 V3.2.3，M33.9 Global Visual Transformation Verification / Architecture Audit + Runtime Visual Verification + Before-After Evidence Audit + Cross-Page Visual QA + Documentation Synchronization / VERIFY ONLY 零代码改动） |
+| Baseline | 725=Audit + 726=Contract + 727=Foundation + 728=Core + 729=Web P0 + 730=Admin P0 + 731=P1 First Batch + 732=QA PASS + 733=Before-After（CONDITIONAL）+ **734=Home Repair（CONFIRMED）**；**M32=CLOSED（保持未重开）**；**M33=IMPLEMENTATION IN PROGRESS** |
+| Task Type | 复核 733（NOT CONFIRMED）+ 734（Home CONFIRMED）后，判定 Global Visual Transformation 是否 CONFIRMED；**非新视觉设计 / 非新页面 / 非 Repair 实施；原则 Code Modification = FORBIDDEN** |
+| Route Verification | **VERIFIED（Web=5/Admin=3/Total=8）**：`/`·`/products`·`/categories`·`/products/[slug]`·`/articles`（Web P0/P1）+ `/home`·`/operation-center`·`/products`（Admin P0/P1）；HTTP 200；未新增 Route/Page |
+| Runtime Evidence | **PASS（32/32）**：`_735_gate.mjs` 真实 Edge Headless+CDP Edg/151.0.4129.93，8 Route × 4 Viewport = **32 PNG** 至 `database/_735_shots/` + measure.jsonl；逐抓取 `runtimeErrors=[]`（Hydration/ChunkLoad/Uncaught/ConsoleError=NONE） |
+| Before Evidence | **PARTIAL**（Home/Products/Articles/Admin Home = VALID；Categories/Product Detail/Operation Center/Admin Products = PARTIAL，保持不伪造） |
+| After Evidence | **PASS**（32 Runtime Captures，全部真实当前代码） |
+| Home Special Gate | **Q1–Q10 = YES → Home = CONFIRMED**（735 实测；monoMeta 5/9/9/9；仪器面板/遥测/坐标/NDT BASE/DSC·CNX·MCH/测量轴运行时呈现） |
+| Products Gate | **STRONG（733 复证维持）**：能力发现结构/UT·RT·PT/技术筛选/Capability ID/技术 Metadata/查看能力详情全保留 |
+| Admin Home Gate | **MODERATE**（IOC masthead + 遥测 + 运营层级存在；内容区白卡依赖残留 VT-R3；依指令登记 VT-R3 不实施） |
+| Cross-Page Consistency | **CONDITIONAL（Perceptual Consistency）**：Web Home/Products 一致 STRONG；Admin Home 内容区与 Web 次页面（Categories/Detail/Articles）mono 技术语言强度不均（monoMeta 0–3 vs 5–9）；非仅 Token 一致 |
+| V1–V12 | V2/V3/V4/V6/V7/V8/V9/V10/V11=PASS；V1=PASS(PARTIAL)；**V5=PARTIAL、V12=CONDITIONAL** |
+| Responsive | **PASS**：Web 375/768/1440 无新溢出、Admin 全视口 sw≤iw；**1024 Web sw=1047=EXISTING BASELINE/DEFERRED（非 735 引入，734 未改 Header）** |
+| Accessibility | **PASS（无新回归）**：h1=1、imgsNoAlt=0、Web emptyA11yName=0、focusVisibleDefined≥1、emoji=false；装饰 SVG aria-hidden；contrast 区分 Ess/Supp/Deco（不把 mono 弱化当豁免伞、不机械 FAIL）；Admin emptyA11yName 3–6 与 Web Products/Articles headingSkips=1 为既有基线（注册 MR-735-2） |
+| Runtime / Build | **PASS**：`tsc --noEmit` PASS + `next build` exit 0；32 抓取 runtimeErrors=[]；Build PASS ≠ Visual Transformation PASS |
+| Regression | **NONE**：Business/API/Schema/Route/Auth/RBAC/Workflow/Search/Matching 全 UNCHANGED；Migration=NONE；New P1/P2/P3=0；New Dependency/UI/Design System/Icon/Animation=0 |
+| Minimal Repair Candidates | **REGISTERED（本任务不实施）**：VT-R3（Admin Home IOC 深化，B，延续）/ MR-735-1（Web 次页面 mono 技术语言补强，B，新观察）/ MR-735-2（Admin emptyA11yName + Web headingSkips 治理，C，注册观测）。发现≠实施 |
+| Architecture / Business Impact | **UNCHANGED / FROZEN**（VERIFY ONLY 零代码改动；冻结区 `git status` 无 apps/api·prisma·migration） |
+| Documentation | UPDATED（PROJECT_STATUS / PROJECT_ROADMAP / MODULE_COMPLETION_MATRIX / 735 报告） |
+| Review Report | docs/_review/735_M33.9_Global_Visual_Transformation_Verification_Report.md |
+| Status | **PASS（Verification 完整执行）** |
+| M33.9 | **COMPLETED（Verification；判定 NOT CONFIRMED）** |
+| Global Visual Transformation | **NOT CONFIRMED（CASE B — Minimal Visual Repair）** |
+| M33 | **IMPLEMENTATION IN PROGRESS（保持，不 CLOSED）** |
+| M33 Final Closeout | 未进入（需 Global CONFIRMED 方可提出） |
+| Next | **Minimal Visual Repair（MR Candidates 已登记，不自动实施）** |
+
+明确：**735 = M33.9 Global Visual Transformation Verification**，遵循 `Minimal Verification > Scope Expansion` / `Verify Before Claiming Transformation` / `Home Repair PASS ≠ Global Transformation PASS`；After Evidence = 32 Runtime Captures、Before = PARTIAL（4 VALID + 4 PARTIAL，未伪造）；Home = CONFIRMED、Products = STRONG、Admin Home = MODERATE（VT-R3 残留）；因 **V5 = PARTIAL、V12 = CONDITIONAL、Cross-Page Consistency = CONDITIONAL** 触发 **Case B → Global Visual Transformation = NOT CONFIRMED**；`M33 = IMPLEMENTATION IN PROGRESS（保持，不 CLOSED）`；After → 733/734 一致，登记 Minimal Repair Candidates 交由下一步，本任务 STOP，**不自动执行 M33 Final Closeout / 任何新 Repair / VT-R3 / Header / Design System 修改**。
+
+### 736 M33.10 Web Secondary Pages Industrial Tech Visual Repair（736 PASS / M33.10 COMPLETED / 仅实施 MR-735-1）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `736_M33.10_Web_Secondary_Pages_Industrial_Tech_Visual_Repair`（指令 V3.2.3，M33.10 Web Secondary Pages Industrial Tech Visual Repair / Development + Visual Repair + Runtime Visual QA + Documentation Synchronization / 最小范围 Web 次页面视觉修复） |
+| Baseline | 725=Audit + 726=Contract + 727=Foundation + 728=Core + 729=Web P0 + 730=Admin P0 + 731=P1 First Batch + 732=QA PASS + 733=Before-After（CONDITIONAL）+ 734=Home Repair（CONFIRMED）+ **735=Verification（NOT CONFIRMED）**；**M32=CLOSED（保持未重开）**；**M33=IMPLEMENTATION IN PROGRESS** |
+| Task Type | 实施 735 已登记的 **MR-735-1（Web 次页面 Categories/Detail/Articles mono 技术语言补强拉齐 Home/Products，B）**；**不实施 VT-R3 / MR-735-2**；仅 3 个 Web 次页面目录/规格/索引台账补强 |
+| Route Verification | **VERIFIED（3 Route）**：`/categories`·`/products/[slug]`·`/articles`；HTTP 200；未新增 Route/Page/API/Model |
+| Files Changed | **恰 4 文件**：`apps/web/src/app/categories/page.tsx`（+186-93）+ `apps/web/src/components/products/ProductDetailContent.tsx`（+118）+ `apps/web/src/components/content/ContentListLayout.tsx`（+107）+ `apps/web/src/app/articles/page.tsx`（+1）；其余 web/admin/design-tokens 为 721-735 既有修改；新增证据 `database/_736_gate.mjs` + `database/_736_shots/*.png+measure.jsonl`；apps/api·prisma·migration 零改动 |
+| Categories Repair | **CONFIRMED**：技术目录台账 `CAPABILITY / DIRECTORY INDEX` + 卡片 mono `TECH ROUTE` 描述 + 子能力计量 `SUB NN`（来源既有 category.slug/children 真实数据） |
+| Product Detail Repair | **CONFIRMED**：技术规格台账 `MODEL / CATEGORY / SPEC FIELDS / REV`（mono 计量元数据，来源既有 product 真实数据）+ 工业技术章节标题 |
+| Articles Repair | **CONFIRMED**：可选技术索引台账 `ART-INDEX / Industrial Technical Documentation`（仅 articles 传入 `techIndex`，`ContentListLayout` 其余内容页不渲染） |
+| After Evidence | **PASS（12/12 Runtime Captures）**：`_736_gate.mjs` 真实 Edge Headless+CDP，3 Route × 4 Viewport（375/768/1024/1440）= 12 PNG + measure.jsonl；逐抓取 `runtimeErrors=[]` |
+| Before Evidence | **PARTIAL**（复用 735 口径：Categories/Detail/Articles = PARTIAL，无本任务新真 Before，未伪造） |
+| monoMeta 探针口径 | 如实记录：735 探针（匹配 Home 遥测点位模式）对次页面台账返回 0；次页面 mono 语言以**运行时截图视觉证据**确证 → `Industrial Tech Language = IMPROVED`（不虚报探针数值） |
+| Responsive | **PASS**：375/768/1024/1440 新修复元素无新溢出；**1024 Web sw=1047 overflowEls=5 = 既有共享 Header baseline / DEFERRED（非本任务引入，未修 Header）** |
+| Accessibility | **PASS（无新回归）**：h1=1/imgsNoAlt=0/emptyA11yName=0/focusVisibleDefined=1/emoji=false；装饰 SVG aria-hidden；**Web Articles headingSkips=1 = 既有基线（MR-735-2 注册范围，本任务不强行治理）** |
+| Runtime / Build | **PASS**：`next build` **exit 0**；12 抓取 runtimeErrors=[]；Build PASS ≠ Visual Transformation Confirm |
+| Regression | **NONE**：Business/API/Schema/Route/Auth/RBAC/Workflow/Search/Matching 全 UNCHANGED；Migration=NONE；New P1/P2/P3=0；New Dependency/UI/Icon/Animation/Chart Library/Design System=0 |
+| Structural Change | **CONFIRMED（Anti-Cosmetic）**：三页均发生 Information Hierarchy / Technical Metadata Organization / Technical Anchor 变化（台账框 + mono 计量 + 技术分组），非仅换色/字体/圆角/阴影/间距 |
+| Architecture / Business Impact | **UNCHANGED / FROZEN**（仅展示层 Repair；Schema/Backend/API/Migration/Business Rules 全 UNCHANGED；无第二套视觉语言） |
+| Documentation | UPDATED（PROJECT_STATUS / PROJECT_ROADMAP / MODULE_COMPLETION_MATRIX / 736 报告） |
+| Review Report | docs/_review/736_M33.10_Web_Secondary_Pages_Industrial_Tech_Visual_Repair_Report.md |
+| Status | **PASS（MR-735-1 实施闭环）** |
+| M33.10 | **COMPLETED**（仅在实际完成并验证通过时使用） |
+| Global Visual Transformation | **NOT AUTOMATICALLY CONFIRMED（736=Repair ≠ Global Verification，不得自动改 CONFIRMED）** |
+| M33 | **IMPLEMENTATION IN PROGRESS（保持，不 CLOSED）** |
+| M33 Final Closeout | 未进入（需 Global CONFIRMED 方可提出） |
+| Next | **735-derived Global Re-Verification / next explicitly approved repair** |
+
+明确：**736 = M33.10 Web 次页面工业技术视觉修复**，遵循 `Minimal Repair > Scope Expansion` / `Structural Transformation > Cosmetic` / `Verify Before Claiming`；Categories/Product Detail/Articles 三页分别完成工业技术目录感、技术规格台账、技术内容索引台账补强（结构性强于化妆性）；After Evidence = 12 Runtime Captures、Before = PARTIAL（未伪造）；`M33.10 = COMPLETED`；**Global Visual Transformation = NOT AUTOMATICALLY CONFIRMED**（736=Repair ≠ Global Verification）；`M33 = IMPLEMENTATION IN PROGRESS（保持，不 CLOSED）`；任务完成后 **STOP**，不自动执行 737/738 / M33 Final Closeout / VT-R3 / MR-735-2 / Header / 全局 Design System 修改。
+
+### 737 M33.11 Global Visual Transformation Re-Verification（737 PASS / Global = NOT CONFIRMED / Case B / 仅登记）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `737_M33.11_Global_Visual_Transformation_Re_Verification`（指令 V3.2.3，M33.11 Global Visual Transformation Re-Verification / Audit + Runtime Visual Verification + Before-After Evidence + Cross-Page Perceptual QA + Documentation Synchronization） |
+| Baseline | 725=Audit + 726=Contract + 727=Foundation + 728=Core + 729=Web P0 + 730=Admin P0 + 731=P1 + 732=QA + 733=Before-After（CONDITIONAL）+ 734=Home Repair（CONFIRMED）+ 735=Verification（NOT CONFIRMED）+ 736=Web Secondary Repair（PASS）；**M32=CLOSED（保持）**；**M33=IMPLEMENTATION IN PROGRESS** |
+| Task Type | **VERIFY ONLY**：判断 736 后 Global Visual Transformation 是否 CONFIRMED；默认不修复，发现问题→登记（Observation→Evidence→Candidate） |
+| Route Verification | **VERIFIED（8 Route）**：`/`·`/products`·`/categories`·`/products/[slug]`·`/articles` + `/home`·`/operation-center`·`/products`；HTTP 200 |
+| Runtime Evidence | **PASS（32/32）**：`_737_gate.mjs` 真实 Edge Headless+CDP（Edg/151.0.4129.93）8×4 = **32 PNG** `database/_737_shots/` + measure.jsonl；逐抓取 runtimeErrors=[] |
+| Build / TypeScript | **PASS**：`tsc --noEmit` + `next build` **exit 0** |
+| Web Verification | **Home=CONFIRMED**（established, monoMeta 5-9）· **Products=STRONG**（established, 无回归）· **Categories=CONFIRMED**（工业检测能力目录）· **Product Detail=CONFIRMED**（技术能力档案）· **Articles=CONDITIONAL**（generic-blog 残留 → documentation theater） |
+| Admin Verification | **VERIFY ONLY**：Admin Home / Operation Center / Admin Products = **MODERATE**（无新回归；VT-R3 持续登记） |
+| V1–V12 | V1=PASS(PARTIAL) V2=PASS V3=PASS V4=PASS V5=IMPROVED V6=PASS V7=PASS V8=PASS V9=PASS V10=PASS V11=PASS **V12=CONDITIONAL** |
+| Cross-Page Visual Consistency | **CONDITIONAL**（Home/Categories/Detail/Products 强工业一致；Articles 为感知断层点） |
+| Responsive | **PASS**（无新溢出；**1024 Web sw=1047 overflowEls=5 = 既有共享 Header baseline / DEFERRED**） |
+| Accessibility | **PASS（无新回归）**（Articles headingSkips=1 与 Admin emptyA11y=3/3/6 = 既有 MR-735-2） |
+| Regression | **NONE**（Business/API/Schema/Migration/Route/Auth/RBAC/Search/Matching/Demand/RFQ/Content 全 UNCHANGED；New P1/P2/P3=0；New Dependency/UI/Icon/Animation/Chart/Design System=0） |
+| Architecture / Business Impact | **UNCHANGED / FROZEN**（Apps/api·prisma·migration 零改动；无第二套视觉语言） |
+| Documentation | UPDATED（PROJECT_STATUS / PROJECT_ROADMAP / MODULE_COMPLETION_MATRIX / 737 报告） |
+| Review Report | docs/_review/737_M33.11_Global_Visual_Transformation_Re_Verification_Report.md |
+| Status | **PASS** |
+| M33.11 | **COMPLETED** |
+| Global Visual Transformation | **NOT CONFIRMED（CASE B — Minimal Visual Repair Required）** |
+| M33 | **IMPLEMENTATION IN PROGRESS（保持，不 CLOSED）** |
+| M33 Final Closeout | 未进入 |
+| Minimal Repair Candidates | **MR-737-1** Articles generic-blog 残留补齐技术文档语言 · **MR-737-2** 1024 Web Header 共享溢出（既有/DEFERRED）· **MR-737-3** Articles headingSkips + Admin emptyA11y（既有 MR-735-2）· **MR-737-4** Admin Home IOC 深化（VT-R3 续）· **MR-737-5** Op-Center/Home「平均匹配度 10000%」异常显示（数据口径，登记待核）· **MR-737-6** monoMeta 探针口径不识别次页面台账（建议扩探针）；**仅登记不实施** |
+| Next | 下一个明确批准的最小补强任务或 Global 复证（本任务 STOP，未自动实施 MR-737-* / 738 / Closeout / VT-R3） |
+
+明确：**737 = M33.11 Global Visual Transformation Re-Verification**，唯一职责=判断 736 后 Global 是否 CONFIRMED。结论 **Global Visual Transformation = NOT CONFIRMED（CASE B）**：Runtime/Build/Regression 全 PASS，但 V12=CONDITIONAL、Cross-Page=CONDITIONAL——**Articles 仍残留 generic-blog 依赖（READ → / 1 MIN 阅读 / TYPE·文章 / 「企业动态、行业新闻」/ Demo Admin）**，使全 Web 感知出现认知断层，虽 ART-INDEX 台账已提升但未达感知一致性（V12）与跨页一致性（Cross-Page）PASS 门槛。Admin 三页保持 MODERATE（无新回归）。**仅登记 MR-737-* 候选，不实施任何修复**；`M33.11=COMPLETED`、`M33=IMPLEMENTATION IN PROGRESS（保持不 CLOSED）`、Global 不回改 CONFIRMED、M33 Final Closeout 未进入；任务完成后 **STOP**。
+
+### 738 M33.12 Articles Technical Documentation Minimal Visual Repair（738 PASS / MR-737-1 实施闭环）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `738_M33.12_Articles_Technical_Documentation_Minimal_Visual_Repair`（指令 V3.2.3，M33.12 Articles Technical Documentation Minimal Visual Repair / Development + Minimal Visual Repair + Runtime Verification + Documentation Synchronization / 单批准修复 MR-737-1） |
+| Baseline | 736=Web Secondary Repair（PASS）+ 737=Re-Verification（PASS / Global NOT CONFIRMED / Case B，登记 **MR-737-1**）；**M32=CLOSED（保持）**；**M33=IMPLEMENTATION IN PROGRESS** |
+| Task Type | 实施仅 **MR-737-1（Articles generic-blog 残留补齐技术文档语言）**；**不扩 MR-737-2~6 / VT-R3 / MR-735-2**；收敛为 `Industrial Technical Documentation + Technical Documentation Interaction` |
+| Route Verification | **VERIFIED（1 Route）**：`/articles`；HTTP **200**；未新增 Route/Page/API/Model |
+| Files Changed | **恰 2 文件**：`apps/web/src/app/articles/page.tsx`（D 项文案 + countLabel）+ `apps/web/src/components/content/ContentCard.tsx`（A/B/C/E/F 卡片技术文档化；真实依赖核查必需）；未触碰 apps/api·prisma·migration·ContentListLayout·业务逻辑 |
+| A `READ →` | **RESOLVED** → `VIEW DOC →`（文档查阅动作，无虚假下载能力） |
+| B `1 MIN` | **RESOLVED**：删除卡片 `{n} MIN` 阅读时长博客化包装 |
+| C `TYPE / 文章` | **RESOLVED** → `TYPE / {item.type}` 真实枚举（`ARTICLE`） |
+| D `企业动态、行业新闻` | **RESOLVED**：页面文案 → 技术资料库 / 工业检测方法文档 / 能力知识 / 行业技术实践 / 共 N 项技术资料 |
+| E `Demo Admin` | **HANDLED**：真实后端数据（`item.author.name`），不伪造/不改库；以技术元数据 `AUTHOR / {name}` 呈现 |
+| F 扁平卡片流 | **CONFIRMED**：卡片层级强化为技术文档条目（TYPE 技术码 + 日期 + AUTHOR + VIEW DOC 动作） |
+| After Evidence | **PASS（4/4 Runtime Captures）**：`_738_gate.mjs` 真实 Edge Headless+CDP（Edg/151.0.4129.93）1 Route × 4 Viewport（375/768/1024/1440）= 4 PNG `database/_738_shots/` + measure.jsonl；Before/After 双态实测：Before `residueHits=[READ,1 MIN,文章,企业动态,行业新闻]`/hasViewDoc=false → After `residueHits=[文章]`（仅真实页面标题「文章中心」）/hasViewDoc=true；逐抓取 runtimeErrors=[] |
+| Before Evidence | **复用 737 基线**（`database/_737_shots/web_articles_*.png` + measure.jsonl），未伪造/重建 |
+| Structural Transformation | **CONFIRMED（Anti-Cosmetic）**：`Generic Blog Interaction → Technical Documentation Interaction` 结构性语义变化（分类分类语义/阅读时长移除/CTA 消费→文档查阅/作者→技术元数据），非仅颜色/字体/border/spacing |
+| Responsive | **PASS**：375/768/1440 overflowEls=0；**1024 Web sw=1047 overflowEls=5 = 既有共享 Header baseline / DEFERRED（非本任务引入）** |
+| Accessibility | **PASS（无新回归）**：h1=1/imgsNoAlt=0/emptyA11yName=0/focusVisibleDefined=1/emoji=false；**Articles headingSkips=1 = 既有 MR-735-2 baseline / NOT IN SCOPE** |
+| Runtime / Build | **PASS**：`next build`（web/admin）**exit 0** + `tsc --noEmit` PASS；4 抓取 runtimeErrors=[]；Build PASS ≠ Global Visual Confirm |
+| Regression | **NONE**：Business/API/Schema/Migration/Route/Content/ContentListLayout 数据链/Pagination/CTA/Navigation 全 UNCHANGED；New P1/P2/P3=0；New Dependency/UI/Icon/Animation/Chart/Design System=0 |
+| Architecture / Business Impact | **UNCHANGED / FROZEN**（仅展示层 Repair；Schema/Backend/API/Migration/Business Rules 全 UNCHANGED；无第二套视觉语言） |
+| Documentation | UPDATED（PROJECT_STATUS / PROJECT_ROADMAP / MODULE_COMPLETION_MATRIX / 738 报告） |
+| Review Report | docs/_review/738_M33.12_Articles_Technical_Documentation_Minimal_Visual_Repair_Review_Report.md |
+| Status | **PASS（MR-737-1 实施闭环）** |
+| M33.12 | **COMPLETED** |
+| Global Visual Transformation | **NOT AUTOMATICALLY CONFIRMED（738=Minimal Repair ≠ Global Verification）** |
+| M33 | **IMPLEMENTATION IN PROGRESS（保持，不 CLOSED）** |
+| M33 Final Closeout | 未进入（需 Global CONFIRMED 方可提出） |
+| Next | **Global Re-Verification（739_M33.13）——仅当 738 证据支持且经明确批准后执行；本任务 STOP，不自动执行 739 / Closeout / Global Confirmation** |
+
+明确：**738 = M33.12 Articles 技术文档视觉修复**，仅实施 **MR-737-1**（真实依赖核查确认 generic-blog 残留 A/B/C/E/F 位于共享 `ContentCard.tsx`，纳入必要修改面）；各残留项 RESOLVED/HANDLED、`Structural Transformation = CONFIRMED`（结构性强于化妆性）、After Evidence = 4 Runtime Captures 实测 Before/After 双态（residue 归零至仅真实标题词、hasViewDoc=true、runtimeErrors=[]）、Before = 复用 737 基线（未伪造）；`M33.12 = COMPLETED`；**Global Visual Transformation = NOT AUTOMATICALLY CONFIRMED**（738=Minimal Repair ≠ Global Verification）；`M33 = IMPLEMENTATION IN PROGRESS（保持，不 CLOSED）`；任务完成后 **STOP**，不自动执行 739 / M33 Final Closeout / MR-737-2~6 / VT-R3 / MR-735-2 / Header / 全局 Design System 修改。
+
+### 739 M33.13 Global Visual Transformation FINAL Re-Verification（739 PASS / Global = CONFIRMED / M33 READY FOR FINAL CLOSEOUT）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `739_M33.13_Global_Visual_Transformation_Final_Re_Verification`（指令 V3.2.3，M33.13 Global Visual Transformation Final Re-Verification / Audit + Verification + Final Gate / Verify Only，零生产代码修改） |
+| Baseline | 725–738 M33 Visual Transformation；**738 = PASS**（MR-737-1 / Articles=CONFIRMED / Global=NOT AUTO-CONFIRMED）；**737** 曾 Global NOT CONFIRMED / Case B |
+| Task Type | **最终一次独立 Global Re-Verification**——判断 Web+Admin 代表性页是否达到 M33 Global Visual Transformation 可接受确认门槛；非新视觉优化 |
+| Repository | **VERIFIED**（F:/Desktop/VISNDT / code root VISNDT / branch main；721-738 PRESERVED；apps/api·prisma·migration 零改动=FROZEN） |
+| Routes / Viewports | 8 Routes × 4 Viewports（375/768/1024/1440） |
+| Evidence | **32/32 Runtime Captures**（`database/_739_shots/` + measure.jsonl，Edge Headless+CDP Edg/151.0.4129.93） |
+| Runtime | **PASS**：32/32 `runtimeErrors=[]`，`ALL_HTTP_OK=true` |
+| Build | **PASS**：`tsc --noEmit` exit 0（生产 `next start` web 3000/admin 3001 运行态验证） |
+| V1–V12 | **V1=PASS V2=PASS V3=PASS V4=PASS V5=PASS V6=PASS V7=PASS V8=PASS V9=PASS V10=PASS V11=PASS V12=PASS** |
+| Web Perceptual | **CONFIRMED**（Gate A/B）：Home/Products/Categories/Product Detail/Articles 均感知为 Industrial Inspection / Industrial Technical Platform（标准码/能力码/ART-INDEX 台账、MODEL·CATEGORY·SPEC FIELDS·REV、DOC·TYPE·REV、VIEW DOC）；非 Generic SaaS/CMS/Blog/E-commerce；**Cross-Page = PASS** |
+| Admin Perceptual | **ACCEPTABLE**（Gate C）：Home=Vertical IOC；Operation-center=MODERATE（与 737 一致无新回归）；Products=Vertical 工业能力管理；无严重视觉断层 |
+| Gates A–F | **PASS**；**M33 Core Blocker = NONE** |
+| Regression | **NONE**：New P1/P2/P3=0；New Dependency=0；Business/API/Schema/Migration/Route/Auth/RBAC/Search/Matching/Demand/RFQ/Content/Pagination/CTA/Navigation/Data 全 UNCHANGED |
+| Respond | 1024 Header sw=1047 overflowEls=5-6=既有 Header baseline/DEFERRED；headingSkips/Admin emptyA11y=Accessibility Baseline（MR-735-2）；Admin 10000% 匹配度+数据混排=Data/Metric 候选；monoMeta 次页面=Probe（MR-737-6）；Admin IOC=VT-R3；其余=Cosmetic/New Visual（禁止入 M33） |
+| Final Global Decision | **`Global Visual Transformation = CONFIRMED`**（§9 Decision A：V12=PASS + Cross-Page=PASS + 无 Core Blocker） |
+| M33.13 | **COMPLETED**（M33 Visual Transformation Objective = ACHIEVED） |
+| M33 | **READY FOR FINAL CLOSEOUT** |
+| M33 Final Closeout | **NEXT EXPLICITLY APPROVED TASK（不自动执行）** |
+| Review Report | docs/_review/739_M33.13_Global_Visual_Transformation_Final_Re_Verification_Report.md |
+
+明确：**739 = M33 FINAL GLOBAL GATE**，对 725–738 做最终一次独立 Re-Verification（Verify Only，零生产代码修改）：真实运行态 **32 Runtime Captures**（web 5 + admin 3 × 4 viewport）、32/32 `runtimeErrors=[]`、`ALL_HTTP_OK=true`、`tsc --noEmit` exit 0；逐页截图判定 **Web 五页均感知为 Industrial Inspection / Industrial Technical Platform**（Gate A）且跨页一致（Gate B）、Admin Vertical/MODERATE 无严重断层（Gate C）、Gates D–F PASS、`M33 Core Blocker = NONE`；**V12=PASS、Cross-Page=PASS** → **`Global Visual Transformation = CONFIRMED`（§9 Decision A）**；剩余观察全属 Non-Core/Future/Data/Cosmetic（M33 Expansion Gate 分类记录，禁止进入 M33）；**`M33.13 = COMPLETED`、M33 Visual Transformation Objective = ACHIEVED、`M33 = READY FOR FINAL CLOSEOUT`**；任务完成后 **STOP**，**不自动执行 M33 Final Closeout / 740+**；不进入无限视觉优化循环。
+
+### 740 M33 Scope Reconciliation And Final Gate Audit（740 PASS as audit / Global = NOT CONFIRMED / Decision B → ONE FINAL BOUNDED REPAIR）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `740_M33_Scope_Reconciliation_And_Final_Gate_Audit`（指令 V3.2.3，Audit + Verification + Scope Reconciliation + Final Gate Audit / Verify Only，零生产代码修改） |
+| Baseline | **739 = PASS / Global = CONFIRMED / M33 = READY FOR FINAL CLOSEOUT**；Kimi 全站前端重新审查报告 |
+| Task Type | 对 739 结论与 Kimi 新证据做范围裁决、证据重审、最终 Gate 判定；引入 **Mobile-First Acceptance**（Desktop = Mobile = M33 Acceptance Surface） |
+| Repository | **VERIFIED**（F:/Desktop/VISNDT / code root VISNDT / branch main；721-739 PRESERVED；apps/api·prisma·migration FROZEN） |
+| Routes / Viewports | **9 Routes × 4 Viewports**（Core 5 Web + `/solutions` + Admin 3；375/768/1024/1440） |
+| Evidence | **36/36 Runtime Captures**（`database/_740_shots/` + measure.jsonl，Edge Headless+CDP Edg/151.0.4129.93）；复用 739 32 captures |
+| Runtime | **PASS**：36/36 `runtimeErrors=[]`，`ALL_HTTP_OK=true` |
+| Accessibility | **PASS**（无新回归；Web emptyA11y=0；Admin 保持既有 baseline） |
+| Responsive | Layout **PASS**（375/768/1440 overflow=false；1024 Header baseline DEFERRED）；Mobile Perceptual **FAIL** |
+| 739 Evidence | **VALID BUT SCOPE-LIMITED / PERCEPTUALLY CONFLICTED**（运行态数据有效，但对 Products/Categories 感知判定过宽容） |
+| Kimi Evidence | **RECONCILED**（按 A-H 分类） |
+| Layer A | `/` Home=CONDITIONAL；`/products`=**FAIL**（B1 电商范式）；`/categories`=**FAIL**（B2 商品名认知断层）；`/products/[slug]`=PASS；`/articles`=PASS |
+| Layer B | `/solutions`=PASS；其余 PASS-ASSUMED / Future Candidate |
+| Layer C | PASS-ASSUMED / Future Candidate（禁止要求功能页全部工业控制台化） |
+| M33 Core Blocker | **2 项**：B1 `/products` E-commerce Capability Catalog 范式；B2 `/categories` 设备商品名与 TC 编码能力分类认知断层 |
+| Future Candidates | 11 项：Pagination/Compare/Layer B/Layer C/PublicHeader IA/Home IA/Admin data/Admin a11y/monoMeta probe/Cosmetic |
+| M33 Completion Contract | **FAIL**（Clause 1/2/3/5/6 因 B1/B2 未通过） |
+| Scope Creep | **NO**（未将 Header/Layer B/Layer C/Cosmetic/Admin/Probe 升级） |
+| Final Decision | **Decision B**：`Global Visual Transformation = NOT CONFIRMED`；`M33 = IMPLEMENTATION IN PROGRESS`；**ONE FINAL BOUNDED REPAIR REQUIRED**（针对 B1+B2） |
+| Repair Contract | Routes: `/products` `/categories`；Files: page + ProductGrid + ProductCard + ProductFilter + Pagination + Category cards；Viewports: 375/768/1024/1440；Desktop+Mobile Criteria: 脱离源码不为电商/商品列表；Exclusions: Header/Home/Layer B/Layer C/Admin/Design System/API/Schema/Migration/新依赖 |
+| M33 Final Closeout | **NOT READY；需 Repair → Re-Verification 后再判定** |
+| Review Report | docs/_review/740_M33_Scope_Reconciliation_And_Final_Gate_Audit_Report.md |
+
+明确：**740 = M33 Scope Reconciliation + Final Gate Audit**（Verify Only，零生产代码修改）。在 Desktop + Mobile 同等验收原则下，Kimi 报告中的问题经 A-H 分类后仅 **2 项构成 M33 Core Blocker**：B1 `/products` 页面整体呈现为 E-commerce Capability Catalog（Facet/分类树/分页/排序/卡片/对比），B2 `/categories` 卡片中普通设备商品名与 TC 编码化能力分类形成认知断层；二者均同时在 Desktop 与 Mobile 成立。其余问题（Header 文案、Home 营销结构、Layer B 通用 CMS 模板、Cosmetic 视觉细节、Admin 数据/Metric、Probe 口径等）均按 Anti-Scope-Creep 规则归入 Future/Independent/Data/Accessibility/Cosmetic，**未扩大 M33**。因 M33 Core Blocker > 0，739 的 `Global Visual Transformation = CONFIRMED` 被裁决为 **NOT CONFIRMED**；按 §20 Decision B，允许 **一次且仅一次有界 Minimal Repair**（范围已限定），之后需独立 Re-Verification。**本任务 STOP，不自动执行 Repair / Closeout / 741+**。
+
+### 741 Cross-Role Platform Perception Audit（741 COMPLETED / Audit Only）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `741_Cross_Role_Platform_Perception_Audit`（跨角色平台感知审计 / 只读审计，零代码变更） |
+| Baseline | **740 = REVISED / Global = NOT CONFIRMED / Decision B / ONE FINAL BOUNDED REPAIR** |
+| Task Type | 以真实登录态分别访问 Buyer / Supplier / Admin，定位「平台感 vs 官网感」根因 |
+| Repository | **VERIFIED**（F:/Desktop/VISNDT / code root VISNDT / branch main；721-740 PRESERVED） |
+| Runtime Evidence | Edge Headless+CDP，Buyer/Supplier/Admin/Public 多角色 + 375/1440 双视口；`database/_741_role_shots/` + measure.jsonl |
+| Major Findings | Supplier `/workspace/supplier` 为 Compatibility Shell；公共页面对已登录角色零感知；Supplier RFQ 页角色数据错位；Admin 指标异常 |
+| Defects | P0=3 / P1=4 / P2=4 / P3=2 |
+| Constraint | 冻结期内不得新增页面/路由/业务逻辑/Schema/API；仅允许低风险文案/链接调整 |
+| Status | **COMPLETED（Audit Only）** |
+| Next | 742 Final Bounded Repair（需显式批准） |
+| Review Report | docs/_review/741_Cross_Role_Platform_Perception_Audit.md |
+
+### 742 M33 Final Bounded Platform Perception Repair（742 COMPLETED / Bounded Repair）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `742_M33_Final_Bounded_Platform_Perception_Repair`（M33 最终有界感知修复 / 仅前端展示层） |
+| Baseline | **740 = Decision B** + **741 = Cross-Role Audit COMPLETED** |
+| Task Type | 执行 740 授权的一次且仅一次有界 Minimal Repair：修正 `/products`、`/categories` 感知语义；修复 Supplier 旧入口；添加最小化已认证公共页面平台入口 |
+| Repository | **VERIFIED**（F:/Desktop/VISNDT / code root VISNDT / branch main；721-741 PRESERVED；apps/api·prisma·migration FROZEN） |
+| Changes | `/products` page+layout+ProductCard+ProductGrid → 能力注册表语义；`/categories` page → 能力分类索引语义；`/workspace/supplier` → 自动重定向；`PublicHeader` → 已登录态「工作台」入口 |
+| Build | **PASS**：`cd apps/web && npx next build` exit 0 |
+| Runtime Verification | **PASS**：`_742_header_verify.mjs` Buyer/Supplier 桌面+移动端 4/4 通过；`_741_role_gate.mjs` 复证 423 条度量，全部 HTTP 200 |
+| Defects Closed | 741 P0-1 / P0-2；740 B1 / B2 |
+| Future Candidates | FC-742-01 Supplier RFQ 角色数据错位；FC-742-02 Admin 异常指标；FC-742-03 Header 导航文案官网化；FC-742-04 Web 1024 Header 溢出（DEFERRED） |
+| Scope Compliance | 未修改 Backend/API/Database/Schema/Migration/Architecture/Business Logic/Matching/Search/AI；未新增 Marketplace/Store/Transaction/独立供应商页面 |
+| Status | **COMPLETED** |
+| Next | 冻结期后评估 Future Candidates；不自动进入新修复轮次
+| Review Report | docs/_review/742_M33_Final_Bounded_Platform_Perception_Repair_Review_Report.md |
+
+### 743 M33 Final Bounded Repair Verification（743 PASS / Final Gate / M33 READY FOR FINAL CLOSEOUT）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `743_M33_Final_Bounded_Repair_Verification`（M33 最终有界修复验证 / Final Gate / Verify Only / Runtime E2E / Perceptual Verification） |
+| Baseline | **740 = Decision B** + **741 = Cross-Role Audit COMPLETED** + **742 = Final Bounded Repair COMPLETED** |
+| Task Type | **VERIFY ONLY**：对 742 四项核心修复做最终独立复核；零生产代码修改 |
+| Repository | **VERIFIED**（F:/Desktop/VISNDT / code root VISNDT / branch main；721-742 PRESERVED；apps/api·prisma·migration FROZEN） |
+| Clean Build | **PASS**：`Remove-Item -Recurse -Force .next` + `pnpm --filter @visndt/web build` exit 0 |
+| Fresh Start | **PASS**：Web 基于最新构建产物重启，API health ok |
+| B1 /products | **CLOSED**：四视口标题「能力注册表 | VISNDT」，无电商范式残留 |
+| B2 /categories | **CLOSED**：四视口能力分类索引语义统一，无商品名认知断层 |
+| P0-1 Supplier Legacy | **CLOSED**：`/workspace/supplier` 自动重定向至 `/dashboard/supplier`，Compatibility Shell ABSENT |
+| P0-2 Workspace Entry | **CLOSED**：Buyer/Supplier 桌面+移动端点击「工作台」4/4 进入对应 Dashboard |
+| RSC Chunk Stability | **PASS**：干净构建后 24 次访问，0 `Cannot find module './9155.js'`，OBS-742-01 RESOLVED |
+| Admin Regression | **PASS**：`/home`、`/operation-center`、`/products` HTTP 200，0 runtime error |
+| Mobile-First | **PASS**：375/768/1024/1440 全部通过；1024 Header 溢出维持 DEFERRED |
+| Accessibility | **PASS**：无新增回归；既有 Deferred 维持 |
+| Defects | New P0=0 / P1=0 / P2=0 / P3=0 / Core Blocker=0 |
+| Global Visual Transformation | **CONFIRMED** |
+| M33 | **READY FOR FINAL CLOSEOUT** |
+| Next | **M33 Final Closeout**（需显式批准，本任务 STOP） |
+| Review Report | docs/_review/743_M33_Final_Bounded_Repair_Verification_Report.md |
+
+### 744 M33 Final Closeout and Visual Transformation Baseline Freeze（744 PASS / M33 = CLOSED / Visual Transformation = CONFIRMED / Next = M34 Planning）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `744_M33_Final_Closeout_And_Visual_Transformation_Baseline_Freeze`（M33 最终关闭 / 状态冻结 / Documentation Synchronization / Verify Only / 零生产代码修改） |
+| Baseline | **743 Final Gate = PASS**（B1/B2/P0-1/P0-2 全部 CLOSED；Runtime/Accessibility/Mobile-First/Cross-Role Perception = PASS；Regression = NONE；Core Blocker = 0） |
+| Task Type | **FINAL CLOSEOUT**：以 743 为最终技术验证依据，冻结 M33 = CLOSED，隔离剩余问题为 Existing Deferred / Future Candidate / Independent Track，同步项目管理文档 |
+| Repository | **VERIFIED**（F:/Desktop/VISNDT / code root VISNDT / branch main；721-743 PRESERVED；apps/api·prisma·migration FROZEN） |
+| Final State Reconciliation | M32 = CLOSED；M33.1 ~ M33.13 全部 COMPLETED；M33 Final Closeout = CURRENT |
+| Final Visual State | Home / Products / Categories / Detail / Articles = PASS；Cross-Role Platform Perception = PASS |
+| Mobile-First | **375/768/1024/1440 = PASS**；1024 Header Overflow = Existing Baseline / Deferred |
+| Accessibility | **PASS**；Admin emptyA11y / existing headingSkips 保持 Future / Existing Baseline |
+| Runtime | **PASS**：HTTP=200、Hydration/ChunkLoad/RSC/Uncaught/Console Error = NONE |
+| Architecture | **FROZEN**：Backend/API/Schema/Migration/Matching/Search/AI/RAG/Vector/Auth/RBAC/Business Workflow 全部 UNCHANGED；无新增 UI/Icon/Animation/Chart library、无 `packages/design-system` |
+| Finding Classification | New P0/P1/P2/P3 = 0；Core Blocker = 0；Existing Deferred：FD-01；Future Candidate：FC-742-01 ~ FC-742-04（未升级为 Blocker） |
+| No Infinite Visual Loop Gate | M33 Visual Transformation = CONFIRMED；remaining imperfections ≠ M33 Blocker；禁止创建 M33.14+ / 重做 Global Verification / 无限循环 |
+| Global Visual Transformation | **CONFIRMED** |
+| M33 | **CLOSED** |
+| Next | **M34 Planning**（本任务 STOP，不自动执行） |
+| Review Report | docs/_review/744_M33_Final_Closeout_And_Visual_Transformation_Baseline_Freeze_Report.md |
+
+### 747 M34-DATA-01 Controlled Test Data Scan, Classification and Backup（747 CONDITIONAL PASS / M34 = DATA PRE-CLEANUP BASELINE / Cleanup = NOT EXECUTED）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `747_M34-DATA-01_Controlled_Test_Data_Scan_Classification_Backup`（M34 Pre-Data-Cleanup 基线 / READ-ONLY 数据扫描 + 分类 + 备份 / 零数据变更） |
+| Task | Controlled Test Data Scan, Classification and Backup（Inventory → Identify → Classify → Protect → Map Dependencies → Backup → Verify → Draft Cleanup Plan → STOP） |
+| Repository | **VERIFIED**（F:/Desktop/VISNDT / code root VISNDT / branch main / commit ff03a9a / Working Tree OTHER） |
+| Environment | Development（postgres:16-alpine + minio:latest）；Database Target `visndt` VERIFIED |
+| Inventory | **COMPLETE**（39 表 record count；user=13 / organization=15 / product=32 / supplier_product=38 / demand=30 / rfq=17 / offer=21 / notification=33 / refresh_token=646 / audit_log=2857） |
+| Classification | **COMPLETE**（SYSTEM_PROTECTED / APPROVED_BASELINE / REAL_OR_PRODUCTION_LIKE / PLATFORM_RULE / LIKELY_TEST / UNKNOWN；Protected ~10 / LIKELY_TEST ~8 / UNKNOWN ~2 / Cleanup Candidate ~7） |
+| Dependency Analysis | **COMPLETE**（FK 依赖图 Cascade/SetNull/Restrict + 删除安全模拟） |
+| Backup | **CREATED（Partial）**（F:\Desktop\VISNDT_backups\M34-DATA-01\：full.dump + schema.sql + 3 vector 表 CSV 补充） |
+| Backup Verification | **PASS**（SHA-256 + pg_restore --list 366 对象） |
+| Restore Verification | **NOT RUN**（当前容器缺 pgvector 共享库，避免影响原库） |
+| Cleanup | **NOT EXECUTED**（未删除任何测试/真实/管理员/平台规则/未知数据或存储对象） |
+| Next | **STOP**（禁止自动执行清理/重置/Seed 替换/M34 实现/UI/API/Schema 修改） |
+| Review Report | docs/_review/747_M34-DATA-01_Controlled_Test_Data_Scan_Classification_Backup_Report.md |
+
+### 748 M34-DATA-02 Controlled Test Data Cleanup and Post-Cleanup Verification（748 CONDITIONAL PASS / M34 = CONTROLLED TEST DATA CLEANUP COMPLETED / Protected Baseline Preserved）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `748_M34-DATA-02_Controlled_Test_Data_Cleanup_And_Post_Cleanup_Verification`（M34 受控数据清理 / AUTHORIZED DELETE ONLY + TRANSACTIONAL CLEANUP + POST-CLEANUP VERIFICATION） |
+| Task | Controlled Test Data Cleanup and Post-Cleanup Verification（Verify Backup → Verify Environment → Revalidate → Final Delete Manifest → Protected Manifest → Verify Dependencies → Transactional Cleanup → Commit → Verify Integrity → Verify Runtime → Verify Storage → Remove Test Objects → Verify Audit → Sync Docs → STOP） |
+| Repository | **VERIFIED**（F:/Desktop/VISNDT / code root VISNDT / branch main / commit ff03a9a） |
+| Environment | Development（postgres:16-alpine + minio:latest）；Database Target `visndt` VERIFIED |
+| Backup | **VERIFIED**（F:\Desktop\VISNDT_backups\M34-DATA-01\：full.dump + schema.sql + 3 vector 表 CSV；SHA-256 + pg_restore --list 通过） |
+| Final Delete Manifest | **ESTABLISHED**（21 groups / 1180 DB records + 1 storage object，仅含充分证据测试数据） |
+| Final Protected Manifest | **ESTABLISHED**（7 类：accounts / orgs / taxonomy / knowledge / audit / migrations / baselines） |
+| Database Mutation | **AUTHORIZED DELETE ONLY / COMMITTED**（单事务 A→G，1180 条删除成功，201 Action Tape 已验证） |
+| Schema / Migration / TRUNCATE / Reset | **NONE**（Schema NONE / Migration NONE / TRUNCATE NONE / Database Reset NONE） |
+| Referential Integrity | **PASS**（FK integrity + orphan + dangling reference + application-level reference 全通过） |
+| Storage Cleanup | **PASS**（按 DB→storage 引用移除 1 个确认测试 MinIO 对象，DB FileAsset 与存储引用一致，无孤儿对象） |
+| Runtime / Auth / RBAC / MinIO | **PASS（health） / PARTIAL（DB 级账户） / PARTIAL（DB 级） / PASS** |
+| Audit Evidence | **PRESERVED**（audit_log 2857 保留，含受控手段产生的删除审计记录） |
+| Deleted / Retained / Skipped / Failed | **1180 / 3 demand + 2 rfq + 1 rfq_response + 8 content + 13 user + 15 org + tracking / 8 test users + 15 orgs（re-seed 歧义）/ 0** |
+| Protected | **taxonomy / knowledge / audit(2857) / migrations(37) / baselines**；Unknown = vsndt@sz-wise.cn / SZ Wise Supplier（未触碰） |
+| Documentation Synchronization | **SYNCED**（PROJECT_STATUS.md / PROJECT_ROADMAP.md / MODULE_COMPLETION_MATRIX.md） |
+| Next | **STOP**（不得自动进入 745 / M34 Platform Architecture / M34.1 / UI 改造 / 搜索改造 / 路由迁移 / 数据库重构；下一项工作必须由新的独立任务授权） |
+| Review Report | docs/_review/748_M34-DATA-02_Controlled_Test_Data_Cleanup_Report.md |
+
+### 749 M34 Platform Experience Architecture Audit（749 CONDITIONAL PASS / M34 = PLATFORM EXPERIENCE ARCHITECTURE AUDIT COMPLETED / Target State + Gap/ADR/Scope/Readiness Defined / Implementation NOT STARTED）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `749_M34_Platform_Experience_Architecture_Audit`（M34 READ-ONLY Architecture Audit + Target-State Definition / 零代码·零数据库·零存储变更） |
+| Task | Platform Experience Architecture Audit（Verify → Read → Measure → Reconcile → Classify → Model → Analyze Relationships/Journey/IA → Define Target/Gap/Scope/Readiness → Align Roadmap → STOP） |
+| Repository | **VERIFIED**（F:/Desktop/VISNDT / code root VISNDT / branch main / commit ff03a9a） |
+| Environment | Development（Web :3001 / API :4000 / PostgreSQL :5432 / MinIO :9000-9001） |
+| Platform Maturity | **Level 2（Discovery Website，向 Level 3 迁移中）**；Classification=Hybrid（Website-first 偏重 / Platform Object 弱） |
+| Core Object Reality | Capability=RUNTIME-ONLY/Projection（无独立对象）；SupplyProduct=完整供应实体（0 数据）；Product=能力权威+目录双重职责；Supplier=Organization 别名（searchSuppliers 恒 0）；Specification=参数层；Category=多职责；Demand=3 / Match=0 / RFQ=2 |
+| Search | 六类聚合检索 + 参数 facet；非规格驱动；Supplier 维度恒 0 |
+| Interaction Model | Current=View→Learn→Contact；Target=Discover→Filter→Compare→View Supplier→Create Demand→View Match→Send Inquiry→Create RFQ→Respond→Quote |
+| Gap Register | **17 项**（P1=7 / P2=7 / P3=3 / P0=0） |
+| Architecture Decision Candidates | **12**（ADR-M34-01..12，仅候选） |
+| Change Gate | Backend=2 / API=2 / Schema=2-3 / Frontend-only=2 |
+| Target Object Model | Capability(候选独立对象)↔N:1 SupplyProduct→Supplier + Spec Template + Demand→Match→RFQ 闭环（TARGET CANDIDATE） |
+| Target IA | DISCOVER(Capabilities/Products/Suppliers/Categories/Specifications) / PUBLISH / CONNECT / LEARN / WORKSPACE / ADMIN |
+| M34 First-Round Scope | **7 主任务**（T1 Capability Object / T2 SupplyProduct·Product 关系 / T3 Specification Template / T4 Category·Capability 边界 / T5 Search·Supplier Discovery / T6 Target IA·Route / T7 Governance） |
+| Implementation Readiness | **NOT READY**（须先过 750 冻结关键决策） |
+| Architecture / Mutation | **UNCHANGED+READ-ONLY**；Mutation NONE / Database NONE / Storage NONE；Schema UNCHANGED / Migration NONE |
+| Next Gate | **750_M34_Platform_Architecture_Freeze_And_Implementation_Gate（NOT STARTED）** |
+| Review Report | docs/_review/749_M34_Platform_Experience_Architecture_Audit_Report.md |
+
+### 750 M34 Platform Architecture Decision Consolidation And Implementation Gate（750 COMPLETE / CONDITIONAL PASS / Architecture Frozen + Contract Defined / M34.1 NOT AUTHORIZED）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `750_M34_Platform_Architecture_Decision_Consolidation_And_Implementation_Gate`（M34.0 Decision Consolidation + Architecture Freeze + Implementation Gate / READ-ONLY / 零代码·零数据库·零存储变更） |
+| Task | Architecture Decision Consolidation（Verify → Read → Measure → Reconcile → Classify → Compare → Decide → Consolidate → Validate → Freeze Contract → Define Gate → Sync → Align Roadmap → STOP） |
+| Repository | **VERIFIED**（F:/Desktop/VISNDT / code root VISNDT / branch main / commit ff03a9a） |
+| Environment | Web :3001 UP / API :4000 UP / :3000 DOWN（历史端口） |
+| Architecture Decisions | **ACCEPTED=10 / MERGED=0 / REJECTED=0 / DEFERRED=2 / UNRESOLVED=0** |
+| Capability Decision | = Product 的发现语义角色（不独立建表，复用 Product=Capability Authority） |
+| Product Decision | Capability Authority + Catalog 一体（冻结） |
+| SupplyProduct Decision | Canonical Supplier-owned Product（复用，1:N via platformProductId） |
+| Supplier Decision | Organization + profile 语义（NO SCHEMA，不新增表） |
+| Specification Decision | 参数横切维度（M34.1 不建模板；模板 DEFERRED） |
+| Search Decision | 统一聚合 + 参数 facet + Capability 维度；supplier 发现修复归 M34.4/M34.6 |
+| IA Decision | DISCOVER/PUBLISH/CONNECT/LEARN/WORKSPACE/ADMIN；/products 能力权威；/knowledge MERGE；/supplier-models DEPRECATE |
+| Public/Workspace | 对象引用 + canonical + workspace 持久（非「加按钮」） |
+| Governance | Platform=Rules / Supplier=Assets / Buyer=Intent / Admin=治理 |
+| SEO/LLM Contract | Capability=Product/suppliers/knowledge 语义锚；SITE_URL=Config Follow-up |
+| Mobile Contract | 375/768/1024/1440 四层展示原则（Responsive≠Shrink，不实施 UI） |
+| 重要纠偏（vs 749 G-03） | searchSuppliers status mismatch→恒0 `不成立`（OfferStatus 含 SUBMITTED/ACCEPTED）；真实根因=Offer 空数据 + 无独立供应商维度 → NO SCHEMA / API+FRONTEND |
+| Change Gate | Schema=CONDITIONAL→NO（M34.1 无需）；API=CONDITIONAL（Supplier 维度）；Backend=NO；Frontend=FRONTEND ONLY |
+| M34 First-Round Scope | **FROZEN**：M34.1–M34.7（Capability & Product Foundation / Relationship / Taxonomy & Spec / Discovery-Search / Canonical IA & Continuity / Buyer-Supplier Workflow / Governance+SEO-LLM+Mobile） |
+| Implementation Readiness | **CONDITIONALLY READY**（核心对象/关系/IA/Journey/Search/Scope/决策集冻结；deferred 不阻断 M34.1–M34.2） |
+| Architecture Contract | **`docs/_architecture/M34_Platform_Architecture_Contract.md`（ACCEPTED/FROZEN 决策）** |
+| Next Authorized Stage | **M34.1 / NOT AUTHORIZED（须新独立授权）** |
+| Review Report | docs/_review/750_M34_Platform_Architecture_Decision_Consolidation_And_Implementation_Gate_Report.md |
+
+### 751 M34 Platform Architecture Consistency And Capability Model Challenge（751 COMPLETE / CONDITIONAL PASS / GATE B VALIDATED WITH CONDITIONS / Architecture Challenge + Model Validation / M34.1 AUTHORIZABLE-BUT-NOT-AUTHORIZED）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `751_M34_Platform_Architecture_Consistency_And_Capability_Model_Challenge`（M34.0 Architecture Consistency Challenge + Capability Model Challenge + Implementation Gate Revalidation / READ-ONLY / 零代码·零数据库·零存储变更） |
+| Task | Challenge the Decision → Try Break Model → Trace Counterexample → Verify Evidence → Resolve → Validate Capability Model → Validate Discovery Model → Validate Platform-first Mental Model → Revalidate Implementation Gate → Sync → Align Roadmap → STOP |
+| Repository | **VERIFIED**（F:/Desktop/VISNDT / code root VISNDT / branch main / commit ff03a9a / Working Tree OTHER） |
+| Baseline | **VERIFIED**（746/747/748/749/750 报告 + M34 Contract 完整读取；M33=CLOSED 未重开） |
+| Challenge A-K | **PASS=2（C：Capability 1→N SupplyProduct DB 验证成立；G：Public/Workspace 对象引用连续性成立）/ PARTIAL=9 / FAIL=0** |
+| 核心裁决 | Capability 无独立表/API/路由（`capabilities.controller` 仅 `@Get(':id')`）；Capability-led Discovery **有条件是**经 **Category=能力粒度 + 参数 facet** 成立；否则退化为 naming → **PRODUCT-CATALOG REGRESSION RISK=YES** |
+| Capability Spec 权威 | 750 **未声明**（Chief Amendment #1）；751 裁决 = Product-derived 原始参数 + Admin 策展 Typical；Search/Match 沿用原始参数值；NO SCHEMA |
+| Supplier 发现 | 当前依赖 Offer（`searchSuppliers` SUBMITTED/ACCEPTED）；须改基 `SupplierProduct.status=PUBLISHED`（API+Frontend，NO SCHEMA） |
+| Search | 纯关键字，无 intent→Capability 解释层；需 M34.4 能力意图→Category 映射 |
+| SEO/LLM | SE Entity=Product，无独立 capability URL；文档化为既定边界 |
+| Low-Operation | 自动撮合+自助提交成立；Capability 典型规格 Admin 策展拉高风险 |
+| Critical Contradiction | **0**（750 冻结决策内部无自相冲突） |
+| Required Amendments | **6**（Spec 权威声明 / Category=能力粒度治理 / Supplier 接线改 Published SupplyProduct / Search 能力意图映射 / Frontend Capability-led 纪律 / SEO-LLM 语义锚文档化；0 项 Schema 变更） |
+| Contract | `docs/_architecture/M34_Platform_Architecture_Contract.md` 状态 FROZEN→**VALIDATED WITH CONDITIONS（GATE B）**，追加 §10 Conditions + §11 Revalidated Gate |
+| Change Gate | Schema=NO / API=CONDITIONAL（Supplier 维度）/ Backend=NO / Frontend=FRONTEND ONLY / Route=NO（只 evaluate） |
+| Architecture Gate | **GATE B — VALIDATED WITH CONDITIONS**（核心模型成立 + 有限非阻断条件进入实施 Gate） |
+| M34.1 | **AUTHORIZABLE（CONDITIONAL） / NOT AUTHORIZED**（须下一条独立指令正式授权） |
+| Next Authorized Stage | **M34.1 / NOT AUTHORIZED（须新独立授权）** |
+| Review Report | docs/_review/751_M34_Platform_Architecture_Consistency_And_Capability_Model_Challenge_Report.md |
+
+### M34.1 Capability And Product Foundation（M34.1 COMPLETE / CONDITIONAL / First-Round Platform Implementation / Capability = Product Discovery Semantic Role / Frontend-Only Minimal Foundation）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `M34.1_Capability_And_Product_Foundation`（CONTROLLED IMPLEMENTATION + VERIFICATION + DOCUMENTATION SYNCHRONIZATION / Frontend-Only 最小基础 / NO Schema / NO Migration / NO API / NO Backend Change） |
+| Task | Verify → Read → Map Product Model → Apply 751 Gates → Implement Minimum Foundation → Verify Object Semantics → Verify Specification Source → Verify Primary Capability Boundary → Verify Supplier Boundary → Verify Downstream Search Compatibility → Verify Mobile → Verify Static → Verify Runtime → Sync Docs → Align Roadmap → STOP |
+| Repository | **VERIFIED**（F:/Desktop/VISNDT / code root VISNDT / branch main / commit ff03a9a / Working Tree OTHER） |
+| Baseline | **VERIFIED**（746/747/748/749/750/751 基线；M33=CLOSED 未重开；API :4000 healthy；web :3000 渲染 200；Product=0 行 / Category=28 能力导向分类） |
+| Capability 实施 | **Frontend View Model**（`apps/web/src/lib/capability-context.ts`：CapabilityContext identity=product.id / name=Product.name / category 锚 / Product-derived specs / supplier context；`isTypical=false` 防伪造典型值；无独立 Entity/Model/Migration） |
+| Frontend 改动 | `apps/web/src/components/products/ProductDetailContent.tsx` 「能力档案」接入 CapabilityContext + 能力提供商上下文（Published SupplierProduct + Organization）+ Product-derived 溯源声明 |
+| 751 Gates | C1=C2=C3=C4=C5=C6=C7=**PASS**（Capability=Product 无第二套身份 / Category=能力粒度锚 / Spec=Product-derived / Primary Capability only / Supplier=Published SupplyProduct+Organization / Capability-led Search Hook 保留 / Domain-Schema 稳定） |
+| Change Gate | Schema=NO / Migration=NONE / API=NO / Backend=NO CHANGE / Frontend=YES（FRONTEND ONLY） / Route=NO（Compare 保持 Technical Product Comparison） |
+| Static Verification | **PASS**（build exit 0 含 TS + lint exit 0 仅既有 warnings） |
+| Runtime Verification | **PASS**（`/`、`/products`、`/categories`、`/search` 200；无测试数据写入） |
+| Mobile Verification | **PASS**（375/768/1024/1440 无水平溢出，导航/Capability 锚可达） |
+| Database/Storage Mutation | **NONE**（0 行/0 对象变更） |
+| Critical Contradiction | **0** |
+| Review Report | docs/_review/M34.1_Capability_And_Product_Foundation_Implementation_Report.md |
+| Next Authorized Stage | **M34.2 / NOT AUTHORIZED（须新独立授权；本任务已 STOP）** |
+
+### M34.2 Capability / SupplyProduct / Supplier Relationship（M34.2 COMPLETE / CONDITIONAL / First-Round Platform Implementation / Supply Relationship Foundation / Supplier Semantic Foundation / Frontend-Only / NO Schema·NO API·NO Backend）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `M34.2_Capability_SupplyProduct_Supplier_Relationship`（CONTROLLED IMPLEMENTATION + VERIFICATION + DOCUMENTATION SYNCHRONIZATION；NO Supplier Table·NO Capability Table·NO Migration·NO Offer dependency in new path） |
+| Inherited Conditions | **C2=CONDITIONAL / C5=FOUNDATION/NOT FULL DISCOVERY / C6=FOUNDATION/NOT FULL CAPABILITY-LED SEARCH**（开始写入，结束保留，未升级） |
+| Task | Verify → Read → Reconcile M34.1 Conditions → Inspect Product/SupplyProduct/Organization → Preserve Contract → Implement Minimal Supply Relationship Foundation → Establish Published Supply Boundary → Expose Supplier Context → Verify Product→SupplyProduct→Supplier → Mobile → Static → Runtime → No Offer Dependency → No Schema Expansion → Sync Docs → Align Route → STOP |
+| Repository | **VERIFIED**（F:/Desktop/VISNDT / code root VISNDT / branch main / commit ff03a9a / Working Tree OTHER） |
+| Baseline | **VERIFIED**（746→751 + M34.1(752) 基线；M33=CLOSED；API :4000 healthy；web :3000 渲染 200；Product/SupplierProduct/Offer=0 行；Category=28） |
+| Relationship | Product(Capability Authority) **1:N** SupplyProduct(supplier_product) **N:1** Organization(type=SUPPLIER)；`platformProductId` 语义稳定；不经 SupplierProduct 绕过 Product authority |
+| Published Boundary | Supplier 可发现 ⇔ ≥1 **PUBLISHED SupplierProduct + Organization(type=SUPPLIER)**；后端 discovery.service 强制 PUBLISHED 过滤；不要求 Offer/Inquiry/RFQ 存在 |
+| Supplier Semantic Model | `apps/web/src/lib/supplier-context.ts`（SupplierContext + buildSupplierRelationshipContext，view model / §7 契约字段 / source=PUBLISHED_SUPPLIER_PRODUCT_ORGANIZATION / 零 Offer 读） |
+| Frontend | `apps/web/src/components/products/ProductDetailContent.tsx` 「能力提供商与供应关系」接入 Supplier Context，按 Organization 归并展示已发布能力型号 + 平台/型号边界声明 |
+| Change Gate | API=NO / Backend=NO CHANGE / Schema=NO / Migration=NONE / SupplierTable=NONE / CapabilityTable=NONE / M:N=NONE / SpecTemplate=NONE / DB·Storage Mutation=NONE |
+| Static Verification | **PASS**（build exit 0 含 TS + lint exit 0 仅存量 warnings，新文件零警告） |
+| Runtime Verification | **PASS**（/products /categories /search /products/compare /products/[slug] /suppliers/[id] 全 200；Real-data Runtime=UNVERIFIED / Evidence Gap） |
+| Mobile Verification | **PASS**（375/768/1024/1440 无水平溢出；/suppliers 全宽无溢出；导航可达） |
+| Architecture Consistency | **PASS**（Capability=Product role / Product=Canonical / SupplyProduct=Supplier-owned / Supplier=Organization role；无 Supplier→Offer only、无 SupplyProduct→Capability entity、无 Capability→Supplier 绕过 Product/SupplyProduct） |
+| Expansion Gate | **CLOSED**（Secondary Capability / M:N / Supplier Table / Spec Template / Search Intent / Full Supplier Discovery / Full Capability-led Search / Marketplace / Monetization 全 DEFERRED/FUTURE/NEXT WORKSTREAM） |
+| Review Report | docs/_review/753_M34.2_Capability_SupplyProduct_Supplier_Relationship_Implementation_Report.md |
+| Next Authorized Stage | **M34.3 / NOT AUTHORIZED（须新独立授权；本任务已 STOP）** |
+
+### M34.3 Taxonomy & Specification Foundation（M34.3 CONDITIONAL / First-Round Platform Implementation / Taxonomy & Specification Foundation / Category + Parameter Dictionary 证据化收敛 / 零 Schema·Migration·API·Backend·Frontend code）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `M34.3_Taxonomy_And_Specification_Foundation`（CONTROLLED IMPLEMENTATION + EVIDENCE VALIDATION + DOCUMENTATION SYNCHRONIZATION；NO Schema·NO Migration·NO API·NO Backend·NO Frontend code） |
+| Inherited Conditions | **C2=CONDITIONAL / C5=FOUNDATION/NOT FULL DISCOVERY / C6=FOUNDATION/NOT FULL CAPABILITY-LED SEARCH**（开始写入，结束保留，未升级） |
+| Task | Verify → Review Sequence → Baseline → Data Reconcile → Inventory All Categories → Evidence-based Category Classification → Cross-validation → Freeze Taxonomy Boundary → Audit Parameter Dictionary → Usage/Ownership/Provenance → Numeric/Unit Consistency → Facet Provenance → Separate Product/SupplyProduct/Demand Spec → Hidden Domain Object Audit → Frontend Semantic Confirm → Mobile → Static → Runtime Layers → Reconcile Data → Sync Docs → Align Roadmap → STOP |
+| Repository | **VERIFIED**（F:/Desktop/VISNDT / code root VISNDT / branch main / commit ff03a9a / Working Tree OTHER） |
+| Baseline | **VERIFIED + RECONCILED**（Database Before=After：product=0/supplier_product=0/offer=0/demand=3/rfq=2/inquiry=0/org=15；product_category=28/parameter_group=11/parameter_definition=54/parameter_option=45；DB Mutation=NONE） |
+| Category Inventory | 28 全量（**16 合法**能力/设备/场景/载体粒度 + **12 个 TC713/TC715/TC716 残留测试分类**；UI 不泄漏，tc=false） |
+| Semantic Matrix | evidence-derived；能力粒度成立；「光学/光纤/电子内窥镜 ≈ 工业内窥镜子类」**冗余别名未收敛**（治理项） |
+| Parameter Audit | 54 defs/11 groups/45 opts（IE_*/FD_*/通用）；**ParameterDefinition=唯一 Spec Dictionary authority**；7 组同义重复 + °C/℃ 单位待标（治理项） |
+| Ownership / Provenance | ProductParameterValue=Platform值 / SupplierProductParameterValue=Supplier型号值 / DemandParameter=Buyer约束；来源可回溯 Object→Field→Relationship→Dictionary |
+| Facet Provenance | **闭环（结构级）**：`ParameterFilterPanel → getCategoryFilterParameterDefinitions → /product-categories/:id/parameters`；无硬编码筛选项 |
+| Boundaries | Product/SupplyProduct/Demand 三层 Specification 值表独立、不合并；不创建 CategoryParameterTemplate / SpecTemplate |
+| Hidden Domain Object | **NONE**（Capability/Spec/SpecTemplate/CategoryParameterTemplate/M:N/第二权威均无） |
+| Change Gate | Schema=NO Change / Migration=NONE / API=NO（KEEP `:id/parameters`）/ Backend=NO CHANGE / DB·Storage Mutation=NONE / Frontend code=NONE（现状已满足语义） |
+| Static Verification | **PASS**（`pnpm --filter @visndt/web build` exit 0 含 TS + `pnpm --filter @visndt/web lint` exit 0 仅存量 warnings） |
+| Runtime Evidence | Infrastructure/Code-Path/Taxonomy/Parameter=**VERIFIED**；Real Product/SupplierProduct=**UNVERIFIED**（0 数据 Evidence Gap）；Browser=**CONDITIONAL**（375/1024/1440 OK，768 溢出 140px 既有归 M34.5） |
+| Mobile Verification | **CONDITIONAL**（375/1024/1440 无溢出；768 平板 140px 溢出为既有基线问题，非本任务引入） |
+| Architecture Consistency | **PASS**（Category=Taxonomy Node / Capability=Product role / Spec=Parameter Dimension / PD=Dictionary authority / 三层值分离；C2/C5/C6 label 保持） |
+| Test Fixture | **NONE**（NO TEST DATA；Residual=0） |
+| Expansion Gate | **CLOSED**（Capability Entity / Secondary Capability / M:N / SpecTemplate / CategoryParameterTemplate / Search Intent / NSAI / AI / RAG / Vector / Full Supplier Discovery / Full Capability-led Search / Marketplace / Monetization 全 DEFERRED/FUTURE/NEXT WORKSTREAM） |
+| Review Report | docs/_review/754_M34.3_Taxonomy_And_Specification_Foundation_Implementation_Report.md |
+| Next Authorized Stage | **M34.4 / NOT AUTHORIZED（须新独立授权；本任务已 STOP）** |
+
+### M34.4 Discovery / Search Foundation（M34.4 CONDITIONAL PASS / Discovery / Search Foundation / 将 M34.1-M34.3 Foundation 连接为可发现的 Purchase/Search 闭环 / MINIMAL READ-ONLY ADAPTATION / Frontend NO CHANGE）
+
+| Field | Value |
+|-------|-------|
+| Iteration | `M34.4_Discovery_Search_Foundation_Implementation`（CONTROLLED IMPLEMENTATION + ARCHITECTURE-CONSTRAINED VALIDATION；Single-file MINIMAL READ-ONLY API adaptation，NO Schema·NO Migration·NO Frontend change） |
+| Inherited Conditions | **C2=CONDITIONAL / C5=FOUNDATION/NOT FULL DISCOVERY / C6=FOUNDATION/NOT FULL CAPABILITY-LED SEARCH**（开始写入，结束保留，未升级） |
+| Task | Verify Sequence → Baseline → Review Search Architecture (Before) → Audit searchSuppliers Offer-dependency → Implement Supplier Discovery Foundation（PUBLISHED SupplyProduct → Organization aggregation）→ Static → Runtime（GET only）→ Mobile → Reconcile Data → Architecture Regression → Sync Docs → Align Roadmap → STOP |
+| Repository | **VERIFIED**（F:/Desktop/VISNDT / code root VISNDT / branch main / commit ff03a9a / Working Tree OTHER） |
+| Baseline | **VERIFIED + RECONCILED**（Before=After：product=0/supplier_product=0/offer=0/demand=3/rfq=2/inquiry=0/org=15；taxonomy=28/11/54/45；DB Mutation=NONE） |
+| Search Architecture (Before) | 六类聚合 `/search`；产品/SupplierProduct/Category/参数 facet 权威链路已正确；**Supplier 分组 searchSuppliers = Offer-dependent（恒 0，违反 Supplier Context 来源）** = BLOCKER |
+| Core Fix | `searchSuppliers` 重构为 **aggregate PUBLISHED `SupplierProduct` → `Organization(type=SUPPLIER)`**；`SupplierDiscoveryItem{organizationId,organizationName,publishedSupplyProductCount,productNames,seriesValues}`；删除 Offer 依赖 |
+| Change Gate | Schema=NO Change / Migration=NONE / API=**MINIMAL READ-ONLY ADAPTATION**（search.service.ts 单文件）/ Backend=MINIMAL READ-ONLY / Frontend=NO CHANGE / DB·Storage Mutation=NONE / Test Data=NONE |
+| Supplier Context | 来源 = **PUBLISHED SupplyProduct + Organization**；不要求 Offer / RFQ / Transaction（AC-06 / AC-07） |
+| Static Verification | **PASS**（`pnpm --filter @visndt/api build` exit 0 含 TS + `pnpm --filter @visndt/web lint` exit 0 仅存量 warnings + `pnpm --filter @visndt/web build` exit 0） |
+| Runtime Evidence | web :3000 `/` `/products` `/categories` `/search` 全 200；API :4000 `GET /api/v1/search?q=超声` 200 + `/search/context` 200，GET only；**Real Product/Real Supplier Runtime=UNVERIFIED**（0 数据 Evidence Gap） |
+| Mobile Verification | **CONDITIONAL**（前端本任务 NO CHANGE；结构性响应式满足；768 溢出 140px 为既有基线问题，非 M34.4 引入，carry forward → M34.5） |
+| Architecture Consistency | **PASS**（无 Capability Entity / Supplier Table / Specification Table / Search Index / AI / Vector / Semantic；Product=Capability Authority；Supplier=Organization role；无双权威） |
+| Test Fixture | **NONE**（NO TEST DATA；no mock API / no fake supplier / no fake capability / no hard-coded result） |
+| Expansion Gate | **CLOSED**（Search Index / 独立 Supplier·Capability 表 / Spec Template / AI / Vector / Semantic / 意图理解 / Full Supplier Discovery / Full Capability-led Search / Marketplace / Monetization 全 DEFERRED/FUTURE/NEXT WORKSTREAM） |
+| Review Report | docs/_review/755_M34.4_Discovery_Search_Foundation_Implementation_Report.md |
+| Next Authorized Stage | **M34.5 / NOT AUTHORIZED（须新独立授权；本任务已 STOP，转 M34.4R Evidence Closure）** |
+
+### M34.4R Discovery Evidence Closure + M34 Roadmap Reconciliation（M34.4R CURRENT / Evidence Closure + Roadmap Reconciliation / 证明 755 完成程度 + 收闭证据缺口 + 受控最小修正 + 平台化转型路线 / 零 Code·Schema·Migration）
+
+> 756_M34.4R_Discovery_Evidence_Closure_And_M34_Roadmap_Reconciliation：**独立 Evidence Closure Gate**。不重做 M34.4、不进入 M34.5、不做视觉优化。核心 = 证明 755 实际完成程度、收闭证据缺口、仅当直接证明必要做受控最小修正、并把 M34 后半程由「页面继续改造」**正式调整为平台化转型路线（Entity → Discovery → Evaluation → Connection → Governance）**。
+
+| Field | Value |
+|-------|-------|
+| Iteration | `756_M34.4R_Discovery_Evidence_Closure_And_M34_Roadmap_Reconciliation` |
+| Change Surface | **Code=NO CHANGE / Schema=NO CHANGE / Migration=NONE / DB·Storage Mutation=NONE / Test Data=NONE / AI·Vector·RAG·Semantic·SearchIndex·Intent=NONE**；仅 Validation + Evidence Closure + Roadmap Reconciliation + Doc Sync |
+| 755 Declared vs Actual | **VERIFIED**（Declared = `apps/api/src/search/search.service.ts` searchSuppliers 重写；Actual = 仅此文件；无未声明功能变更） |
+| Evidence Classification | Search Wiring=**VERIFIED** / Search Query Structure=**VERIFIED** / Category Context=**VERIFIED·STRUCTURAL** / Spec Facet=**VERIFIED(结构级)** / Product-Capability Authority=**VERIFIED** / Published SupplyProduct=**VERIFIED·STRUCTURAL** / Supplier Discovery Query=**VERIFIED** / User-facing Supplier Discovery=**NOT CLAIMED** / Real Product·Supplier Runtime=**UNVERIFIED** |
+| 756 Remediation | **No remediation required**（755 修正正确且隔离；无越权 Domain Authority / Schema / Seed / 工作流变更） |
+| Static | **PASS**（`@visndt/api build`=0、「`@visndt/web lint`=0 仅存量 warnings」、「`@visndt/web build`=0；API lint=**PRE-EXISTING TOOLING GAP**） |
+| Runtime | HTTP `GET /search`·`/search/context` = 200（空数据）；web `/` `/products` `/categories` `/search` = 200；GET only |
+| Mobile | **STRUCTURAL**（前端 755/756 NO CHANGE）；768 溢出 140px=**既有基线，CARRY FORWARD → M34.5** |
+| M34 平台化行为闭环 | **Entity → Discovery → Evaluation → Connection → Governance/Discoverability**（替代「页面继续改造」） |
+| M34.5 Definition | **Canonical Discovery Information Architecture**（DISCOVER：Search/Categories/Capabilities/Products/Suppliers；禁止 Global UI/Header/Homepage/DesignSystem Rewrite） |
+| M34.6 Definition | **Evaluation + Connection Workflow**（Compare→Shortlist→Inquiry→RFQ→Buyer↔Supplier；复用 Demand/RFQ/RFQResponse/Inquiry） |
+| M34.7 Definition | **Platform Governance + SEO/LLM + Mobile**（Governance Existing Authority；承接 TC713/TC715/TC716/Category/Param 冗余/°C/STRING/768/SITE_URL） |
+| Expansion Gates | **Gate A Entity Authority / Gate B Discovery Evidence / Gate C Evaluation / Gate D Connection / Gate E Semantic Search** |
+| Review Report | docs/_review/756_M34.4R_Discovery_Evidence_Closure_And_M34_Roadmap_Reconciliation_Report.md |
+| Next Authorized Stage | **M34.5 Canonical Discovery Information Architecture — COMPLETED（757 / CONDITIONAL PASS）；M34.6 / NOT AUTHORIZED（本任务已 STOP）** |
+
+### M34.5 Canonical Discovery Information Architecture（M34.5 COMPLETE-CONDITIONAL / Canonical Discovery IA / DISCOVER：Search/Categories/Capabilities/Products/Suppliers / 受控导航语义收敛 / Frontend-Only·NO Schema·NO Migration）
+
+> 757_M34.5_Canonical_Discovery_Information_Architecture：**Canonical Discovery Information Architecture 建立**。将已建立的 Entity/Discovery Foundation 正式组织为统一的 DISCOVER（Search / Categories / Capabilities / Products / Suppliers）信息架构，并明确 Public / Workspace / Admin 边界、跨实体发现路径（Search→Category/Capability→Product→Supplier→Back to Discovery）。非 Website/Visual Redesign、非 Search 2.0、非 Supplier Marketplace。执行受控导航语义收敛（PublicHeader NAV_ITEMS）+ 运行时/静态/空数据分层验证 + 文档同步。报告编号 **757**；746–756 报告 **Preserved（未修改）**。
+
+| Field | Value |
+|-------|-------|
+| Iteration | `757_M34.5_Canonical_Discovery_Information_Architecture` |
+| Change Surface | **Code=仅 PublicHeader 导航语义收敛 / Schema=NO CHANGE / Migration=NONE / DB·Storage Mutation=NONE / Test Data=NONE / AI·Vector·RAG·Semantic·SearchIndex·Intent=NONE / Matching=NO CHANGE / RFQ=NO CHANGE** |
+| Canonical Discovery IA | **DISCOVER=Search(/search)/Categories(/categories)·能力分类/Capabilities(=Product 语义角色·/products)/Products(/products)/Suppliers(/search?type=supplier-product + /suppliers/[id])**；内容（解决方案/知识中心）降至 Supporting Layer；`/business`·`/about` 保留于 footer，不产生死链 |
+| Nav Semantic Convergence | **VERIFIED**：PublicHeader NAV_ITEMS 重建为 DISCOVER 主线（首页/搜索/能力分类/产品中心/能力型号·供应商/解决方案/知识中心）；新增**供应商公开发现入口** `/search?type=supplier-product`（复用现有搜索面，不新增路由）；`/search` 通过 `parseType(searchParams.get('type'))` 正确落地到能力型号 Tab |
+| Architecture Authority | **ONE 权威集**：Capability=Product Semantic Authority（product.id 唯一 identity）；Product=Canonical Platform Object；Supplier=Organization(type=SUPPLIER)；SupplyProduct=Supplier-owned Commercial Product；Specification=ParameterDefinition Authority。无第二套 authority（无双 authority） |
+| Public / Workspace / Admin Boundary | **BOUNDARY VERIFIED**：Public Discovery（/ /search /categories /products /suppliers）公开只读；BUYER WORKSPACE=/dashboard/buyer、SUPPLIER WORKSPACE=/dashboard/supplier、ADMIN 运营中心与之分离；Public/Workspace 通过认证入口分界，不混淆 |
+| Cross-Entity Discovery Paths | **STRUCTURAL VERIFIED**：Search→Category→Product（categoryPath `/products?categoryId=`）；Search→Product→Supplier（SupplierProductResultCard→`/products/[slug]`→SupplierCapabilityList/SupplierInfo→`/suppliers/[id]`）；Category→Product；Product→Supplier（`/suppliers/${org.id}`）；Supplier→Published SupplyProduct→Product（`/suppliers/[id]` 供应能力区）；Public→Workspace=**BOUNDARY VERIFIED**。真实数据 runtime=UNVERIFIED（empty data） |
+| Route Canonicalization | **CONDITIONAL**：复用现有 canonical 路由（/search /categories /products /suppliers/[id]），收敛导航语义、保留 SEO/导航语义；`/supplier-models` 遗留静态路由存在（207B）→ **Future Candidate**（未改动，不虚构收敛） |
+| Runtime Evidence | Route Reachability=**VERIFIED**（HTTP GET `/` `/search` `/search?type=supplier-product` `/categories` `/products` `/solutions` `/knowledge` `/about` `/business` 全 200；GET only，无业务写入）；Navigation Wiring=**VERIFIED·STRUCTURAL**（homepage SSR HTML 含 DISCOVER 主线标签 能力分类/能力型号·供应商/搜索/产品中心）；Real Product/Supplier/Capability Population=**UNVERIFIED**（product=0/supplier_product=0/offer=0，空数据合法） |
+| Empty-data Classification | **Route Reachability=VERIFIED / Navigation·Query Wiring=VERIFIED / Real Product·Supplier·Capability Population=UNVERIFIED**；HTTP 200 ≠ Experience Complete；Empty List ≠ Feature Broken |
+| Mobile | **STRUCTURAL**（主导航 count=7 不变，移动端 hamburger < lg；`/business` `/about` 主导航移除仅收敛语义，footer 保留可达）；受 **No-Visual-Loop Gate** 约束，未重入逐屏视觉审计，未扩大为视觉项目；768≈140px 历史溢出 → **Future Candidate / Carry Forward** |
+| Static | **PASS**（`@visndt/api build` exit 0 / `@visndt/web lint` exit 0 仅存量 warnings / `@visndt/web build` exit 0 全 44 静态页）；API lint=**PRE-EXISTING TOOLING GAP**（apps/api 无 eslint.config.*，不伪造 PASS） |
+| Regression | **NO BEHAVIOR CHANGE**：Auth/RBAC/Demand/Matching/RFQ/RFQResponse/Inquiry 未触及；Search/Category/Product/Supplier/Workspace Entry 无未授权回归（仅导航语义收敛，业务行为不变） |
+| Scope Compliance | Schema=NO CHANGE / Migration=NONE / Database Mutation=NONE / Test Data=NONE / AI·Vector·RAG·Semantic Search=NONE / Matching=NO CHANGE / RFQ=NO CHANGE / Transaction=NONE；无新增 Capability/Supplier/Specification Authority；无 Search Index；无 Global UI/Header Rewrite（仅语义收敛）；无 Route Migration（复用现有路由） |
+| M34 Roadmap Alignment | M34.0=CONDITIONAL / M34.1=COMPLETE-CONDITIONAL / M34.2=COMPLETE-CONDITIONAL / M34.3=COMPLETE-CONDITIONAL / M34.4=CONDITIONAL PASS / M34.4R=CONDITIONAL PASS / **M34.5=CONDITIONAL PASS** / M34.6=NOT AUTHORIZED / M34.7=NOT AUTHORIZED / M34-FINAL=NOT STARTED |
+| Remaining Conditions | Real-data Population=**UNVERIFIED**（empty） / 768 溢出=**Carry Forward→Future Candidate** / `/supplier-models` 遗留路由=**Future Candidate** / 历史搜索缺口=**Unverified** / Supplier user-facing 目录=**NOT CLAIMED**（仅 entry+详情面，无全量供应商列表） |
+| Final Decision | **CONDITIONAL PASS**（M34.5 implementation accepted ≠ M34 platformization complete；空数据合法 → Real-data runtime UNVERIFIED 为条件） |
+| Review Report | docs/_review/757_M34.5_Canonical_Discovery_Information_Architecture_Report.md |
+| Next Authorized Stage | **M34.6 Evaluation + Connection Workflow / NOT AUTHORIZED（本任务已 STOP，不得自动进入 M34.6/M34.7/M34-FINAL；后续必须独立授权）** |
+
+### 758 M34.5 Discovery Surface Completion And Evaluation Gate（758 CONDITIONAL PASS / DISCOVERY COMPLETION GATE / Supplier Surface 补齐 + Cross-Entity Continuity / Frontend-Only · 复用后端已存在 suppliers 组 / Evaluation Entry Gate → M34.6 READY FOR INDEPENDENT AUTHORIZATION）
+
+> 758 是 **Discovery Completion Gate（B1–B7）**：在 757 Canonical IA 之上，真正补齐**能力导向 + 供应商导向发现面**与**跨实体发现连续性**，为 M34.6 Evaluation + Connection 提供独立授权入口。**非 Evaluation / Connection / 视觉改造**；完成后 **STOP**。
+
+| Field | Value |
+|-------|-------|
+| Iteration | `758_M34.5_Discovery_Surface_Completion_And_Evaluation_Gate` |
+| Core | **补齐供应商发现面 + Product→Supplier 连续性**：前端消费后端已存在的 `suppliers` 组（PUBLISHED SupplierProduct→Organization(type=SUPPLIER) 聚合，无 Offer 依赖） |
+| Change Surface | Code=仅 8 个前端展示/接线文件（`lib/api/search.ts`/`services/search.service.ts`/新增 `SupplierResultCard.tsx`/`SearchPageContent.tsx`/`SearchTypeTabs.tsx`/`SupplierProductResultCard.tsx`/`ProductDetailContent.tsx`/`GlobalSearchBar.tsx`）/ Schema=NO CHANGE / Migration=NONE / API=NO CHANGE / Backend=NO CHANGE / DB·Storage Mutation=NONE / Test Data=NONE / AI·Vector·RAG·Semantic=NONE / Matching·RFQ·Transaction=NO CHANGE |
+| Complexity | Code Change = **Minimal（Frontend Display-Layer）** |
+| Supplier Surface | **补齐（B4）**：`/search?type=supplier` 供应商列表（SupplierResultCard）+ `/suppliers/[id]` 详情 = Supplier=Organization(type=SUPPLIER)，Public Supplier List Source=PUBLISHED SupplierProduct |
+| Cross-Entity | **补齐 Product→Supplier 链接（B5/B6）**：SupplierProductResultCard + ProductDetailContent 供应商名 →`/suppliers/${orgId}` 链接 |
+| Gates | B1 Search=PASS / B2 Category=PASS / B3 Capability=PASS / B4 Supplier=PASS / B5 Cross-Entity=PASS·STRUCTURAL / B6 Continuity=PASS·STRUCTURAL / B7 Authority=PASS（ONE 权威集，无第二套 authority） |
+| Real-data Runtime | **UNVERIFIED**（product=0/supplier_product=0/offer=0，合法空数据）；Route Reachability + Navigation Wiring = VERIFIED·STRUCTURAL |
+| Static | API build exit 0 / Web lint exit 0 / Web build exit 0 / **API lint = PRE-EXISTING TOOLING GAP**（apps/api 无 eslint.config.*），不伪造 PASS |
+| Regression | **NO BEHAVIOR CHANGE**（Auth/RBAC/Demand/Matching/RFQ/RFQResponse/Inquiry 未触及；Product/SupplierProduct/Search/Category/Workspace 无业务改动） |
+| Mobile | **STRUCTURAL**（供应商卡响应式 grid）；768≈140px 历史溢出=CARRY FORWARD→Future Candidate |
+| M34 Roadmap Alignment | M34.0=CONDITIONAL / M34.1-3=COMPLETE-CONDITIONAL / M34.4=CONDITIONAL PASS / M34.4R=CONDITIONAL PASS / **M34.5=CONDITIONAL PASS / 758=CONDITIONAL PASS** / **M34.6=NOT AUTHORIZED / READY FOR INDEPENDENT AUTHORIZATION** / M34.7=NOT AUTHORIZED / M34-FINAL=NOT STARTED |
+| Remaining Conditions | Real-data Population=**UNVERIFIED**（empty） / 768 溢出=**Carry Forward→Future Candidate** / `/supplier-models` 遗留路由=Future Candidate / `/suppliers/[id]` 详情页"供应能力"区仍基于 Offer=**LEGACY**（不改写，转 M34.6/Governance Future Candidate） |
+| Final Decision | **CONDITIONAL PASS**（核心 Discovery Surface 建立 + 结构证据充分 + 无架构违规 + 空数据合法 → Real-data runtime UNVERIFIED） |
+| M34.6 Recommendation | **READY FOR INDEPENDENT AUTHORIZATION**（Gate B1–B7 结构性达成；唯真实数据空，故状态=NOT AUTHORIZED，须独立授权后在数据就绪情况下实施 Evaluation+Connection） |
+| Review Report | docs/_review/758_M34.5_Discovery_Surface_Completion_And_Evaluation_Gate_Report.md |
+| Next Authorized Stage | **M34.6 Evaluation + Connection Workflow / NOT AUTHORIZED（READY FOR INDEPENDENT AUTHORIZATION；本任务已 STOP，不得自动执行 Compare/Shortlist/Inquiry/RFQ/Buyer-Supplier workflow）** |
+
+### 759 M34 Technical Context + Discoverability Architecture Reconciliation（759 CONDITIONAL PASS / 补足 Context + Discoverability / 冻结 Technical Context 模型 + Discoverability 契约 + Search 语义契约 + M34.6 Blueprint / 零生产代码）
+
+| Field | Value |
+|-------|-------|
+| 759 Status | **CONDITIONAL PASS**（Technical Context boundary 已冻结 + Discoverability Contract 建立 + Search semantics 收敛 + M34.6 Blueprint 建立 + 无架构违规；剩余 gap=既有数据空限制 + 历史遗留（legacy `/search/supplier-models`、768≈140px overflow、`/supplier-models` 路由、SITE_URL placeholder）+ Future Candidates（Application/DetectionObject/Standard/Certification/Evidence 一级对象）） |
+| Change Boundary | **Production Code = NONE**（纯架构审计 + 语义契约 + 文档同步）；Schema=NO CHANGE / Migration=NONE / DB·Storage Mutation=NONE / Test Data=NONE / AI·Vector·RAG·Embedding·Semantic·SearchIndex·Intent=NONE / Matching=NO CHANGE / RFQ=NO CHANGE / Global UI Rewrite=NONE |
+| Repository | 仓库根 `F:\Desktop\VISNDT` / 代码根 `F:\Desktop\VISNDT\VISNDT` / 分支 `main` / 提交 `ff03a9a` / Working Tree OTHER（既有改动，759 不再改代码） |
+| Technical Context Model | **类型化 Context Block**=Capability(Product)+SupplierProduct(Model)+Organization(Provider)+Category+Parameter/Spec+Evidence(FileAsset)+Knowledge/Solution（轻量挂载）；**Contract 级，不建表** |
+| Context 语义角色 | Application=FUTURE / Detection Object=FUTURE / Insight=FUTURE（现有衍生） / Knowledge=现有 Publication Domains（Content type=KNOWLEDGE / KnowledgeEntry） / Standard=FUTURE / Document=FUTURE（FileEntityType） / Certification=FUTURE / Evidence=FUTURE（FileAsset 双形态） / Media=CONTENT·FUTURE / Solution=现有 /solutions（Content type=SOLUTION）+ 应用场景 |
+| Discoverability Contract（Internal / External / AI·LLM 共享） | **Internal Search**=统一 `/search`（unified 六类聚合）+ `/categories` + `/products` + `/suppliers/[id]`；**External Search**=SEO Metadata + JSON-LD（Organization/WebSite+SearchAction/Article/TechArticle/Product）+ canonical URL；**AI·LLM**=推广/爬取无结构化 API 的被动可读、不变更、无运行时 AI。三者共享同一 Canonical Entity + Semantic + URL + Structure + Relationship + Evidence |
+| Search Semantic Contract（判定） | `product`=**CANONICAL**（Capability Authority）/ `capability`=**ALIAS → product** / `supplier-product`=**CANONICAL**（Supplier-owned Capability Model）/ `supplier`=**CANONICAL**（Capability Provider / Supplier Entity）/ `knowledge`=**CANONICAL** / `solution`=**CANONICAL** / `category`=**CANONICAL（FACET / IA）非搜索 type** / `/search/supplier-models`（API）=**LEGACY → Remove Later** / `/supplier-models`（路由）=**LEGACY / DEPRECATE → Remove Later** |
+| supplier vs supplier-product（专项） | **NOT DUPLICATE / NOT CONFLICT — CANONICAL（双视图，粒度不同）**：`supplier`=供应商实体视图（Organization(type=SUPPLIER) 聚合 / Provider）；`supplier-product`=能力型号视图（SupplierProduct / Model）。共享同一 PUBLISHED 种群但投影粒度不同（Organization 级 vs Model 级）；关系=Model→Provider 下钻 + Provider→Models 上卷，**非重复**。两 Tab 语义固定，不得合并、不得互相承载列表 |
+| Relationship Graph | SupplierProduct→Organization(Provider / type=SUPPLIER) / SupplierProduct→Product(Capability Authority via platformProductId) / Product→Category / Category→PCKM→KnowledgeCategory→KnowledgeEntry（确定性）/ Knowledge→KB / Solution=Content type=SOLUTION / Evidence=FileAsset（FileEntityType） |
+| M34.6 Blueprint | **Evaluation + Connection Workflow**：`Technical Context → Compare(CompareBar/既有) → Shortlist → Inquiry → RFQ/Buyer↔Supplier`；复用既有 Demand/RFQ/RFQResponse/Inquiry；禁止重新设计交易系统 |
+| Expansion Gates | Gate A—Authority=**HOLD** / Gate B—Context=**PASS**（分类完成；一级对象=FUTURE）/ Gate C—Discoverability=**PASS**（契约建立）/ Gate D—Evaluation=Blueprint 建立·实施 NOT AUTHORIZED / Gate E—Implementation=759 CONDITIONAL PASS → M34.6 可规划但独立授权 |
+| M34 Roadmap Alignment | M34.0=CONDITIONAL / M34.1-3=COMPLETE·CONDITIONAL / M34.4=CONDITIONAL PASS / M34.4R=CONDITIONAL PASS / M34.5=CONDITIONAL PASS / 758=CONDITIONAL PASS / **759=CONDITIONAL PASS（CURRENT）** / **M34.6=NOT AUTHORIZED（READY FOR INDEPENDENT AUTHORIZATION·Blueprint+Contract 达成，唯真实数据空不作为授权）** / M34.7=NOT AUTHORIZED / M34-FINAL=NOT STARTED |
+| C2 / C5 / C6 | **C2=CONDITIONAL（保持）/ C5=FOUNDATION·NOT FULL DISCOVERY（保持）/ C6=FOUNDATION·NOT FULL CAPABILITY-LED SEARCH（保持）**；759 未升级三态 |
+| Static / Runtime | **759 零生产代码 → 复用既有 758 Static baseline**（api build 0 / web lint 0 / web build 0，不重复完整生产构建）；Runtime=**GET only / 未创建业务数据**（既有路由/搜索/Context/API 只读验证）；Real Product/Supplier/Capability Population=**UNVERIFIED**（合法空数据） |
+| Mobile | STRUCTURAL；**768 ≈ 140px overflow = CARRY FORWARD**（归 M34.7/未来，不阻断架构验证、不作为本任务修复） |
+| Review Report | docs/_review/759_M34_Technical_Context_And_Discoverability_Architecture_Reconciliation_Report.md |
+| Next Authorized Stage | **M34.6 Technical Context + Evaluation / NOT AUTHORIZED（READY FOR INDEPENDENT AUTHORIZATION；本任务已 STOP，不自动执行 Compare/Shortlist/Inquiry/RFQ/Buyer↔Supplier；不自动实施 Insight/Application/DetectionObject/Knowledge/Standard/Document/Evidence/Solution 与 SEO/Structured Data/LLM Runtime/AI Search/Embedding/Vector/RAG）** |
+
+### 760 M34.6 Pre-Execution Authorization Gate（760 = CURRENT AUTHORIZATION GATE → **NOT AUTHORIZED** / M34.6 = NOT AUTHORIZED / BLOCKED / 预执行授权门禁 / Runtime Readiness / 零生产代码）
+
+| Field | Value |
+|-------|-------|
+| 760 Status | **CURRENT AUTHORIZATION GATE = NOT AUTHORIZED**（M34.6 = **NOT AUTHORIZED / BLOCKED**，等待数据就绪后重新授权） |
+| Change Boundary | **Production Code = NONE**；Schema=NO CHANGE / Migration=NONE / DB·Storage Mutation=NONE / Test Data=NONE / Search·Discovery·Matching·Inquiry·RFQ=NO CHANGE / Transaction=NONE / Marketplace·Seller·Store·Cart·Checkout·Order·Payment·Transaction=NONE / SEO·LLM·Vector·RAG·Embedding·Semantic·SearchIndex=NONE / Mobile·Accessibility·Visual Redesign=NONE |
+| Repository | 仓库根 `F:\Desktop\VISNDT` / 代码根 `F:\Desktop\VISNDT\VISNDT` / 分支 `main` / 提交 `ff03a9a`（`M31阶段优化完成`）/ Working Tree OTHER（既有改动，760 不新增生产代码）；BASELINE DRIFT=NONE |
+| Authorization Decision | **NOT AUTHORIZED**：Scope = PASS / Architecture(ONE Authority) = PASS / Workflow Safety = PASS / Runtime Plan = PASS / RBAC = PASS / Expansion Control = PASS / Documentation = PASS / Mobile = PASS（768≈140px CARRY FORWARD） / **Real-data Readiness = FAIL（Product=0 / SupplierProduct=0 / Offer=0）** |
+| 阻断项（Condition） | **Real-data Readiness = NOT READY**（核心 Product→SupplierProduct→Supplier 评估链零可验证真实数据）→ 命中 NOT AUTHORIZED「真实数据完全无法支撑核心验证」 |
+| 重新授权前置 | 数据就绪后提供最小评估数据集（≥1 published Product + ≥1 published SupplierProduct(platformProductId→Product) + 拥有它的 SUPPLIER 组织 + Product 参数；多记录 2+ 集用于 Compare/Shortlist）并重跑本 Gate；Shortlist 持久化边界 = 待独立 Architecture Decision |
+| Compare | 读only投影复用既有 `/products/compare?ids=`（Platform Product + SupplierProduct 双模式，URL 状态共享）；不新第二套权威 |
+| Shortlist | User Evaluation State（grep 无现存实现）；非商业实体；跨会话持久化若需新表 → Architecture Decision Required（760 不裁决） |
+| Inquiry / RFQ | 复用既有 Demand/Match/RFQ/RFQResponse/Inquiry 一等模型；M34.6 = Orchestration / Evaluation Entry；禁止第二套工作流 |
+| Real-data（760 实测） | product=0 / supplier_product=0 / offer=0 / inquiry=0 / demand=3 / rfq=2 / rfq_response=1 / org(SUPPLIER)=8（但无已发布 SupplierProduct 无可发现链路）/ product_category=28 / parameter_definition=54 / knowledge_entry=6 / content=8 |
+| Runtime Verification Plan | **PASS（授权前定义完成）**：Discovery→Evaluation / Technical Context / Compare 矩阵 / Shortlist 矩阵 / Inquiry 矩阵 / RFQ 矩阵 / RBAC 矩阵 / Mobile（768≈140px CARRY FORWARD） |
+| M34 Roadmap Alignment | M34.0=CONDITIONAL / M34.1-3=COMPLETE·CONDITIONAL / M34.4·M34.4R·M34.5·758·759=CONDITIONAL PASS（保持）/ **760=NOT AUTHORIZED（CURRENT GATE）** / **M34.6=NOT AUTHORIZED / BLOCKED** / M34.7=NOT AUTHORIZED / M34-FINAL=NOT STARTED |
+| C2 / C5 / C6 | **C2=CONDITIONAL / C5=FOUNDATION·NOT FULL DISCOVERY / C6=FOUNDATION·NOT FULL CAPABILITY-LED SEARCH**（保持，未升级） |
+| Review Report | docs/_review/760_M34.6_Pre-Execution_Authorization_Gate_Report.md |
+| Next Authorized Stage | **M34.6 Evaluation + Connection / NOT AUTHORIZED / BLOCKED（本任务已 STOP；不得自动进入 M34.6 Implementation；须数据就绪后重新跑 760 Gate 并以独立授权进入受控实施）** |
+
+### 761 M34.6 Real Data Readiness Remediation + Gate Reconciliation（761 = CURRENT Data Readiness Gate → **CASE B** / M34.6 = NOT AUTHORIZED / Data Readiness Audit + Gate Reconciliation / 四维分类 + 修正 Offer 判定 + 判定既有 Onboarding 链路 / 零生产代码）
+> 在 760 `NOT AUTHORIZED` 基础上，把 760 的「Real-data BLOCKER」从粗粒度计数判断升级为可审计、可分层、可验证、可授权的四维 Data Readiness Gate。任务不实施 M34.6，也不撰写 Synthetic Data。
+
+| 字段 | 值 |
+|------|-----|
+| 761 Status | **CURRENT / COMPLETE**（Data Readiness Audit + Gate Reconciliation；Core=NOT READY·BLOCKER / Extended=NOT READY / Workflow=CONDITIONAL / Commercial=OPTIONAL；Data Source=AVAILABLE；零生产代码） |
+| Gate-Logic 修正 | **Offer = OPTIONAL / COMMERCIAL CONTEXT / LEGACY WORKFLOW DATA，NOT CORE BLOCKER**（760 将 `Product=0/SupplierProduct=0/Offer=0` 并列判定存在粗粒度错误；761 无任何 M34.6 核心验收场景强依赖 Offer 的证据） |
+| Repository | 仓库根 `F:\Desktop\VISNDT` / 代码根 `F:\Desktop\VISNDT\VISNDT` / 分支 `main` / 提交 `ff03a9a` / Working Tree OTHER（既有改动，761 不新增生产代码）；BASELINE DRIFT=NONE |
+| Core Data Gate | **NOT READY / BLOCKER**（Product=0 / Published SupplierProduct=0 / Discoverable SUPPLIER=0 / Relationships=0 / Product Parameter Runtime=0） |
+| Extended Evaluation Gate | **NOT READY**（2nd Product/SP/Supplier/ParamProfile 均 0；非架构失败） |
+| Workflow Scenario Gate | **CONDITIONAL**（Demand=3：DRAFT1/CLOSED2；RFQ=2：DRAFT1/OPEN1；RFQResponse=1：SUBMITTED；Inquiry=0；按场景分判，不用单一全局判定） |
+| Commercial Gate | **OPTIONAL**（Offer=0；无 Scenario Dependency） |
+| Existing Real Data Source | **AVAILABLE**（Admin Product Create / Admin Product Governance / Admin SupplierProduct 全生命周期 / Organization 管理 / ParameterDefinition 管理 均已存在；可合法产生 Published Product/SupplierProduct/Organization relationship/Parameter Profile；761 未实施数据导入/清洗/创建） |
+| Real-data（761 实测） | product=0 / supplier_product=0 / published_supplier_product=0 / offer=0 / inquiry=0 / demand=3 / rfq=2 / rfq_response=1 / org(SUPPLIER)=8（无已发布 SupplierProduct→无可发现链路）/ product_category=28 / parameter_definition=54（无 Product 关联及值）/ knowledge_entry=6 / content=8 |
+| M34 Roadmap Alignment | M34.0=CONDITIONAL / M34.1-3=COMPLETE·CONDITIONAL / M34.4·M34.4R·M34.5·758·759=CONDITIONAL PASS（保持）/ **760=NOT AUTHORIZED（保持）** / **761=CURRENT（Data Readiness Gate）** / **M34.6=NOT AUTHORIZED（Case B：Core NOT READY，Data Source AVAILABLE）** / M34.7=NOT AUTHORIZED / M34-FINAL=NOT STARTED |
+| C2 / C5 / C6 | C2=CONDITIONAL / C5=FOUNDATION·NOT FULL DISCOVERY / C6=FOUNDATION·NOT FULL CAPABILITY-LED SEARCH（761 未升级） |
+| Mobile | 761 不做视觉改造；M34.6 Runtime Plan 保持 Desktop+Mobile；`768≈140px overflow` = **CARRY FORWARD**（不借 761 修复） |
+| Review Report | docs/_review/761_M34.6_Real_Data_Readiness_Remediation_And_Gate_Reconciliation_Report.md |
+| Next Authorized Stage | **Controlled Real-data Onboarding / Preparation Assessment（独立任务，不在 761 内执行）**；数据就绪后重跑 **762_M34.6_Authorization_Recheck**；Shortlist Persistence Boundary = ARCHITECTURE DECISION REQUIRED；本任务已 **STOP**，不得自动执行 M34.6 Implementation / Compare / Shortlist / Inquiry / RFQ / Marketplace / Transaction / SEO / LLM / Vector / RAG / M34.7 / M34-FINAL |
+
+### 762 M34.6 Controlled Real-data Onboarding Preparation Assessment（762 = CURRENT / Onboarding Preparation Assessment / 验证既有合法业务管理链路能否不扩域合法落地 M34.6 Core Dataset / 零生产代码 · 零数据创建 · READ-ONLY）
+> 在 761（Core NOT READY + Data Source AVAILABLE / Case B）基础上，762 只读核验既有合法业务管理链路（Product / SupplierProduct / Organization / Parameter）能否在不新增 Domain Authority、不新增 M34.6 业务模型、不修改 Search/Discovery/Workflow、不制造 Synthetic Data 的前提下合法产生 M34.6 最小真实数据集，并冻结后续真实数据准备所需的业务步骤、数据条件、发布条件、关系条件与参数条件。**非数据创建 / 非 M34.6 Implementation / 非 M34.6 Authorization。**
+
+| Field | Value |
+|-------|-------|
+| 762 Status | **CURRENT / COMPLETE**（Architecture Audit + Real-data Onboarding Assessment + Data-flow Verification + Governance/Lifecycle Verification + Runtime Readiness Preparation；Production Code=NONE；Database=READ-ONLY） |
+| Core Dataset Definition | **≥1 Published Product（status='ACTIVE'）＋ ≥1 Published SupplierProduct（status=PUBLISHED）＋ ≥1 SUPPLIER Organization ＋ valid Product↔SupplierProduct（platform_product_id）＋ valid SupplierProduct↔SUPPLIER Organization（organization_id）＋ ≥1 valid Product Parameter Profile（ProductParameterValue→ParameterDefinition）** |
+| Extended Dataset Definition | ≥2 Products／≥2 SupplierProducts／≥2 Discoverable Suppliers／≥2 Parameter Profiles；≥1 组「same Product + multiple SupplierProducts + different Suppliers」＋ ≥1 组「different Products + different Parameter Profiles」 |
+| Product Lifecycle | Admin > Product Operation Center（CREATE→EDIT→批量状态→ status='ACTIVE' = Publish → Discovery 可见）＝ AVAILABLE |
+| SupplierProduct Lifecycle | 状态机 `DRAFT→SUBMITTED→REVIEWING→APPROVED→PUBLISHED/REJECTED`；`platform_product_id` 强校验存在；`organization_id` 服务层派生；publish=status=PUBLISHED ＝ AVAILABLE |
+| Parameter Lifecycle | `parameter-definitions` + `parameter-groups` + `product-parameters`（POST `/products/:id/parameters` → ProductParameterValue → ProductParameterDefinition）运行时可读 ＝ AVAILABLE |
+| Publication / Discoverability | Product 可发现=`status='ACTIVE'`；SupplierProduct 可发现=`status=PUBLISHED`；Supplier 聚合=`status=PUBLISHED` 且 `organization.type='SUPPLIER'`（search.service.ts 冻结） |
+| Core Data Readiness | **NOT READY（INSTANCE）／ STRUCTURALLY READY（PATH）**（结构可落地；实例 Product=0 / SupplierProduct=0 / Discoverable Supplier=0） |
+| Extended Evaluation Readiness | **NOT READY**（需 2+；非架构失败） |
+| Workflow Scenario Readiness | **CONDITIONAL / SPARSE**（Demand=3 / RFQ=2 / RFQResponse=1 / Inquiry=0） |
+| Commercial Readiness | **OPTIONAL**（Offer=0；无场景依赖） |
+| M34 Roadmap Alignment | M34.0=CONDITIONAL / M34.1-3=COMPLETE·CONDITIONAL / M34.4·M34.4R·M34.5·758·759=CONDITIONAL PASS（保持）/ **760=NOT AUTHORIZED（保持）** / **761=ACCEPTED / CONDITIONAL（保持）** / **762=CURRENT（Onboarding Preparation Assessment）** / **M34.6=NOT AUTHORIZED（PENDING RECHECK）** / M34.7=NOT AUTHORIZED / M34-FINAL=NOT STARTED |
+| Shortlist Persistence Boundary | **ARCHITECTURE DECISION REQUIRED（保持，762 不裁决；若持久化需新表 → 独立 Schema Assessment + Migration Plan）** |
+| Review Report | docs/_review/762_M34.6_Controlled_Real_Data_Onboarding_Preparation_Assessment_Report.md |
+| Next Authorized Stage | **Controlled Real-data Onboarding / Preparation（真实数据落地，独立任务，不在 762 内创建任何数据）**；数据就绪后重跑 **M34.6 Authorization Recheck（762）**；短名单持久化边界需先独立 Architecture Decision。本任务已 **STOP**，不得自动执行 M34.6 Implementation / Compare / Shortlist / Inquiry / RFQ / Search / Discovery / Marketplace / Transaction / SEO / LLM / Vector / RAG / M34.7 / M34-FINAL |
+
+### 763 M34.6 Controlled Test Data Onboarding（763 = CURRENT / Controlled Test Data Onboarding / 受控测试数据落地，建立 M34.6 Core Dataset / 零 Schema · 零 Migration · 零生产代码 · 数据落地级）
+> 在 761（Core NOT READY + Data Source AVAILABLE / Case B）与 762（STRUCTURALLY READY / INSTANCE NOT READY）基础上，通过既有合法业务数据链路（Organization=SUPPLIER / User / Product=Capability / ProductParameterValue→ParameterDefinition / SupplierProduct 生命周期→PUBLISHED）落地一套受控测试数据集，解除 762 实测的产品/供应商产品/供应商/参数全零数据阻断。**非 M34.6 Implementation / 非 M34.6 Authorization / 非交易数据 / 非 Synthetic-Fake。**
+>
+> 执行原则：受控测试数据落地（direct data landing）只改 Database 数据，**不修改**任何生产代码；只新增未跟踪的 `database/_763_*.sql` 脚本；`schema.prisma` diff=空（NONE）、无 migration、无一级 Domain Authority 新增、无 Search/Discovery/Product/SupplierProduct/Parameter/Matching/Inquiry/RFQ 变更；不创建 Offer / Fake Transaction / Fake Inquiry / Fake RFQ / Fake RFQResponse；6 个测试账号共用受控密码（`Visndt763Test!`，仅 Controlled Test Dataset 身份，不触发真实邮件/短信/支付）。
+
+| Field | Value |
+|-------|-------|
+| 763 Status | **PASS（Core Dataset READY）** / Core Data Gate = **READY** / M34.6 = **NOT AUTHORIZED（PENDING RECHECK）** |
+| Repository | 仓库根 `F:\Desktop\VISNDT` / 代码根 `F:\Desktop\VISNDT\VISNDT` / 分支 `main` / HEAD `ff03a9a`（与 761/762 基线一致） |
+| Working Tree | OTHER（762 前后既有大批未提交改动，属 M32/M33/M34 前序任务；**763 未改动任何已跟踪文件**，仅新增未跟踪 `database/_763_onboard.sql / _763_probe.sql / _763_verify.sql`）；Schema diff=NONE / Migration=NONE / Production Code=NONE |
+| Organizations | MicroVision 深圳市微视光电科技有限公司（既有，SUPPLIER/ACTIVE，未重复）=PASS；Revopoint 西安知象光电科技有限公司（新建，SUPPLIER/ACTIVE）=PASS；Discoverable SUPPLIER（PUBLISHED SP + org.type=SUPPLIER）=**2** |
+| Controlled Test Users | 6 个：admin.vs.763@ → 微视/ADMIN、admin.zx.763@ → 知象/ADMIN、zhangsan/lisi.763@ → 微视/MEMBER、wangwu/zhaoliu.763@ → 知象/MEMBER（全 ACTIVE，归属正确） |
+| Products | ZB-K60、ZB-TJ095、POP 4、MetroY Ultra 共 **4**，全部 `status='ACTIVE'`（可发现）；ACTIVE Product=4 |
+| SupplierProducts | SP-001..004（ZB-K60/ZB-TJ095→微视；POP4/MetroY Ultra→知象）全部 `status=PUBLISHED`；PUBLISHED=4；orphan=0；invalid org-type=0；平台产品绑定 valid |
+| Parameter Profiles | 每 Product 8 条 ProductParameterValue→ParameterDefinition＋8 条 ProductParameterDefinition 关联；PPV 总计 **32（≥20）**；4 个 Profile 运行时可读（GET `/products/:id/parameters` 各返回 8） |
+| Runtime Verification | 受控账号登录成功（SUPPLIER/ADMIN）；`/api/v1/search?q=...` 对 4 个产品均 products=1＋supplierProducts=1＋suppliers=1；`/search/context` categories=1／commonFilters=1；Search/Discovery/Product detail/Parameter Context **READABLE** |
+| Data Classification | Product/SupplierProduct 描述与参数 = **PUBLIC_SOURCE_DATA + CONTROLLED_TEST_DATA**（标注前缀）；无虚构认证/专利/客户/成交/订单/价格/库存/评价/检测报告（**763 时段陈述，已由 765 C7 明确 superseded：`PUBLIC_SOURCE_DATA` 重分类为 `USER_PROVIDED_TEST_DATA`，官网来源 UNVERIFIED、不写成「官网已确认」；数据库 `[PUBLIC SOURCE DATA]` 文本保持不改** —— 见 765 段与 766 Recheck） |
+| Image / Media | **OPTIONAL（未实现）**：公开产品图仅作 CONTROLLED TEST DATA 建议项，未进入媒体/文件存储流水线；记录为 Optional Data Gap（不阻断 Core Gate） |
+| Core Data Gate | **READY**（Published Product≥1 / Published SupplierProduct≥1 / SUPPLIER Org≥1 / Product↔SupplierProduct 关联 valid / SupplierProduct↔SUPPLIER Org valid / Product Parameter Profile≥1） |
+| Extended Dataset Gate | **READY**（Products=2+、SupplierProducts=2+、Discoverable Suppliers=2+、Parameter Profiles=2+）；⚠ `same Product + multiple SupplierProducts`=**NOT SATISFIED**（Extended Scenario Gap，非 Core Blocker，不为此创建重复 SupplierProduct） |
+| Workflow Gate | **CONDITIONAL**（未触碰；Demand=3 / RFQ=2 / RFQResponse=1 既有已存在；Inquiry/Offer=0 保持） |
+| Commercial Gate | **OPTIONAL**（Offer=0；DO NOT CREATE OFFER；不阻断 Core） |
+| Schema / Migration / Production Code | NONE / NONE / NONE |
+| Synthetic Data | NONE（受控测试数据已创建，非虚构真实交易/客户/订单） |
+| Roadmap Alignment | M34.0-4·4R·5·758·759=CONDITIONAL PASS（保持）/ **760=NOT AUTHORIZED（保持）** / **761=ACCEPTED·CONDITIONAL（保持）** / **762=STRUCTURALLY READY·INSTANCE NOT READY（保持）** / **763=CURRENT（Controlled Test Data Onboarding）** / **M34.6=NOT AUTHORIZED（PENDING RECHECK）** / M34.7=NOT AUTHORIZED / M34-FINAL=NOT STARTED |
+| Shortlist Persistence Boundary | **ARCHITECTURE DECISION REQUIRED（保持，763 不裁决）** |
+| Review Report | docs/_review/763_M34.6_Controlled_Test_Data_Onboarding_Report.md |
+| Next Authorized Stage | **M34.6 Authorization Recheck（独立 Gate）** 或 **Manual Data Completion（如需补齐 Extended Scenario/同上 Product 多 SupplierProduct 等可选/扩展缺口）**；本任务已 **STOP**，不得自动执行 M34.6 Implementation / Shortlist / Evaluation / Compare / Inquiry / RFQ / Search / Discovery / Marketplace / Transaction / SEO / LLM / Vector / RAG / M34.7 / M34-FINAL |
+
+### 764 M34.6 Authorization Recheck（764 = CURRENT / AUTHORIZATION RECHECK / 只读审计 / M34.6=CONDITIONAL）
+
+- **性质**：Authorization Gate 独立重查，READ-ONLY（NO CODE CHANGE / NO DATA CREATION）。基于 761/762/763 冻结证据，对 M34.6 授权做唯一最终判定。
+- **核验**：Repository=PASS（F:/Desktop/VISNDT）/ Code Root=PASS / Branch=main / HEAD=ff03a9a（无漂移）/ Schema diff=0 / Working Tree=169 项历史改动（764 零新增）。Core Dataset=READY（4 Product·4 ACTIVE / 4 SupplierProduct·4 PUBLISHED / 2 可发现 Supplier / 32 PPV / orphan=0·bad_org=0·4 参数 Profile）。Runtime：`q=内窥镜`→products=2·sp=2·suppliers=1、`q=POP`→1·1·1、`GET /products/zb-k60`→ACTIVE＋8 参数 READABLE。Workflow：Demand=3/RFQ=2/RFQResponse=1/Inquiry=0/Offer=0。Data Provenance=PASS（受控边界正确、Synthetic=NONE、[PUBLIC SOURCE DATA] 标签 UNVERIFIED→Rule E 文档校正）。
+- **Extended 表述纠正**：763 的 `Extended = READY (4/5)` **不再沿用** → **Extended = PARTIAL / CONDITIONAL（Scenario Gap）**（`products_with_multiple_sp=0`）。
+- **Shortlist 架构决策**：Case A = **CARRY FORWARD（当前非阻断）**；`schema.prisma` 无 Shortlist/Evaluation 模型。
+- **最终判定**：**M34.6 = CONDITIONAL**（Core=READY 且主 Gate 全 PASS，但存在条件 C1-C7：Extended PARTIAL、Workflow CONDITIONAL、Commercial OPTIONAL、Shortlist ARCH DECISION REQUIRED、required 无强制、Image 可选缺口、PUBLIC_SOURCE 标签校正）。不采用 PENDING；未写成 AUTHORIZED。
+- **Review Report** `docs/_review/764_M34.6_Authorization_Recheck_Report.md` | 下一授权步：**M34.6 Authorization Recheck（条件 C1-C7 解除后）** 或 **受控扩展数据 + Shortlist 架构决策补足**；本任务已 **STOP**。
+
+### 765 M34.6 Conditional Gap Closure（765 = CURRENT / CONDITIONAL CLOSURE / 条件闭环 / 765=PASS）
+- **性质**：764 `M34.6=CONDITIONAL` 后的条件闭环任务；仅解除可解除条件（C1/C2/C4/C7）+ 受控测试数据 + 架构决策 + 文档同步；**不实施 M34.6、不宣布 AUTHORIZED**。
+- **核验**：Repository=PASS / Branch=main / HEAD=ff03a9a（无漂移）/ Schema diff=0 / 765 零 Schema·零 Migration·零生产代码改动。
+- **C1 Extended Scenario=CLOSED**：新增 `ZB-K60-EX [PUBLISHED]`（同 Product ZB-K60 · 微视，差异化 modelNumber 满足 `@@unique`，经状态机 DRAFT→SUBMITTED→REVIEWING→APPROVED→PUBLISHED）。`products_with_multiple_sp` 0→1；SP 4→5（5/5 PUBLISHED）。
+- **C2 Workflow Inquiry=CLOSED/VERIFIED**：1 条受控 Inquiry（product=ZB-K60 · 微视 · zhangsan.763，标注 `[M34.6 CONTROLLED TEST DATA][765 CONTROLLED INQUIRY]`），既有 Authority + JWT 认证可读（inquiry=1）；未扩展 Demand/Match/RFQ/Offer/Order。
+- **C4 Shortlist Architecture=DECIDED（Decision Only）**：`ADR-M34-13`，Option B — Persistent User Evaluation State；Implementation=NOT STARTED；不新增一级 Domain Model / Schema / Migration。
+- **C7 Data Provenance=CORRECTED（文档纠正，DB 不修改）**：`PUBLIC_SOURCE_DATA` 重分类为 `USER_PROVIDED_TEST_DATA`（官网来源 UNVERIFIED）。
+- **Runtime（只读）**：products=4 / sp=5(pub=5) / ppv=32 / multi_sp=1 / inquiry=1 / discoverable_suppliers=2 / 4 参数 Profile。
+- **保留项**：C3 Commercial=OPTIONAL/DEFERRED；C5 required=DEFERRED；C6 Image/Media=OPTIONAL/DEFERRED。
+- **Review Report** `docs/_review/765_M34.6_Conditional_Gap_Closure_Report.md` + ADR `docs/_architecture/ADR-M34-13-Shortlist-Persistence-Boundary.md` | **最终判定：765=PASS / CONDITIONAL CONDITIONS CLOSED；M34.6 Authorization = READY FOR INDEPENDENT RECHECK**；本任务已 **STOP**，等待独立 Authorization Recheck 决定 M34.6 = AUTHORIZED / CONDITIONAL / NOT AUTHORIZED。
+
+### 766 M34.6 Authorization Recheck（766 = CURRENT / INDEPENDENT AUTHORIZATION RECHECK / M34.6=AUTHORIZED）
+- **性质**：对 765 条件闭环结果的**独立授权复核**；READ-ONLY（零代码 / 零 Schema / 零 Migration / 零数据创建）。`765 PASS ≠ M34.6 AUTHORIZED`，本结论由 766 独立重新取证判定。
+- **独立取证（非继承）**：765 Result=**VERIFIED**——独立 SQL/API 复核 ZB-K60-EX（PUBLISHED）、受控 Inquiry（`204b6570…`，status=NEW）、multi_sp=1、SP 4→5、ppv=32。
+- **Baseline**：Repository=PASS / Branch=main / HEAD=ff03a9a（无漂移）/ Schema diff=0 / Migration=36（无新增）/ Production Code=NONE / Business Data Mutation by 766=NONE。
+- **Gates（766 独立只读实证）**：Core=**READY**（product=4 ACTIVE / sp=5 PUBLISHED / ppv=32 / orphan=0 / discoverable=2 / profiles=4）；Extended=**COMPLETE**（multi_sp=1，ZB-K60 双 SP 同 pid=`ebb1c034…`）；Workflow/Connection=**READY**（Inquiry rel valid + 认证可读）；Commercial=**OPTIONAL**（Offer=0）；Search/Discovery=**PASS**（q=内窥镜→2 products/3 SP/1 supplier）；Parameter Runtime=**PASS**（zb-k60 8 参数 ACTIVE）。
+- **Provenance=PASS**：无「官网已确认」；763 分类行已 superseded → USER_PROVIDED_TEST_DATA + UNVERIFIED（DB 文本不改）。Controlled Boundary=PASS（商业事实表不存在，Synthetic=NONE）。ONE Authority=PASS；ADR-M34-13=VERIFIED；Mobile Contract=PRESERVED；Documentation=CONSISTENT。
+- **Blocking=[NONE]**；Deferred/non-blocking=[C3] OPTIONAL、[C5] required=DEFERRED、[C6] OPTIONAL/DEFERRED、[M] Mobile UI=Deferred（Contract Required）。
+- **最终判定（Case A 全满足）**：**766 = INDEPENDENT AUTHORIZATION RECHECK；M34.6 = AUTHORIZED**；下一授权步 = **M34.6 Implementation（Evaluation + Connection）= 独立任务 767**。
+- **Review Report** `docs/_review/766_M34.6_Authorization_Recheck_Report.md` | 本任务已 **STOP**；即使 AUTHORIZED 也不自动实施下一阶段，须等待独立任务 767 指令。
 
 ## Future Architecture Candidates
 

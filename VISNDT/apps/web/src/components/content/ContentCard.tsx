@@ -1,13 +1,6 @@
 import Link from 'next/link';
 import type { Content } from '@/types/content';
 
-const TYPE_BADGE: Record<string, { label: string; color: string }> = {
-  ARTICLE: { label: '文章', color: 'bg-blue-100 text-blue-700' },
-  KNOWLEDGE: { label: '知识', color: 'bg-indigo-100 text-indigo-700' },
-  SOLUTION: { label: '解决方案', color: 'bg-emerald-100 text-emerald-700' },
-  INSIGHT: { label: '洞察', color: 'bg-amber-100 text-amber-700' },
-};
-
 const TYPE_HREF: Record<string, (slug: string) => string> = {
   ARTICLE: (slug) => `/articles/${slug}`,
   KNOWLEDGE: (slug) => `/knowledge/${slug}`,
@@ -29,15 +22,17 @@ interface ContentCardProps {
 }
 
 export default function ContentCard({ item }: ContentCardProps) {
-  const badge = TYPE_BADGE[item.type];
   const href = (TYPE_HREF[item.type] ?? TYPE_HREF.KNOWLEDGE)(item.slug);
   const tags = item.tags?.map((t) => t.tag).filter(Boolean) ?? [];
 
   return (
     <Link
       href={href}
-      className="group rounded-xl border border-slate-200/80 shadow-industrial-sm bg-white overflow-hidden hover:shadow-industrial-md hover:-translate-y-1 transition-all duration-300 flex flex-col"
+      className="group relative rounded-xl border border-slate-200/80 shadow-industrial-sm bg-white overflow-hidden hover:shadow-industrial-md hover:-translate-y-1 transition-all duration-300 flex flex-col"
     >
+      {/* Industrial accent edge — structural top rail */}
+      <span className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-industrial-cyan via-primary to-industrial-cyan opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" aria-hidden="true" />
+
       {/* Cover Image */}
       {item.coverImage && (
         <div className="aspect-[16/9] bg-slate-100 overflow-hidden">
@@ -52,22 +47,18 @@ export default function ContentCard({ item }: ContentCardProps) {
 
       {/* Body */}
       <div className="p-4 sm:p-6 flex flex-col flex-1">
-        {/* Type Badge + Estimated Read Time */}
+        {/* Type marker row — mono technical classification (real type code) */}
         <div className="flex items-center gap-2 mb-3">
-          {badge && (
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${badge.color}`}>
-              {badge.label}
-            </span>
-          )}
-          {item.estimatedReadTime && (
-            <span className="text-xs text-slate-400">
-              {item.estimatedReadTime} 分钟阅读
-            </span>
-          )}
+          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-widest">
+            <span className="h-3 w-1 rounded-sm bg-industrial-cyan" aria-hidden="true" />
+            <span className="text-slate-400">TYPE</span>
+            <span className="text-slate-300">/</span>
+            <span className="text-primary font-semibold">{item.type}</span>
+          </span>
         </div>
 
         {/* Title */}
-        <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2">
+        <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2 text-base">
           {item.title}
         </h3>
 
@@ -84,30 +75,38 @@ export default function ContentCard({ item }: ContentCardProps) {
             {tags.slice(0, 3).map((tag) => (
               <span
                 key={tag.id}
-                className="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-600"
+                className="font-mono text-[11px] px-2 py-0.5 rounded border border-slate-200 bg-slate-50 text-slate-600"
               >
-                {tag.name}
+                #{tag.name}
               </span>
             ))}
             {tags.length > 3 && (
-              <span className="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-400">
+              <span className="font-mono text-[11px] px-2 py-0.5 rounded border border-slate-200 bg-slate-50 text-slate-400">
                 +{tags.length - 3}
               </span>
             )}
           </div>
         )}
 
-        {/* Footer */}
+        {/* Footer — mono technical metadata + document action */}
         <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-          <span className="text-xs text-slate-400">
+          <span className="font-mono text-[11px] text-slate-400 tabular-nums">
             {item.publishedAt
               ? formatDate(item.publishedAt)
               : formatDate(item.updatedAt)}
           </span>
           {item.author?.name && (
-            <span className="text-xs text-slate-400">{item.author.name}</span>
+            <span className="font-mono text-[11px] text-slate-400">
+              <span className="text-slate-500">AUTHOR</span>
+              <span className="mx-1.5 text-slate-300">/</span>
+              {item.author.name}
+            </span>
           )}
         </div>
+        <span className="mt-3 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-widest text-primary/70 group-hover:text-primary transition-colors">
+          VIEW DOC
+          <span aria-hidden="true">→</span>
+        </span>
       </div>
     </Link>
   );

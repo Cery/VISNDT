@@ -20,13 +20,14 @@ import ProductResultCard from '@/components/search/ProductResultCard';
 import KnowledgeResultCard from '@/components/search/KnowledgeResultCard';
 import SolutionResultCard from '@/components/search/SolutionResultCard';
 import SupplierProductResultCard from '@/components/search/SupplierProductResultCard';
+import SupplierResultCard from '@/components/search/SupplierResultCard';
 import SupplierModelFacetPanel from '@/components/search/SupplierModelFacetPanel';
 import { useSearchContext } from '@/hooks/useSearchContext';
 import { useFacetFilterState } from '@/hooks/useFacetFilterState';
 import type { FilterValues, FacetFilterState } from '@/hooks/useFacetFilterState';
 import ParameterFacet from '@/components/search/ParameterFacet';
 
-const VALID_TYPES: SearchDomain[] = ['all', 'product', 'knowledge', 'solution', 'supplier-product'];
+const VALID_TYPES: SearchDomain[] = ['all', 'product', 'knowledge', 'solution', 'supplier-product', 'supplier'];
 const PAGE_SIZE = 20;
 
 function parseType(raw: string | null): SearchDomain {
@@ -310,7 +311,7 @@ export default function SearchPageContent() {
         if (!append) {
           trackEvent(buildEvent('search', {
             source: '/search',
-            metadata: { query: query.trim(), type, totalResults: data.products.total + data.supplierProducts.total + data.knowledge.total + data.solutions.total },
+            metadata: { query: query.trim(), type, totalResults: data.products.total + data.supplierProducts.total + data.suppliers.total + data.knowledge.total + data.solutions.total },
           }));
         }
 
@@ -331,6 +332,10 @@ export default function SearchPageContent() {
             supplierProducts: {
               ...data.supplierProducts,
               items: [...results.supplierProducts.items, ...data.supplierProducts.items],
+            },
+            suppliers: {
+              ...data.suppliers,
+              items: [...results.suppliers.items, ...data.suppliers.items],
             },
             knowledge: {
               ...data.knowledge,
@@ -452,6 +457,7 @@ export default function SearchPageContent() {
     ? {
         product: results.products.total,
         'supplier-product': results.supplierProducts.total,
+        supplier: results.suppliers.total,
         knowledge: results.knowledge.total,
         solution: results.solutions.total,
       }
@@ -460,6 +466,7 @@ export default function SearchPageContent() {
   const hasAnyResults = results
     ? results.products.total > 0 ||
       results.supplierProducts.total > 0 ||
+      results.suppliers.total > 0 ||
       results.knowledge.total > 0 ||
       results.solutions.total > 0
     : false;
@@ -469,6 +476,7 @@ export default function SearchPageContent() {
   const hasMore = results
     ? results.products.items.length < results.products.total ||
       results.supplierProducts.items.length < results.supplierProducts.total ||
+      results.suppliers.items.length < results.suppliers.total ||
       results.knowledge.items.length < results.knowledge.total ||
       results.solutions.items.length < results.solutions.total
     : false;
@@ -526,6 +534,7 @@ export default function SearchPageContent() {
                   <strong className="text-foreground">
                     {results.products.total +
                       results.supplierProducts.total +
+                      results.suppliers.total +
                       results.knowledge.total +
                       results.solutions.total}
                   </strong>{' '}
@@ -562,6 +571,7 @@ export default function SearchPageContent() {
                 total={
                   results.products.total +
                   results.supplierProducts.total +
+                  results.suppliers.total +
                   results.knowledge.total +
                   results.solutions.total
                 }
@@ -569,6 +579,7 @@ export default function SearchPageContent() {
                   { label: '产品', value: results.products.total },
                   { label: '检测方案', value: results.solutions.total },
                   { label: '能力型号', value: results.supplierProducts.total },
+                  { label: '供应商', value: results.suppliers.total },
                   { label: '知识', value: results.knowledge.total },
                 ]}
               />
@@ -672,6 +683,24 @@ export default function SearchPageContent() {
                     {displayResults?.supplierProducts.items.map((item) => (
                       <SupplierProductResultCard
                         key={item.supplierProduct.id}
+                        item={item}
+                      />
+                    ))}
+                  </SearchResultSection>
+                )}
+
+                {/* Supplier Section — 758 Public Supplier Discovery Surface.
+                    Supplier = Organization(type=SUPPLIER) from PUBLISHED SupplierProduct. */}
+                {shouldRenderSection('supplier', results?.suppliers.total ?? 0) && (
+                  <SearchResultSection
+                    title="供应商"
+                    count={displayResults?.suppliers.total ?? 0}
+                    loading={loading}
+                    error={error}
+                  >
+                    {displayResults?.suppliers.items.map((item) => (
+                      <SupplierResultCard
+                        key={item.organizationId}
                         item={item}
                       />
                     ))}

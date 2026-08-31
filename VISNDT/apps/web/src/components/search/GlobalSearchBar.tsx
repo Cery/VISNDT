@@ -9,6 +9,7 @@ const SEARCH_DOMAINS: { value: SearchDomain; label: string }[] = [
   { value: 'all', label: '全部' },
   { value: 'product', label: '产品' },
   { value: 'supplier-product', label: '能力型号' },
+  { value: 'supplier', label: '供应商' },
   { value: 'knowledge', label: '知识' },
   { value: 'solution', label: '方案' },
 ];

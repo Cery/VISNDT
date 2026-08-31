@@ -24,7 +24,7 @@ export default function CompareBar({
   const compareUrl = `/products/compare?ids=${compareIds.join(',')}`;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 shadow-industrial-lg">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 shadow-industrial-lg pb-[env(safe-area-inset-bottom)]">
       <div className="max-w-[1200px] mx-auto px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <span className="text-sm font-medium text-slate-700 whitespace-nowrap">

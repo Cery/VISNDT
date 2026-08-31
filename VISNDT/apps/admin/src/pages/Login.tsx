@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Form, Input, Button, Typography, Alert, Card, Space } from 'antd';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import { useAuth } from '../hooks/useAuth';
+import { VISNDT_COLORS } from '../components/design-system/tokens';
 
 const { Title, Text } = Typography;
 
@@ -38,11 +39,11 @@ function Login() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: `linear-gradient(135deg, ${VISNDT_COLORS.siderBg} 0%, ${VISNDT_COLORS.primaryDark} 100%)`,
       }}
     >
       <Card
-        style={{ width: 400, boxShadow: '0 8px 24px rgba(0,0,0,0.15)' }}
+        style={{ width: 400, boxShadow: '0 8px 24px rgba(0,0,0,0.18)' }}
         styles={{ body: { padding: 40 } }}
       >
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -50,7 +51,7 @@ function Login() {
             <Title level={3} style={{ marginBottom: 4 }}>
               VISNDT 管理后台
             </Title>
-            <Text type="secondary">登录您的账户</Text>
+            <Text type="secondary">工业检测能力发现平台 · Platform Governance Center</Text>
           </div>
 
           {error && (

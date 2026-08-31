@@ -15,8 +15,13 @@ import { ContentStatus, ContentType, KnowledgeEntryStatus, SupplierProductStatus
 //   Knowledge → title, summary, structuredBody (KnowledgeEntry, PUBLISHED)
 //   Content   → title, summary (ARTICLE, INSIGHT only; KNOWLEDGE excluded)
 //   Solution  → title, summary (SOLUTION)
-//   Supplier  → offer title, description (via organization aggregation)
+//   Supplier  → PUBLISHED SupplierProduct → Organization aggregation
 // ============================================
+
+// M34.4 Discovery / Search Foundation — Supplier Discovery constraint.
+// Supplier Context MUST be sourced from PUBLISHED SupplyProduct → Organization
+// (NOT Offer-only / RFQ-only / Transaction-only). Supplier existence is proven by
+// a PUBLISHED SupplierProduct owned by Organization(type=SUPPLIER).
 
 /** Lightweight product result for discovery */
 interface ProductDiscoveryItem {
@@ -53,13 +58,16 @@ interface ContentDiscoveryItem {
   tags: Array<{ tag: { id: string; name: string; slug: string; type: string } }>;
 }
 
-/** Lightweight supplier result (aggregated from offers) */
+/**
+ * Lightweight supplier discovery result — aggregated from PUBLISHED SupplierProduct
+ * → Organization. Supplier Context base (M34.4). No Offer dependency.
+ */
 interface SupplierDiscoveryItem {
   organizationId: string;
   organizationName: string;
-  offerCount: number;
-  offerTitles: string[];
+  publishedSupplyProductCount: number;
   productNames: string[];
+  seriesValues: string[];
 }
 
 /**
@@ -513,55 +521,83 @@ export class SearchService {
   }
 
   // ============================================
-  // Supplier Search Adapter (via Offers)
+  // Supplier Search Adapter (M34.4 — PUBLISHED SupplierProduct → Organization)
   // ============================================
+  // Supplier Context source: PUBLISHED SupplierProduct → Organization(type=SUPPLIER).
+  // NOT Offer-only / RFQ-only / Transaction-only. Supplier existence is proven by
+  // a PUBLISHED SupplierProduct owned by the Organization.
   private async searchSuppliers(
     keyword: string,
-    _skip: number,
-    _take: number,
+    skip: number,
+    take: number,
   ): Promise<EntitySearchGroup<SupplierDiscoveryItem>> {
-    // Fetch all matching offers and aggregate by organization
-    const offers = await this.prisma.offer.findMany({
-      where: {
-        status: { in: ['SUBMITTED', 'ACCEPTED'] },
-        OR: [
-          { title: { contains: keyword, mode: 'insensitive' as const } },
-          { description: { contains: keyword, mode: 'insensitive' as const } },
-        ],
-      },
-      select: {
-        id: true,
-        title: true,
-        organization: { select: { id: true, name: true, type: true } },
-        product: { select: { id: true, name: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    const where = {
+      status: SupplierProductStatus.PUBLISHED,
+      organization: { type: 'SUPPLIER' },
+      OR: [
+        { brand: { contains: keyword, mode: 'insensitive' as const } },
+        { series: { contains: keyword, mode: 'insensitive' as const } },
+        { modelNumber: { contains: keyword, mode: 'insensitive' as const } },
+        {
+          platformProduct: {
+            OR: [
+              { name: { contains: keyword, mode: 'insensitive' as const } },
+              { model: { contains: keyword, mode: 'insensitive' as const } },
+              { description: { contains: keyword, mode: 'insensitive' as const } },
+            ],
+          },
+        },
+      ],
+    };
 
-    // Aggregate by organizationId
+    const [supplierProducts, totalPublished] = await Promise.all([
+      this.prisma.supplierProduct.findMany({
+        where,
+        orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }, { id: 'asc' }],
+        select: {
+          id: true,
+          brand: true,
+          series: true,
+          modelNumber: true,
+          platformProduct: { select: { name: true } },
+          organization: { select: { id: true, name: true } },
+        },
+      }),
+      this.prisma.supplierProduct.count({ where }),
+    ]);
+
+    // Aggregate PUBLISHED SupplierProduct by organizationId → one SupplierDiscoveryItem
+    // per distinct Organization. total = distinct org groups; items honor skip/take.
     const orgMap = new Map<string, SupplierDiscoveryItem>();
-    for (const offer of offers) {
-      const orgId = offer.organization.id;
-      if (!orgMap.has(orgId)) {
-        orgMap.set(orgId, {
+    for (const sp of supplierProducts) {
+      const orgId = sp.organization.id;
+      let entry = orgMap.get(orgId);
+      if (!entry) {
+        entry = {
           organizationId: orgId,
-          organizationName: offer.organization.name,
-          offerCount: 0,
-          offerTitles: [],
+          organizationName: sp.organization.name,
+          publishedSupplyProductCount: 0,
           productNames: [],
-        });
+          seriesValues: [],
+        };
+        orgMap.set(orgId, entry);
       }
-      const entry = orgMap.get(orgId)!;
-      if (offer.title && !entry.offerTitles.includes(offer.title)) {
-        entry.offerTitles.push(offer.title);
+      entry.publishedSupplyProductCount++;
+      if (sp.platformProduct?.name && !entry.productNames.includes(sp.platformProduct.name)) {
+        entry.productNames.push(sp.platformProduct.name);
       }
-      if (offer.product?.name && !entry.productNames.includes(offer.product.name)) {
-        entry.productNames.push(offer.product.name);
+      if (sp.series && !entry.seriesValues.includes(sp.series)) {
+        entry.seriesValues.push(sp.series);
       }
-      entry.offerCount++;
     }
 
-    const items = Array.from(orgMap.values());
-    return { items, total: items.length };
+    if (totalPublished === 0 && orgMap.size === 0) {
+      return { items: [], total: 0 };
+    }
+
+    const allItems = Array.from(orgMap.values());
+    const safeSkip = Math.max(0, Math.min(skip, allItems.length));
+    const items = allItems.slice(safeSkip, safeSkip + take);
+    return { items, total: allItems.length };
   }
 }

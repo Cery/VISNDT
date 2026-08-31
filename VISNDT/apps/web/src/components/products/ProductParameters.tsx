@@ -37,81 +37,95 @@ export default function ProductParameters({
     return (ga?.name ?? '').localeCompare(gb?.name ?? '');
   });
 
-  const renderRow = (pv: ProductParameterValue) => (
-    <tr key={pv.id} className="border-b last:border-0">
-      <td className="py-2 px-3 text-muted-foreground">
-        {pv.parameterDefinition.name}
-        {pv.parameterDefinition.unit && (
-          <span className="text-xs ml-1">({pv.parameterDefinition.unit})</span>
-        )}
-      </td>
-      <td className="py-2 px-3">
-        <div className="font-medium">
-          {pv.value}
-          {pv.valueNumber !== null && (
-            <span className="text-xs text-muted-foreground ml-1">
-              ({pv.valueNumber})
-            </span>
-          )}
-        </div>
-        <ParameterHighlight
-          name={pv.parameterDefinition.name}
-          code={pv.parameterDefinition.code}
-          className="mt-1"
-        />
-      </td>
-    </tr>
+  const isFlat = sortedKeys.length === 1 && sortedKeys[0] === null;
+
+  // 分组技术标题条（工业语境 / mono 组索引 / 受控 accent 竖条）
+  const GroupHeader = ({ label, index }: { label: string; index: number }) => (
+    <div className="flex items-center gap-2.5 mb-3">
+      <span className="h-4 w-1 rounded-sm bg-industrial-cyan shrink-0" aria-hidden="true" />
+      <span className="font-mono text-[11px] tracking-widest text-slate-400 uppercase">
+        PARAM-GRP / {String(index).padStart(2, '0')}
+      </span>
+      <h3 className="text-sm font-semibold text-slate-700">{label}</h3>
+      <span className="flex-1 border-t border-slate-200/80" aria-hidden="true" />
+    </div>
+  );
+
+  // 技术表头（深色工业条）
+  const TableHead = () => (
+    <thead>
+      <tr className="bg-industrial-dark">
+        <th className="text-left py-2.5 px-3 font-mono text-[11px] font-medium tracking-widest text-slate-300 uppercase w-1/3 whitespace-nowrap">
+          <span className="text-industrial-cyan mr-1">#</span> Parameter
+        </th>
+        <th className="text-left py-2.5 px-3 font-mono text-[11px] font-medium tracking-widest text-slate-300 uppercase">
+          Spec Value
+        </th>
+      </tr>
+    </thead>
+  );
+
+  const SpecTable = ({ items }: { items: ProductParameterValue[] }) => (
+    <div className="overflow-x-auto rounded-xl border border-slate-200/80 shadow-industrial-sm">
+      <table className="w-full text-sm">
+        <TableHead />
+        <tbody>{items.map((pv, i) => {
+          const isAlt = i % 2 === 1;
+          return (
+            <tr key={pv.id} className={`border-t first:border-t-0 ${isAlt ? 'bg-slate-50/60' : 'bg-white'}`}>
+              <td className="py-2.5 px-3 align-top">
+                <span className="font-mono text-[11px] text-slate-300 mr-2 tabular-nums">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span className="text-slate-600">{pv.parameterDefinition.name}</span>
+                {pv.parameterDefinition.unit && (
+                  <span className="ml-1.5 inline-block font-mono text-[10px] text-slate-400 border border-slate-200 rounded px-1 py-0.5 align-middle">
+                    {pv.parameterDefinition.unit}
+                  </span>
+                )}
+              </td>
+              <td className="py-2.5 px-3">
+                <div className="font-mono font-semibold text-slate-800 tabular-nums">
+                  {pv.value}
+                  {pv.valueNumber !== null && (
+                    <span className="text-xs text-slate-400 ml-1.5">({pv.valueNumber})</span>
+                  )}
+                </div>
+                <ParameterHighlight
+                  name={pv.parameterDefinition.name}
+                  code={pv.parameterDefinition.code}
+                  className="mt-1"
+                />
+              </td>
+            </tr>
+          );
+        })}</tbody>
+      </table>
+    </div>
   );
 
   // Flat table (no groups provided or all ungrouped)
-  if (sortedKeys.length === 1 && sortedKeys[0] === null) {
+  if (isFlat) {
     return (
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left py-2 px-3 font-semibold text-muted-foreground w-1/3">
-                参数
-              </th>
-              <th className="text-left py-2 px-3 font-semibold text-muted-foreground">
-                值
-              </th>
-            </tr>
-          </thead>
-          <tbody>{grouped.get(null)!.map(renderRow)}</tbody>
-        </table>
+      <div>
+        <GroupHeader label="技术参数" index={1} />
+        <SpecTable items={grouped.get(null)!} />
       </div>
     );
   }
 
   // Grouped display
   return (
-    <div className="space-y-6">
-      {sortedKeys.map((gid) => {
+    <div className="space-y-7">
+      {sortedKeys.map((gid, idx) => {
         const group = gid ? groupMap.get(gid) : null;
         const items = grouped.get(gid) ?? [];
         const label = group?.name ?? '其他参数';
 
         return (
           <div key={gid ?? '__ungrouped__'}>
-            <h3 className="text-sm font-semibold text-slate-700 mb-2 border-b pb-2">
-              {label}
-            </h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-2 px-3 font-semibold text-muted-foreground w-1/3">
-                      参数
-                    </th>
-                    <th className="text-left py-2 px-3 font-semibold text-muted-foreground">
-                      值
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>{items.map(renderRow)}</tbody>
-              </table>
-            </div>
+            <GroupHeader label={label} index={idx + 1} />
+            <SpecTable items={items} />
           </div>
         );
       })}

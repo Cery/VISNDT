@@ -6,7 +6,7 @@ import { buildPageMetadata } from '@/lib/seo-config';
 
 export const metadata: Metadata = buildPageMetadata({
   title: '文章中心',
-  description: 'VISNDT企业动态、行业新闻、技术趋势与公司资讯。',
+  description: 'VISNDT 工业检测技术资料库：方法文档、能力知识与行业技术实践。',
   path: '/articles',
 });
 
@@ -23,14 +23,15 @@ export default async function ArticlesPage() {
     <ContentListLayout
       title="文章"
       titleHighlight="中心"
-      description="企业动态、行业新闻与技术趋势，了解VISNDT的最新发展。"
+      description="技术资料库，收录 VISNDT 工业检测方法文档、能力知识与行业技术实践。"
       contents={contents}
-      countLabel={(count) => `共 ${count} 篇文章`}
+      countLabel={(count) => `共 ${count} 项技术资料`}
+      techIndex={{ code: 'ART-INDEX', label: 'Industrial Technical Documentation' }}
       empty={{
         icon: 'document',
         title: '文章中心',
-        message: '暂无已发布的文章内容',
-        description: '企业动态、行业新闻与技术趋势正在筹备中，敬请期待。',
+        message: '暂无已发布的技术资料',
+        description: '工业检测方法文档与技术资料正在收录中，敬请期待。',
       }}
     />
   );

@@ -19,7 +19,7 @@ export const colors = {
   primaryDark: '#1d4ed8',
   /** 工业辅助色 */
   industrialBlue: '#1e40af',
-  industrialCyan: '#0891b2',
+  industrialCyan: '#0ea5e9',
   industrialViolet: '#7c3aed',
   industrialSky: '#0ea5e9',
   industrialLime: '#84cc16',
@@ -41,15 +41,15 @@ export const colors = {
     '950': '#020617',
   },
 
-  /** 语义状态色（与 STATUS_TONE 保持一致） */
+  /** 语义状态色（与 STATUS_TONE 保持一致，对齐 docs/design-system/VISNDT_COLOR_SYSTEM.md 冻结值） */
   status: {
-    success: '#16a34a',
-    warning: '#d97706',
-    error: '#dc2626',
-    info: '#0891b2',
+    success: '#10b981',
+    warning: '#f59e0b',
+    error: '#ef4444',
+    info: '#0ea5e9',
     neutral: '#64748b',
     primary: '#2563eb',
-    cyan: '#0891b2',
+    cyan: '#0ea5e9',
     violet: '#7c3aed',
   },
 
@@ -60,8 +60,26 @@ export const colors = {
     siderBg: '#0f172a',
     tableHeaderBg: '#f8fafc',
     cardBg: '#ffffff',
+    secondaryBg: '#f1f5f9',
+    elevatedBg: '#ffffff',
+    overlay: 'rgba(15, 23, 42, 0.5)',
   },
 } as const;
+
+/* ============================================================
+ * Surface Hierarchy（表层级语义，对接 726 §7 Surface Contract）
+ * 全部复用既有色值 + rgba overlay（功能遮挡，非品牌色），不新增第二套色板。
+ * surface-0 PageBg → surface-1 Primary → surface-2 Secondary → elevated → overlay
+ * ============================================================ */
+export const surfaceHierarchy = {
+  'surface-0': colors.surfaces.layoutBg,
+  'surface-1': colors.surfaces.cardBg,
+  'surface-2': colors.surfaces.secondaryBg,
+  elevated: colors.surfaces.elevatedBg,
+  overlay: colors.surfaces.overlay,
+} as const;
+
+export type SurfaceLevel = keyof typeof surfaceHierarchy;
 
 /** 语义状态色调 */
 export type SemanticTone =
@@ -123,6 +141,28 @@ export const spacing: Record<number, number> = {
 };
 
 /* ============================================================
+ * Layout Container（布局容器，对接 726 §8.1 Container 基础规则）
+ * content 默认内容 / wide Hero 视觉场 / reading 内容与知识正文阅读宽度
+ * ============================================================ */
+export const container = {
+  width: {
+    content: 1280,
+    wide: 1480,
+    reading: { min: 760, max: 820 },
+  },
+} as const;
+
+/* ============================================================
+ * Responsive Padding（响应式留白，对接 726 §4.5 / §2.2C）
+ * mobile 375 / tablet 768 / desktop 1024·1440
+ * ============================================================ */
+export const responsivePadding = {
+  mobile: 16,
+  tablet: 24,
+  desktop: 32,
+} as const;
+
+/* ============================================================
  * Radius（圆角）
  * ============================================================ */
 export const radius = {
@@ -154,6 +194,11 @@ export const border = {
     default: '#e2e8f0',
     strong: '#cbd5e1',
   },
+  /**
+   * Focus ring（可访问性焦点环，对接 726 §18 / TG-02）。
+   * 复用既有 primary 作为 focus-visible ring，不新增颜色。
+   */
+  focus: '#2563eb',
 } as const;
 
 /* ============================================================
@@ -273,10 +318,10 @@ export function toneToHex(status?: string | null): string {
  * ============================================================ */
 export const CHART_PALETTE: readonly string[] = [
   '#2563eb', // 工业蓝
-  '#0891b2', // 工业青
-  '#16a34a', // 成功绿
-  '#d97706', // 警告琥珀
-  '#dc2626', // 错误红
+  '#0ea5e9', // 工业青（Secondary）
+  '#10b981', // 成功绿（Success）
+  '#f59e0b', // 警告琥珀（Warning/Accent）
+  '#ef4444', // 错误红（Error）
   '#7c3aed', // 紫
   '#0ea5e9', // 天蓝
   '#84cc16', // 青柠
@@ -305,6 +350,19 @@ export function toCssVariables(prefix = 'vds'): Record<string, string> {
     [`--${prefix}-status-warning`]: colors.status.warning,
     [`--${prefix}-status-error`]: colors.status.error,
     [`--${prefix}-status-info`]: colors.status.info,
+    // Surface hierarchy（726 §7）
+    [`--${prefix}-surface-0`]: surfaceHierarchy['surface-0'],
+    [`--${prefix}-surface-1`]: surfaceHierarchy['surface-1'],
+    [`--${prefix}-surface-2`]: surfaceHierarchy['surface-2'],
+    [`--${prefix}-surface-elevated`]: surfaceHierarchy.elevated,
+    [`--${prefix}-surface-overlay`]: surfaceHierarchy.overlay,
+    // Layout container（726 §8.1 / TG-03）
+    [`--${prefix}-container-content`]: `${container.width.content}px`,
+    [`--${prefix}-container-wide`]: `${container.width.wide}px`,
+    [`--${prefix}-container-reading-min`]: `${container.width.reading.min}px`,
+    [`--${prefix}-container-reading-max`]: `${container.width.reading.max}px`,
+    // Focus ring（TG-02）
+    [`--${prefix}-border-focus`]: border.focus,
   };
   return vars;
 }
@@ -322,6 +380,9 @@ const designTokens = {
   shadow,
   border,
   motion,
+  surfaceHierarchy,
+  container,
+  responsivePadding,
   STATUS_TONE,
   TONE_TO_HEX,
   TONE_TO_ANTD_COLOR,

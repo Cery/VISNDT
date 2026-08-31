@@ -6,14 +6,19 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/auth/AuthProvider';
 import GlobalSearchBar from '@/components/search/GlobalSearchBar';
 
+// 757_M34.5 — Canonical Discovery IA.
+// 主导航收敛为 DISCOVER 主线（Search / Category / Product / Supplier），
+// 内容类（解决方案 / 知识中心）作为 Supporting Layer 保留，
+// /business 与 /about 仍可在 PublicFooter 中访问，不产生死链。
 const NAV_ITEMS = [
   { href: '/', label: '首页', exact: true },
+  { href: '/search', label: '搜索' },
+  { href: '/categories', label: '能力分类' },
   { href: '/products', label: '产品中心' },
-  { href: '/categories', label: '产品分类' },
+  // Supplier Discovery：复用现有 /search?type=supplier-product 公开入口，不新增路由
+  { href: '/search?type=supplier-product', label: '能力型号/供应商' },
   { href: '/solutions', label: '解决方案' },
   { href: '/knowledge', label: '知识中心' },
-  { href: '/business', label: '商务合作' },
-  { href: '/about', label: '关于我们' },
 ];
 
 export default function PublicHeader() {
@@ -83,48 +88,55 @@ export default function PublicHeader() {
             {isLoading ? (
               <div className="w-20 h-8 bg-slate-100 rounded-lg animate-pulse" />
             ) : isAuthenticated && user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:text-foreground hover:bg-slate-50 rounded-lg transition-colors"
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/dashboard"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-primary to-industrial-cyan px-4 py-2 text-sm font-semibold text-white shadow-industrial-sm hover:opacity-90 transition-opacity"
                 >
-                  <span className="w-7 h-7 bg-gradient-to-r from-primary to-industrial-cyan rounded-full flex items-center justify-center text-white text-xs font-bold">
-                    {user.name?.charAt(0) || user.email?.charAt(0) || '?'}
-                  </span>
-                  <span className="max-w-[120px] truncate">{user.name || user.email}</span>
-                  <svg
-                    className={`w-4 h-4 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  工作台
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
-                </button>
-                {userMenuOpen && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
-                    <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-industrial-lg py-1 z-20">
-                      <Link
-                        href="/dashboard"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
-                      >
-                        工作台
-                      </Link>
-                      <hr className="my-1 border-slate-100" />
-                      <button
-                        onClick={() => {
-                          setUserMenuOpen(false);
-                          handleLogout();
-                        }}
-                        className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                      >
-                        退出登录
-                      </button>
-                    </div>
-                  </>
-                )}
+                </Link>
+                <div className="relative">
+                  <button
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center gap-2 px-2 py-2 text-sm font-medium text-slate-700 hover:text-foreground hover:bg-slate-50 rounded-lg transition-colors"
+                    aria-label="用户菜单"
+                  >
+                    <span className="w-7 h-7 bg-gradient-to-r from-primary to-industrial-cyan rounded-full flex items-center justify-center text-white text-xs font-bold">
+                      {user.name?.charAt(0) || user.email?.charAt(0) || '?'}
+                    </span>
+                    <span className="max-w-[120px] truncate hidden lg:inline">{user.name || user.email}</span>
+                    <svg
+                      className={`w-4 h-4 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {userMenuOpen && (
+                    <>
+                      <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
+                      <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-industrial-lg py-1 z-20">
+                        <div className="px-4 py-2 text-xs text-slate-400 truncate border-b border-slate-100">
+                          {user.email}
+                        </div>
+                        <button
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            handleLogout();
+                          }}
+                          className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          退出登录
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             ) : (
               <>

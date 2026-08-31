@@ -73,6 +73,19 @@ export interface SupplierProductDiscoveryItem {
   inquiryAvailable: boolean;
 }
 
+/**
+ * Supplier Discovery item — M34.4 / 758 Supplier Discovery Surface.
+ * Aggregated on the backend from PUBLISHED SupplierProduct → Organization(type=SUPPLIER).
+ * Supplier = Organization semantic role, NOT a new Entity / Marketplace Seller.
+ */
+export interface SupplierDiscoveryItem {
+  organizationId: string;
+  organizationName: string;
+  publishedSupplyProductCount: number;
+  productNames: string[];
+  seriesValues: string[];
+}
+
 /** Per-entity search group */
 export interface EntitySearchGroup<T> {
   items: T[];
@@ -84,6 +97,8 @@ export interface UnifiedDiscoveryResponse {
   query: string;
   products: EntitySearchGroup<ProductDiscoveryItem>;
   supplierProducts: EntitySearchGroup<SupplierProductDiscoveryItem>;
+  /** Supplier group — served by unified /search as `suppliers` (PUBLISHED SupplierProduct aggregation). */
+  suppliers: EntitySearchGroup<SupplierDiscoveryItem>;
   knowledge: EntitySearchGroup<KnowledgeDiscoveryItem>;
   content: EntitySearchGroup<ContentDiscoveryItem>;
   solutions: EntitySearchGroup<ContentDiscoveryItem>;

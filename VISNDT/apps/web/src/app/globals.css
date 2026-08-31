@@ -25,11 +25,11 @@
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.5rem;
 
-    /* === 工业平台辅助色 === */
-    --industrial-cyan: 190 85% 45%;
+    /* === 工业平台辅助色（冻结于 VISNDT_COLOR_SYSTEM：Secondary #0EA5E9 / Accent #F59E0B）=== */
+    --industrial-cyan: 199 89% 48%;
     --industrial-cyan-foreground: 0 0% 100%;
 
-    --industrial-amber: 32 95% 50%;
+    --industrial-amber: 38 92% 50%;
     --industrial-amber-foreground: 0 0% 100%;
 
     --industrial-slate: 220 14% 96%;
@@ -74,6 +74,54 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* ============================================================
+     M33.1 Visual Foundation — Typography Level Lines（726 §5）
+     仅建立可复用 base 级排版基线，不重构任何页面。
+     ============================================================ */
+  h1 { font-size: 2.25rem; line-height: 1.15; font-weight: 700; letter-spacing: -0.025em; }
+  h2 { font-size: 1.875rem; line-height: 1.2; font-weight: 600; letter-spacing: -0.02em; }
+  h3 { font-size: 1.5rem; line-height: 1.25; font-weight: 600; letter-spacing: -0.015em; }
+  h4 { font-size: 1.25rem; line-height: 1.3; font-weight: 600; }
+
+  /* Focus-visible ring（TG-02 / 726 §18）：复用 primary，Frame vs. none */
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+}
+
+/* === VISNDT Prose Overrides（Content Surface，对齐 VISNDT_TYPOGRAPHY / COLOR_SYSTEM）=== */
+@layer components {
+  .prose {
+    /* 正文色对齐 Neutral-700/800 */
+    --tw-prose-body: hsl(222.2 84% 4.9%);
+    --tw-prose-headings: hsl(222.2 84% 4.9%);
+    --tw-prose-links: hsl(221.2 83.2% 53.3%);
+    --tw-prose-bold: hsl(222.2 84% 4.9%);
+    /* 表格 */
+    --tw-prose-th-borders: #e2e8f0;
+    --tw-prose-td-borders: #e2e8f0;
+    --tw-prose-captions: #64748b;
+    --tw-prose-quote-borders: #0ea5e9; /* Secondary */
+    --tw-prose-quotes: #475569;
+    --tw-prose-code: #0ea5e9; /* Secondary 技术高亮 */
+    --tw-prose-pre-code: #e2e8f0;
+    --tw-prose-code-bg: #f1f5f9;
+  }
+  /* 表格 wrapper：窄屏下整表横向滚动，避免溢出（不做数据裁剪） */
+  .prose :where(table):not(:where([class~="not-prose"] *)) {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  .prose :where(table):not(:where([class~="not-prose"] *)) th,
+  .prose :where(table):not(:where([class~="not-prose"] *)) td {
+    white-space: nowrap;
+  }
 }
 
 @layer utilities {
@@ -83,6 +131,45 @@
   .animate-slide-up {
     animation: slideUp 0.5s ease-out;
   }
+
+  /* ============================================================
+     M33.1 Visual Foundation — Surface Hierarchy（726 §7）
+     Surface 0(PageBg) / 1(Primary) / 2(Secondary) / elevated
+     复用 css 变量（对齐 design-tokens surfaceHierarchy），不新增品牌色。
+     ============================================================ */
+  .surface-0 { background-color: var(--vds-surface-0, #f5f7fa); }
+  .surface-1 { background-color: var(--vds-surface-1, #ffffff); }
+  .surface-2 { background-color: var(--vds-surface-2, #f1f5f9); }
+  .surface-elevated {
+    background-color: var(--vds-surface-elevated, #ffffff);
+    box-shadow: var(--shadow-industrial-md, 0 4px 12px rgba(0,0,0,0.06));
+  }
+
+  /* ============================================================
+     M33.1 Visual Foundation — Container（726 §8.1 / TG-03）
+     content / wide / reading + responsive padding（375 16 / 768 24 / 1024+ 32）
+     ============================================================ */
+  .vds-container,
+  .vds-container-content,
+  .vds-container-wide,
+  .vds-container-reading {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: clamp(16px, 4vw, 32px);
+    box-sizing: border-box;
+  }
+  .vds-container,
+  .vds-container-content { max-width: 1280px; }
+  .vds-container-wide { max-width: 1480px; }
+  .vds-container-reading { max-width: min(820px, 100%); }
+
+  /* 8px rhythm（726 §4.5 / spacing）—— 语义间距基础工具类 */
+  .vds-space-y-1 { row-gap: 4px; }
+  .vds-space-y-2 { row-gap: 8px; }
+  .vds-space-y-3 { row-gap: 12px; }
+  .vds-space-y-4 { row-gap: 16px; }
+  .vds-space-y-6 { row-gap: 24px; }
+  .vds-space-y-8 { row-gap: 32px; }
 }
 
 @keyframes fadeIn {
@@ -102,4 +189,75 @@
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* =====================================================================
+   M32.2 Interaction & Final Polish — VISNDT 统一交互基础
+   仅 CSS / Native React，无新运行时依赖。对齐 VISNDT_SPACING / COLOR_SYSTEM
+   ===================================================================== */
+
+/* --- 1. 统一 Reduced Motion 基础（唯一入口，避免多处冲突）---
+   自动影响此后所有 M32 动画：纯视觉反馈在 reduce 下立即完成，
+   hover/active/focus 状态仍保留，动画不作为唯一反馈。 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer utilities {
+  /* 路由进入（template.tsx 使用）：
+     仅 opacity，不产生 containing block，避免干扰 fixed（CompareBar/Drawer）定位 */
+  .page-enter {
+    animation: visndPageEnter 0.28s ease-out;
+  }
+
+  /* 卡片 hover 抬升：translateY ≤ 4px + shadow + border 过渡 */
+  .card-lift {
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    will-change: transform;
+  }
+  .card-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-industrial-lg);
+  }
+
+  /* 按钮按下反馈：active 轻微缩放 ≤0.98，hover/focus/active 均提供状态 */
+  .btn-press {
+    transition: transform 0.12s ease, box-shadow 0.2s ease,
+      background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+  .btn-press:active {
+    transform: scale(0.98);
+  }
+
+  /* 网格 stagger 入场项：配合内联 animation-delay（max ≤ 400ms） */
+  .stagger-item {
+    opacity: 0;
+    animation: visndFadeUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  /* Hero / EmptyState 轻微入场 */
+  .hero-enter {
+    animation: visndHeroFade 0.7s ease-out;
+  }
+}
+
+@keyframes visndPageEnter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes visndFadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes visndHeroFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

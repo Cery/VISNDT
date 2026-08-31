@@ -10,8 +10,10 @@ import type { ProductParameterFilter } from '@/types/product';
 import { trackEvent, buildEvent } from '@/lib/analytics';
 import { translateCategoryName } from '@/lib/translate';
 import IndustrialBadge from '@/components/brand/IndustrialBadge';
+import PageContainer from '@/components/common/PageContainer';
 import SearchBar from '@/components/products/SearchBar';
 import ProductFilter from '@/components/products/ProductFilter';
+import MobileFilterDrawer from '@/components/products/MobileFilterDrawer';
 import ProductGrid from '@/components/products/ProductGrid';
 import CompareBar from '@/components/products/CompareBar';
 import Pagination from '@/components/common/Pagination';
@@ -65,6 +67,7 @@ function ProductsPageContent() {
     initialState.parameterFilters,
   );
   const [compareIds, setCompareIds] = useState<string[]>([]);
+  const [filterOpen, setFilterOpen] = useState(false);
 
   // Sync state to URL (replace, not push — avoids bloating browser history)
   const syncURL = useCallback(
@@ -225,49 +228,78 @@ function ProductsPageContent() {
     (keyword ? 1 : 0) + (categoryId ? 1 : 0) + parameterFilters.length;
 
   return (
-    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
-      <div className="mb-6 sm:mb-8 rounded-2xl border border-slate-200/80 shadow-industrial-sm bg-white px-6 py-7 sm:px-8 sm:py-9">
-        <IndustrialBadge label="工业检测能力发现" tone="cyan" />
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground mt-4">
-          工业检测能力目录
-        </h1>
-        <p className="text-muted-foreground mt-2 text-sm sm:text-base max-w-2xl">
-          面向工业无损检测的能力发现平台。围绕检测场景与核心参数，快速定位具备目标检测能力的设备与方案。
-        </p>
-        <div className="mt-4 text-sm text-muted-foreground">
-          共{' '}
-          <span className="font-semibold text-foreground">{productsData?.total ?? '—'}</span>{' '}
-          项检测能力
-        </div>
-        {categories.length > 0 && (
-          <div className="mt-5 flex flex-wrap gap-2">
-            {categories.slice(0, 8).map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => handleCategoryChange(c.id)}
-                className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium transition-colors ${
-                  categoryId === c.id
-                    ? 'bg-primary/10 text-primary border-primary/30'
-                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-primary/40 hover:text-primary'
-                }`}
-              >
-                <span className="w-1 h-1 rotate-45 bg-current" aria-hidden="true" />
-                {translateCategoryName(c.name)}
-              </button>
-            ))}
+    <div className="min-h-screen bg-surface-0">
+      {/* 工业检测能力中心 Header 带（M33.3 结构性重组：Dark Technical Band + 分类能力铁轨 + mono 数据锚点） */}
+      <div className="bg-industrial-dark relative overflow-hidden border-b border-slate-200/80">
+        {/* 受控技术网格 */}
+        <div className="absolute inset-0 bg-grid-pattern bg-grid-md opacity-20" aria-hidden="true" />
+        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-primary/0 via-industrial-cyan/50 to-primary/0" aria-hidden="true" />
+        <PageContainer variant="content" paddingY={40}>
+          <div className="max-w-4xl relative">
+            <IndustrialBadge label="工业检测能力发现 · 能力中心" tone="cyan" />
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mt-5 tracking-tight">
+            工业检测能力注册表
+          </h1>
+          <p className="text-slate-400 mt-3 text-sm sm:text-base max-w-2xl leading-relaxed">
+            面向工业无损检测的能力发现平台。围绕检测场景、技术参数与能力状态，从注册能力中定位匹配的设备与方案。
+          </p>
+          {/* mono 数据锚点：注册能力总数 */}
+          <div className="mt-5 inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5">
+            <span className="font-mono text-lg font-bold text-white tabular-nums">
+              {productsData?.total ?? '—'}
+            </span>
+            <span className="text-xs text-slate-400">项已注册检测能力</span>
           </div>
-        )}
+          </div>
+
+          {/* 分类能力铁轨 rail（保留既有 onCategoryChange 行为） */}
+          {categories.length > 0 && (
+            <div className="mt-7 flex flex-wrap gap-2">
+              {categories.slice(0, 8).map((c, idx) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => handleCategoryChange(c.id)}
+                  className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium transition-colors ${
+                    categoryId === c.id
+                      ? 'bg-primary/20 text-white border-primary/50'
+                      : 'bg-white/5 text-slate-300 border-white/10 hover:border-primary/40 hover:text-white'
+                  }`}
+                >
+                  <span className="font-mono opacity-50 tabular-nums">{String(idx + 1).padStart(2, '0')}</span>
+                  <span>{translateCategoryName(c.name)}</span>
+                  <span className="opacity-60">检测能力</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </PageContainer>
       </div>
 
-      {/* Search */}
-      <div className="mb-6 max-w-full sm:max-w-lg">
-        <SearchBar
-          onSearch={handleSearch}
-          onClear={handleClearSearch}
-          initialValue={keyword}
-        />
-      </div>
+      <PageContainer variant="content" paddingY={28}>
+        {/* Search */}
+        <div className="mb-6 max-w-full sm:max-w-lg">
+          <SearchBar
+            onSearch={handleSearch}
+            onClear={handleClearSearch}
+            initialValue={keyword}
+            placeholder="搜索检测能力、技术参数或型号..."
+          />
+        </div>
+
+        {/* 移动端筛选入口（< lg 显示） */}
+        <div className="mb-4 lg:hidden">
+          <button
+            type="button"
+            onClick={() => setFilterOpen(true)}
+            className="inline-flex items-center gap-2 w-full sm:w-auto bg-white border border-slate-200 text-foreground text-sm font-medium px-4 py-2.5 rounded-lg hover:border-primary/40 hover:text-primary transition-colors"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true">
+              <path d="M2 3.5h10M3.5 7h7M5.5 10.5h3" />
+            </svg>
+            筛选{activeFilterCount > 0 ? `（${activeFilterCount}）` : ''}
+          </button>
+        </div>
 
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         {/* Sidebar Filter */}
@@ -376,6 +408,27 @@ function ProductsPageContent() {
         </div>
       </div>
 
+      {/* 移动端筛选抽屉 */}
+      <MobileFilterDrawer
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        title="筛选能力"
+      >
+        <ProductFilter
+          categories={categories}
+          selectedCategoryId={categoryId}
+          onCategoryChange={handleCategoryChange}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSortChange={handleSortChange}
+          parameterDefinitions={parameterDefinitions}
+          parameterFilters={parameterFilters}
+          onParameterFilterChange={handleParameterFilterChange}
+          hasActiveFilters={hasActiveFilters}
+          onClearAll={handleClearAll}
+        />
+      </MobileFilterDrawer>
+
       {/* Compare Bar — floating bottom bar */}
       <CompareBar
         compareIds={compareIds}
@@ -383,6 +436,10 @@ function ProductsPageContent() {
         onRemove={handleCompareRemove}
         onClear={handleCompareClear}
       />
+
+      {/* 占位：已选择对比时给底部固定 CompareBar 预留空间，避免遮挡最后一项内容 */}
+      {compareIds.length > 0 && <div className="h-20" aria-hidden="true" />}
+      </PageContainer>
     </div>
   );
 }

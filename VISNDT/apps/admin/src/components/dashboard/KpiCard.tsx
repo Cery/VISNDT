@@ -24,10 +24,10 @@ interface KpiCardProps {
 }
 
 /**
- * 运营驾驶舱 KPI 卡片 —— 从「数字 + 标题」升级为：
- * Metric → Value → Trend/Status → Business Meaning 的语义化表达。
- *
- * 仅做展示层增强，不修改统计接口。
+ * M33.2 — Executive KPI StatCard（726 §12 / KPI Contract）
+ * 信息层级：Executive Label → Metric（mono + tabular-nums，TG-05 数据数字强调）
+ *           → Trend/Status（语义色）→ Operational Meaning。
+ * 通用 icon 容器（固定 40px、统一对齐）；无 emoji；仅展示层增强，不改统计接口。
  */
 export default function KpiCard({
   title,
@@ -51,46 +51,25 @@ export default function KpiCard({
   }
 
   const resolvedAccent = accent ?? TONE_TO_HEX[tone];
+  const metaColor = metaTone ? TONE_TO_HEX[metaTone] : 'inherit';
 
   return (
     <Card
       hoverable={!!onClick}
       onClick={onClick}
+      className="vds-surface-elevated"
       style={{
         borderTop: `3px solid ${resolvedAccent}`,
         cursor: onClick ? 'pointer' : undefined,
         height: '100%',
+        borderRadius: 12,
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-        <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 13, color: '#64748b', marginBottom: 8 }}>{title}</div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-            <span style={{ fontSize: 26, fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>
-              {value}
-            </span>
-            {suffix && (
-              <span style={{ fontSize: 13, color: '#64748b', fontWeight: 500 }}>{suffix}</span>
-            )}
-          </div>
-          {hint && (
-            <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 8, lineHeight: 1.5 }}>
-              {hint}
-            </div>
-          )}
-          {meta && (
-            <div
-              style={{
-                fontSize: 12,
-                color: metaTone ? TONE_TO_HEX[metaTone] : '#64748b',
-                marginTop: 6,
-                fontWeight: 500,
-              }}
-            >
-              {meta}
-            </div>
-          )}
-        </div>
+      {/* Label 行：title + icon 容器（统一 40px 圆角图标，无 emoji） */}
+      <div
+        style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}
+      >
+        <div style={{ minWidth: 0, fontSize: 13, color: '#64748b', fontWeight: 500 }}>{title}</div>
         {icon && (
           <div
             style={{
@@ -100,16 +79,60 @@ export default function KpiCard({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 20,
+              fontSize: 18,
               color: resolvedAccent,
               background: `${resolvedAccent}14`,
               flexShrink: 0,
+              lineHeight: 1,
             }}
           >
             {icon}
           </div>
         )}
       </div>
+
+      {/* Metric 行：mono + tabular-nums 数值强调（TG-05） */}
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginTop: 10 }}>
+        <span
+          style={{
+            fontSize: 28,
+            fontWeight: 800,
+            color: '#0f172a',
+            fontFamily: "'JetBrains Mono', 'SFMono-Regular', Consolas, monospace",
+            fontVariantNumeric: 'tabular-nums',
+            lineHeight: 1,
+            letterSpacing: '-0.02em',
+          }}
+        >
+          {value}
+        </span>
+        {suffix && (
+          <span style={{ fontSize: 13, color: '#64748b', fontWeight: 500, fontFamily: 'inherit' }}>
+            {suffix}
+          </span>
+        )}
+      </div>
+
+      {/* Trend / Status：语义色 meta（运营含义的即时状态） */}
+      {meta && (
+        <div style={{ fontSize: 12, color: metaColor, marginTop: 8, fontWeight: 500 }}>{meta}</div>
+      )}
+
+      {/* Operational Meaning：数字背后的业务意义 */}
+      {hint && (
+        <div
+          style={{
+            fontSize: 12,
+            color: '#94a3b8',
+            marginTop: 6,
+            lineHeight: 1.5,
+            borderTop: `1px solid #f1f5f9`,
+            paddingTop: 8,
+          }}
+        >
+          {hint}
+        </div>
+      )}
     </Card>
   );
 }

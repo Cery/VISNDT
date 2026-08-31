@@ -74,10 +74,15 @@ export default function SupplierProductResultCard({
 
       <div className="mt-4 flex flex-wrap justify-between items-center gap-2">
         <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-400">
-          {supplierProduct.organization?.name && (
+          {supplierProduct.organization?.id && supplierProduct.organization.name && (
             <span title={supplierProduct.organization.name}>
               <span className="text-slate-500">能力提供商：</span>
-              <span className="text-slate-700">{supplierProduct.organization.name}</span>
+              <Link
+                href={`/suppliers/${supplierProduct.organization.id}`}
+                className="text-slate-700 hover:text-primary transition-colors"
+              >
+                {supplierProduct.organization.name}
+              </Link>
             </span>
           )}
           <span>

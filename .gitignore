@@ -1,0 +1,3 @@
+# Root-level scratch / local-only artifacts (should NOT be committed)
+.chrome_profile/
+GitHubdesk erro.png

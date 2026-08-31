@@ -7,6 +7,11 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
 
+# 统一 pnpm 版本：仓库 root package.json 的 `packageManager` 声明为 pnpm@11.20.0，
+# 与 lockfile（lockfileVersion 9.0 / 本地 pnpm@9）不一致，会导致 corepack 加载 pnpm@11
+# 在 node:20-alpine 下触发 ERR_UNKNOWN_BUILTIN_MODULE。此处禁用 corepack 读取项目 spec，
+# 强制使用下面 prepare 激活的 pnpm@9（与 lockfile 匹配）。
+ENV COREPACK_ENABLE_PROJECT_SPEC=0
 RUN corepack enable && corepack prepare pnpm@9 --activate
 RUN echo "node-linker=hoisted" > .npmrc
 
@@ -45,8 +50,6 @@ WORKDIR /app
 
 # Install OpenSSL for Prisma engine
 RUN apk add --no-cache openssl
-
-RUN corepack enable && corepack prepare pnpm@9 --activate
 
 # Copy production deps (use --prod deps to keep image small)
 COPY --from=deps /app/node_modules node_modules

@@ -15,6 +15,7 @@ import type {
   KnowledgeDiscoveryItem,
   ContentDiscoveryItem,
   SupplierProductDiscoveryItem,
+  SupplierDiscoveryItem,
   SupplierModelFacetSearchParams,
   SupplierModelFacetSearchResponse,
   SupplierProductFacetBundle,
@@ -28,7 +29,8 @@ export type SearchDomain =
   | 'product'
   | 'knowledge'
   | 'solution'
-  | 'supplier-product';
+  | 'supplier-product'
+  | 'supplier';
 
 /** Unified search params */
 export interface UnifiedSearchParams {
@@ -82,12 +84,24 @@ export interface SupplierProductSearchResult {
   inquiryAvailable: boolean;
 }
 
+/** Supplier discovery result — PUBLIC supplier surface (758 / M34.4).
+ * Supplier = Organization(type=SUPPLIER) semantic role, aggregated from PUBLISHED
+ * SupplierProduct. Not a store / marketplace seller entity. */
+export interface SupplierSearchResult {
+  organizationId: string;
+  organizationName: string;
+  publishedSupplyProductCount: number;
+  productNames: string[];
+  seriesValues: string[];
+}
+
 /** Aggregated unified search result */
 export interface UnifiedSearchResults {
   query: string;
   activeType: SearchDomain;
   products: DomainSearchResult<Product>;
   supplierProducts: DomainSearchResult<SupplierProductSearchResult>;
+  suppliers: DomainSearchResult<SupplierSearchResult>;
   knowledge: DomainSearchResult<Content>;
   solutions: DomainSearchResult<Content>;
   /** M28.0 M661.6 — SupplierProduct dimension facets from unified /search */
@@ -125,6 +139,17 @@ function mapKnowledgeToContent(item: KnowledgeDiscoveryItem): Content {
     createdAt: '',
     updatedAt: '',
   } as Content;
+}
+
+/** Map backend SupplierDiscoveryItem to frontend SupplierSearchResult (Public Supplier Surface). */
+function mapSupplier(item: SupplierDiscoveryItem): SupplierSearchResult {
+  return {
+    organizationId: item.organizationId,
+    organizationName: item.organizationName,
+    publishedSupplyProductCount: item.publishedSupplyProductCount,
+    productNames: item.productNames,
+    seriesValues: item.seriesValues,
+  };
 }
 
 /** Map backend ContentDiscoveryItem to frontend Content type */
@@ -218,6 +243,11 @@ export async function unifiedSearch(
     supplierProducts: {
       items: response.supplierProducts.items.map(mapSupplierProduct),
       total: response.supplierProducts.total,
+      searched: true,
+    },
+    suppliers: {
+      items: response.suppliers.items.map(mapSupplier),
+      total: response.suppliers.total,
       searched: true,
     },
     knowledge: {

@@ -210,3 +210,75 @@ body {
 .markdown-preview a { color: #2563eb; }
 .markdown-preview img { max-width: 100%; }
 .markdown-preview hr { margin: 1.2em 0; border: none; border-top: 1px solid #e5e7eb; }
+
+/* =====================================================================
+   M32.2 Interaction & Final Polish — Admin 轻量路由进入反馈
+   仅 CSS，非动画作为唯一反馈；reduced-motion 下立即完成。
+   ===================================================================== */
+.admin-route-enter {
+  animation: visndAdminRoute 0.24s ease-out;
+}
+
+@keyframes visndAdminRoute {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 按钮按下轻反馈（admin 移动端触感） */
+.admin-btn-press:active {
+  transform: scale(0.97);
+  transition: transform 0.12s ease;
+}
+
+/* 统一 Reduced Motion：admin 端所有 M32 视觉动画立即完成，交互状态保留 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* =====================================================================
+   M33.1 Visual Foundation — Admin（726 §7 / §8.1 / §18 / TG-01..TG-03）
+   仅建立 Surface / Container / Focus / Typography 基础，不重构任何页面。
+   复用既有色值（对齐 design-tokens），不新增品牌色 / 依赖。
+   ===================================================================== */
+
+/* Focus-visible ring（TG-02 / 726 §18）：复用 primary #2563eb */
+:where(.admin-layout, .ant-app) :focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Surface Hierarchy（TG-01 / 726 §7）：Surface 0(PageBg) / 1(Primary) / 2(Secondary) / elevated */
+.vds-surface-0 { background-color: #f5f7fa; }
+.vds-surface-1 { background-color: #ffffff; }
+.vds-surface-2 { background-color: #f1f5f9; }
+.vds-surface-elevated {
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* Container（TG-03 / 726 §8.1）：content / wide / reading + responsive padding */
+.vds-container,
+.vds-container-content,
+.vds-container-wide,
+.vds-container-reading {
+  width: 100%;
+  margin-inline: auto;
+  box-sizing: border-box;
+  padding-inline: clamp(16px, 3vw, 32px);
+}
+.vds-container,
+.vds-container-content { max-width: 1280px; }
+.vds-container-wide { max-width: 1480px; }
+.vds-container-reading { max-width: min(820px, 100%); }
+
+/* 8px rhythm（726 §4.5）语义间距工具类 */
+.vds-space-y-2 { row-gap: 8px; display: flex; flex-direction: column; }
+.vds-space-y-4 { row-gap: 16px; display: flex; flex-direction: column; }
+.vds-space-y-6 { row-gap: 24px; display: flex; flex-direction: column; }
+.vds-space-y-8 { row-gap: 32px; display: flex; flex-direction: column; }

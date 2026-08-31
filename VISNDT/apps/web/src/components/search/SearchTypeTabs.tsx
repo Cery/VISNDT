@@ -57,6 +57,16 @@ const TABS: SearchTypeTab[] = [
     ),
   },
   {
+    value: 'supplier',
+    label: '供应商',
+    icon: (
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="8" r="3" />
+        <path d="M12 14a5 5 0 0 0-5 5h10a5 5 0 0 0-5-5z" />
+      </svg>
+    ),
+  },
+  {
     value: 'knowledge',
     label: '知识',
     icon: (
