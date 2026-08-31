@@ -2617,6 +2617,18 @@ Review Report:             docs/_review/727_M33.1_Frontend_Visual_Redesign_Found
 - **Roadmap Alignment** ✅：M34.0-5·758-759=CONDITIONAL PASS（保持）/ 760=NOT AUTHORIZED（保持）/ 761=CURRENT·CASE B（保持）/ 762=CURRENT·SR·INR（保持）/ 763=PASS（保持）/ 764=CONDITIONAL（保持）/ 765=PASS（保持）/ 766=AUTHORIZED（保持）/ **767=CURRENT（M34.6 Implementation）** / M34.7=NOT AUTHORIZED / M34-FINAL=NOT STARTED。
 - **Review Report** `docs/_review/767_M34.6_Implementation_Report.md` + ADR `docs/_architecture/ADR-M34-13`（Implementation Status Update 登记）| **最终判定：767 = IMPLEMENTED**；本任务已 **STOP**，不得自动实施 M34.7 / M34-FINAL / Governance / SEO / LLM / Mobile UI / Buyer Workspace 短名单 UI；后续所有任务必须重新独立授权。
 
+### 768 M34.6 Post-Implementation Recheck And Closeout（768 = CURRENT / INDEPENDENT RECHECK / Product Connection Authority 修正 / **M34.6=CLOSED** / Runtime 21/21 PASS）
+- **性质**：对 767 `IMPLEMENTED` 结果的**独立复核 + Closeout Decision**；不继承 767 PASS，独立重新取证；收口遗留条件（Q11A orgId=null、767 统计口径冲突）；M34.6 是否 CLOSED 由实际证据决定。**767 历史报告 Preserved（未修改）**。
+- **Repository**：仓库根 `F:/Desktop/VISNDT` / 代码根 `F:/Desktop/VISNDT/VISNDT` / 分支 `main` / baseline `ff03a9a`（无漂移）/ 767 提交 `4e21b4e` / **768 最小修正提交 `d5e4000`**。
+- **767 Implementation = VERIFIED（独立）**：Schema / Migration 017（APPLIED）/ EvaluationsModule / RBAC（BUYER-only 403）/ owner 隔离 403 / Connection 复用 Inquiry。全部独立确认，**不继承 767 PASS**。
+- **Runtime Recheck** ✅：**21/21 PASS**（LOGIN×3 / CRUD / Persistence / List / Delete / Duplicate-409 / Invalid-404 / Ownership-403 / Supplier RBAC-403 / SP-Connection / Product-Connection / Inquiry / Regression×3）。唯一权威矩阵：`Total=21 · PASS=21 · CONDITIONAL=0 · FAIL=0`。
+- **Product Connection（Section 4.4 Case A）** ✅：M34 Contract §10.3 确认 Supplier 发现/连接 = **PUBLISHED SupplierProduct → Organization(type=SUPPLIER)**（零 Offer 依赖）；767 仅查 `Product→Offer→Org` 属错误接线。768 最小修正（`evaluations.service.ts`），修正后 Product Connection orgId=697c99b2（type=SUPPLIER），不再为 null。**Q11A CLOSED**；新提交 `d5e4000`。
+- **SupplierProduct Connection** ✅：sp=`02507f4c…`→platformProductId=`ebb1c034…`→orgId=`697c99b2…`→type=SUPPLIER，HTTP 200。
+- **Migration Artifact** ✅：`new_migration.sql`=已删的失效 `migrate dev` stderr 残留；**CLEAN**；Migration 017 完整未改。
+- **Gates（G1–G18）** ✅：G1 Repository=PASS / G2 Schema·Migration=PASS / G3 Persistence=PASS / G4 RBAC=PASS / G5 Ownership=PASS / G6 Product Eval=PASS / G7 SP Eval=PASS / G8 SP Connection=PASS / **G9 Product Connection Authority=PASS** / G10 Inquiry=PASS / **G11 Matrix=CONSISTENT** / G12 Controlled=PASS / G13 ONE Authority=PASS / G14 Architecture=CONSISTENT / G15 Migration Artifact=CLEAN / G16 Documentation=CONSISTENT / G17 Roadmap=CONSISTENT / G18 Blocking=NONE。
+- **最终判定（Option A）**：**M34.6 = CLOSED**；**M34.7 = NOT STARTED / NEXT AUTHORIZED STAGE**；M34-FINAL=NOT STARTED。
+- **Review Report** `docs/_review/768_M34.6_Post_Implementation_Recheck_And_Closeout_Report.md` | **最终判定：768 = POST-IMPLEMENTATION RECHECK / CLOSEOUT；M34.6 = CLOSED**；本任务已 **STOP**，即使 CLOSED 也不自动实施 M34.7 / M34-FINAL / Governance / Buyer Workspace 短名单 UI / Shortlist UI / Comparison UI / Mobile UI / Homepage / SEO / LLM / Vector / RAG / Search 2.0 / Marketplace / Transaction / Payment；下一阶段必须由新的独立任务指令触发。
+
 ## Future Architecture Candidates
 
 以下为未来架构演进候选，当前 **FROZEN / NOT FOR DEVELOPMENT**，待满足触发条件后通过正式架构审计重新激活。

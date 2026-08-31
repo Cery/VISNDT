@@ -2973,6 +2973,24 @@ M26.1 Foundation Experience Stabilization：实施 4 项 P0 用户阻断问题�
 - **Review Report** ✅：`docs/_review/767_M34.6_Implementation_Report.md`；ADR 状态 ✅：`docs/_architecture/ADR-M34-13`（Implementation Status Update 登记）。
 - **Next** ⏸️：**STOP**——767 已完成 M34.6 Evaluation + Connection 后端实现；不得自动实施 M34.7 / M34-FINAL / Governance / SEO / LLM / Mobile UI / Buyer Workspace 短名单 UI；后续所有任务必须重新独立授权。
 
+### 768 M34.6 Post-Implementation Recheck And Closeout — CURRENT（INDEPENDENT RECHECK / Product Connection Authority 修正 / CLOSED / Runtime 21/21 PASS）
+- **性质**：767 `IMPLEMENTED` 后的**独立复核 + Closeout Decision**。不继承 767 PASS，独立重新取证；对遗留条件（Q11A Product Connection orgId=null、767 统计口径冲突）做收口；依实际证据判定 M34.6 是否 CLOSED。**767 历史报告未修改**。
+- **Repository**：仓库根 `F:/Desktop/VISNDT` / 代码根 `F:/Desktop/VISNDT/VISNDT` / 分支 `main` / baseline `ff03a9a`（无漂移）/ 767 提交 `4e21b4e` / **768 最小修正提交 `d5e4000`**。
+- **767 Implementation = VERIFIED（独立）**：Schema（`BuyerEvaluation` + enums）/ Migration `017`（APPLIED，`prisma migrate status` up to date）/ EvaluationsModule（module/controller/service/guard/dto×3）/ RBAC=BUYER-only（403）/ owner 隔离 403 / Connection 复用既有 Inquiry 权威。**不继承 767 PASS，全部独立确认**。
+- **Runtime Recheck（独立，apps/api/_768_eval_runtime.mjs @ :3100）**：**21/21 PASS**。LOGIN×3（201）/ CREATE-PRODUCT-EVAL / READ / PERSISTENCE-RE-READ / LIST-MINE / UPDATE / DELETE（200→404）/ DUPLICATE（409）/ INVALID-PRODUCT（404）/ INVALID-SP（404）/ OWNERSHIP-ISOLATION（403）/ SUPPLIER-RBAC（403）/ SP-CONNECTION（200）/ PRODUCT-CONNECTION（200）/ INQUIRY-RUNTIME（200）/ REGRESSION-HEALTH·SEARCH·PRODUCT-DETAIL（200）。**唯一权威矩阵：Total=21 · PASS=21 · CONDITIONAL=0 · FAIL=0**。
+- **Product Connection Authority（Section 4.4 Case A）** ✅：M34 Contract §10.3 明确 Supplier 发现 = **PUBLISHED SupplierProduct → Organization(type=SUPPLIER)**（零 Offer 依赖，Offer=OPTIONAL/LEGACY）。767 实现错误地仅查询 `Product → Offer → Organization` → Q11A orgId=null。768 执行**最小代码修正**：`evaluations.service.ts` `connectionContext` 优先经 PUBLISHED SupplierProduct 取 orgId（备选 Offer）。修正后 `GET /evaluations/:id/connection` → **orgId=697c99b2（type=SUPPLIER），不再为 null**；TS compile exit 0。**Q11A CLOSED**。
+- **SupplierProduct Connection（Section 4.2）** ✅：sp=`02507f4c…`（PUBLISHED）→ platformProductId=`ebb1c034…`（Product ZB-K60，ACTIVE）→ organizationId=`697c99b2…` → organization.type=**SUPPLIER**。HTTP=200，字段全部正确。
+- **Inquiry Reuse / ONE Authority** ✅：Connection 复用既有 Inquiry 权威（`/inquiries/mine` 200），`buyer_evaluation`=评估断面非一级 Domain Authority。ONE Authority=PASS。
+- **受控数据** ✅：Runtime 记录标注 `[768 CONTROLLED EVALUATION]`，运行后已清理（0 残留）；未创建任何 Product/SupplierProduct/Offer/Inquiry 业务数据；Synthetic=NONE。
+- **Migration Artifact** ✅：`database/prisma/migrations/new_migration.sql`（失败的 `migrate dev` stderr 残留）已确认非有效迁移、非项目必要文件，目录中已不存在；Migration 017 完整未改。**Migration Artifact = CLEAN**。
+- **统计口径纠正（Section 5.1）** ✅：767「16/17 PASS」与「18 tests total」存在统计冲突，768 在**本权威报告**中明确指出并以 `Total=21 · PASS=21 · CONDITIONAL=0 · FAIL=0`（X+Y+Z=21=N，FAIL=0）形成唯一结论；**不改写 767 历史原事实**。
+- **Closeout Gate（G1–G18）** ✅：G1 Repository=PASS / G2 Schema·Migration=PASS / G3 Persistence=PASS / G4 RBAC=PASS / G5 Ownership=PASS / G6 Product Eval=PASS / G7 SP Eval=PASS / G8 SP Connection=PASS / **G9 Product Connection Authority=PASS（orgId 正确）** / G10 Inquiry=PASS / **G11 Matrix=CONSISTENT** / G12 Controlled=PASS / G13 ONE Authority=PASS / G14 Architecture=CONSISTENT / G15 Migration Artifact=CLEAN / G16 Documentation=CONSISTENT / G17 Roadmap=CONSISTENT / G18 Blocking=NONE。**G1–G18 全满足 → Option A**。
+- **Blocking Conditions=[NONE]**；Deferred/non-blocking=[C3] Offer=OPTIONAL（M34 §10.3 合规）、[M] Buyer Workspace 短名单 UI + Mobile = M34.7 / 未来。
+- **最终判定（Option A）**：**768 = POST-IMPLEMENTATION RECHECK / CLOSEOUT；M34.6 = CLOSED**；M34.7 = NOT STARTED / NEXT AUTHORIZED STAGE。
+- **Review Report** ✅：`docs/_review/768_M34.6_Post_Implementation_Recheck_And_Closeout_Report.md`；ADR `docs/_architecture/ADR-M34-13`（Closeout 登记）。
+- **Roadmap Alignment** ✅：M34.0-5·758-759=CONDITIONAL PASS（保持）/ 760=NOT AUTHORIZED（保持）/ 761=CURRENT·CASE B（保持）/ 762=CURRENT·SR·INR（保持）/ 763=PASS（保持）/ 764=CONDITIONAL（保持）/ 765=PASS（保持）/ 766=AUTHORIZATION COMPLETE（保持）/ 767=IMPLEMENTED·CONDITIONAL PASS（保持）/ **768=CURRENT（POST-IMPLEMENTATION RECHECK · CLOSED）** / **M34.6=CLOSED** / **M34.7=NOT STARTED / NEXT AUTHORIZED STAGE** / M34-FINAL=NOT STARTED。
+- **Next** ⏸️：**STOP**——即使 M34.6=CLOSED 也不自动实施 M34.7 / M34-FINAL / Governance / Buyer Workspace 短名单 UI / Shortlist UI / Comparison UI / Mobile UI / Homepage / SEO / LLM / Vector / RAG / Search 2.0 / Marketplace / Transaction / Payment；下一阶段必须由新的独立任务指令触发。
+
 ## Next Step
 
 ### M20.1 Frontend Platformization Development Planning（M20 Architecture Planning）

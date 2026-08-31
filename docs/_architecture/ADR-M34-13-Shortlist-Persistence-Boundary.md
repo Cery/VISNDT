@@ -135,3 +135,13 @@ New Domain Authority = NONE
 - **Connection**：`GET /evaluations/:id/connection` 解析 Product/Organization 上下文，**复用既有 Inquiry 权威**（不新建第二套）。
 - **RBAC**：`BuyerEvaluationGuard` 限 `workspaceRole=BUYER`；owner 隔离 403。
 - **状态**：`Implementation` — *BACKEND IMPLEMENTED*（767）；Buyer Workspace 短名单 UI / Mobile = M34.7 / 未来，未实施。
+
+## Closeout Update（768, 2026-08-31）
+
+> 768（M34.6 Post-Implementation Recheck And Closeout）对该实施的**独立复核 + CLOSEOUT 登记**。本 ADR 决策与实施状态不变。
+
+- **独立复核**：767 不继承 PASS，768 独立重新取证。Schema / Migration 017（APPLIED）/ EvaluationsModule / RBAC（仅 BUYER，403）/ owner 隔离 403 / Connection 复用既有 Inquiry 权威 —— 全部独立确认。
+- **Product Connection Authority 修正（Section 4.4 Case A）**：M34 Contract §10.3 明确 Supplier 发现/连接 = **PUBLISHED SupplierProduct → Organization(type=SUPPLIER）**（零 Offer 依赖，Offer=OPTIONAL/LEGACY）。767 实现仅查 `Product → Offer → Organization` 致 Q11A orgId=null。768 对 `evaluations.service.ts` 做最小 Connection Resolution Correction（优先经 PUBLISHED SupplierProduct 取 orgId，备选 Offer），修正后 Product Connection orgId=`697c99b2`（type=SUPPLIER），不再为 null。
+- **Runtime**：21/21 PASS（LOGIN×3 / CRUD / Persistence / Delete / Duplicate-409 / Invalid-404 / Ownership-403 / Supplier-RBAC-403 / SP-Connection / Product-Connection / Inquiry / Regression×3）；唯一权威矩阵 `Total=21 · PASS=21 · CONDITIONAL=0 · FAIL=0`。
+- **Closeout Decision**：Closeout Gate G1–G18 全 PASS → **M34.6 = CLOSED**；M34.7 = NOT STARTED / NEXT AUTHORIZED STAGE。
+- **Review Report**：`docs/_review/768_M34.6_Post_Implementation_Recheck_And_Closeout_Report.md`。
