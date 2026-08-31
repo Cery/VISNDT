@@ -172,6 +172,23 @@ enum InquiryStatus {
   CLOSED
 }
 
+// ===========================================
+// M34.6 Evaluation — Persistent Buyer Evaluation State (ADR-M34-13 Option B)
+// Buyer user × (Product | SupplierProduct) evaluation snapshot. NOT a Domain Authority.
+// ===========================================
+
+enum EvaluationTargetType {
+  PRODUCT
+  SUPPLIER_PRODUCT
+}
+
+enum EvaluationState {
+  INTERESTED
+  SHORTLISTED
+  COMPARING
+  CONTACTED
+}
+
 enum ContentType {
   ARTICLE
   KNOWLEDGE
@@ -245,6 +262,7 @@ model User {
   contents                 Content[]
   knowledgeEntries         KnowledgeEntry[]
   reviewedSupplierProducts SupplierProduct[]    @relation("SupplierProductReviewer")
+  evaluations              BuyerEvaluation[]    @relation("BuyerEvaluationOwner")
 
   @@index([organizationId])
   @@index([status])
@@ -893,6 +911,31 @@ model Inquiry {
   @@index([status])
   @@index([createdAt])
   @@map("inquiry")
+}
+
+// ===========================================
+// M34.6 Evaluation — Persistent Buyer Evaluation State (ADR-M34-13 Option B)
+// Buyer user × (Product | SupplierProduct) evaluation snapshot.
+// User-owned state only; NOT a Domain Authority. Authority stays with target.
+// ===========================================
+
+model BuyerEvaluation {
+  id         String                @id @default(uuid()) @db.Uuid
+  userId     String                @map("user_id") @db.Uuid
+  targetType EvaluationTargetType  @map("target_type")
+  targetId   String                @map("target_id") @db.Uuid
+  state      EvaluationState       @default(INTERESTED)
+  note       String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation("BuyerEvaluationOwner", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, targetType, targetId])
+  @@index([userId])
+  @@index([targetType, targetId])
+  @@map("buyer_evaluation")
 }
 
 // ===========================================

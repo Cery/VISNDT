@@ -38,6 +38,7 @@ import { KnowledgeModule } from './knowledge/knowledge.module';
 import { SearchModule } from './search/search.module';
 import { SupplierProductsModule } from './supplier-products/supplier-products.module';
 import { DiscoveryModule } from './discovery/discovery.module';
+import { EvaluationsModule } from './evaluations/evaluations.module';
 
 @Module({
   imports: [
@@ -84,6 +85,7 @@ import { DiscoveryModule } from './discovery/discovery.module';
     SearchModule,
     SupplierProductsModule,
     DiscoveryModule,
+    EvaluationsModule,
   ],
   providers: [
     {

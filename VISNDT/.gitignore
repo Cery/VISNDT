@@ -49,5 +49,8 @@ coverage/
 /database/_*.txt
 /database/_*.ps1
 
+# Prisma error-output stray (Prisma diff error redirect)
+/database/prisma/migrations/new_migration.sql
+
 # Local node modules
 node_modules/

@@ -2959,6 +2959,20 @@ M26.1 Foundation Experience Stabilization：实施 4 项 P0 用户阻断问题�
 - **Review Report** ✅：`docs/_review/766_M34.6_Authorization_Recheck_Report.md`。
 - **Next** ⏸️：**STOP**。**即使 M34.6=AUTHORIZED 也不自动实施下一阶段**；下一授权步 = **M34.6 Implementation（Evaluation + Connection）= 独立任务 767**（须下一独立指令）；不得自动执行 M34.6 实施 / M34.7 / M34-FINAL / Compare / Shortlist / Evaluation / Marketplace / Transaction / SEO / LLM / Vector / RAG / Search 2.0 / Mobile UI / Homepage。
 
+### 767 M34.6 Implementation — CURRENT（IMPLEMENTED / Evaluation + Connection 工作流 / 受控表 `buyer_evaluation` / Runtime 16/17 PASS）
+- **性质**：766 `M34.6=AUTHORIZED` 后的**正式实施**。落实 `ADR-M34-13 Option B — Persistent User Evaluation State`，交付后端 Evaluation（评估状态持久化）+ Connection（复用既有 Inquiry 上下文）。**767 = Implementation（允许 Schema/Migration/代码提交）**。
+- **Repository**：仓库根 `F:/Desktop/VISNDT` / 代码根 `F:/Desktop/VISNDT/VISNDT` / 分支 `main` / HEAD `4e21b4e`（767 实施提交，base `ff03a9a`）。
+- **Schema（受控表）** ✅：`BuyerEvaluation` 模型 `+ enums(EvaluationTargetType/EvaluationState)`，unique `@@unique([userId,targetType,targetId])`，indexes，User FK CASCADE。**Authority 边界保持**（评估断面非一级 Domain Authority）。
+- **Migration** ✅：`20260831090000_017_buyer_evaluation`（`prisma migrate deploy` 已应用；`migrate dev` Shadow 因 pgvector 失败为已知环境问题）。
+- **Backend** ✅：新增 `apps/api/src/evaluations/`（module/controller/service/guard/dto×3）；端点 `POST /evaluations`、`GET /evaluations`、`GET /evaluations/:id`、`GET /evaluations/:id/connection`、`PATCH /evaluations/:id`、`DELETE /evaluations/:id`；RBAC=仅 BUYER；owner 隔离 403；目标校验 404/仅 PUBLISHED SP；去重 409；Connection 复用既有 Inquiry 权威。
+- **受控数据** ✅：Runtime 评估记录标注 `[767 CONTROLLED EVALUATION]`；**未创建**任何 Product/SupplierProduct/Offer/Inquiry 业务数据；Synthetic=NONE。
+- **Runtime 验证** ✅：**16/17 PASS**（Q1–Q13；Q-LOGIN×3/CRUD/Persistence/Ownership-403/Invalid-404/Duplicate-409/SP-Connection/RBAC-403）；唯一 Q11A（Product 无 Offer→orgId=null）为**数据空白非代码缺陷**（Offer=0，766 Commercial=OPTIONAL 一致）。
+- **Frontend/UI** ✅：**NOT CHANGED**（Buyer Workspace 短名单 UI / Mobile 归 M34.7/未来，不提前实施）。
+- **Roadmap Alignment** ✅：M34.0-5·758-759=CONDITIONAL PASS（保持）/ 760=NOT AUTHORIZED（保持）/ 761=CURRENT（保持）/ 762=CURRENT（保持）/ 763=PASS（保持）/ 764=CONDITIONAL（保持）/ 765=PASS（保持）/ 766=AUTHORIZED（保持）/ **767=CURRENT（M34.6 Implementation）** / M34.7=NOT AUTHORIZED / M34-FINAL=NOT STARTED。
+- **767**：**IMPLEMENTED**（M34.6 Evaluation + Connection 后端完成；Schema/Migration/RBAC/Connection 受控落地）。
+- **Review Report** ✅：`docs/_review/767_M34.6_Implementation_Report.md`；ADR 状态 ✅：`docs/_architecture/ADR-M34-13`（Implementation Status Update 登记）。
+- **Next** ⏸️：**STOP**——767 已完成 M34.6 Evaluation + Connection 后端实现；不得自动实施 M34.7 / M34-FINAL / Governance / SEO / LLM / Mobile UI / Buyer Workspace 短名单 UI；后续所有任务必须重新独立授权。
+
 ## Next Step
 
 ### M20.1 Frontend Platformization Development Planning（M20 Architecture Planning）

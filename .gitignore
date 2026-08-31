@@ -1,3 +1,6 @@
 # Root-level scratch / local-only artifacts (should NOT be committed)
 .chrome_profile/
 GitHubdesk erro.png
+
+# Stray root-level database scratch folder (code root is VISNDT/database)
+/database/

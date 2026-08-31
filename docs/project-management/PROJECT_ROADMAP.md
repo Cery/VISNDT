@@ -2605,6 +2605,18 @@ Review Report:             docs/_review/727_M33.1_Frontend_Visual_Redesign_Found
 - **最终判定（Case A 全满足）**：**766 = INDEPENDENT AUTHORIZATION RECHECK；M34.6 = AUTHORIZED**；下一授权步 = **M34.6 Implementation（Evaluation + Connection）= 独立任务 767**。
 - **Review Report** `docs/_review/766_M34.6_Authorization_Recheck_Report.md` | 本任务已 **STOP**；即使 AUTHORIZED 也不自动实施下一阶段，须等待独立任务 767 指令。
 
+### 767 M34.6 Implementation（767 = CURRENT / M34.6 Evaluation + Connection / IMPLEMENTED / 受控表 `buyer_evaluation` / Runtime 16/17 PASS）
+- **性质**：766 `M34.6=AUTHORIZED` 的正式实施。落实 `ADR-M34-13 Option B — Persistent User Evaluation State`，新增受控表 `buyer_evaluation`（Evaluation 评估断面持久化）+ Connection（复用既有 Inquiry 上下文）；**767 = Implementation（允许 Schema/Migration/代码提交）**。
+- **Repository**：仓库根 `F:/Desktop/VISNDT` / 代码根 `F:/Desktop/VISNDT/VISNDT` / 分支 `main` / HEAD `4e21b4e`（767 实施提交，base `ff03a9a`）。
+- **Schema（受控表）** ✅：`BuyerEvaluation` + enums（`EvaluationTargetType`/`EvaluationState`），unique `@@unique([userId,targetType,targetId])`，User FK CASCADE；**Authority 边界保持**（评估断面非一级 Domain Authority）。
+- **Migration** ✅：`20260831090000_017_buyer_evaluation`（`prisma migrate deploy` 已应用；`migrate dev` Shadow 因 pgvector 失败为已知环境项）。
+- **Backend** ✅：`apps/api/src/evaluations/`（module/controller/service/guard/dto×3）；端点 `POST·GET·GET:id·GET:id/connection·PATCH:id·DELETE:id /evaluations`；RBAC=仅 BUYER；owner 隔离 403；目标校验 404/仅 PUBLISHED SP；去重 409；Connection 复用既有 Inquiry 权威，不新建第二套。
+- **Runtime 验证** ✅：**16/17 PASS**（CRUD / Persistence / Ownership-403 / Invalid-404 / Duplicate-409 / SP-Connection / RBAC-403）；唯一 Q11A（Product 无 Offer→orgId=null）=**数据空白非代码缺陷**（Offer=0 与 766 Commercial=OPTIONAL 一致）。
+- **受控数据** ✅：评估记录标注 `[767 CONTROLLED EVALUATION]`；**未创建**任何 Product/SupplierProduct/Offer/Inquiry 业务数据；Synthetic=NONE。
+- **Frontend/UI** ✅：**NOT CHANGED**（Buyer Workspace 短名单 UI / Mobile 归 M34.7/未来，不提前实施）。
+- **Roadmap Alignment** ✅：M34.0-5·758-759=CONDITIONAL PASS（保持）/ 760=NOT AUTHORIZED（保持）/ 761=CURRENT·CASE B（保持）/ 762=CURRENT·SR·INR（保持）/ 763=PASS（保持）/ 764=CONDITIONAL（保持）/ 765=PASS（保持）/ 766=AUTHORIZED（保持）/ **767=CURRENT（M34.6 Implementation）** / M34.7=NOT AUTHORIZED / M34-FINAL=NOT STARTED。
+- **Review Report** `docs/_review/767_M34.6_Implementation_Report.md` + ADR `docs/_architecture/ADR-M34-13`（Implementation Status Update 登记）| **最终判定：767 = IMPLEMENTED**；本任务已 **STOP**，不得自动实施 M34.7 / M34-FINAL / Governance / SEO / LLM / Mobile UI / Buyer Workspace 短名单 UI；后续所有任务必须重新独立授权。
+
 ## Future Architecture Candidates
 
 以下为未来架构演进候选，当前 **FROZEN / NOT FOR DEVELOPMENT**，待满足触发条件后通过正式架构审计重新激活。

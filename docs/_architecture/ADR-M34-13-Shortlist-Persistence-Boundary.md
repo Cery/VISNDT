@@ -123,3 +123,15 @@ New Domain Authority = NONE
 ```
 
 本 ADR 使 764 的 `Shortlist Architecture = REQUIRED（Case A Carry Forward）` 落为正式 **DECIDED / CARRY FORWARD**，不再视为开放阻断项。
+
+---
+
+## Implementation Status Update（767, 2026-08-31）
+
+> 本 ADR **决策不变**；以下为 767（M34.6 Implementation，由 766 AUTHORIZED）对该决策的正式落库实现状态登记。
+
+- **实现载体**：新增受控表 `buyer_evaluation`（`BuyerEvaluation` Prisma Model）+ 迁移 `20260831090000_017_buyer_evaluation`。
+- **边界落实**：`Buyer 用户 × 评估对象（Product / SupplierProduct）` 的评估断面（Evaluation Snapshot）；唯一约束 `@@unique([userId, targetType, targetId])` 保证每 Buyer×Target 单一当前评估；归属仍在既有 Authority（Product / SupplierProduct / Organization(type=SUPPLIER)）。
+- **Connection**：`GET /evaluations/:id/connection` 解析 Product/Organization 上下文，**复用既有 Inquiry 权威**（不新建第二套）。
+- **RBAC**：`BuyerEvaluationGuard` 限 `workspaceRole=BUYER`；owner 隔离 403。
+- **状态**：`Implementation` — *BACKEND IMPLEMENTED*（767）；Buyer Workspace 短名单 UI / Mobile = M34.7 / 未来，未实施。
