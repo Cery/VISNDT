@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   title: '知识中心',
   description:
     '为工业检测专业人士提供的技术文章、检测指南、应用案例和设备选型指南。',
+  // 797: 补全 /knowledge 列表页 canonical（详情页已有，列表页缺失）
+  alternates: { canonical: `${SITE_URL}/knowledge` },
   openGraph: {
     title: '知识中心 – 工业检测技术知识',
     description:

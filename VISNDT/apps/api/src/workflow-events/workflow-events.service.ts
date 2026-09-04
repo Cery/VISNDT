@@ -3,6 +3,7 @@ import { Prisma, WorkflowEntityType } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateWorkflowEventDto } from './dto/create-workflow-event.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
+import { PUBLIC_USER_SELECT } from '../common/projection/user.projection';
 
 export interface WorkflowEventUser {
   id: string;
@@ -22,7 +23,7 @@ export class WorkflowEventsService {
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
-        include: { operator: true },
+        include: { operator: { select: PUBLIC_USER_SELECT } },
       }),
       this.prisma.workflowEvent.count(),
     ]);
@@ -33,7 +34,7 @@ export class WorkflowEventsService {
   async findOne(id: string) {
     const event = await this.prisma.workflowEvent.findUnique({
       where: { id },
-      include: { operator: true },
+      include: { operator: { select: PUBLIC_USER_SELECT } },
     });
     if (!event) throw new NotFoundException(`Workflow Event ${id} not found`);
     return event;

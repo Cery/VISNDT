@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, Body, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ApiResponse } from '../common/dto/api-response.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -6,6 +6,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AuthRequest } from '../auth/interfaces/auth-request.interface';
 import { WorkspaceService } from './workspace.service';
 import { WorkspaceSupplierProductsQueryDto } from './dto/workspace-supplier-products-query.dto';
+import { WorkspaceAttachSupplierProductDto } from './dto/workspace-attach-supplier-product.dto';
 
 @ApiTags('Workspace')
 @Controller('workspace')
@@ -78,6 +79,23 @@ export class WorkspaceController {
   ) {
     return ApiResponse.ok(
       await this.workspaceService.getSupplierInquiryContext(user, supplierProductId),
+    );
+  }
+
+  @Post('supplier/products/attach')
+  @ApiOperation({
+    summary:
+      '817 — Supplier Attach: associate an existing Platform Product with the authenticated supplier organization by creating a NEW organization-owned SupplierProduct DRAFT. SUPPLIER only.',
+    description:
+      'organizationId is server-derived from the authenticated supplier context (never accepted from the client). Creates a SupplierProduct DRAFT (brand seeded from platform name; modelNumber is a placeholder). Preserves Platform Product authority — the selected Product is never created or mutated. Duplicate-safe: if the org already owns a SupplierProduct for the same Platform Product, the existing record is returned.',
+  })
+  async attachSupplierProduct(
+    @CurrentUser() user: AuthRequest['user'],
+    @Body() dto: WorkspaceAttachSupplierProductDto,
+  ) {
+    return ApiResponse.ok(
+      await this.workspaceService.attachSupplierProduct(user, dto),
+      'SupplierProduct attached',
     );
   }
 }

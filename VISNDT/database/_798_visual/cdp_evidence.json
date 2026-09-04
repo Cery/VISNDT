@@ -1,0 +1,41 @@
+{
+  "task": "798_M39_Mobile_FirstClass_Real_Browser_Evidence",
+  "mode": "READ-ONLY / VERIFY",
+  "date": "2026-09-02",
+  "method": "Chrome headless via CDP, role-isolated incognito profiles, WebAuthenticated HTTP_201 login, per-viewport metric capture (overflow check, CTA count, path dcl)",
+  "remarks": "Web dev server limited to 3584MB heap; all routes pre-compiled before browser run to survive low-RAM host (FreeMB ~1.4GB). All measured values sourced from actual per-page console output.",
+  "roles": {
+    "buyer": {
+      "pages": ["dashboard", "demands", "demand_create", "demand_match", "rfqs", "notifications"],
+      "cells": 24,
+      "overflow_positive": 0,
+      "assertions_zero": true,
+      "issues": 0,
+      "exceptions": 0,
+      "login": "HTTP_201 + access_token@localhost, path=/login",
+      "by_viewport": {
+        "375":  { "overflow": 0, "ctas": [15,16,14,14,15,16], "path_ok": true },
+        "768":  { "overflow": 0, "ctas": [17,16,14,14,15,16], "path_ok": true },
+        "1024": { "overflow": 0, "ctas": [17,18,16,16,17,18], "path_ok": true },
+        "1440": { "overflow": 0, "ctas": [23,24,22,22,23,24], "path_ok": true }
+      }
+    },
+    "supplier": {
+      "pages": ["dashboard", "supplier_rfqs", "supplier_responses", "supplier_offers_new", "supplier_inquiries", "supplier_opportunities"],
+      "cells": 24,
+      "overflow_positive": 0,
+      "assertions_zero": true,
+      "issues": 0,
+      "exceptions": 0,
+      "login": "HTTP_201 + access_token@localhost, path=/login",
+      "by_viewport": {
+        "375":  { "overflow": 0, "ctas": [18,19,23,24,23,22], "path_ok": true },
+        "768":  { "overflow": 0, "ctas": [25,19,23,24,23,22], "path_ok": true },
+        "1024": { "overflow": 0, "ctas": [26,21,25,24,25,24], "path_ok": true },
+        "1440": { "overflow": 0, "ctas": [33,27,31,30,31,30], "path_ok": true }
+      }
+    }
+  },
+  "totals": { "cells": 48, "overflow_positive": 0, "issues": 0, "exceptions": 0 },
+  "screenshots_dir": "database/_798_visual/*.png"
+}

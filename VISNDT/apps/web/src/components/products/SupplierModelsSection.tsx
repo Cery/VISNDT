@@ -1,39 +1,28 @@
 'use client';
 
 import { useState } from 'react';
-import type { CapabilitySupplierProductWithOffers } from '@/types/capability';
+import type { CapabilitySupplierProduct } from '@/types/capability';
 import CapabilitySection from '@/components/capability/CapabilitySection';
 import EmptyState from '@/components/common/EmptyState';
-import InquiryForm from '@/components/inquiry/InquiryForm';
 import SupplierCompareBar from './SupplierCompareBar';
-import { trackEvent } from '@/lib/analytics/tracker';
-import { buildEvent } from '@/lib/analytics/events';
 
 /**
  * SupplierModelsSection — M28.0 Public Discovery View.
  *
  * Renders the published Supplier Models (SupplierProduct) for a Platform Product
- * together with each model's commercial availability and a Buyer Inquiry entry.
- * Only PUBLISHED models are exposed (backend-enforced); the backend supplies no
- * governance data (Draft / Review status / Rejected reason) — this section never
- * renders those.
- *
- * Inquiry flow (M28.0): Published SupplierProduct → Buyer Interest → Inquiry Form,
- * carrying supplierProductId + platformProductId, then the existing RFQ workflow
- * is reused unchanged. Never an Order / Payment.
+ * as model identity + compare entry. Only PUBLISHED models are exposed
+ * (backend-enforced). This is a NON-COMMERCIAL public view (P2 frozen):
+ *   - no price / currency / offer-count / commercial summary
+ *   - no Offer payload
+ * Offer remains commercial/private and is reachable only through the existing
+ * private inquiry → RFQ workflow, never from this public discovery surface.
  */
 
 interface SupplierModelsSectionProps {
   /** Platform Product (Capability Authority) context */
   productId: string;
   productName: string;
-  models: CapabilitySupplierProductWithOffers[];
-}
-
-/** Format a price band value for display. */
-function formatPrice(value: number | null | undefined): string | null {
-  if (value === null || value === undefined) return null;
-  return Number.isInteger(value) ? String(value) : value.toFixed(2);
+  models: CapabilitySupplierProduct[];
 }
 
 /** Max number of SupplierProducts the Buyer can select for comparison. */
@@ -44,7 +33,6 @@ export default function SupplierModelsSection({
   productName,
   models,
 }: SupplierModelsSectionProps) {
-  const [openInquiryId, setOpenInquiryId] = useState<string | null>(null);
   const [compareIds, setCompareIds] = useState<string[]>([]);
 
   const toggleCompare = (id: string) => {
@@ -55,7 +43,7 @@ export default function SupplierModelsSection({
 
   const compareSelection = compareIds
     .map((id) => {
-      const sp = models.find((m) => m.supplierProduct.id === id)?.supplierProduct;
+      const sp = models.find((m) => m.id === id);
       if (!sp) return null;
       const label = `${sp.brand ?? ''} ${sp.modelNumber ?? ''}`.trim();
       return { id, label };
@@ -85,46 +73,12 @@ export default function SupplierModelsSection({
       <CapabilitySection
         eyebrow="Supplier Models"
         title="能力型号"
-        subtitle="已上架并通过审核（Approved Supplier Model）的公开能力型号、商业可购与询价入口"
+        subtitle="已上架并通过审核（Approved Supplier Model）的公开能力型号"
       >
         <div className="divide-y divide-slate-100 rounded-xl border border-slate-200/80 shadow-industrial-sm bg-white">
-          {models.map(({ supplierProduct, offers }) => {
-            const { commercialSummary } = supplierProduct;
-            const available = (commercialSummary?.activeOfferCount ?? 0) > 0;
-            const priceFrom = commercialSummary
-              ? formatPrice(commercialSummary.priceFrom)
-              : null;
-            const priceTo = commercialSummary
-              ? formatPrice(commercialSummary.priceTo)
-              : null;
-
-            // Inquiry entry target: prefer an ACTIVE offer, else the first offer.
-            const entryOffer =
-              offers.find((o) => o.status === 'ACTIVE') ?? offers[0];
-            const canInquire = Boolean(entryOffer && entryOffer.organizationId);
-            const isOpen = openInquiryId === supplierProduct.id;
-
+          {models.map((supplierProduct) => {
             const modelLabel =
               `${supplierProduct.brand ?? ''} ${supplierProduct.series ?? ''} ${supplierProduct.modelNumber ?? ''}`.trim();
-
-            const handleInquiryToggle = () => {
-              const next = isOpen ? null : supplierProduct.id;
-              setOpenInquiryId(next);
-              if (next) {
-                trackEvent(
-                  buildEvent('inquiry_start', {
-                    source: 'supplier_models_section',
-                    targetId: supplierProduct.id,
-                    metadata: {
-                      productId,
-                      productName,
-                      modelLabel,
-                      organizationName: supplierProduct.organization?.name,
-                    },
-                  }),
-                );
-              }
-            };
 
             return (
               <div key={supplierProduct.id} className="p-4 sm:p-6">
@@ -147,22 +101,7 @@ export default function SupplierModelsSection({
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0">
-                    <span
-                      className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full font-medium ${
-                        available
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-slate-100 text-slate-500'
-                      }`}
-                    >
-                      <span
-                        className={`w-1.5 h-1.5 rounded-full ${
-                          available ? 'bg-green-500' : 'bg-slate-400'
-                        }`}
-                      />
-                      {available ? '可询价' : '暂无可购'}
-                    </span>
-
+                  <div className="flex items-center gap-2 shrink-0">
                     <button
                       type="button"
                       onClick={() => toggleCompare(supplierProduct.id)}
@@ -190,20 +129,6 @@ export default function SupplierModelsSection({
                         ? '已加入对比'
                         : '加入对比'}
                     </button>
-
-                    {canInquire && (
-                      <button
-                        type="button"
-                        onClick={handleInquiryToggle}
-                        className={`inline-flex items-center px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                          isOpen
-                            ? 'bg-primary text-white hover:bg-primary/90'
-                            : 'border border-primary/30 text-primary hover:bg-primary/5'
-                        }`}
-                      >
-                        {isOpen ? '收起咨询' : '咨询此型号'}
-                      </button>
-                    )}
                   </div>
                 </div>
 
@@ -215,85 +140,15 @@ export default function SupplierModelsSection({
                   </p>
                 )}
 
-                {offers.length > 0 && (
-                  <div className="mt-4">
-                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                      商业可购（Commercial Availability）
-                    </p>
-                    <ul className="space-y-1.5">
-                      {offers.map((offer) => (
-                        <li
-                          key={offer.id}
-                          className="flex items-center gap-3 text-sm text-slate-600"
-                        >
-                          <span className="text-slate-700 font-medium">
-                            {offer.title || supplierProduct.brand}
-                          </span>
-                          {priceFrom !== null && (
-                            <span className="text-slate-500">
-                              {priceFrom}
-                              {priceTo !== null && priceTo !== priceFrom
-                                ? ` ~ ${priceTo}`
-                                : ''}
-                              {commercialSummary?.currency
-                                ? ` ${commercialSummary.currency}`
-                                : ''}
-                            </span>
-                          )}
-                          {offer.status && (
-                            <span className="text-xs text-slate-400">
-                              {offer.status === 'ACTIVE'
-                                ? '在售'
-                                : offer.status}
-                            </span>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Inquiry Entry — Buyer Interest bound to this specific Supplier Model */}
-                {isOpen && canInquire && entryOffer && (
-                  <div className="mt-5 rounded-lg border border-slate-200/80 bg-slate-50/60 p-4">
-                    <div className="mb-3">
-                      <p className="text-sm font-medium text-slate-800">
-                        咨询能力型号
-                      </p>
-                      <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500">
-                        <span>
-                          <span className="text-slate-400">品牌：</span>
-                          {supplierProduct.brand}
-                        </span>
-                        <span>
-                          <span className="text-slate-400">型号：</span>
-                          {supplierProduct.modelNumber}
-                        </span>
-                        <span>
-                          <span className="text-slate-400">能力：</span>
-                          {productName}
-                        </span>
-                      </div>
-                    </div>
-
-                    <InquiryForm
-                      productId={productId}
-                      productName={productName}
-                      offerId={entryOffer.id}
-                      organizationId={entryOffer.organizationId}
-                      organizationName={supplierProduct.organization?.name}
-                      supplierProductId={supplierProduct.id}
-                      supplierModelLabel={modelLabel}
-                    />
-                  </div>
-                )}
+                {/* P2 — commercial/inquiry entry (offer-derived) removed from this
+                    public model context. Offer stays commercial/private (frozen). */}
               </div>
             );
           })}
         </div>
 
         <p className="mt-3 text-xs text-slate-400">
-          勾选 2–7 个能力型号，比较技术参数与商业信息（同一检测能力下）。
+          勾选 2–7 个能力型号，比较技术参数与规格（同一检测能力下）。
         </p>
       </CapabilitySection>
 

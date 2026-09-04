@@ -34,8 +34,8 @@ interface ScenarioRule {
 }
 
 const CATEGORY_SCENARIOS: ScenarioRule[] = [
-  { keywords: ['endoscope', 'borescope'], scenario: '深入狭小或不可见空间，进行内部目视检测' },
-  { keywords: ['measurement'], scenario: '高精度尺寸测量与几何量检测' },
+  { keywords: ['endoscope', 'borescope', '内窥'], scenario: '深入狭小或不可见空间，进行内部目视检测' },
+  { keywords: ['measurement', '扫描'], scenario: '高精度尺寸测量与几何量检测' },
   { keywords: ['inspection camera', 'camera'], scenario: '表面缺陷与外观质量视觉检测' },
   { keywords: ['ultrasonic'], scenario: '材料内部缺陷的超声无损探伤' },
   { keywords: ['radiographic', 'x-ray', 'x ray'], scenario: '内部结构与缺陷的射线透视检测' },
@@ -47,6 +47,32 @@ const CATEGORY_SCENARIOS: ScenarioRule[] = [
   { keywords: ['thickness'], scenario: '壁厚/涂层厚度精确测量' },
   { keywords: ['visual'], scenario: '目视/机器视觉外观质量检测' },
 ];
+
+/** 检测分类 → 检测对象（Application/Detection Object 语义派生，无独立 Entity）。 */
+interface DetectionObjectRule {
+  keywords: string[];
+  object: string;
+}
+
+const CATEGORY_DETECTION_OBJECTS: DetectionObjectRule[] = [
+  { keywords: ['endoscope', 'borescope', '内窥'], object: '狭小或不可见内部空间结构' },
+  { keywords: ['pipeline', 'pipe', 'tube', 'crawler'], object: '管道内壁、焊缝与内部附件' },
+  { keywords: ['ultrasonic', 'thickness'], object: '材料内部组织与壁厚' },
+  { keywords: ['radiographic', 'x-ray', 'x ray'], object: '焊接结构与内部构件' },
+  { keywords: ['magnetic particle', 'penetrant', 'eddy current'], object: '表面及近表面缺陷' },
+  { keywords: ['thermal', 'infrared'], object: '发热构件与温度异常区域' },
+  { keywords: ['measurement', 'dimensi', '扫描'], object: '关键尺寸与几何量' },
+  { keywords: ['inspection camera', 'camera', 'visual'], object: '外部可视表面与外观' },
+];
+
+/**
+ * 返回指定分类的「检测对象」描述（Detection Object 语义角色）；无匹配返回 null。
+ * M35：Detection Object = SEMANTIC / DERIVED（基于分类确定性推导，无独立 Entity）。
+ */
+export function getDetectionObject(categoryName: string): string | null {
+  const rule = firstMatch(categoryName, CATEGORY_DETECTION_OBJECTS) as DetectionObjectRule | null;
+  return rule?.object ?? null;
+}
 
 function firstMatch(name: string, rules: { keywords: string[] }[], fallback: null = null) {
   const normalized = name.toLowerCase();

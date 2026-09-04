@@ -1,0 +1,1000 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/src/pages/AuditIntelligence.tsx");import __vite__cjsImport0_react_jsxDevRuntime from "/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=e8cf61fd"; const Fragment = __vite__cjsImport0_react_jsxDevRuntime["Fragment"]; const jsxDEV = __vite__cjsImport0_react_jsxDevRuntime["jsxDEV"];
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== "undefined" && self instanceof WorkerGlobalScope;
+let prevRefreshReg;
+let prevRefreshSig;
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+  prevRefreshReg = window.$RefreshReg$;
+  prevRefreshSig = window.$RefreshSig$;
+  window.$RefreshReg$ = RefreshRuntime.getRefreshReg("F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx");
+  window.$RefreshSig$ = RefreshRuntime.createSignatureFunctionForTransform;
+}
+var _s = $RefreshSig$();
+import __vite__cjsImport3_react from "/node_modules/.vite/deps/react.js?v=e8cf61fd"; const useEffect = __vite__cjsImport3_react["useEffect"]; const useState = __vite__cjsImport3_react["useState"]; const useCallback = __vite__cjsImport3_react["useCallback"];
+import {
+  Card,
+  Row,
+  Col,
+  Spin,
+  Alert,
+  Typography,
+  Statistic,
+  Tooltip,
+  Empty,
+  Tag,
+  Segmented,
+  Table,
+  Tabs
+} from "/node_modules/.vite/deps/antd.js?v=e8cf61fd";
+import {
+  ReloadOutlined,
+  CheckCircleOutlined,
+  WarningOutlined,
+  CloseCircleOutlined,
+  AuditOutlined,
+  PlusCircleOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  SwapOutlined,
+  LoginOutlined,
+  BarChartOutlined,
+  PieChartOutlined,
+  TeamOutlined,
+  ExclamationCircleOutlined
+} from "/node_modules/.vite/deps/@ant-design_icons.js?v=e8cf61fd";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  AreaChart,
+  Area
+} from "/node_modules/.vite/deps/recharts.js?v=e8cf61fd";
+import { auditIntelligenceService } from "/src/api/index.ts";
+import { VISNDT_COLORS, CHART_PALETTE } from "/src/components/design-system/tokens.ts";
+const { Title, Text } = Typography;
+const RISK_COLORS = {
+  NORMAL: VISNDT_COLORS.success,
+  WARNING: VISNDT_COLORS.warning,
+  CRITICAL: VISNDT_COLORS.error
+};
+const RISK_ICONS = {
+  NORMAL: /* @__PURE__ */ jsxDEV(CheckCircleOutlined, {}, void 0, false, {
+    fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+    lineNumber: 61,
+    columnNumber: 11
+  }, this),
+  WARNING: /* @__PURE__ */ jsxDEV(WarningOutlined, {}, void 0, false, {
+    fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+    lineNumber: 62,
+    columnNumber: 12
+  }, this),
+  CRITICAL: /* @__PURE__ */ jsxDEV(CloseCircleOutlined, {}, void 0, false, {
+    fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+    lineNumber: 63,
+    columnNumber: 13
+  }, this)
+};
+const RISK_LABELS = {
+  NORMAL: "正常",
+  WARNING: "警告",
+  CRITICAL: "严重"
+};
+const ACTION_COLORS = {
+  create: VISNDT_COLORS.success,
+  update: "#2563eb",
+  delete: VISNDT_COLORS.error,
+  statusChange: VISNDT_COLORS.warning,
+  login: "#722ed1"
+};
+const PIE_COLORS = CHART_PALETTE;
+const TIME_RANGES = [
+  { label: "7天", value: 7 },
+  { label: "30天", value: 30 },
+  { label: "90天", value: 90 }
+];
+function AuditIntelligence() {
+  _s();
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [days, setDays] = useState(7);
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await auditIntelligenceService.getOverview(days);
+      setData(result);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "加载审计智能数据失败");
+    } finally {
+      setLoading(false);
+    }
+  }, [days]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+  if (loading) {
+    return /* @__PURE__ */ jsxDEV("div", { style: { textAlign: "center", padding: "120px 0" }, children: /* @__PURE__ */ jsxDEV(Spin, { size: "large" }, void 0, false, {
+      fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+      lineNumber: 117,
+      columnNumber: 9
+    }, this) }, void 0, false, {
+      fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+      lineNumber: 116,
+      columnNumber: 7
+    }, this);
+  }
+  if (error) {
+    return /* @__PURE__ */ jsxDEV("div", { style: { padding: 24 }, children: /* @__PURE__ */ jsxDEV(
+      Alert,
+      {
+        type: "error",
+        message: "加载审计智能数据失败",
+        description: error,
+        showIcon: true,
+        action: /* @__PURE__ */ jsxDEV(ReloadOutlined, { onClick: fetchData, style: { cursor: "pointer", fontSize: 16 } }, void 0, false, {
+          fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+          lineNumber: 131,
+          columnNumber: 11
+        }, this)
+      },
+      void 0,
+      false,
+      {
+        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+        lineNumber: 125,
+        columnNumber: 9
+      },
+      this
+    ) }, void 0, false, {
+      fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+      lineNumber: 124,
+      columnNumber: 7
+    }, this);
+  }
+  if (!data) {
+    return /* @__PURE__ */ jsxDEV(Empty, { description: "暂无审计智能数据" }, void 0, false, {
+      fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+      lineNumber: 139,
+      columnNumber: 12
+    }, this);
+  }
+  const trendData = data.trend.map((d) => ({
+    ...d,
+    date: d.date.slice(5)
+    // MM-DD
+  }));
+  return /* @__PURE__ */ jsxDEV("div", { style: { padding: 24 }, children: [
+    /* @__PURE__ */ jsxDEV(
+      "div",
+      {
+        style: {
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 16,
+          flexWrap: "wrap",
+          gap: 12
+        },
+        children: [
+          /* @__PURE__ */ jsxDEV("div", { children: [
+            /* @__PURE__ */ jsxDEV(Title, { level: 4, style: { marginBottom: 4 }, children: "审计智能" }, void 0, false, {
+              fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+              lineNumber: 160,
+              columnNumber: 11
+            }, this),
+            /* @__PURE__ */ jsxDEV(Text, { type: "secondary", style: { fontSize: 13 }, children: "审计概览 · 操作趋势 · 实体分布 · 用户活动 · 风险指标" }, void 0, false, {
+              fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+              lineNumber: 163,
+              columnNumber: 11
+            }, this)
+          ] }, void 0, true, {
+            fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+            lineNumber: 159,
+            columnNumber: 9
+          }, this),
+          /* @__PURE__ */ jsxDEV("div", { style: { display: "flex", gap: 12, alignItems: "center" }, children: [
+            /* @__PURE__ */ jsxDEV(
+              Segmented,
+              {
+                options: TIME_RANGES,
+                value: days,
+                onChange: (v) => setDays(v)
+              },
+              void 0,
+              false,
+              {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 168,
+                columnNumber: 11
+              },
+              this
+            ),
+            /* @__PURE__ */ jsxDEV(
+              ReloadOutlined,
+              {
+                onClick: fetchData,
+                style: { cursor: "pointer", fontSize: 18, color: "#2563eb" }
+              },
+              void 0,
+              false,
+              {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 173,
+                columnNumber: 11
+              },
+              this
+            )
+          ] }, void 0, true, {
+            fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+            lineNumber: 167,
+            columnNumber: 9
+          }, this)
+        ]
+      },
+      void 0,
+      true,
+      {
+        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+        lineNumber: 149,
+        columnNumber: 7
+      },
+      this
+    ),
+    /* @__PURE__ */ jsxDEV(Card, { title: /* @__PURE__ */ jsxDEV(Fragment, { children: [
+      /* @__PURE__ */ jsxDEV(AuditOutlined, {}, void 0, false, {
+        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+        lineNumber: 183,
+        columnNumber: 22
+      }, this),
+      " 审计概览"
+    ] }, void 0, true, {
+      fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+      lineNumber: 183,
+      columnNumber: 20
+    }, this), style: { marginBottom: 16 }, children: /* @__PURE__ */ jsxDEV(Row, { gutter: [16, 16], children: [
+      /* @__PURE__ */ jsxDEV(Col, { xs: 12, sm: 8, md: 4, children: /* @__PURE__ */ jsxDEV(Card, { size: "small", children: /* @__PURE__ */ jsxDEV(
+        Statistic,
+        {
+          title: "总事件",
+          value: data.overview.totalEvents,
+          prefix: /* @__PURE__ */ jsxDEV(AuditOutlined, {}, void 0, false, {
+            fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+            lineNumber: 190,
+            columnNumber: 25
+          }, this),
+          valueStyle: { color: "#2563eb" }
+        },
+        void 0,
+        false,
+        {
+          fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+          lineNumber: 187,
+          columnNumber: 15
+        },
+        this
+      ) }, void 0, false, {
+        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+        lineNumber: 186,
+        columnNumber: 13
+      }, this) }, void 0, false, {
+        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+        lineNumber: 185,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV(Col, { xs: 12, sm: 8, md: 4, children: /* @__PURE__ */ jsxDEV(Card, { size: "small", children: /* @__PURE__ */ jsxDEV(
+        Statistic,
+        {
+          title: "创建",
+          value: data.overview.createCount,
+          prefix: /* @__PURE__ */ jsxDEV(PlusCircleOutlined, {}, void 0, false, {
+            fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+            lineNumber: 200,
+            columnNumber: 25
+          }, this),
+          valueStyle: { color: VISNDT_COLORS.success }
+        },
+        void 0,
+        false,
+        {
+          fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+          lineNumber: 197,
+          columnNumber: 15
+        },
+        this
+      ) }, void 0, false, {
+        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+        lineNumber: 196,
+        columnNumber: 13
+      }, this) }, void 0, false, {
+        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+        lineNumber: 195,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV(Col, { xs: 12, sm: 8, md: 4, children: /* @__PURE__ */ jsxDEV(Card, { size: "small", children: /* @__PURE__ */ jsxDEV(
+        Statistic,
+        {
+          title: "更新",
+          value: data.overview.updateCount,
+          prefix: /* @__PURE__ */ jsxDEV(EditOutlined, {}, void 0, false, {
+            fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+            lineNumber: 210,
+            columnNumber: 25
+          }, this),
+          valueStyle: { color: "#2563eb" }
+        },
+        void 0,
+        false,
+        {
+          fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+          lineNumber: 207,
+          columnNumber: 15
+        },
+        this
+      ) }, void 0, false, {
+        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+        lineNumber: 206,
+        columnNumber: 13
+      }, this) }, void 0, false, {
+        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+        lineNumber: 205,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV(Col, { xs: 12, sm: 8, md: 4, children: /* @__PURE__ */ jsxDEV(Card, { size: "small", children: /* @__PURE__ */ jsxDEV(
+        Statistic,
+        {
+          title: "删除",
+          value: data.overview.deleteCount,
+          prefix: /* @__PURE__ */ jsxDEV(DeleteOutlined, {}, void 0, false, {
+            fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+            lineNumber: 220,
+            columnNumber: 25
+          }, this),
+          valueStyle: { color: VISNDT_COLORS.error }
+        },
+        void 0,
+        false,
+        {
+          fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+          lineNumber: 217,
+          columnNumber: 15
+        },
+        this
+      ) }, void 0, false, {
+        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+        lineNumber: 216,
+        columnNumber: 13
+      }, this) }, void 0, false, {
+        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+        lineNumber: 215,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV(Col, { xs: 12, sm: 8, md: 4, children: /* @__PURE__ */ jsxDEV(Card, { size: "small", children: /* @__PURE__ */ jsxDEV(
+        Statistic,
+        {
+          title: "状态变更",
+          value: data.overview.statusChangeCount,
+          prefix: /* @__PURE__ */ jsxDEV(SwapOutlined, {}, void 0, false, {
+            fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+            lineNumber: 230,
+            columnNumber: 25
+          }, this),
+          valueStyle: { color: VISNDT_COLORS.warning }
+        },
+        void 0,
+        false,
+        {
+          fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+          lineNumber: 227,
+          columnNumber: 15
+        },
+        this
+      ) }, void 0, false, {
+        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+        lineNumber: 226,
+        columnNumber: 13
+      }, this) }, void 0, false, {
+        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+        lineNumber: 225,
+        columnNumber: 11
+      }, this),
+      /* @__PURE__ */ jsxDEV(Col, { xs: 12, sm: 8, md: 4, children: /* @__PURE__ */ jsxDEV(Card, { size: "small", children: /* @__PURE__ */ jsxDEV(
+        Statistic,
+        {
+          title: "登录",
+          value: data.overview.loginCount,
+          prefix: /* @__PURE__ */ jsxDEV(LoginOutlined, {}, void 0, false, {
+            fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+            lineNumber: 240,
+            columnNumber: 25
+          }, this),
+          valueStyle: { color: "#722ed1" }
+        },
+        void 0,
+        false,
+        {
+          fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+          lineNumber: 237,
+          columnNumber: 15
+        },
+        this
+      ) }, void 0, false, {
+        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+        lineNumber: 236,
+        columnNumber: 13
+      }, this) }, void 0, false, {
+        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+        lineNumber: 235,
+        columnNumber: 11
+      }, this)
+    ] }, void 0, true, {
+      fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+      lineNumber: 184,
+      columnNumber: 9
+    }, this) }, void 0, false, {
+      fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+      lineNumber: 183,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDEV(
+      Tabs,
+      {
+        defaultActiveKey: "trend",
+        items: [
+          // ============================================
+          // 2. Audit Trend
+          // ============================================
+          {
+            key: "trend",
+            label: /* @__PURE__ */ jsxDEV(Fragment, { children: [
+              /* @__PURE__ */ jsxDEV(BarChartOutlined, {}, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 256,
+                columnNumber: 20
+              }, this),
+              " 操作趋势"
+            ] }, void 0, true, {
+              fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+              lineNumber: 256,
+              columnNumber: 18
+            }, this),
+            children: /* @__PURE__ */ jsxDEV(Row, { gutter: 16, children: [
+              /* @__PURE__ */ jsxDEV(Col, { xs: 24, lg: 12, children: /* @__PURE__ */ jsxDEV(Card, { title: "事件总量趋势", style: { marginBottom: 16 }, children: trendData.length > 0 ? /* @__PURE__ */ jsxDEV(ResponsiveContainer, { width: "100%", height: 300, children: /* @__PURE__ */ jsxDEV(AreaChart, { data: trendData, children: [
+                /* @__PURE__ */ jsxDEV(CartesianGrid, { strokeDasharray: "3 3" }, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 264,
+                  columnNumber: 27
+                }, this),
+                /* @__PURE__ */ jsxDEV(XAxis, { dataKey: "date", fontSize: 11 }, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 265,
+                  columnNumber: 27
+                }, this),
+                /* @__PURE__ */ jsxDEV(YAxis, { fontSize: 11 }, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 266,
+                  columnNumber: 27
+                }, this),
+                /* @__PURE__ */ jsxDEV(RechartsTooltip, {}, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 267,
+                  columnNumber: 27
+                }, this),
+                /* @__PURE__ */ jsxDEV(Area, { type: "monotone", dataKey: "total", stroke: "#2563eb", fill: "#2563eb", fillOpacity: 0.15 }, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 268,
+                  columnNumber: 27
+                }, this)
+              ] }, void 0, true, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 263,
+                columnNumber: 25
+              }, this) }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 262,
+                columnNumber: 17
+              }, this) : /* @__PURE__ */ jsxDEV(Empty, { description: "暂无趋势数据" }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 272,
+                columnNumber: 17
+              }, this) }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 260,
+                columnNumber: 19
+              }, this) }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 259,
+                columnNumber: 17
+              }, this),
+              /* @__PURE__ */ jsxDEV(Col, { xs: 24, lg: 12, children: /* @__PURE__ */ jsxDEV(Card, { title: "操作类型分布", style: { marginBottom: 16 }, children: trendData.some((d) => d.total > 0) ? /* @__PURE__ */ jsxDEV(ResponsiveContainer, { width: "100%", height: 300, children: /* @__PURE__ */ jsxDEV(BarChart, { data: trendData, children: [
+                /* @__PURE__ */ jsxDEV(CartesianGrid, { strokeDasharray: "3 3" }, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 281,
+                  columnNumber: 27
+                }, this),
+                /* @__PURE__ */ jsxDEV(XAxis, { dataKey: "date", fontSize: 11 }, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 282,
+                  columnNumber: 27
+                }, this),
+                /* @__PURE__ */ jsxDEV(YAxis, { fontSize: 11 }, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 283,
+                  columnNumber: 27
+                }, this),
+                /* @__PURE__ */ jsxDEV(RechartsTooltip, {}, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 284,
+                  columnNumber: 27
+                }, this),
+                /* @__PURE__ */ jsxDEV(Bar, { dataKey: "create", stackId: "a", fill: ACTION_COLORS.create, name: "创建" }, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 285,
+                  columnNumber: 27
+                }, this),
+                /* @__PURE__ */ jsxDEV(Bar, { dataKey: "update", stackId: "a", fill: ACTION_COLORS.update, name: "更新" }, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 286,
+                  columnNumber: 27
+                }, this),
+                /* @__PURE__ */ jsxDEV(Bar, { dataKey: "delete", stackId: "a", fill: ACTION_COLORS.delete, name: "删除" }, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 287,
+                  columnNumber: 27
+                }, this),
+                /* @__PURE__ */ jsxDEV(Bar, { dataKey: "statusChange", stackId: "a", fill: ACTION_COLORS.statusChange, name: "状态变更" }, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 288,
+                  columnNumber: 27
+                }, this),
+                /* @__PURE__ */ jsxDEV(Bar, { dataKey: "login", stackId: "a", fill: ACTION_COLORS.login, name: "登录" }, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 289,
+                  columnNumber: 27
+                }, this)
+              ] }, void 0, true, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 280,
+                columnNumber: 25
+              }, this) }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 279,
+                columnNumber: 17
+              }, this) : /* @__PURE__ */ jsxDEV(Empty, { description: "暂无操作分布数据" }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 293,
+                columnNumber: 17
+              }, this) }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 277,
+                columnNumber: 19
+              }, this) }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 276,
+                columnNumber: 17
+              }, this)
+            ] }, void 0, true, {
+              fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+              lineNumber: 258,
+              columnNumber: 11
+            }, this)
+          },
+          // ============================================
+          // 3. Entity Distribution
+          // ============================================
+          {
+            key: "entity",
+            label: /* @__PURE__ */ jsxDEV(Fragment, { children: [
+              /* @__PURE__ */ jsxDEV(PieChartOutlined, {}, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 305,
+                columnNumber: 20
+              }, this),
+              " 实体分布"
+            ] }, void 0, true, {
+              fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+              lineNumber: 305,
+              columnNumber: 18
+            }, this),
+            children: /* @__PURE__ */ jsxDEV(Row, { gutter: 16, children: [
+              /* @__PURE__ */ jsxDEV(Col, { xs: 24, lg: 12, children: /* @__PURE__ */ jsxDEV(Card, { title: "实体类型分布（饼图）", style: { marginBottom: 16 }, children: data.entityDistribution.length > 0 ? /* @__PURE__ */ jsxDEV(ResponsiveContainer, { width: "100%", height: 350, children: /* @__PURE__ */ jsxDEV(PieChart, { children: [
+                /* @__PURE__ */ jsxDEV(
+                  Pie,
+                  {
+                    data: data.entityDistribution,
+                    dataKey: "count",
+                    nameKey: "label",
+                    cx: "50%",
+                    cy: "50%",
+                    outerRadius: 120,
+                    label: ({ payload, percent }) => {
+                      const pct = percent != null ? (percent * 100).toFixed(0) : "0";
+                      return `${payload.label} ${pct}%`;
+                    },
+                    children: data.entityDistribution.map(
+                      (_, index) => /* @__PURE__ */ jsxDEV(Cell, { fill: PIE_COLORS[index % PIE_COLORS.length] }, `cell-${index}`, false, {
+                        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                        lineNumber: 326,
+                        columnNumber: 23
+                      }, this)
+                    )
+                  },
+                  void 0,
+                  false,
+                  {
+                    fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                    lineNumber: 313,
+                    columnNumber: 27
+                  },
+                  this
+                ),
+                /* @__PURE__ */ jsxDEV(RechartsTooltip, {}, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 329,
+                  columnNumber: 27
+                }, this),
+                /* @__PURE__ */ jsxDEV(Legend, {}, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 330,
+                  columnNumber: 27
+                }, this)
+              ] }, void 0, true, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 312,
+                columnNumber: 25
+              }, this) }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 311,
+                columnNumber: 17
+              }, this) : /* @__PURE__ */ jsxDEV(Empty, { description: "暂无实体分布数据" }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 334,
+                columnNumber: 17
+              }, this) }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 309,
+                columnNumber: 19
+              }, this) }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 308,
+                columnNumber: 17
+              }, this),
+              /* @__PURE__ */ jsxDEV(Col, { xs: 24, lg: 12, children: /* @__PURE__ */ jsxDEV(Card, { title: "实体类型分布（柱状图）", style: { marginBottom: 16 }, children: data.entityDistribution.length > 0 ? /* @__PURE__ */ jsxDEV(ResponsiveContainer, { width: "100%", height: 350, children: /* @__PURE__ */ jsxDEV(BarChart, { data: data.entityDistribution, layout: "vertical", children: [
+                /* @__PURE__ */ jsxDEV(CartesianGrid, { strokeDasharray: "3 3" }, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 343,
+                  columnNumber: 27
+                }, this),
+                /* @__PURE__ */ jsxDEV(XAxis, { type: "number", fontSize: 11 }, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 344,
+                  columnNumber: 27
+                }, this),
+                /* @__PURE__ */ jsxDEV(YAxis, { dataKey: "label", type: "category", width: 80, fontSize: 11 }, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 345,
+                  columnNumber: 27
+                }, this),
+                /* @__PURE__ */ jsxDEV(RechartsTooltip, {}, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 346,
+                  columnNumber: 27
+                }, this),
+                /* @__PURE__ */ jsxDEV(Bar, { dataKey: "count", radius: [0, 4, 4, 0], children: data.entityDistribution.map(
+                  (_, index) => /* @__PURE__ */ jsxDEV(Cell, { fill: PIE_COLORS[index % PIE_COLORS.length] }, `cell-${index}`, false, {
+                    fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                    lineNumber: 349,
+                    columnNumber: 23
+                  }, this)
+                ) }, void 0, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 347,
+                  columnNumber: 27
+                }, this)
+              ] }, void 0, true, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 342,
+                columnNumber: 25
+              }, this) }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 341,
+                columnNumber: 17
+              }, this) : /* @__PURE__ */ jsxDEV(Empty, { description: "暂无实体分布数据" }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 355,
+                columnNumber: 17
+              }, this) }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 339,
+                columnNumber: 19
+              }, this) }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 338,
+                columnNumber: 17
+              }, this)
+            ] }, void 0, true, {
+              fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+              lineNumber: 307,
+              columnNumber: 11
+            }, this)
+          },
+          // ============================================
+          // 4. Actor Activity
+          // ============================================
+          {
+            key: "actor",
+            label: /* @__PURE__ */ jsxDEV(Fragment, { children: [
+              /* @__PURE__ */ jsxDEV(TeamOutlined, {}, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 367,
+                columnNumber: 20
+              }, this),
+              " 用户活动"
+            ] }, void 0, true, {
+              fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+              lineNumber: 367,
+              columnNumber: 18
+            }, this),
+            children: /* @__PURE__ */ jsxDEV(Card, { title: "Top 用户活动", children: data.topActors.length > 0 ? /* @__PURE__ */ jsxDEV(
+              Table,
+              {
+                dataSource: data.topActors,
+                rowKey: "operatorId",
+                pagination: false,
+                size: "small",
+                columns: [
+                  {
+                    title: "操作人",
+                    dataIndex: "operatorName",
+                    key: "name",
+                    render: (name, record) => /* @__PURE__ */ jsxDEV(Tooltip, { title: record.operatorEmail, children: /* @__PURE__ */ jsxDEV("span", { children: name }, void 0, false, {
+                      fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                      lineNumber: 383,
+                      columnNumber: 29
+                    }, this) }, void 0, false, {
+                      fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                      lineNumber: 382,
+                      columnNumber: 17
+                    }, this)
+                  },
+                  {
+                    title: "总事件",
+                    dataIndex: "totalEvents",
+                    key: "total",
+                    sorter: (a, b) => a.totalEvents - b.totalEvents,
+                    render: (v) => /* @__PURE__ */ jsxDEV("strong", { children: v }, void 0, false, {
+                      fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                      lineNumber: 392,
+                      columnNumber: 40
+                    }, this)
+                  },
+                  {
+                    title: "创建",
+                    dataIndex: "createCount",
+                    key: "create",
+                    render: (v) => /* @__PURE__ */ jsxDEV("span", { style: { color: VISNDT_COLORS.success }, children: v }, void 0, false, {
+                      fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                      lineNumber: 398,
+                      columnNumber: 40
+                    }, this)
+                  },
+                  {
+                    title: "更新",
+                    dataIndex: "updateCount",
+                    key: "update",
+                    render: (v) => /* @__PURE__ */ jsxDEV("span", { style: { color: "#2563eb" }, children: v }, void 0, false, {
+                      fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                      lineNumber: 404,
+                      columnNumber: 40
+                    }, this)
+                  },
+                  {
+                    title: "删除",
+                    dataIndex: "deleteCount",
+                    key: "delete",
+                    render: (v) => /* @__PURE__ */ jsxDEV("span", { style: { color: v > 0 ? VISNDT_COLORS.error : void 0, fontWeight: v > 0 ? 600 : 400 }, children: v }, void 0, false, {
+                      fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                      lineNumber: 411,
+                      columnNumber: 17
+                    }, this)
+                  },
+                  {
+                    title: "状态变更",
+                    dataIndex: "statusChangeCount",
+                    key: "statusChange",
+                    render: (v) => /* @__PURE__ */ jsxDEV("span", { style: { color: VISNDT_COLORS.warning }, children: v }, void 0, false, {
+                      fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                      lineNumber: 420,
+                      columnNumber: 40
+                    }, this)
+                  },
+                  {
+                    title: "登录",
+                    dataIndex: "loginCount",
+                    key: "login",
+                    render: (v) => /* @__PURE__ */ jsxDEV("span", { style: { color: "#722ed1" }, children: v }, void 0, false, {
+                      fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                      lineNumber: 426,
+                      columnNumber: 40
+                    }, this)
+                  },
+                  {
+                    title: "最后活跃",
+                    dataIndex: "lastActivity",
+                    key: "last",
+                    render: (v) => /* @__PURE__ */ jsxDEV(Text, { type: "secondary", style: { fontSize: 12 }, children: v ? new Date(v).toLocaleString("zh-CN") : "-" }, void 0, false, {
+                      fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                      lineNumber: 433,
+                      columnNumber: 17
+                    }, this)
+                  }
+                ]
+              },
+              void 0,
+              false,
+              {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 371,
+                columnNumber: 13
+              },
+              this
+            ) : /* @__PURE__ */ jsxDEV(Empty, { description: "暂无用户活动数据" }, void 0, false, {
+              fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+              lineNumber: 441,
+              columnNumber: 13
+            }, this) }, void 0, false, {
+              fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+              lineNumber: 369,
+              columnNumber: 11
+            }, this)
+          },
+          // ============================================
+          // 5. Risk Indicators
+          // ============================================
+          {
+            key: "risk",
+            label: /* @__PURE__ */ jsxDEV(Fragment, { children: [
+              /* @__PURE__ */ jsxDEV(ExclamationCircleOutlined, {}, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 451,
+                columnNumber: 20
+              }, this),
+              " 风险指标"
+            ] }, void 0, true, {
+              fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+              lineNumber: 451,
+              columnNumber: 18
+            }, this),
+            children: /* @__PURE__ */ jsxDEV(Card, { title: "审计风险指标", extra: /* @__PURE__ */ jsxDEV(Text, { type: "secondary", style: { fontSize: 12 }, children: "指标仅用于观察，非安全决策依据" }, void 0, false, {
+              fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+              lineNumber: 453,
+              columnNumber: 39
+            }, this), children: [
+              /* @__PURE__ */ jsxDEV(Row, { gutter: [16, 16], children: data.riskIndicators.map(
+                (indicator) => /* @__PURE__ */ jsxDEV(Col, { xs: 24, sm: 12, lg: 8, children: /* @__PURE__ */ jsxDEV(
+                  Card,
+                  {
+                    size: "small",
+                    style: {
+                      borderLeft: `4px solid ${RISK_COLORS[indicator.level]}`,
+                      background: indicator.level === "CRITICAL" ? "#fff2f0" : indicator.level === "WARNING" ? "#fffbe6" : void 0
+                    },
+                    children: [
+                      /* @__PURE__ */ jsxDEV("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start" }, children: [
+                        /* @__PURE__ */ jsxDEV("div", { children: [
+                          /* @__PURE__ */ jsxDEV(Text, { type: "secondary", style: { fontSize: 12, display: "block", marginBottom: 4 }, children: indicator.label }, void 0, false, {
+                            fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                            lineNumber: 466,
+                            columnNumber: 29
+                          }, this),
+                          /* @__PURE__ */ jsxDEV("span", { style: { fontSize: 24, fontWeight: 600, color: RISK_COLORS[indicator.level] }, children: indicator.value }, void 0, false, {
+                            fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                            lineNumber: 469,
+                            columnNumber: 29
+                          }, this)
+                        ] }, void 0, true, {
+                          fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                          lineNumber: 465,
+                          columnNumber: 27
+                        }, this),
+                        /* @__PURE__ */ jsxDEV(Tag, { color: RISK_COLORS[indicator.level], style: { marginTop: 4 }, children: [
+                          RISK_ICONS[indicator.level],
+                          " ",
+                          RISK_LABELS[indicator.level]
+                        ] }, void 0, true, {
+                          fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                          lineNumber: 473,
+                          columnNumber: 27
+                        }, this)
+                      ] }, void 0, true, {
+                        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                        lineNumber: 464,
+                        columnNumber: 25
+                      }, this),
+                      /* @__PURE__ */ jsxDEV(Text, { type: "secondary", style: { fontSize: 11, display: "block", marginTop: 8 }, children: indicator.detail }, void 0, false, {
+                        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                        lineNumber: 477,
+                        columnNumber: 25
+                      }, this)
+                    ]
+                  },
+                  void 0,
+                  true,
+                  {
+                    fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                    lineNumber: 457,
+                    columnNumber: 23
+                  },
+                  this
+                ) }, indicator.metric, false, {
+                  fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                  lineNumber: 456,
+                  columnNumber: 15
+                }, this)
+              ) }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 454,
+                columnNumber: 17
+              }, this),
+              data.riskIndicators.length === 0 && /* @__PURE__ */ jsxDEV(Empty, { description: "暂无风险指标" }, void 0, false, {
+                fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+                lineNumber: 485,
+                columnNumber: 13
+              }, this)
+            ] }, void 0, true, {
+              fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+              lineNumber: 453,
+              columnNumber: 11
+            }, this)
+          }
+        ]
+      },
+      void 0,
+      false,
+      {
+        fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+        lineNumber: 248,
+        columnNumber: 7
+      },
+      this
+    )
+  ] }, void 0, true, {
+    fileName: "F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx",
+    lineNumber: 148,
+    columnNumber: 5
+  }, this);
+}
+_s(AuditIntelligence, "GBps51ylrbyhbkvCCU6qE2s/zyE=");
+_c = AuditIntelligence;
+export default AuditIntelligence;
+var _c;
+$RefreshReg$(_c, "AuditIntelligence");
+if (import.meta.hot && !inWebWorker) {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+if (import.meta.hot && !inWebWorker) {
+  RefreshRuntime.__hmr_import(import.meta.url).then((currentExports) => {
+    RefreshRuntime.registerExportsForReactRefresh("F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("F:/Desktop/VISNDT/VISNDT/apps/admin/src/pages/AuditIntelligence.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+
+//# sourceMappingURL=data:application/json;base64,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QUFBQTtBQUFBO0FBQUE7QUFBQSw2QkFFQTtBQUFBO0FBQUE7QUFBQSxrQkF0QkY7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBLGdCQXVCQSxLQXhCUUwsVUFBVU0sUUFBcEI7QUFBQTtBQUFBO0FBQUE7QUFBQSx1QkF5QkE7QUFBQSxjQUNELEtBNUJIO0FBQUE7QUFBQTtBQUFBO0FBQUEscUJBNkJBO0FBQUEsY0FDQ3ZFLEtBQUtnRSxlQUFleEIsV0FBVyxLQUM5Qix1QkFBQyxTQUFNLGFBQVksWUFBbkI7QUFBQTtBQUFBO0FBQUE7QUFBQSxxQkFBMkI7QUFBQSxpQkFoQy9CO0FBQUE7QUFBQTtBQUFBO0FBQUEsbUJBa0NBO0FBQUEsVUFFSjtBQUFBLFFBQUM7QUFBQTtBQUFBLE1BalBMO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQSxJQWtQSTtBQUFBLE9BdFZOO0FBQUE7QUFBQTtBQUFBO0FBQUEsU0F3VkE7QUFFSjtBQUFDekMsR0FuWlFELG1CQUFpQjtBQUFBLEtBQWpCQTtBQXFaVCxlQUFlQTtBQUFrQixJQUFBMEU7QUFBQSxhQUFBQSxJQUFBIiwibmFtZXMiOlsidXNlRWZmZWN0IiwidXNlU3RhdGUiLCJ1c2VDYWxsYmFjayIsIkNhcmQiLCJSb3ciLCJDb2wiLCJTcGluIiwiQWxlcnQiLCJUeXBvZ3JhcGh5IiwiU3RhdGlzdGljIiwiVG9vbHRpcCIsIkVtcHR5IiwiVGFnIiwiU2VnbWVudGVkIiwiVGFibGUiLCJUYWJzIiwiUmVsb2FkT3V0bGluZWQiLCJDaGVja0NpcmNsZU91dGxpbmVkIiwiV2FybmluZ091dGxpbmVkIiwiQ2xvc2VDaXJjbGVPdXRsaW5lZCIsIkF1ZGl0T3V0bGluZWQiLCJQbHVzQ2lyY2xlT3V0bGluZWQiLCJFZGl0T3V0bGluZWQiLCJEZWxldGVPdXRsaW5lZCIsIlN3YXBPdXRsaW5lZCIsIkxvZ2luT3V0bGluZWQiLCJCYXJDaGFydE91dGxpbmVkIiwiUGllQ2hhcnRPdXRsaW5lZCIsIlRlYW1PdXRsaW5lZCIsIkV4Y2xhbWF0aW9uQ2lyY2xlT3V0bGluZWQiLCJCYXJDaGFydCIsIkJhciIsIlhBeGlzIiwiWUF4aXMiLCJDYXJ0ZXNpYW5HcmlkIiwiUmVjaGFydHNUb29sdGlwIiwiUmVzcG9uc2l2ZUNvbnRhaW5lciIsIlBpZUNoYXJ0IiwiUGllIiwiQ2VsbCIsIkxlZ2VuZCIsIkFyZWFDaGFydCIsIkFyZWEiLCJhdWRpdEludGVsbGlnZW5jZVNlcnZpY2UiLCJWSVNORFRfQ09MT1JTIiwiQ0hBUlRfUEFMRVRURSIsIlRpdGxlIiwiVGV4dCIsIlJJU0tfQ09MT1JTIiwiTk9STUFMIiwic3VjY2VzcyIsIldBUk5JTkciLCJ3YXJuaW5nIiwiQ1JJVElDQUwiLCJlcnJvciIsIlJJU0tfSUNPTlMiLCJSSVNLX0xBQkVMUyIsIkFDVElPTl9DT0xPUlMiLCJjcmVhdGUiLCJ1cGRhdGUiLCJkZWxldGUiLCJzdGF0dXNDaGFuZ2UiLCJsb2dpbiIsIlBJRV9DT0xPUlMiLCJUSU1FX1JBTkdFUyIsImxhYmVsIiwidmFsdWUiLCJBdWRpdEludGVsbGlnZW5jZSIsIl9zIiwiZGF0YSIsInNldERhdGEiLCJsb2FkaW5nIiwic2V0TG9hZGluZyIsInNldEVycm9yIiwiZGF5cyIsInNldERheXMiLCJmZXRjaERhdGEiLCJyZXN1bHQiLCJnZXRPdmVydmlldyIsImVyciIsIkVycm9yIiwibWVzc2FnZSIsInRleHRBbGlnbiIsInBhZGRpbmciLCJjdXJzb3IiLCJmb250U2l6ZSIsInRyZW5kRGF0YSIsInRyZW5kIiwibWFwIiwiZCIsImRhdGUiLCJzbGljZSIsImRpc3BsYXkiLCJqdXN0aWZ5Q29udGVudCIsImFsaWduSXRlbXMiLCJtYXJnaW5Cb3R0b20iLCJmbGV4V3JhcCIsImdhcCIsInYiLCJjb2xvciIsIm92ZXJ2aWV3IiwidG90YWxFdmVudHMiLCJjcmVhdGVDb3VudCIsInVwZGF0ZUNvdW50IiwiZGVsZXRlQ291bnQiLCJzdGF0dXNDaGFuZ2VDb3VudCIsImxvZ2luQ291bnQiLCJrZXkiLCJjaGlsZHJlbiIsImxlbmd0aCIsInNvbWUiLCJ0b3RhbCIsImVudGl0eURpc3RyaWJ1dGlvbiIsInBheWxvYWQiLCJwZXJjZW50IiwicGN0IiwidG9GaXhlZCIsIl8iLCJpbmRleCIsInRvcEFjdG9ycyIsInRpdGxlIiwiZGF0YUluZGV4IiwicmVuZGVyIiwibmFtZSIsInJlY29yZCIsIm9wZXJhdG9yRW1haWwiLCJzb3J0ZXIiLCJhIiwiYiIsInVuZGVmaW5lZCIsImZvbnRXZWlnaHQiLCJEYXRlIiwidG9Mb2NhbGVTdHJpbmciLCJyaXNrSW5kaWNhdG9ycyIsImluZGljYXRvciIsImJvcmRlckxlZnQiLCJsZXZlbCIsImJhY2tncm91bmQiLCJtYXJnaW5Ub3AiLCJkZXRhaWwiLCJtZXRyaWMiLCJfYyJdLCJpZ25vcmVMaXN0IjpbXSwic291cmNlcyI6WyJBdWRpdEludGVsbGlnZW5jZS50c3giXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgdXNlRWZmZWN0LCB1c2VTdGF0ZSwgdXNlQ2FsbGJhY2sgfSBmcm9tICdyZWFjdCc7XG5pbXBvcnQge1xuICBDYXJkLCBSb3csIENvbCwgU3BpbiwgQWxlcnQsIFR5cG9ncmFwaHksIFN0YXRpc3RpYywgVG9vbHRpcCwgRW1wdHksIFRhZyxcbiAgU2VnbWVudGVkLCBUYWJsZSwgVGFicyxcbn0gZnJvbSAnYW50ZCc7XG5pbXBvcnQge1xuICBSZWxvYWRPdXRsaW5lZCxcbiAgQ2hlY2tDaXJjbGVPdXRsaW5lZCxcbiAgV2FybmluZ091dGxpbmVkLFxuICBDbG9zZUNpcmNsZU91dGxpbmVkLFxuICBBdWRpdE91dGxpbmVkLFxuICBQbHVzQ2lyY2xlT3V0bGluZWQsXG4gIEVkaXRPdXRsaW5lZCxcbiAgRGVsZXRlT3V0bGluZWQsXG4gIFN3YXBPdXRsaW5lZCxcbiAgTG9naW5PdXRsaW5lZCxcbiAgQmFyQ2hhcnRPdXRsaW5lZCxcbiAgUGllQ2hhcnRPdXRsaW5lZCxcbiAgVGVhbU91dGxpbmVkLFxuICBFeGNsYW1hdGlvbkNpcmNsZU91dGxpbmVkLFxufSBmcm9tICdAYW50LWRlc2lnbi9pY29ucyc7XG5pbXBvcnQge1xuICBCYXJDaGFydCwgQmFyLCBYQXhpcywgWUF4aXMsIENhcnRlc2lhbkdyaWQsIFRvb2x0aXAgYXMgUmVjaGFydHNUb29sdGlwLFxuICBSZXNwb25zaXZlQ29udGFpbmVyLCBQaWVDaGFydCwgUGllLCBDZWxsLCBMZWdlbmQsIEFyZWFDaGFydCwgQXJlYSxcbn0gZnJvbSAncmVjaGFydHMnO1xuaW1wb3J0IHsgYXVkaXRJbnRlbGxpZ2VuY2VTZXJ2aWNlIH0gZnJvbSAnLi4vYXBpJztcbmltcG9ydCB0eXBlIHsgQXVkaXRJbnRlbGxpZ2VuY2VPdmVydmlldywgQWN0b3JBY3Rpdml0eSwgUmlza0xldmVsIH0gZnJvbSAnLi4vdHlwZXMnO1xuaW1wb3J0IHsgVklTTkRUX0NPTE9SUywgQ0hBUlRfUEFMRVRURSB9IGZyb20gJy4uL2NvbXBvbmVudHMvZGVzaWduLXN5c3RlbS90b2tlbnMnO1xuXG5jb25zdCB7IFRpdGxlLCBUZXh0IH0gPSBUeXBvZ3JhcGh5O1xuXG4vLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PVxuLy8gQ29sb3JzXG4vLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PVxuY29uc3QgUklTS19DT0xPUlM6IFJlY29yZDxSaXNrTGV2ZWwsIHN0cmluZz4gPSB7XG4gIE5PUk1BTDogVklTTkRUX0NPTE9SUy5zdWNjZXNzLFxuICBXQVJOSU5HOiBWSVNORFRfQ09MT1JTLndhcm5pbmcsXG4gIENSSVRJQ0FMOiBWSVNORFRfQ09MT1JTLmVycm9yLFxufTtcblxuY29uc3QgUklTS19JQ09OUzogUmVjb3JkPFJpc2tMZXZlbCwgUmVhY3QuUmVhY3ROb2RlPiA9IHtcbiAgTk9STUFMOiA8Q2hlY2tDaXJjbGVPdXRsaW5lZCAvPixcbiAgV0FSTklORzogPFdhcm5pbmdPdXRsaW5lZCAvPixcbiAgQ1JJVElDQUw6IDxDbG9zZUNpcmNsZU91dGxpbmVkIC8+LFxufTtcblxuY29uc3QgUklTS19MQUJFTFM6IFJlY29yZDxSaXNrTGV2ZWwsIHN0cmluZz4gPSB7XG4gIE5PUk1BTDogJ+ato+W4uCcsXG4gIFdBUk5JTkc6ICforablkYonLFxuICBDUklUSUNBTDogJ+S4pemHjScsXG59O1xuXG5jb25zdCBBQ1RJT05fQ09MT1JTOiBSZWNvcmQ8c3RyaW5nLCBzdHJpbmc+ID0ge1xuICBjcmVhdGU6IFZJU05EVF9DT0xPUlMuc3VjY2VzcyxcbiAgdXBkYXRlOiAnIzI1NjNlYicsXG4gIGRlbGV0ZTogVklTTkRUX0NPTE9SUy5lcnJvcixcbiAgc3RhdHVzQ2hhbmdlOiBWSVNORFRfQ09MT1JTLndhcm5pbmcsXG4gIGxvZ2luOiAnIzcyMmVkMScsXG59O1xuXG5jb25zdCBQSUVfQ09MT1JTID0gQ0hBUlRfUEFMRVRURTtcblxuY29uc3QgVElNRV9SQU5HRVMgPSBbXG4gIHsgbGFiZWw6ICc35aSpJywgdmFsdWU6IDcgfSxcbiAgeyBsYWJlbDogJzMw5aSpJywgdmFsdWU6IDMwIH0sXG4gIHsgbGFiZWw6ICc5MOWkqScsIHZhbHVlOiA5MCB9LFxuXTtcblxuLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT1cbi8vIEF1ZGl0IEludGVsbGlnZW5jZSBQYWdlXG4vLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PVxuZnVuY3Rpb24gQXVkaXRJbnRlbGxpZ2VuY2UoKSB7XG4gIGNvbnN0IFtkYXRhLCBzZXREYXRhXSA9IHVzZVN0YXRlPEF1ZGl0SW50ZWxsaWdlbmNlT3ZlcnZpZXcgfCBudWxsPihudWxsKTtcbiAgY29uc3QgW2xvYWRpbmcsIHNldExvYWRpbmddID0gdXNlU3RhdGUodHJ1ZSk7XG4gIGNvbnN0IFtlcnJvciwgc2V0RXJyb3JdID0gdXNlU3RhdGU8c3RyaW5nIHwgbnVsbD4obnVsbCk7XG4gIGNvbnN0IFtkYXlzLCBzZXREYXlzXSA9IHVzZVN0YXRlKDcpO1xuXG4gIGNvbnN0IGZldGNoRGF0YSA9IHVzZUNhbGxiYWNrKGFzeW5jICgpID0+IHtcbiAgICBzZXRMb2FkaW5nKHRydWUpO1xuICAgIHNldEVycm9yKG51bGwpO1xuICAgIHRyeSB7XG4gICAgICBjb25zdCByZXN1bHQgPSBhd2FpdCBhdWRpdEludGVsbGlnZW5jZVNlcnZpY2UuZ2V0T3ZlcnZpZXcoZGF5cyk7XG4gICAgICBzZXREYXRhKHJlc3VsdCk7XG4gICAgfSBjYXRjaCAoZXJyKSB7XG4gICAgICBzZXRFcnJvcihlcnIgaW5zdGFuY2VvZiBFcnJvciA/IGVyci5tZXNzYWdlIDogJ+WKoOi9veWuoeiuoeaZuuiDveaVsOaNruWksei0pScpO1xuICAgIH0gZmluYWxseSB7XG4gICAgICBzZXRMb2FkaW5nKGZhbHNlKTtcbiAgICB9XG4gIH0sIFtkYXlzXSk7XG5cbiAgdXNlRWZmZWN0KCgpID0+IHtcbiAgICBmZXRjaERhdGEoKTtcbiAgfSwgW2ZldGNoRGF0YV0pO1xuXG4gIGlmIChsb2FkaW5nKSB7XG4gICAgcmV0dXJuIChcbiAgICAgIDxkaXYgc3R5bGU9e3sgdGV4dEFsaWduOiAnY2VudGVyJywgcGFkZGluZzogJzEyMHB4IDAnIH19PlxuICAgICAgICA8U3BpbiBzaXplPVwibGFyZ2VcIiAvPlxuICAgICAgPC9kaXY+XG4gICAgKTtcbiAgfVxuXG4gIGlmIChlcnJvcikge1xuICAgIHJldHVybiAoXG4gICAgICA8ZGl2IHN0eWxlPXt7IHBhZGRpbmc6IDI0IH19PlxuICAgICAgICA8QWxlcnRcbiAgICAgICAgICB0eXBlPVwiZXJyb3JcIlxuICAgICAgICAgIG1lc3NhZ2U9XCLliqDovb3lrqHorqHmmbrog73mlbDmja7lpLHotKVcIlxuICAgICAgICAgIGRlc2NyaXB0aW9uPXtlcnJvcn1cbiAgICAgICAgICBzaG93SWNvblxuICAgICAgICAgIGFjdGlvbj17XG4gICAgICAgICAgICA8UmVsb2FkT3V0bGluZWQgb25DbGljaz17ZmV0Y2hEYXRhfSBzdHlsZT17eyBjdXJzb3I6ICdwb2ludGVyJywgZm9udFNpemU6IDE2IH19IC8+XG4gICAgICAgICAgfVxuICAgICAgICAvPlxuICAgICAgPC9kaXY+XG4gICAgKTtcbiAgfVxuXG4gIGlmICghZGF0YSkge1xuICAgIHJldHVybiA8RW1wdHkgZGVzY3JpcHRpb249XCLmmoLml6DlrqHorqHmmbrog73mlbDmja5cIiAvPjtcbiAgfVxuXG4gIGNvbnN0IHRyZW5kRGF0YSA9IGRhdGEudHJlbmQubWFwKChkKSA9PiAoe1xuICAgIC4uLmQsXG4gICAgZGF0ZTogZC5kYXRlLnNsaWNlKDUpLCAvLyBNTS1ERFxuICB9KSk7XG5cbiAgcmV0dXJuIChcbiAgICA8ZGl2IHN0eWxlPXt7IHBhZGRpbmc6IDI0IH19PlxuICAgICAgPGRpdlxuICAgICAgICBzdHlsZT17e1xuICAgICAgICAgIGRpc3BsYXk6ICdmbGV4JyxcbiAgICAgICAgICBqdXN0aWZ5Q29udGVudDogJ3NwYWNlLWJldHdlZW4nLFxuICAgICAgICAgIGFsaWduSXRlbXM6ICdjZW50ZXInLFxuICAgICAgICAgIG1hcmdpbkJvdHRvbTogMTYsXG4gICAgICAgICAgZmxleFdyYXA6ICd3cmFwJyxcbiAgICAgICAgICBnYXA6IDEyLFxuICAgICAgICB9fVxuICAgICAgPlxuICAgICAgICA8ZGl2PlxuICAgICAgICAgIDxUaXRsZSBsZXZlbD17NH0gc3R5bGU9e3sgbWFyZ2luQm90dG9tOiA0IH19PlxuICAgICAgICAgICAg5a6h6K6h5pm66IO9XG4gICAgICAgICAgPC9UaXRsZT5cbiAgICAgICAgICA8VGV4dCB0eXBlPVwic2Vjb25kYXJ5XCIgc3R5bGU9e3sgZm9udFNpemU6IDEzIH19PlxuICAgICAgICAgICAg5a6h6K6h5qaC6KeIIMK3IOaTjeS9nOi2i+WKvyDCtyDlrp7kvZPliIbluIMgwrcg55So5oi35rS75YqoIMK3IOmjjumZqeaMh+agh1xuICAgICAgICAgIDwvVGV4dD5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxkaXYgc3R5bGU9e3sgZGlzcGxheTogJ2ZsZXgnLCBnYXA6IDEyLCBhbGlnbkl0ZW1zOiAnY2VudGVyJyB9fT5cbiAgICAgICAgICA8U2VnbWVudGVkXG4gICAgICAgICAgICBvcHRpb25zPXtUSU1FX1JBTkdFU31cbiAgICAgICAgICAgIHZhbHVlPXtkYXlzfVxuICAgICAgICAgICAgb25DaGFuZ2U9eyh2KSA9PiBzZXREYXlzKHYgYXMgbnVtYmVyKX1cbiAgICAgICAgICAvPlxuICAgICAgICAgIDxSZWxvYWRPdXRsaW5lZFxuICAgICAgICAgICAgb25DbGljaz17ZmV0Y2hEYXRhfVxuICAgICAgICAgICAgc3R5bGU9e3sgY3Vyc29yOiAncG9pbnRlcicsIGZvbnRTaXplOiAxOCwgY29sb3I6ICcjMjU2M2ViJyB9fVxuICAgICAgICAgIC8+XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9kaXY+XG5cbiAgICAgIHsvKiA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PVxuICAgICAgICAgIDEuIEF1ZGl0IE92ZXJ2aWV3XG4gICAgICAgPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0gKi99XG4gICAgICA8Q2FyZCB0aXRsZT17PD48QXVkaXRPdXRsaW5lZCAvPiDlrqHorqHmpoLop4g8Lz59IHN0eWxlPXt7IG1hcmdpbkJvdHRvbTogMTYgfX0+XG4gICAgICAgIDxSb3cgZ3V0dGVyPXtbMTYsIDE2XX0+XG4gICAgICAgICAgPENvbCB4cz17MTJ9IHNtPXs4fSBtZD17NH0+XG4gICAgICAgICAgICA8Q2FyZCBzaXplPVwic21hbGxcIj5cbiAgICAgICAgICAgICAgPFN0YXRpc3RpY1xuICAgICAgICAgICAgICAgIHRpdGxlPVwi5oC75LqL5Lu2XCJcbiAgICAgICAgICAgICAgICB2YWx1ZT17ZGF0YS5vdmVydmlldy50b3RhbEV2ZW50c31cbiAgICAgICAgICAgICAgICBwcmVmaXg9ezxBdWRpdE91dGxpbmVkIC8+fVxuICAgICAgICAgICAgICAgIHZhbHVlU3R5bGU9e3sgY29sb3I6ICcjMjU2M2ViJyB9fVxuICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgPC9DYXJkPlxuICAgICAgICAgIDwvQ29sPlxuICAgICAgICAgIDxDb2wgeHM9ezEyfSBzbT17OH0gbWQ9ezR9PlxuICAgICAgICAgICAgPENhcmQgc2l6ZT1cInNtYWxsXCI+XG4gICAgICAgICAgICAgIDxTdGF0aXN0aWNcbiAgICAgICAgICAgICAgICB0aXRsZT1cIuWIm+W7ulwiXG4gICAgICAgICAgICAgICAgdmFsdWU9e2RhdGEub3ZlcnZpZXcuY3JlYXRlQ291bnR9XG4gICAgICAgICAgICAgICAgcHJlZml4PXs8UGx1c0NpcmNsZU91dGxpbmVkIC8+fVxuICAgICAgICAgICAgICAgIHZhbHVlU3R5bGU9e3sgY29sb3I6IFZJU05EVF9DT0xPUlMuc3VjY2VzcyB9fVxuICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgPC9DYXJkPlxuICAgICAgICAgIDwvQ29sPlxuICAgICAgICAgIDxDb2wgeHM9ezEyfSBzbT17OH0gbWQ9ezR9PlxuICAgICAgICAgICAgPENhcmQgc2l6ZT1cInNtYWxsXCI+XG4gICAgICAgICAgICAgIDxTdGF0aXN0aWNcbiAgICAgICAgICAgICAgICB0aXRsZT1cIuabtOaWsFwiXG4gICAgICAgICAgICAgICAgdmFsdWU9e2RhdGEub3ZlcnZpZXcudXBkYXRlQ291bnR9XG4gICAgICAgICAgICAgICAgcHJlZml4PXs8RWRpdE91dGxpbmVkIC8+fVxuICAgICAgICAgICAgICAgIHZhbHVlU3R5bGU9e3sgY29sb3I6ICcjMjU2M2ViJyB9fVxuICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgPC9DYXJkPlxuICAgICAgICAgIDwvQ29sPlxuICAgICAgICAgIDxDb2wgeHM9ezEyfSBzbT17OH0gbWQ9ezR9PlxuICAgICAgICAgICAgPENhcmQgc2l6ZT1cInNtYWxsXCI+XG4gICAgICAgICAgICAgIDxTdGF0aXN0aWNcbiAgICAgICAgICAgICAgICB0aXRsZT1cIuWIoOmZpFwiXG4gICAgICAgICAgICAgICAgdmFsdWU9e2RhdGEub3ZlcnZpZXcuZGVsZXRlQ291bnR9XG4gICAgICAgICAgICAgICAgcHJlZml4PXs8RGVsZXRlT3V0bGluZWQgLz59XG4gICAgICAgICAgICAgICAgdmFsdWVTdHlsZT17eyBjb2xvcjogVklTTkRUX0NPTE9SUy5lcnJvciB9fVxuICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgPC9DYXJkPlxuICAgICAgICAgIDwvQ29sPlxuICAgICAgICAgIDxDb2wgeHM9ezEyfSBzbT17OH0gbWQ9ezR9PlxuICAgICAgICAgICAgPENhcmQgc2l6ZT1cInNtYWxsXCI+XG4gICAgICAgICAgICAgIDxTdGF0aXN0aWNcbiAgICAgICAgICAgICAgICB0aXRsZT1cIueKtuaAgeWPmOabtFwiXG4gICAgICAgICAgICAgICAgdmFsdWU9e2RhdGEub3ZlcnZpZXcuc3RhdHVzQ2hhbmdlQ291bnR9XG4gICAgICAgICAgICAgICAgcHJlZml4PXs8U3dhcE91dGxpbmVkIC8+fVxuICAgICAgICAgICAgICAgIHZhbHVlU3R5bGU9e3sgY29sb3I6IFZJU05EVF9DT0xPUlMud2FybmluZyB9fVxuICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgPC9DYXJkPlxuICAgICAgICAgIDwvQ29sPlxuICAgICAgICAgIDxDb2wgeHM9ezEyfSBzbT17OH0gbWQ9ezR9PlxuICAgICAgICAgICAgPENhcmQgc2l6ZT1cInNtYWxsXCI+XG4gICAgICAgICAgICAgIDxTdGF0aXN0aWNcbiAgICAgICAgICAgICAgICB0aXRsZT1cIueZu+W9lVwiXG4gICAgICAgICAgICAgICAgdmFsdWU9e2RhdGEub3ZlcnZpZXcubG9naW5Db3VudH1cbiAgICAgICAgICAgICAgICBwcmVmaXg9ezxMb2dpbk91dGxpbmVkIC8+fVxuICAgICAgICAgICAgICAgIHZhbHVlU3R5bGU9e3sgY29sb3I6ICcjNzIyZWQxJyB9fVxuICAgICAgICAgICAgICAvPlxuICAgICAgICAgICAgPC9DYXJkPlxuICAgICAgICAgIDwvQ29sPlxuICAgICAgICA8L1Jvdz5cbiAgICAgIDwvQ2FyZD5cblxuICAgICAgPFRhYnNcbiAgICAgICAgZGVmYXVsdEFjdGl2ZUtleT1cInRyZW5kXCJcbiAgICAgICAgaXRlbXM9e1tcbiAgICAgICAgICAvLyA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PVxuICAgICAgICAgIC8vIDIuIEF1ZGl0IFRyZW5kXG4gICAgICAgICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT1cbiAgICAgICAgICB7XG4gICAgICAgICAgICBrZXk6ICd0cmVuZCcsXG4gICAgICAgICAgICBsYWJlbDogPD48QmFyQ2hhcnRPdXRsaW5lZCAvPiDmk43kvZzotovlir88Lz4sXG4gICAgICAgICAgICBjaGlsZHJlbjogKFxuICAgICAgICAgICAgICA8Um93IGd1dHRlcj17MTZ9PlxuICAgICAgICAgICAgICAgIDxDb2wgeHM9ezI0fSBsZz17MTJ9PlxuICAgICAgICAgICAgICAgICAgPENhcmQgdGl0bGU9XCLkuovku7bmgLvph4/otovlir9cIiBzdHlsZT17eyBtYXJnaW5Cb3R0b206IDE2IH19PlxuICAgICAgICAgICAgICAgICAgICB7dHJlbmREYXRhLmxlbmd0aCA+IDAgPyAoXG4gICAgICAgICAgICAgICAgICAgICAgPFJlc3BvbnNpdmVDb250YWluZXIgd2lkdGg9XCIxMDAlXCIgaGVpZ2h0PXszMDB9PlxuICAgICAgICAgICAgICAgICAgICAgICAgPEFyZWFDaGFydCBkYXRhPXt0cmVuZERhdGF9PlxuICAgICAgICAgICAgICAgICAgICAgICAgICA8Q2FydGVzaWFuR3JpZCBzdHJva2VEYXNoYXJyYXk9XCIzIDNcIiAvPlxuICAgICAgICAgICAgICAgICAgICAgICAgICA8WEF4aXMgZGF0YUtleT1cImRhdGVcIiBmb250U2l6ZT17MTF9IC8+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxZQXhpcyBmb250U2l6ZT17MTF9IC8+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxSZWNoYXJ0c1Rvb2x0aXAgLz5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgPEFyZWEgdHlwZT1cIm1vbm90b25lXCIgZGF0YUtleT1cInRvdGFsXCIgc3Ryb2tlPVwiIzI1NjNlYlwiIGZpbGw9XCIjMjU2M2ViXCIgZmlsbE9wYWNpdHk9ezAuMTV9IC8+XG4gICAgICAgICAgICAgICAgICAgICAgICA8L0FyZWFDaGFydD5cbiAgICAgICAgICAgICAgICAgICAgICA8L1Jlc3BvbnNpdmVDb250YWluZXI+XG4gICAgICAgICAgICAgICAgICAgICkgOiAoXG4gICAgICAgICAgICAgICAgICAgICAgPEVtcHR5IGRlc2NyaXB0aW9uPVwi5pqC5peg6LaL5Yq/5pWw5o2uXCIgLz5cbiAgICAgICAgICAgICAgICAgICAgKX1cbiAgICAgICAgICAgICAgICAgIDwvQ2FyZD5cbiAgICAgICAgICAgICAgICA8L0NvbD5cbiAgICAgICAgICAgICAgICA8Q29sIHhzPXsyNH0gbGc9ezEyfT5cbiAgICAgICAgICAgICAgICAgIDxDYXJkIHRpdGxlPVwi5pON5L2c57G75Z6L5YiG5biDXCIgc3R5bGU9e3sgbWFyZ2luQm90dG9tOiAxNiB9fT5cbiAgICAgICAgICAgICAgICAgICAge3RyZW5kRGF0YS5zb21lKChkKSA9PiBkLnRvdGFsID4gMCkgPyAoXG4gICAgICAgICAgICAgICAgICAgICAgPFJlc3BvbnNpdmVDb250YWluZXIgd2lkdGg9XCIxMDAlXCIgaGVpZ2h0PXszMDB9PlxuICAgICAgICAgICAgICAgICAgICAgICAgPEJhckNoYXJ0IGRhdGE9e3RyZW5kRGF0YX0+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxDYXJ0ZXNpYW5HcmlkIHN0cm9rZURhc2hhcnJheT1cIjMgM1wiIC8+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxYQXhpcyBkYXRhS2V5PVwiZGF0ZVwiIGZvbnRTaXplPXsxMX0gLz5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgPFlBeGlzIGZvbnRTaXplPXsxMX0gLz5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgPFJlY2hhcnRzVG9vbHRpcCAvPlxuICAgICAgICAgICAgICAgICAgICAgICAgICA8QmFyIGRhdGFLZXk9XCJjcmVhdGVcIiBzdGFja0lkPVwiYVwiIGZpbGw9e0FDVElPTl9DT0xPUlMuY3JlYXRlfSBuYW1lPVwi5Yib5bu6XCIgLz5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgPEJhciBkYXRhS2V5PVwidXBkYXRlXCIgc3RhY2tJZD1cImFcIiBmaWxsPXtBQ1RJT05fQ09MT1JTLnVwZGF0ZX0gbmFtZT1cIuabtOaWsFwiIC8+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxCYXIgZGF0YUtleT1cImRlbGV0ZVwiIHN0YWNrSWQ9XCJhXCIgZmlsbD17QUNUSU9OX0NPTE9SUy5kZWxldGV9IG5hbWU9XCLliKDpmaRcIiAvPlxuICAgICAgICAgICAgICAgICAgICAgICAgICA8QmFyIGRhdGFLZXk9XCJzdGF0dXNDaGFuZ2VcIiBzdGFja0lkPVwiYVwiIGZpbGw9e0FDVElPTl9DT0xPUlMuc3RhdHVzQ2hhbmdlfSBuYW1lPVwi54q25oCB5Y+Y5pu0XCIgLz5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgPEJhciBkYXRhS2V5PVwibG9naW5cIiBzdGFja0lkPVwiYVwiIGZpbGw9e0FDVElPTl9DT0xPUlMubG9naW59IG5hbWU9XCLnmbvlvZVcIiAvPlxuICAgICAgICAgICAgICAgICAgICAgICAgPC9CYXJDaGFydD5cbiAgICAgICAgICAgICAgICAgICAgICA8L1Jlc3BvbnNpdmVDb250YWluZXI+XG4gICAgICAgICAgICAgICAgICAgICkgOiAoXG4gICAgICAgICAgICAgICAgICAgICAgPEVtcHR5IGRlc2NyaXB0aW9uPVwi5pqC5peg5pON5L2c5YiG5biD5pWw5o2uXCIgLz5cbiAgICAgICAgICAgICAgICAgICAgKX1cbiAgICAgICAgICAgICAgICAgIDwvQ2FyZD5cbiAgICAgICAgICAgICAgICA8L0NvbD5cbiAgICAgICAgICAgICAgPC9Sb3c+XG4gICAgICAgICAgICApLFxuICAgICAgICAgIH0sXG4gICAgICAgICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT1cbiAgICAgICAgICAvLyAzLiBFbnRpdHkgRGlzdHJpYnV0aW9uXG4gICAgICAgICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT1cbiAgICAgICAgICB7XG4gICAgICAgICAgICBrZXk6ICdlbnRpdHknLFxuICAgICAgICAgICAgbGFiZWw6IDw+PFBpZUNoYXJ0T3V0bGluZWQgLz4g5a6e5L2T5YiG5biDPC8+LFxuICAgICAgICAgICAgY2hpbGRyZW46IChcbiAgICAgICAgICAgICAgPFJvdyBndXR0ZXI9ezE2fT5cbiAgICAgICAgICAgICAgICA8Q29sIHhzPXsyNH0gbGc9ezEyfT5cbiAgICAgICAgICAgICAgICAgIDxDYXJkIHRpdGxlPVwi5a6e5L2T57G75Z6L5YiG5biD77yI6aW85Zu+77yJXCIgc3R5bGU9e3sgbWFyZ2luQm90dG9tOiAxNiB9fT5cbiAgICAgICAgICAgICAgICAgICAge2RhdGEuZW50aXR5RGlzdHJpYnV0aW9uLmxlbmd0aCA+IDAgPyAoXG4gICAgICAgICAgICAgICAgICAgICAgPFJlc3BvbnNpdmVDb250YWluZXIgd2lkdGg9XCIxMDAlXCIgaGVpZ2h0PXszNTB9PlxuICAgICAgICAgICAgICAgICAgICAgICAgPFBpZUNoYXJ0PlxuICAgICAgICAgICAgICAgICAgICAgICAgICA8UGllXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgZGF0YT17ZGF0YS5lbnRpdHlEaXN0cmlidXRpb259XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgZGF0YUtleT1cImNvdW50XCJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBuYW1lS2V5PVwibGFiZWxcIlxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIGN4PVwiNTAlXCJcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBjeT1cIjUwJVwiXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgb3V0ZXJSYWRpdXM9ezEyMH1cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICBsYWJlbD17KHsgcGF5bG9hZCwgcGVyY2VudCB9OiBhbnkpID0+IHtcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IHBjdCA9IHBlcmNlbnQgIT0gbnVsbCA/IChwZXJjZW50ICogMTAwKS50b0ZpeGVkKDApIDogJzAnO1xuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcmV0dXJuIGAke3BheWxvYWQubGFiZWx9ICR7cGN0fSVgO1xuICAgICAgICAgICAgICAgICAgICAgICAgICAgIH19XG4gICAgICAgICAgICAgICAgICAgICAgICAgID5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB7ZGF0YS5lbnRpdHlEaXN0cmlidXRpb24ubWFwKChfLCBpbmRleCkgPT4gKFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENlbGwga2V5PXtgY2VsbC0ke2luZGV4fWB9IGZpbGw9e1BJRV9DT0xPUlNbaW5kZXggJSBQSUVfQ09MT1JTLmxlbmd0aF19IC8+XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgKSl9XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDwvUGllPlxuICAgICAgICAgICAgICAgICAgICAgICAgICA8UmVjaGFydHNUb29sdGlwIC8+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxMZWdlbmQgLz5cbiAgICAgICAgICAgICAgICAgICAgICAgIDwvUGllQ2hhcnQ+XG4gICAgICAgICAgICAgICAgICAgICAgPC9SZXNwb25zaXZlQ29udGFpbmVyPlxuICAgICAgICAgICAgICAgICAgICApIDogKFxuICAgICAgICAgICAgICAgICAgICAgIDxFbXB0eSBkZXNjcmlwdGlvbj1cIuaaguaXoOWunuS9k+WIhuW4g+aVsOaNrlwiIC8+XG4gICAgICAgICAgICAgICAgICAgICl9XG4gICAgICAgICAgICAgICAgICA8L0NhcmQ+XG4gICAgICAgICAgICAgICAgPC9Db2w+XG4gICAgICAgICAgICAgICAgPENvbCB4cz17MjR9IGxnPXsxMn0+XG4gICAgICAgICAgICAgICAgICA8Q2FyZCB0aXRsZT1cIuWunuS9k+exu+Wei+WIhuW4g++8iOafseeKtuWbvu+8iVwiIHN0eWxlPXt7IG1hcmdpbkJvdHRvbTogMTYgfX0+XG4gICAgICAgICAgICAgICAgICAgIHtkYXRhLmVudGl0eURpc3RyaWJ1dGlvbi5sZW5ndGggPiAwID8gKFxuICAgICAgICAgICAgICAgICAgICAgIDxSZXNwb25zaXZlQ29udGFpbmVyIHdpZHRoPVwiMTAwJVwiIGhlaWdodD17MzUwfT5cbiAgICAgICAgICAgICAgICAgICAgICAgIDxCYXJDaGFydCBkYXRhPXtkYXRhLmVudGl0eURpc3RyaWJ1dGlvbn0gbGF5b3V0PVwidmVydGljYWxcIj5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgPENhcnRlc2lhbkdyaWQgc3Ryb2tlRGFzaGFycmF5PVwiMyAzXCIgLz5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgPFhBeGlzIHR5cGU9XCJudW1iZXJcIiBmb250U2l6ZT17MTF9IC8+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxZQXhpcyBkYXRhS2V5PVwibGFiZWxcIiB0eXBlPVwiY2F0ZWdvcnlcIiB3aWR0aD17ODB9IGZvbnRTaXplPXsxMX0gLz5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgPFJlY2hhcnRzVG9vbHRpcCAvPlxuICAgICAgICAgICAgICAgICAgICAgICAgICA8QmFyIGRhdGFLZXk9XCJjb3VudFwiIHJhZGl1cz17WzAsIDQsIDQsIDBdfT5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICB7ZGF0YS5lbnRpdHlEaXN0cmlidXRpb24ubWFwKChfLCBpbmRleCkgPT4gKFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgPENlbGwga2V5PXtgY2VsbC0ke2luZGV4fWB9IGZpbGw9e1BJRV9DT0xPUlNbaW5kZXggJSBQSUVfQ09MT1JTLmxlbmd0aF19IC8+XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgKSl9XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDwvQmFyPlxuICAgICAgICAgICAgICAgICAgICAgICAgPC9CYXJDaGFydD5cbiAgICAgICAgICAgICAgICAgICAgICA8L1Jlc3BvbnNpdmVDb250YWluZXI+XG4gICAgICAgICAgICAgICAgICAgICkgOiAoXG4gICAgICAgICAgICAgICAgICAgICAgPEVtcHR5IGRlc2NyaXB0aW9uPVwi5pqC5peg5a6e5L2T5YiG5biD5pWw5o2uXCIgLz5cbiAgICAgICAgICAgICAgICAgICAgKX1cbiAgICAgICAgICAgICAgICAgIDwvQ2FyZD5cbiAgICAgICAgICAgICAgICA8L0NvbD5cbiAgICAgICAgICAgICAgPC9Sb3c+XG4gICAgICAgICAgICApLFxuICAgICAgICAgIH0sXG4gICAgICAgICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT1cbiAgICAgICAgICAvLyA0LiBBY3RvciBBY3Rpdml0eVxuICAgICAgICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09XG4gICAgICAgICAge1xuICAgICAgICAgICAga2V5OiAnYWN0b3InLFxuICAgICAgICAgICAgbGFiZWw6IDw+PFRlYW1PdXRsaW5lZCAvPiDnlKjmiLfmtLvliqg8Lz4sXG4gICAgICAgICAgICBjaGlsZHJlbjogKFxuICAgICAgICAgICAgICA8Q2FyZCB0aXRsZT1cIlRvcCDnlKjmiLfmtLvliqhcIj5cbiAgICAgICAgICAgICAgICB7ZGF0YS50b3BBY3RvcnMubGVuZ3RoID4gMCA/IChcbiAgICAgICAgICAgICAgICAgIDxUYWJsZVxuICAgICAgICAgICAgICAgICAgICBkYXRhU291cmNlPXtkYXRhLnRvcEFjdG9yc31cbiAgICAgICAgICAgICAgICAgICAgcm93S2V5PVwib3BlcmF0b3JJZFwiXG4gICAgICAgICAgICAgICAgICAgIHBhZ2luYXRpb249e2ZhbHNlfVxuICAgICAgICAgICAgICAgICAgICBzaXplPVwic21hbGxcIlxuICAgICAgICAgICAgICAgICAgICBjb2x1bW5zPXtbXG4gICAgICAgICAgICAgICAgICAgICAge1xuICAgICAgICAgICAgICAgICAgICAgICAgdGl0bGU6ICfmk43kvZzkuronLFxuICAgICAgICAgICAgICAgICAgICAgICAgZGF0YUluZGV4OiAnb3BlcmF0b3JOYW1lJyxcbiAgICAgICAgICAgICAgICAgICAgICAgIGtleTogJ25hbWUnLFxuICAgICAgICAgICAgICAgICAgICAgICAgcmVuZGVyOiAobmFtZTogc3RyaW5nLCByZWNvcmQ6IEFjdG9yQWN0aXZpdHkpID0+IChcbiAgICAgICAgICAgICAgICAgICAgICAgICAgPFRvb2x0aXAgdGl0bGU9e3JlY29yZC5vcGVyYXRvckVtYWlsfT5cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8c3Bhbj57bmFtZX08L3NwYW4+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDwvVG9vbHRpcD5cbiAgICAgICAgICAgICAgICAgICAgICAgICksXG4gICAgICAgICAgICAgICAgICAgICAgfSxcbiAgICAgICAgICAgICAgICAgICAgICB7XG4gICAgICAgICAgICAgICAgICAgICAgICB0aXRsZTogJ+aAu+S6i+S7ticsXG4gICAgICAgICAgICAgICAgICAgICAgICBkYXRhSW5kZXg6ICd0b3RhbEV2ZW50cycsXG4gICAgICAgICAgICAgICAgICAgICAgICBrZXk6ICd0b3RhbCcsXG4gICAgICAgICAgICAgICAgICAgICAgICBzb3J0ZXI6IChhOiBBY3RvckFjdGl2aXR5LCBiOiBBY3RvckFjdGl2aXR5KSA9PiBhLnRvdGFsRXZlbnRzIC0gYi50b3RhbEV2ZW50cyxcbiAgICAgICAgICAgICAgICAgICAgICAgIHJlbmRlcjogKHY6IG51bWJlcikgPT4gPHN0cm9uZz57dn08L3N0cm9uZz4sXG4gICAgICAgICAgICAgICAgICAgICAgfSxcbiAgICAgICAgICAgICAgICAgICAgICB7XG4gICAgICAgICAgICAgICAgICAgICAgICB0aXRsZTogJ+WIm+W7uicsXG4gICAgICAgICAgICAgICAgICAgICAgICBkYXRhSW5kZXg6ICdjcmVhdGVDb3VudCcsXG4gICAgICAgICAgICAgICAgICAgICAgICBrZXk6ICdjcmVhdGUnLFxuICAgICAgICAgICAgICAgICAgICAgICAgcmVuZGVyOiAodjogbnVtYmVyKSA9PiA8c3BhbiBzdHlsZT17eyBjb2xvcjogVklTTkRUX0NPTE9SUy5zdWNjZXNzIH19Pnt2fTwvc3Bhbj4sXG4gICAgICAgICAgICAgICAgICAgICAgfSxcbiAgICAgICAgICAgICAgICAgICAgICB7XG4gICAgICAgICAgICAgICAgICAgICAgICB0aXRsZTogJ+abtOaWsCcsXG4gICAgICAgICAgICAgICAgICAgICAgICBkYXRhSW5kZXg6ICd1cGRhdGVDb3VudCcsXG4gICAgICAgICAgICAgICAgICAgICAgICBrZXk6ICd1cGRhdGUnLFxuICAgICAgICAgICAgICAgICAgICAgICAgcmVuZGVyOiAodjogbnVtYmVyKSA9PiA8c3BhbiBzdHlsZT17eyBjb2xvcjogJyMyNTYzZWInIH19Pnt2fTwvc3Bhbj4sXG4gICAgICAgICAgICAgICAgICAgICAgfSxcbiAgICAgICAgICAgICAgICAgICAgICB7XG4gICAgICAgICAgICAgICAgICAgICAgICB0aXRsZTogJ+WIoOmZpCcsXG4gICAgICAgICAgICAgICAgICAgICAgICBkYXRhSW5kZXg6ICdkZWxldGVDb3VudCcsXG4gICAgICAgICAgICAgICAgICAgICAgICBrZXk6ICdkZWxldGUnLFxuICAgICAgICAgICAgICAgICAgICAgICAgcmVuZGVyOiAodjogbnVtYmVyKSA9PiAoXG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxzcGFuIHN0eWxlPXt7IGNvbG9yOiB2ID4gMCA/IFZJU05EVF9DT0xPUlMuZXJyb3IgOiB1bmRlZmluZWQsIGZvbnRXZWlnaHQ6IHYgPiAwID8gNjAwIDogNDAwIH19PlxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHt2fVxuICAgICAgICAgICAgICAgICAgICAgICAgICA8L3NwYW4+XG4gICAgICAgICAgICAgICAgICAgICAgICApLFxuICAgICAgICAgICAgICAgICAgICAgIH0sXG4gICAgICAgICAgICAgICAgICAgICAge1xuICAgICAgICAgICAgICAgICAgICAgICAgdGl0bGU6ICfnirbmgIHlj5jmm7QnLFxuICAgICAgICAgICAgICAgICAgICAgICAgZGF0YUluZGV4OiAnc3RhdHVzQ2hhbmdlQ291bnQnLFxuICAgICAgICAgICAgICAgICAgICAgICAga2V5OiAnc3RhdHVzQ2hhbmdlJyxcbiAgICAgICAgICAgICAgICAgICAgICAgIHJlbmRlcjogKHY6IG51bWJlcikgPT4gPHNwYW4gc3R5bGU9e3sgY29sb3I6IFZJU05EVF9DT0xPUlMud2FybmluZyB9fT57dn08L3NwYW4+LFxuICAgICAgICAgICAgICAgICAgICAgIH0sXG4gICAgICAgICAgICAgICAgICAgICAge1xuICAgICAgICAgICAgICAgICAgICAgICAgdGl0bGU6ICfnmbvlvZUnLFxuICAgICAgICAgICAgICAgICAgICAgICAgZGF0YUluZGV4OiAnbG9naW5Db3VudCcsXG4gICAgICAgICAgICAgICAgICAgICAgICBrZXk6ICdsb2dpbicsXG4gICAgICAgICAgICAgICAgICAgICAgICByZW5kZXI6ICh2OiBudW1iZXIpID0+IDxzcGFuIHN0eWxlPXt7IGNvbG9yOiAnIzcyMmVkMScgfX0+e3Z9PC9zcGFuPixcbiAgICAgICAgICAgICAgICAgICAgICB9LFxuICAgICAgICAgICAgICAgICAgICAgIHtcbiAgICAgICAgICAgICAgICAgICAgICAgIHRpdGxlOiAn5pyA5ZCO5rS76LeDJyxcbiAgICAgICAgICAgICAgICAgICAgICAgIGRhdGFJbmRleDogJ2xhc3RBY3Rpdml0eScsXG4gICAgICAgICAgICAgICAgICAgICAgICBrZXk6ICdsYXN0JyxcbiAgICAgICAgICAgICAgICAgICAgICAgIHJlbmRlcjogKHY6IHN0cmluZykgPT4gKFxuICAgICAgICAgICAgICAgICAgICAgICAgICA8VGV4dCB0eXBlPVwic2Vjb25kYXJ5XCIgc3R5bGU9e3sgZm9udFNpemU6IDEyIH19PlxuICAgICAgICAgICAgICAgICAgICAgICAgICAgIHt2ID8gbmV3IERhdGUodikudG9Mb2NhbGVTdHJpbmcoJ3poLUNOJykgOiAnLSd9XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDwvVGV4dD5cbiAgICAgICAgICAgICAgICAgICAgICAgICksXG4gICAgICAgICAgICAgICAgICAgICAgfSxcbiAgICAgICAgICAgICAgICAgICAgXX1cbiAgICAgICAgICAgICAgICAgIC8+XG4gICAgICAgICAgICAgICAgKSA6IChcbiAgICAgICAgICAgICAgICAgIDxFbXB0eSBkZXNjcmlwdGlvbj1cIuaaguaXoOeUqOaIt+a0u+WKqOaVsOaNrlwiIC8+XG4gICAgICAgICAgICAgICAgKX1cbiAgICAgICAgICAgICAgPC9DYXJkPlxuICAgICAgICAgICAgKSxcbiAgICAgICAgICB9LFxuICAgICAgICAgIC8vID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09XG4gICAgICAgICAgLy8gNS4gUmlzayBJbmRpY2F0b3JzXG4gICAgICAgICAgLy8gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT1cbiAgICAgICAgICB7XG4gICAgICAgICAgICBrZXk6ICdyaXNrJyxcbiAgICAgICAgICAgIGxhYmVsOiA8PjxFeGNsYW1hdGlvbkNpcmNsZU91dGxpbmVkIC8+IOmjjumZqeaMh+aghzwvPixcbiAgICAgICAgICAgIGNoaWxkcmVuOiAoXG4gICAgICAgICAgICAgIDxDYXJkIHRpdGxlPVwi5a6h6K6h6aOO6Zmp5oyH5qCHXCIgZXh0cmE9ezxUZXh0IHR5cGU9XCJzZWNvbmRhcnlcIiBzdHlsZT17eyBmb250U2l6ZTogMTIgfX0+5oyH5qCH5LuF55So5LqO6KeC5a+f77yM6Z2e5a6J5YWo5Yaz562W5L6d5o2uPC9UZXh0Pn0+XG4gICAgICAgICAgICAgICAgPFJvdyBndXR0ZXI9e1sxNiwgMTZdfT5cbiAgICAgICAgICAgICAgICAgIHtkYXRhLnJpc2tJbmRpY2F0b3JzLm1hcCgoaW5kaWNhdG9yKSA9PiAoXG4gICAgICAgICAgICAgICAgICAgIDxDb2wga2V5PXtpbmRpY2F0b3IubWV0cmljfSB4cz17MjR9IHNtPXsxMn0gbGc9ezh9PlxuICAgICAgICAgICAgICAgICAgICAgIDxDYXJkXG4gICAgICAgICAgICAgICAgICAgICAgICBzaXplPVwic21hbGxcIlxuICAgICAgICAgICAgICAgICAgICAgICAgc3R5bGU9e3tcbiAgICAgICAgICAgICAgICAgICAgICAgICAgYm9yZGVyTGVmdDogYDRweCBzb2xpZCAke1JJU0tfQ09MT1JTW2luZGljYXRvci5sZXZlbF19YCxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgYmFja2dyb3VuZDogaW5kaWNhdG9yLmxldmVsID09PSAnQ1JJVElDQUwnID8gJyNmZmYyZjAnIDogaW5kaWNhdG9yLmxldmVsID09PSAnV0FSTklORycgPyAnI2ZmZmJlNicgOiB1bmRlZmluZWQsXG4gICAgICAgICAgICAgICAgICAgICAgICB9fVxuICAgICAgICAgICAgICAgICAgICAgID5cbiAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgc3R5bGU9e3sgZGlzcGxheTogJ2ZsZXgnLCBqdXN0aWZ5Q29udGVudDogJ3NwYWNlLWJldHdlZW4nLCBhbGlnbkl0ZW1zOiAnZmxleC1zdGFydCcgfX0+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgPFRleHQgdHlwZT1cInNlY29uZGFyeVwiIHN0eWxlPXt7IGZvbnRTaXplOiAxMiwgZGlzcGxheTogJ2Jsb2NrJywgbWFyZ2luQm90dG9tOiA0IH19PlxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAge2luZGljYXRvci5sYWJlbH1cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L1RleHQ+XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgPHNwYW4gc3R5bGU9e3sgZm9udFNpemU6IDI0LCBmb250V2VpZ2h0OiA2MDAsIGNvbG9yOiBSSVNLX0NPTE9SU1tpbmRpY2F0b3IubGV2ZWxdIH19PlxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAge2luZGljYXRvci52YWx1ZX1cbiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8L3NwYW4+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgICAgICAgICAgICA8VGFnIGNvbG9yPXtSSVNLX0NPTE9SU1tpbmRpY2F0b3IubGV2ZWxdfSBzdHlsZT17eyBtYXJnaW5Ub3A6IDQgfX0+XG4gICAgICAgICAgICAgICAgICAgICAgICAgICAge1JJU0tfSUNPTlNbaW5kaWNhdG9yLmxldmVsXX0ge1JJU0tfTEFCRUxTW2luZGljYXRvci5sZXZlbF19XG4gICAgICAgICAgICAgICAgICAgICAgICAgIDwvVGFnPlxuICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgICAgICAgICA8VGV4dCB0eXBlPVwic2Vjb25kYXJ5XCIgc3R5bGU9e3sgZm9udFNpemU6IDExLCBkaXNwbGF5OiAnYmxvY2snLCBtYXJnaW5Ub3A6IDggfX0+XG4gICAgICAgICAgICAgICAgICAgICAgICAgIHtpbmRpY2F0b3IuZGV0YWlsfVxuICAgICAgICAgICAgICAgICAgICAgICAgPC9UZXh0PlxuICAgICAgICAgICAgICAgICAgICAgIDwvQ2FyZD5cbiAgICAgICAgICAgICAgICAgICAgPC9Db2w+XG4gICAgICAgICAgICAgICAgICApKX1cbiAgICAgICAgICAgICAgICA8L1Jvdz5cbiAgICAgICAgICAgICAgICB7ZGF0YS5yaXNrSW5kaWNhdG9ycy5sZW5ndGggPT09IDAgJiYgKFxuICAgICAgICAgICAgICAgICAgPEVtcHR5IGRlc2NyaXB0aW9uPVwi5pqC5peg6aOO6Zmp5oyH5qCHXCIgLz5cbiAgICAgICAgICAgICAgICApfVxuICAgICAgICAgICAgICA8L0NhcmQ+XG4gICAgICAgICAgICApLFxuICAgICAgICAgIH0sXG4gICAgICAgIF19XG4gICAgICAvPlxuICAgIDwvZGl2PlxuICApO1xufVxuXG5leHBvcnQgZGVmYXVsdCBBdWRpdEludGVsbGlnZW5jZTsiXSwiZmlsZSI6IkY6L0Rlc2t0b3AvVklTTkRUL1ZJU05EVC9hcHBzL2FkbWluL3NyYy9wYWdlcy9BdWRpdEludGVsbGlnZW5jZS50c3gifQ==

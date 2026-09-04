@@ -20,7 +20,7 @@
  *   - supplier identity 一律来自 SupplierProduct.organizationId / organization（非 Offer.organizationId）
  */
 
-import type { CapabilitySupplierProductWithOffers } from '@/types/capability';
+import type { CapabilitySupplierProduct } from '@/types/capability';
 
 /** 供应商型号的规格（SupplierProduct 技术参数 override，Product-derived 原始值）。 */
 export interface SupplierModelSpecContext {
@@ -80,11 +80,11 @@ export interface SupplierRelationshipContext {
 /** 仅从已发布 SupplierProduct + Organization 汇总，零 Offer / 交易依赖。 */
 export function buildSupplierRelationshipContext(
   relatedProductId: string,
-  supplierModels: CapabilitySupplierProductWithOffers[],
+  supplierModels: CapabilitySupplierProduct[],
 ): SupplierRelationshipContext {
   const suppliers = new Map<string, SupplierContext>();
 
-  for (const { supplierProduct } of supplierModels) {
+  for (const supplierProduct of supplierModels) {
     const org = supplierProduct.organization;
     const orgId = supplierProduct.organizationId ?? org?.id;
     if (!orgId) continue;

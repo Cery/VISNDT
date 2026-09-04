@@ -63,4 +63,13 @@ export const organizationService = {
     const response = (await apiClient.patch('/organizations/batch-status', { ids, status })) as unknown as ApiResponseWrapper<{ count: number }>;
     return response.data;
   },
+
+  /** 819 Permission Foundation — enable/disable SupplierProduct self-service for an org (ADMIN). */
+  async setSupplierProductEnablement(id: string, enabled: boolean): Promise<Organization> {
+    const response = (await apiClient.patch(
+      `/organizations/${id}/supplier-product-enablement`,
+      { enabled },
+    )) as unknown as ApiResponseWrapper<Organization>;
+    return response.data;
+  },
 };

@@ -11,8 +11,9 @@ import {
   message,
   Modal,
   Input,
+  Form,
 } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { supplierProductService } from '../api';
 import type { SupplierProduct } from '../types';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
@@ -41,6 +42,8 @@ export default function SupplierProductDetailPage() {
   const [rejectOpen, setRejectOpen] = useState(false);
   const [rejectNote, setRejectNote] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editForm] = Form.useForm();
 
   const fetchData = useCallback(async () => {
     if (!id) return;
@@ -121,6 +124,67 @@ export default function SupplierProductDetailPage() {
     runAction(() => supplierProductService.reject(id!, rejectNote.trim()), '能力型号已拒绝')
       .then(() => setRejectOpen(false))
       .catch(() => undefined);
+  };
+
+  const handleEditSave = () => {
+    editForm.validateFields().then((values: Record<string, unknown>) => {
+      if (!id) return;
+      setActionLoading(true);
+      supplierProductService
+        .update(id, {
+          brand: values.brand as string,
+          series: (values.series as string) || null,
+          modelNumber: values.modelNumber as string,
+          slug: (values.slug as string) || null,
+          description: (values.description as string) || null,
+          technicalDescription: (values.technicalDescription as string) || null,
+          applicationInfo: (values.applicationInfo as string) || null,
+        })
+        .then(() => {
+          message.success('能力型号已更新');
+          setEditOpen(false);
+          fetchData();
+        })
+        .catch((err) => {
+          const msg = err instanceof Error ? err.message : '更新失败';
+          message.error(msg);
+        })
+        .finally(() => setActionLoading(false));
+    });
+  };
+
+  const handleUnpublish = () => {
+    Modal.confirm({
+      title: '下架能力型号',
+      content: '确认下架（PUBLISHED → APPROVED）？下架后将从公开发现中移除。',
+      okText: '下架',
+      okType: 'danger',
+      onOk: () => runAction(() => supplierProductService.unpublish(id!), '能力型号已下架'),
+    });
+  };
+
+  const handleDelete = () => {
+    Modal.confirm({
+      title: '删除能力型号',
+      content: '确认删除该能力型号？若存在关联 Offer，删除将被依赖保护阻止。',
+      okText: '删除',
+      okType: 'danger',
+      okButtonProps: { id: `delete-${id}` },
+      onOk: async () => {
+        if (!id) return;
+        setActionLoading(true);
+        try {
+          await supplierProductService.remove(id);
+          message.success('能力型号已删除');
+          navigate('/supplier-products');
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : '删除失败';
+          message.error(msg);
+        } finally {
+          setActionLoading(false);
+        }
+      },
+    });
   };
 
   if (pageState.status === 'loading') {
@@ -280,14 +344,27 @@ export default function SupplierProductDetailPage() {
       <Card title="审核工作流（Approval Workflow）" style={{ marginBottom: 16 }}>
         <Space wrap>
           {status === 'DRAFT' && (
-            <Button type="primary" loading={actionLoading} onClick={handleSubmit}>
-              提交（DRAFT → SUBMITTED）
-            </Button>
+            <>
+              <Button type="primary" loading={actionLoading} onClick={handleSubmit}>
+                提交（DRAFT → SUBMITTED）
+              </Button>
+              <Button icon={<EditOutlined />} loading={actionLoading} onClick={() => { editForm.setFieldsValue({ brand: sp.brand, series: sp.series ?? '', modelNumber: sp.modelNumber, slug: sp.slug ?? '', description: sp.description ?? '', technicalDescription: sp.technicalDescription ?? '', applicationInfo: sp.applicationInfo ?? '' }); setEditOpen(true); }}>
+                编辑（草稿）
+              </Button>
+              <Button danger icon={<DeleteOutlined />} loading={actionLoading} onClick={handleDelete}>
+                删除
+              </Button>
+            </>
           )}
           {status === 'SUBMITTED' && (
-            <Button type="primary" loading={actionLoading} onClick={handleReview}>
-              开始审核（SUBMITTED → REVIEWING）
-            </Button>
+            <>
+              <Button type="primary" loading={actionLoading} onClick={handleReview}>
+                开始审核（SUBMITTED → REVIEWING）
+              </Button>
+              <Button danger icon={<DeleteOutlined />} loading={actionLoading} onClick={handleDelete}>
+                删除
+              </Button>
+            </>
           )}
           {status === 'REVIEWING' && (
             <>
@@ -297,18 +374,81 @@ export default function SupplierProductDetailPage() {
               <Button danger loading={actionLoading} onClick={() => setRejectOpen(true)}>
                 拒绝（REVIEWING → REJECTED）
               </Button>
+              <Button icon={<DeleteOutlined />} loading={actionLoading} onClick={handleDelete}>
+                删除
+              </Button>
             </>
           )}
           {status === 'APPROVED' && (
-            <Button type="primary" loading={actionLoading} onClick={handlePublish}>
-              发布（APPROVED → PUBLISHED）
-            </Button>
+            <>
+              <Button type="primary" loading={actionLoading} onClick={handlePublish}>
+                发布（APPROVED → PUBLISHED）
+              </Button>
+              <Button icon={<EditOutlined />} loading={actionLoading} onClick={() => { editForm.setFieldsValue({ brand: sp.brand, series: sp.series ?? '', modelNumber: sp.modelNumber, slug: sp.slug ?? '', description: sp.description ?? '', technicalDescription: sp.technicalDescription ?? '', applicationInfo: sp.applicationInfo ?? '' }); setEditOpen(true); }}>
+                编辑（已批准，未公开）
+              </Button>
+              <Button danger icon={<DeleteOutlined />} loading={actionLoading} onClick={handleDelete}>
+                删除
+              </Button>
+            </>
           )}
-          {['REJECTED', 'PUBLISHED'].includes(status) && (
-            <Text type="secondary">当前为终态，无可执行审核操作。</Text>
+          {status === 'PUBLISHED' && (
+            <>
+              <Button type="primary" danger loading={actionLoading} onClick={handleUnpublish}>
+                下架（PUBLISHED → APPROVED）
+              </Button>
+              <Button danger icon={<DeleteOutlined />} loading={actionLoading} onClick={handleDelete}>
+                删除
+              </Button>
+            </>
+          )}
+          {status === 'REJECTED' && (
+            <Button danger icon={<DeleteOutlined />} loading={actionLoading} onClick={handleDelete}>
+              删除
+            </Button>
           )}
         </Space>
       </Card>
+
+      <Modal
+        title="编辑能力型号"
+        open={editOpen}
+        okText="保存"
+        cancelText="取消"
+        confirmLoading={actionLoading}
+        onOk={handleEditSave}
+        onCancel={() => setEditOpen(false)}
+        destroyOnHidden
+      >
+        <Form
+          form={editForm}
+          layout="vertical"
+          initialValues={{ brand: '', series: '', modelNumber: '', slug: '', description: '', technicalDescription: '', applicationInfo: '' }}
+          style={{ marginTop: 8 }}
+        >
+          <Form.Item name="brand" label="品牌（Brand）" rules={[{ required: true, message: '请输入品牌' }]}>
+            <Input maxLength={255} />
+          </Form.Item>
+          <Form.Item name="series" label="系列（Series）">
+            <Input maxLength={255} />
+          </Form.Item>
+          <Form.Item name="modelNumber" label="型号（Model Number）" rules={[{ required: true, message: '请输入型号' }]}>
+            <Input maxLength={255} />
+          </Form.Item>
+          <Form.Item name="slug" label="Slug（可选）" tooltip="唯一标识；修改必须唯一。">
+            <Input maxLength={255} />
+          </Form.Item>
+          <Form.Item name="description" label="描述（Description）">
+            <Input.TextArea rows={2} maxLength={2000} />
+          </Form.Item>
+          <Form.Item name="technicalDescription" label="技术描述（Technical Description）">
+            <Input.TextArea rows={2} maxLength={2000} />
+          </Form.Item>
+          <Form.Item name="applicationInfo" label="应用信息（Application Info）">
+            <Input.TextArea rows={2} maxLength={2000} />
+          </Form.Item>
+        </Form>
+      </Modal>
 
       <Modal
         title="拒绝能力型号"

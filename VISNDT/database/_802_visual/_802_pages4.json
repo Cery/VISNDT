@@ -1,0 +1,73 @@
+[
+  {
+    "probe": "buyer_login",
+    "email": "demo.buyer.01@visndt.local",
+    "status": 201
+  },
+  {
+    "surface": "buyer_dashboard",
+    "viewport": 375,
+    "path": "/dashboard/buyer",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "overview": true,
+    "workflow": true,
+    "err": false
+  },
+  {
+    "surface": "buyer_dashboard",
+    "viewport": 1440,
+    "path": "/dashboard/buyer",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "overview": true,
+    "workflow": true,
+    "err": false
+  },
+  {
+    "surface": "buyer_demands",
+    "viewport": 1440,
+    "path": "/workspace/demands",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "overview": true,
+    "workflow": true,
+    "err": false
+  },
+  {
+    "surface": "buyer_matches",
+    "viewport": 1440,
+    "path": "/workspace/matches",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "overview": true,
+    "workflow": true,
+    "err": false
+  },
+  {
+    "surface": "buyer_rfqs",
+    "viewport": 1440,
+    "path": "/workspace/rfqs",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "overview": true,
+    "workflow": true,
+    "err": false
+  },
+  {
+    "surface": "buyer_evaluations",
+    "viewport": 1440,
+    "path": "/workspace/evaluations",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "overview": true,
+    "workflow": true,
+    "err": false
+  }
+]

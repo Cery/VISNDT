@@ -1,0 +1,32 @@
+{
+  "task": "807_M39_Controlled_Test_Data_Cleanup",
+  "generatedAt": "2026-09-02T16:21:09.990Z",
+  "marker": "TEST/E2E/807",
+  "policy": "Controlled E2E verification data, explicitly marked, traceable, temporary; NOT production business data / maturity.",
+  "inventory": {
+    "demand": "e0672785-9e4e-4d61-8b48-454f0e1a6f33",
+    "match": "40f68c3c-2c92-4a3b-9300-3776e1759a81",
+    "rfq": "d3604b3f-dc15-4801-a7e0-5857066aa7e7",
+    "response": "d9ed1fa5-bd91-484b-9578-a77aacf31f44",
+    "inquiry": "f866c67c-7850-4efa-80d2-5c3ee5e91eab",
+    "offer": "ba16e230-9abf-4397-bd64-f3b018b4c281"
+  },
+  "legalCleanupAttempts": [
+    {
+      "method": "DELETE",
+      "target": "/demands/e0672785-9e4e-4d61-8b48-454f0e1a6f33",
+      "as": "buyer-owner",
+      "status": 403,
+      "response": "Insufficient permissions"
+    },
+    {
+      "method": "DELETE",
+      "target": "/offers/ba16e230-9abf-4397-bd64-f3b018b4c281",
+      "as": "supplier-owner",
+      "status": 403,
+      "response": "Insufficient permissions"
+    }
+  ],
+  "integrityProtection": "Legal deletion is blocked by the authority model (403 insufficient permissions observed for owner) AND, at the service layer, Demand.remove refuses to delete a demand with matches/rfqs (dependency integrity guard). Legal cleanup of a completed closed-loop record is not supported by the existing API.",
+  "cleanupStatus": "LIMITATION - records retained, marked TEST/E2E/807, traceable, temporary; removal not legally supported (permission + dependency guards); no direct DB bypass performed per policy."
+}

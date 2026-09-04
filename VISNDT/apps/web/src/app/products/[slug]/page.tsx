@@ -11,9 +11,11 @@ import { translateCategoryName } from '@/lib/translate';
 import { SITE_DESCRIPTION, absoluteUrl, buildProductJsonLd, buildBreadcrumbListJsonLd, JsonLdScript } from '@/lib/seo';
 import TrackOnMount from '@/components/analytics/TrackOnMount';
 import type { RelatedKnowledgeItem } from '@/types/knowledge-base';
-import type { Product } from '@/types/product';
+import type { Product, ProductDetail } from '@/types/product';
+import type { EngineeringAnnotation } from '@/lib/engineering-insight/annotation';
+import { resolveEngineeringAnnotations } from '@/lib/engineering-insight/annotation';
 import type { Content } from '@/types/content';
-import type { CapabilitySupplierProductWithOffers } from '@/types/capability';
+import type { CapabilitySupplierProduct } from '@/types/capability';
 
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -101,15 +103,29 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     relatedSolutions = [];
   }
 
-  // Load public Capability Discovery (published Supplier Models + commercial summary).
-  // Backend enforces SupplierProduct.status = PUBLISHED only.
-  let supplierModels: CapabilitySupplierProductWithOffers[] = [];
+  // Load public Capability Discovery (published Supplier Models, non-commercial context).
+  // P2 frozen: backend enforces SupplierProduct.status = PUBLISHED and never exposes
+  // price / currency / commercialSummary / offer payload on this public path.
+  let supplierModels: CapabilitySupplierProduct[] = [];
   try {
     const capability = await getCapabilityDetail(product.id);
     supplierModels = capability.supplierProducts ?? [];
   } catch {
     // Capability discovery failure must not block product detail — degrade to empty.
     supplierModels = [];
+  }
+
+  // Build M37 engineering-context annotations for parameter names (Insight Annotation, deterministic).
+  // Reuses existing public Content/Knowledge — no new API/entity. Degrades gracefully.
+  let parameterAnnotations: Record<string, EngineeringAnnotation> = {};
+  try {
+    const terms = (product.parameterValues ?? []).map(
+      (pv) => pv.parameterDefinition.name,
+    );
+    const annos = await resolveEngineeringAnnotations(terms);
+    parameterAnnotations = Object.fromEntries(annos.map((a) => [a.term, a]));
+  } catch {
+    parameterAnnotations = {};
   }
 
   // Build structured data
@@ -187,6 +203,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             relatedProducts={relatedProducts}
             relatedSolutions={relatedSolutions}
             supplierModels={supplierModels}
+            parameterAnnotations={parameterAnnotations}
           />
         </div>
       </div>

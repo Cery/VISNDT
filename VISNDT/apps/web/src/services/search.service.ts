@@ -23,14 +23,13 @@ import type {
 import type { Product } from '@/types/product';
 import type { Content } from '@/types/content';
 
-/** Search domain types */
+/** Search domain types — 814: removed supplier-product and supplier as active types.
+ *  Old URLs with type=supplier or type=supplier-product are normalized to 'all'. */
 export type SearchDomain =
   | 'all'
   | 'product'
   | 'knowledge'
-  | 'solution'
-  | 'supplier-product'
-  | 'supplier';
+  | 'solution';
 
 /** Unified search params */
 export interface UnifiedSearchParams {
@@ -73,13 +72,6 @@ export interface SupplierProductSearchResult {
       id: string;
       name: string;
     } | null;
-  };
-  commercialSummary: {
-    offerCount: number;
-    activeOfferCount: number;
-    priceFrom: number | null;
-    priceTo: number | null;
-    currency: string | null;
   };
   inquiryAvailable: boolean;
 }
@@ -202,13 +194,6 @@ function mapSupplierProduct(item: SupplierProductDiscoveryItem): SupplierProduct
             name: item.supplierProduct.organization.name,
           }
         : null,
-    },
-    commercialSummary: {
-      offerCount: item.commercialSummary.offerCount,
-      activeOfferCount: item.commercialSummary.activeOfferCount,
-      priceFrom: item.commercialSummary.priceFrom,
-      priceTo: item.commercialSummary.priceTo,
-      currency: item.commercialSummary.currency,
     },
     inquiryAvailable: item.inquiryAvailable,
   };

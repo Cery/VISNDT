@@ -9,10 +9,12 @@ import ErrorState from '@/components/common/ErrorState';
 import Loading from '@/components/common/Loading';
 import StatCard from '@/components/workspace/StatCard';
 import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
-import { getSupplierRuntimeProducts } from '@/services/workspace.service';
+import { getSupplierRuntimeProducts, attachSupplierProduct } from '@/services/workspace.service';
+import { getProducts } from '@/services/product.service';
 import type {
   WorkspaceSupplierProductItem,
 } from '@/lib/api/workspace';
+import type { Product } from '@/types/product';
 
 /**
  * Supplier Runtime — 661.3 M28.0 Capability Operation Boundary.
@@ -146,6 +148,74 @@ function SupplierRuntimeContent() {
   const [page, setPage] = useState(initial.page);
   const [searchInput, setSearchInput] = useState(initial.q);
 
+  // 817 Supplier Attach — associate an existing Platform Product with this org.
+  const [attachOpen, setAttachOpen] = useState(false);
+  const [attachProducts, setAttachProducts] = useState<Product[]>([]);
+  const [attachSearch, setAttachSearch] = useState('');
+  const [attachLoading, setAttachLoading] = useState(false);
+  const [selectedPlatform, setSelectedPlatform] = useState<Product | null>(null);
+  const [attaching, setAttaching] = useState(false);
+  const [attachError, setAttachError] = useState<string | null>(null);
+  const [attachNotice, setAttachNotice] = useState<{ ok: boolean; message: string } | null>(null);
+
+  const openAttach = () => {
+    setAttachOpen(true);
+    setAttachError(null);
+    setAttachNotice(null);
+    setSelectedPlatform(null);
+    setAttachProducts([]);
+    setAttachSearch('');
+  };
+
+  // Search existing Platform Products (public /admin-managed platform authority).
+  const searchAttachProducts = async () => {
+    setAttachLoading(true);
+    setAttachError(null);
+    setAttachNotice(null);
+    try {
+      const res = await getProducts({
+        page: 1,
+        pageSize: 50,
+        keyword: attachSearch.trim() || undefined,
+      });
+      setAttachProducts(res.data ?? []);
+    } catch {
+      setAttachError('加载平台产品失败，请稍后重试。');
+      setAttachProducts([]);
+    } finally {
+      setAttachLoading(false);
+    }
+  };
+
+  // Confirm: create a NEW organization-owned SupplierProduct DRAFT from the chosen
+  // Platform Product. The platform product itself is never created/mutated.
+  const confirmAttach = async () => {
+    if (!selectedPlatform) return;
+    setAttaching(true);
+    setAttachError(null);
+    setAttachNotice(null);
+    try {
+      const result = await attachSupplierProduct(selectedPlatform.id);
+      setAttachNotice({
+        ok: true,
+        message: result.alreadyAttached
+          ? `「${selectedPlatform.name}」此前已挂靠（返回既有记录），未创建重复草稿。`
+          : `已为「${selectedPlatform.name}」创建归属贵组织的供应商型号草稿（DRAFT），待平台治理审核/发布。`,
+      });
+      setSelectedPlatform(null);
+      setAttachSearch('');
+      setAttachProducts([]);
+      // Refresh draft list + overview so the new Draft is visible immediately.
+      void productsQuery.refetch();
+      void overviewQuery.refetch();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : '挂靠失败，请稍后重试。';
+      setAttachError(msg);
+    } finally {
+      setAttaching(false);
+    }
+  };
+
   // Persist filter state to the address bar so refresh / deep-link survive.
   useEffect(() => {
     const sp = new URLSearchParams();
@@ -232,9 +302,16 @@ function SupplierRuntimeContent() {
           <div>
             <h1 className="text-2xl font-bold text-slate-900">供应商运行时（Supplier Runtime）</h1>
             <p className="mt-1 text-sm text-slate-500">
-              供应商能力操作边界 — 只读查看自身 SupplierProduct、商用汇总与买方兴趣。不是商城、不是卖家中心。
+              供应商能力操作边界 — 查看自身 SupplierProduct、商用汇总、买方兴趣；并可把平台既有能力挂靠到自己组织。不是商城、不是卖家中心。
             </p>
           </div>
+          <button
+            type="button"
+            onClick={openAttach}
+            className="h-10 rounded-md bg-slate-900 px-4 text-sm font-medium text-white transition-colors hover:bg-slate-700"
+          >
+            + 挂靠平台能力
+          </button>
         </div>
 
         {/* Capability Overview */}
@@ -398,6 +475,133 @@ function SupplierRuntimeContent() {
           </div>
         </section>
       </div>
+
+      {/* 817 Attach modal — select existing Platform Product → create org-owned DRAFT */}
+      {attachOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="挂靠平台能力"
+        >
+          <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">挂靠平台能力</h2>
+                <p className="mt-1 text-xs text-slate-500">
+                  选择一个**平台既有能力**（Platform Product，平台定义、平台权威），将其挂靠为你们组织自己的供应商型号草稿。
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAttachOpen(false)}
+                className="rounded-md px-2 py-1 text-sm text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                aria-label="关闭"
+              >
+                关闭
+              </button>
+            </div>
+
+            <div className="mt-2 rounded-lg bg-slate-50 p-3 text-xs leading-relaxed text-slate-500">
+              <p>
+                <b>平台能力（Platform Product）</b> = 平台定义的能力/产品（只读，不可由供应商新增或修改）。
+              </p>
+              <p className="mt-1">
+                <b>你们的供应商型号（Supplier Product）</b> = 归属你们组织的自建实现（草稿，待平台治理审核/发布）。
+              </p>
+              <p className="mt-1">
+                挂靠≠新增平台能力、≠认领他人型号、≠共享型号；仅创建一个归属贵组织的新草稿。
+              </p>
+            </div>
+
+            {attachNotice && (
+              <div
+                className={`mt-3 rounded-md border px-3 py-2 text-sm ${
+                  attachNotice.ok
+                    ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                    : 'border-rose-200 bg-rose-50 text-rose-700'
+                }`}
+              >
+                {attachNotice.message}
+              </div>
+            )}
+            {attachError && (
+              <div className="mt-3 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+                {attachError}
+              </div>
+            )}
+
+            <div className="mt-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  type="text"
+                  value={attachSearch}
+                  onChange={(e) => setAttachSearch(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') void searchAttachProducts();
+                  }}
+                  placeholder="搜索平台能力名称…"
+                  className="h-9 w-full flex-1 rounded-md border border-slate-300 bg-white px-2 text-sm text-slate-700 focus:border-slate-500 focus:outline-none sm:w-56"
+                />
+                <button
+                  type="button"
+                  onClick={() => void searchAttachProducts()}
+                  disabled={attachLoading}
+                  className="h-9 rounded-md bg-slate-900 px-3 text-sm font-medium text-white transition-colors hover:bg-slate-700 disabled:opacity-50"
+                >
+                  搜索
+                </button>
+              </div>
+
+              <div className="mt-3 max-h-64 space-y-2 overflow-y-auto">
+                {attachLoading ? (
+                  <p className="py-6 text-center text-sm text-slate-400">加载中…</p>
+                ) : attachProducts.length === 0 ? (
+                  <p className="py-6 text-center text-sm text-slate-400">
+                    输入关键词搜索，或留空搜索全部平台能力。
+                  </p>
+                ) : (
+                  attachProducts.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setSelectedPlatform(p)}
+                      className={`w-full rounded-lg border px-3 py-2.5 text-left text-sm transition-colors ${
+                        selectedPlatform?.id === p.id
+                          ? 'border-slate-900 bg-slate-100 text-slate-900'
+                          : 'border-slate-200 bg-white text-slate-700 hover:border-slate-400'
+                      }`}
+                    >
+                      <span className="block w-full break-words font-medium">{p.name}</span>
+                      {p.model ? (
+                        <span className="mt-0.5 block text-xs text-slate-400">型号：{p.model}</span>
+                      ) : null}
+                    </button>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setAttachOpen(false)}
+                className="h-9 rounded-md border border-slate-300 px-3 text-sm text-slate-600 transition-colors hover:bg-slate-50"
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                onClick={() => void confirmAttach()}
+                disabled={!selectedPlatform || attaching}
+                className="h-9 rounded-md bg-slate-900 px-4 text-sm font-medium text-white transition-colors hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {attaching ? '挂靠中…' : '确认挂靠'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </WorkspaceLayout>
   );
 }

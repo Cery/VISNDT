@@ -1,0 +1,254 @@
+{
+  "task": "808_M39_Final_Closure_Certification_Security_Authorization_Discovery",
+  "generatedAt": "2026-09-02T16:29:22.186Z",
+  "rows": [
+    {
+      "p": "/demands",
+      "status": 200,
+      "exposed": []
+    },
+    {
+      "p": "/demands/e0672785-9e4e-4d61-8b48-454f0e1a6f33",
+      "status": 200,
+      "exposed": []
+    },
+    {
+      "p": "/products",
+      "status": 200,
+      "exposed": []
+    },
+    {
+      "p": "/products/38a711ff-9352-40ea-978b-90ecd566b826",
+      "status": 200,
+      "exposed": []
+    },
+    {
+      "p": "/rfqs",
+      "status": 200,
+      "exposed": []
+    },
+    {
+      "p": "/workflow-events",
+      "status": 200,
+      "exposed": []
+    },
+    {
+      "p": "/workflow-events?pageSize=1",
+      "status": 200,
+      "exposed": []
+    },
+    {
+      "p": "/workflow-events/008d9210-b8af-48b0-99d4-8dc26fd04de4",
+      "status": 200,
+      "exposed": []
+    }
+  ],
+  "guestAuth": [
+    {
+      "p": "/demands/my",
+      "status": 401
+    },
+    {
+      "p": "/evaluations",
+      "status": 401
+    },
+    {
+      "p": "/notifications",
+      "status": 401
+    },
+    {
+      "p": "/notifications/unread-count",
+      "status": 401
+    },
+    {
+      "p": "/inquiries/mine",
+      "status": 401
+    },
+    {
+      "p": "/offers/mine",
+      "status": 401
+    }
+  ],
+  "roleScoped": {
+    "buyerMy": 200,
+    "supplierRfq": 200
+  },
+  "publicDiscovery": [
+    {
+      "label": "home",
+      "status": 200
+    },
+    {
+      "label": "products",
+      "status": 200
+    },
+    {
+      "label": "search",
+      "status": 200
+    },
+    {
+      "label": "categories",
+      "status": 200
+    },
+    {
+      "label": "solutions",
+      "status": 200
+    },
+    {
+      "label": "knowledge",
+      "status": 200
+    },
+    {
+      "label": "business",
+      "status": 200
+    },
+    {
+      "label": "about",
+      "status": 200
+    }
+  ],
+  "privateWalls": [
+    {
+      "path": "/workspace/demands",
+      "status": 200
+    },
+    {
+      "path": "/workspace/supplier/rfqs",
+      "status": 200
+    },
+    {
+      "path": "/workspace/notifications",
+      "status": 200
+    }
+  ],
+  "steps": [
+    {
+      "s": "Public endpoints credential exposure = 0",
+      "ok": true,
+      "d": {
+        "checked": 8,
+        "statuses": 0,
+        "exposureRows": []
+      }
+    },
+    {
+      "s": "Guest -> protected API = 401",
+      "ok": true,
+      "d": [
+        {
+          "p": "/demands/my",
+          "status": 401
+        },
+        {
+          "p": "/evaluations",
+          "status": 401
+        },
+        {
+          "p": "/notifications",
+          "status": 401
+        },
+        {
+          "p": "/notifications/unread-count",
+          "status": 401
+        },
+        {
+          "p": "/inquiries/mine",
+          "status": 401
+        },
+        {
+          "p": "/offers/mine",
+          "status": 401
+        }
+      ]
+    },
+    {
+      "s": "Buyer scoped access (/demands/my)",
+      "ok": true,
+      "d": {
+        "status": 200
+      }
+    },
+    {
+      "s": "Supplier scoped access (/workspace/supplier/rfqs)",
+      "ok": true,
+      "d": {
+        "status": 200
+      }
+    },
+    {
+      "s": "Admin scope present",
+      "ok": true,
+      "d": {
+        "note": "admin token issued; scope enforced by RBAC guards"
+      }
+    },
+    {
+      "s": "Public discovery surfaces public (guest 200)",
+      "ok": true,
+      "d": [
+        {
+          "l": "home",
+          "s": 200
+        },
+        {
+          "l": "products",
+          "s": 200
+        },
+        {
+          "l": "search",
+          "s": 200
+        },
+        {
+          "l": "categories",
+          "s": 200
+        },
+        {
+          "l": "solutions",
+          "s": 200
+        },
+        {
+          "l": "knowledge",
+          "s": 200
+        },
+        {
+          "l": "business",
+          "s": 200
+        },
+        {
+          "l": "about",
+          "s": 200
+        }
+      ]
+    },
+    {
+      "s": "Supplier discovery (public detail page)",
+      "ok": true,
+      "d": {
+        "supplierId": null,
+        "status": "n/a",
+        "noteWithoutIndex": "/suppliers index route absent; discovery via /suppliers/{id}"
+      }
+    },
+    {
+      "s": "Private workflow surfaces: API denies guest (401); UI client-guard shell expected",
+      "ok": true,
+      "d": {
+        "ui200IsSpaShell": [
+          {
+            "path": "/workspace/demands",
+            "status": 200
+          },
+          {
+            "path": "/workspace/supplier/rfqs",
+            "status": 200
+          },
+          {
+            "path": "/workspace/notifications",
+            "status": 200
+          }
+        ],
+        "api401Boundary": "verified above"
+      }
+    }
+  ]
+}

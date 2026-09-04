@@ -1,0 +1,139 @@
+{
+  "task": "807_M39_Security_Authorization_Regression",
+  "generatedAt": "2026-09-02T16:10:59.813Z",
+  "publicExposure": [
+    {
+      "exposure": 0
+    },
+    {
+      "exposure": 0
+    },
+    {
+      "exposure": 0
+    },
+    {
+      "exposure": 0
+    },
+    {
+      "exposure": 0
+    },
+    {
+      "exposure": 0
+    },
+    {
+      "exposure": 0
+    },
+    {
+      "exposure": 0
+    }
+  ],
+  "exposureFindings": [],
+  "guest401": [
+    {
+      "path": "/demands/my",
+      "status": 401
+    },
+    {
+      "path": "/evaluations",
+      "status": 401
+    },
+    {
+      "path": "/notifications",
+      "status": 401
+    },
+    {
+      "path": "/notifications/unread-count",
+      "status": 401
+    },
+    {
+      "path": "/offers/mine",
+      "status": 401
+    }
+  ],
+  "org": {
+    "buyerOrg": "8b0e7521-b98b-42ab-8005-4f32f0063551",
+    "supplierOrg": "926d5a96-e1be-455c-8d58-8f4a79b6735d",
+    "distinct": true
+  },
+  "steps": [
+    {
+      "step": "Public endpoints return valid responses",
+      "ok": true,
+      "ts": "2026-09-02T16:11:00.229Z",
+      "detail": {
+        "endpoints": 8
+      }
+    },
+    {
+      "step": "Public endpoints: credential exposure = 0",
+      "ok": true,
+      "ts": "2026-09-02T16:11:00.229Z",
+      "detail": {
+        "exposureCount": 0,
+        "exposureRows": []
+      }
+    },
+    {
+      "step": "Public endpoints (authenticated): credential exposure = 0",
+      "ok": true,
+      "ts": "2026-09-02T16:11:00.310Z",
+      "detail": {
+        "exposureCount": 0,
+        "authRows": []
+      }
+    },
+    {
+      "step": "Guest private endpoints -> 401",
+      "ok": true,
+      "ts": "2026-09-02T16:11:00.320Z",
+      "detail": {
+        "guest401": [
+          {
+            "path": "/demands/my",
+            "status": 401
+          },
+          {
+            "path": "/evaluations",
+            "status": 401
+          },
+          {
+            "path": "/notifications",
+            "status": 401
+          },
+          {
+            "path": "/notifications/unread-count",
+            "status": 401
+          },
+          {
+            "path": "/offers/mine",
+            "status": 401
+          }
+        ]
+      }
+    },
+    {
+      "step": "Org isolation: supplier reads own offer",
+      "ok": true,
+      "ts": "2026-09-02T16:11:00.344Z",
+      "detail": {
+        "buyerReadStatus": 404,
+        "supplierReadStatus": 200,
+        "buyerSawSupplierData": false
+      }
+    },
+    {
+      "step": "Org isolation: buyer /demands/mine has no cross-org rows",
+      "ok": true,
+      "ts": "2026-09-02T16:11:00.361Z",
+      "detail": {
+        "crossOrg": 0
+      }
+    },
+    {
+      "step": "Org isolation: buyer/supplier RFQ lists independently scoped",
+      "ok": true,
+      "ts": "2026-09-02T16:11:00.389Z",
+      "detail": {}
+    }
+  ]
+}

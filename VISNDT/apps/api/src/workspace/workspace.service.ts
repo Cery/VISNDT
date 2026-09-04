@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import {
   DemandMatchStatus,
   DemandStatus,
@@ -6,6 +6,7 @@ import {
   OfferStatus,
   RFQStatus,
   RFQResponseStatus,
+  SupplierProductStatus,
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthRequest } from '../auth/interfaces/auth-request.interface';
@@ -20,6 +21,7 @@ import {
   WorkspaceSupplierProductsDto,
 } from './dto/workspace-supplier-product.dto';
 import { WorkspaceSupplierProductsQueryDto } from './dto/workspace-supplier-products-query.dto';
+import { WorkspaceAttachSupplierProductDto } from './dto/workspace-attach-supplier-product.dto';
 import { WorkspaceSupplierInquiryContextDto } from './dto/workspace-supplier-inquiry-context.dto';
 
 type BuyerWorkspaceUser = AuthRequest['user'];
@@ -660,6 +662,79 @@ export class WorkspaceService {
     }
 
     return user.organizationId;
+  }
+
+  /**
+   * 817 — Supplier Attach: associate an existing Platform Product with the
+   * authenticated supplier organization by creating a NEW organization-owned
+   * SupplierProduct DRAFT.
+   *
+   * Contract (817 §3):
+   *   SUPPLIER ATTACH
+   *     = Supplier selects an existing Platform Product
+   *     + system creates a NEW SupplierProduct
+   *     + organizationId = authenticated supplier organization (server-derived)
+   *     + platformProductId = selected Platform Product
+   *     + status = DRAFT
+   *
+   * It MUST NOT claim another organization's SupplierProduct, MUST NOT share one
+   * SupplierProduct between organizations, and MUST NOT create a Platform Product.
+   * Platform Authority is preserved: the selected Product is never created or
+   * mutated here.
+   *
+   * Permission gate: reuses the existing Supplier workspace authorization boundary
+   * (workspaceRole === 'SUPPLIER' + organization context) via getSupplierOrganizationId.
+   * No new RBAC system and no schema change introduced (817 §17/§18).
+   *
+   * Duplicate prevention (817 §12): the composite @unique([organizationId,
+   * platformProductId, modelNumber]) is preserved. Attach does NOT spam duplicates:
+   * if the organization already owns a SupplierProduct bound to the same Platform
+   * Product, the existing record is returned (not silently duplicated). Defining
+   * additional models for the same capability stays a future management action.
+   *
+   * Minimum required fields (817 §11): brand + modelNumber are non-null in schema.
+   * They are not "meaningless business data" here — brand is seeded from the
+   * Platform Product name; modelNumber is a deterministic placeholder derived from
+   * the Platform Product slug. Both remain editable in the future management batch.
+   */
+  async attachSupplierProduct(
+    user: BuyerWorkspaceUser,
+    dto: WorkspaceAttachSupplierProductDto,
+  ) {
+    const organizationId = this.getSupplierOrganizationId(user);
+
+    const platformProduct = await this.prisma.product.findUnique({
+      where: { id: dto.platformProductId },
+      select: { id: true, name: true, slug: true },
+    });
+    if (!platformProduct) {
+      throw new NotFoundException(
+        `Platform Product ${dto.platformProductId} not found; attach rejected. Platform Products can only be created by the platform (Admin), not by suppliers.`,
+      );
+    }
+
+    // Duplicate prevention — same org + same platform product already attached.
+    const existing = await this.prisma.supplierProduct.findFirst({
+      where: { organizationId, platformProductId: dto.platformProductId },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (existing) {
+      return { alreadyAttached: true, supplierProduct: existing };
+    }
+
+    // schema-required minimum (brand non-null, modelNumber non-null).
+    const modelNumber = `${platformProduct.slug ?? 'platform'}`;
+    const supplierProduct = await this.prisma.supplierProduct.create({
+      data: {
+        organizationId,
+        platformProductId: dto.platformProductId,
+        brand: platformProduct.name,
+        modelNumber,
+        status: SupplierProductStatus.DRAFT,
+      },
+    });
+
+    return { alreadyAttached: false, supplierProduct };
   }
 
   private createStatusCountMap<TStatus extends string>(

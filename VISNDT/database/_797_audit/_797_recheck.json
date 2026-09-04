@@ -1,0 +1,51 @@
+{
+  "note": "797 中断后复查（2026-09-02）第三方复验补证：不改代码，仅重新抓取当前运行时真实证据。",
+  "generatedAt": "2026-09-02",
+  "meta_post_fix": {
+    "compare": {
+      "title": "产品对比",
+      "canonical": "https://visndt.example.com/products/compare",
+      "robots": "index, follow",
+      "ogUrl": "https://visndt.example.com/products/compare"
+    },
+    "search": { "title": "搜索 | VISNDT", "canonical": "https://visndt.example.com/search" },
+    "knowledge": { "title": "知识中心 | VISNDT", "canonical": "https://visndt.example.com/knowledge" },
+    "knowledge_base_detail_valid_slug": {
+      "slug": "ultrasonic-flaw-detection-basics",
+      "title": "超声波探伤基本原理 | VISNDT",
+      "canonical": "https://visndt.example.com/knowledge-base/ultrasonic-flaw-detection-basics",
+      "h1": "超声波探伤基本原理",
+      "status": 200
+    }
+  },
+  "public_routes_200": {
+    "/": 200,
+    "/categories": 200,
+    "/products": 200,
+    "/products/zb-k60": 200,
+    "/search": 200,
+    "/solutions": 200,
+    "/solutions/automotive-casting-defect-inspection-solution": 200,
+    "/knowledge-base": 200,
+    "/knowledge-base/ultrasonic-flaw-detection-basics": 200,
+    "/knowledge": 200,
+    "/business": 200,
+    "/suppliers/63917638-4439-4d04-a042-8e1e66338134": 200,
+    "/products/compare": 200
+  },
+  "admin_pckm_post_fix": {
+    "loggedInPath": "/home",
+    "target": "/product-category-knowledge-mappings",
+    "rows": 9,
+    "btns": 30,
+    "hasRetry": false
+  },
+  "publishdKnowledgeEntrySlugs": [
+    "ultrasonic-flaw-detection-basics",
+    "visual-inspection-industrial-microscope",
+    "structured-light-3d-scanning",
+    "pipeline-internal-inspection-method",
+    "industrial-endoscope-parameter-guide"
+  ],
+  "note_on_kn_404": "public.json 中 knowledge_base_detail 抓的 flexible-probe-inspection-scenarios 为无效 slug（404）；有效 PUBLISHED slug 如上，已用 ultrasonic-flaw-detection-basics 补证。"
+}

@@ -13,6 +13,7 @@ import { SearchDemandDto } from './dto/search-demand.dto';
 import { QueryMatchDto } from './dto/query-match.dto';
 import { UpdateMatchStatusDto } from './dto/update-match-status.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
+import { PUBLIC_USER_SELECT } from '../common/projection/user.projection';
 import { WorkflowEventsService } from '../workflow-events/workflow-events.service';
 import { MatchingService } from '../matching/matching.service';
 import { NotificationsService } from '../notifications/notifications.service';
@@ -252,7 +253,7 @@ export class DemandsService {
         orderBy,
         include: {
           organization: true,
-          createdByUser: true,
+          createdByUser: { select: PUBLIC_USER_SELECT },
           category: true,
           parameters: { include: { parameterDefinition: true } },
           matches: {
@@ -298,7 +299,7 @@ export class DemandsService {
         orderBy: { createdAt: 'desc' },
         include: {
           organization: true,
-          createdByUser: true,
+          createdByUser: { select: PUBLIC_USER_SELECT },
           category: true,
           parameters: { include: { parameterDefinition: true } },
         },
@@ -314,7 +315,7 @@ export class DemandsService {
       where: { id },
       include: {
         organization: true,
-        createdByUser: true,
+        createdByUser: { select: PUBLIC_USER_SELECT },
         category: true,
         parameters: {
           include: { parameterDefinition: { include: { options: true } } },

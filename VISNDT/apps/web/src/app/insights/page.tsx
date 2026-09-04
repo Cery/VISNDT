@@ -1,37 +1,13 @@
-import type { Metadata } from 'next';
-import { getContentList } from '@/services/content.service';
-import type { Content } from '@/types/content';
-import ContentListLayout from '@/components/content/ContentListLayout';
-import { buildPageMetadata } from '@/lib/seo-config';
+import { redirect } from 'next/navigation';
 
-export const metadata: Metadata = buildPageMetadata({
-  title: '行业洞察',
-  description: '工业检测行业深度分析、参数解读、数据洞察与趋势研究。',
-  path: '/insights',
-});
-
-export default async function InsightsPage() {
-  let contents: Content[] = [];
-  try {
-    const result = await getContentList({ type: 'INSIGHT', pageSize: 50 });
-    contents = result.data;
-  } catch {
-    contents = [];
-  }
-
-  return (
-    <ContentListLayout
-      title="行业"
-      titleHighlight="洞察"
-      description="深度行业分析、参数解读与数据洞察，为工业检测专业决策提供参考。"
-      contents={contents}
-      countLabel={(count) => `共 ${count} 篇洞察`}
-      empty={{
-        icon: 'document',
-        title: '行业洞察',
-        message: '暂无已发布的行业洞察内容',
-        description: '深度行业分析、参数解读与数据洞察正在筹备中，敬请期待。',
-      }}
-    />
-  );
+/**
+ * 公开 Insight Library 表面退役（788 / M37 Insight Annotation Semantic Correction）。
+ *
+ * Insight 最终语义 = Contextual Engineering Annotation Layer（非公开内容频道）。
+ * /insights 不再是公开 Insight Library / 内容频道 —— 最小变更：重定向至工程知识中心，
+ * 使用户进入真实工程信息发现（Knowledge），公开 Insight 列表面退役（AC-07）。
+ * 无新 API / 无 Schema 变更。
+ */
+export default function InsightsPage() {
+  redirect('/knowledge-base');
 }

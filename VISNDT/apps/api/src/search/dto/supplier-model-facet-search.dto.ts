@@ -92,9 +92,6 @@ export class SupplierModelSearchResultItemDTO {
   @ApiProperty({ type: SupplierModelSearchFacetSummaryDTO })
   facetSummary: SupplierModelSearchFacetSummaryDTO;
 
-  @ApiProperty({ type: SupplierModelSearchCommercialSummaryDTO })
-  commercialSummary: SupplierModelSearchCommercialSummaryDTO;
-
   @ApiProperty({ description: 'Whether a Buyer Inquiry entry is available for this capability' })
   inquiryAvailable: boolean;
 }

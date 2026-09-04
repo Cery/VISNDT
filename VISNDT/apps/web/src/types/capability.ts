@@ -1,10 +1,14 @@
 /**
  * Capability Discovery types — M28.0 Hybrid Model C public read contract.
  *
+ * P2 (frozen): the public Capability read is NON-COMMERCIAL. Offer remains
+ * commercial/private and is never part of this public contract — no price,
+ * no currency, no commercialSummary, no offer payload.
+ *
  * Domain boundary:
  *   Platform Product            = Capability Authority
- *   SupplierProduct (published) = Supplier Model
- *   Offer                        = Commercial Layer
+ *   SupplierProduct (published) = Supplier Model (model context only)
+ *   Offer                        = Commercial Layer (private, NOT here)
  *
  * Only PUBLISHED SupplierProducts ever appear (backend enforces the filter).
  */
@@ -27,15 +31,6 @@ export interface CapabilitySupplierProductMedia {
   fileAssetId: string | null;
   mediaType?: string;
   title?: string | null;
-}
-
-/** Commercial layer summary — count + price band from ACTIVE offers only. */
-export interface CapabilityCommercialSummary {
-  offerCount: number;
-  activeOfferCount: number;
-  priceFrom?: number | null;
-  priceTo?: number | null;
-  currency?: string | null;
 }
 
 /** Technical parameter definition carried by a SupplierProduct override. */
@@ -69,28 +64,10 @@ export interface CapabilitySupplierProduct {
   technicalDescription?: string | null;
   organization?: CapabilityOrganization | null;
   media?: CapabilitySupplierProductMedia[];
-  commercialSummary?: CapabilityCommercialSummary;
   parameterValues?: CapabilitySupplierProductParameterValue[];
-}
-
-export interface CapabilityOffer {
-  id: string;
-  organizationId: string;
-  productId?: string | null;
-  supplierProductId?: string | null;
-  title: string;
-  description?: string | null;
-  price?: number | null;
-  currency?: string | null;
-  status?: string;
-}
-
-export interface CapabilitySupplierProductWithOffers {
-  supplierProduct: CapabilitySupplierProduct;
-  offers: CapabilityOffer[];
 }
 
 export interface CapabilityDetail {
   platformProduct: CapabilityPlatformProduct;
-  supplierProducts: CapabilitySupplierProductWithOffers[];
+  supplierProducts: CapabilitySupplierProduct[];
 }

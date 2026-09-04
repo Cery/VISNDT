@@ -185,4 +185,27 @@ export class OrganizationsService {
     });
     return { count: result.count };
   }
+
+  /**
+   * 819 Permission Foundation — Admin enables / disables SupplierProduct
+   * self-service for a target organization (opt-in, default false).
+   * Only gates the SUPPLIER self-service surface; does NOT gate Admin
+   * attach/governance nor Platform Product authority.
+   */
+  async setSupplierProductEnablement(id: string, enabled: boolean) {
+    const org = await this.prisma.organization.findUnique({ where: { id } });
+    if (!org) {
+      throw new NotFoundException(`Organization ${id} not found`);
+    }
+    return this.prisma.organization.update({
+      where: { id },
+      data: { supplierProductManagementEnabled: enabled },
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        supplierProductManagementEnabled: true,
+      },
+    });
+  }
 }

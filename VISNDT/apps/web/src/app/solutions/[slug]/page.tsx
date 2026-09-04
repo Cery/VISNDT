@@ -15,9 +15,7 @@ import {
 import MarkdownRenderer from '@/components/markdown/MarkdownRenderer';
 import ContentProductCTA from '@/components/common/ContentProductCTA';
 import DemandCTA from '@/components/conversion/DemandCTA';
-import RelatedProducts from '@/components/relation/RelatedProducts';
-import RelatedKnowledge from '@/components/relation/RelatedKnowledge';
-import RelatedSolutions from '@/components/relation/RelatedSolutions';
+import RelevantEngineeringDiscovery from '@/components/engineering/RelevantEngineeringDiscovery';
 import type { Content } from '@/types/content';
 import type { Product } from '@/types/product';
 
@@ -198,10 +196,47 @@ export default async function SolutionDetailPage({
         </div>
       </article>
 
-      {/* Commercial relation feeds — deterministic product / knowledge / solution discovery */}
-      <RelatedProducts items={relatedProducts} className="mt-12" />
-      <RelatedKnowledge items={relatedKnowledge} className="mt-2" />
-      <RelatedSolutions items={otherSolutions} className="mt-2" />
+      {/* 802_M39 — Relevant Engineering Discovery：把“相关推荐”重构为分组的“相关工程发现”——
+          related capability products / technical knowledge / solutions 折叠为单一发现面，
+          提供工程相关性框架 + 跨面下一步发现。非购物推荐，未引入 recommendation domain。 */}
+      <RelevantEngineeringDiscovery
+        capabilityAnchor={solution.title}
+        groups={[
+          {
+            label: '相关检测能力产品',
+            mono: 'PRODUCT',
+            items: relatedProducts.map((p) => ({
+              href: `/products/${p.id}`,
+              title: p.name,
+              sub: p.status === 'ACTIVE' ? '可用' : undefined,
+            })),
+            seeAllHref: '/products',
+          },
+          {
+            label: '相关技术知识',
+            mono: 'KNOWLEDGE',
+            items: relatedKnowledge.map((k) => ({
+              href: `/knowledge/${k.slug}`,
+              title: k.title,
+            })),
+            seeAllHref: '/knowledge',
+          },
+          {
+            label: '相关解决方案',
+            mono: 'SOLUTION',
+            items: otherSolutions.map((s) => ({
+              href: `/solutions/${s.slug}`,
+              title: s.title,
+            })),
+            seeAllHref: '/solutions',
+          },
+        ]}
+        nextActions={[
+          { href: '/search', label: '统一检索相关参数' },
+          { href: '/products/compare', label: '评估对比检测能力' },
+          { href: '/categories', label: '回到能力分类' },
+        ]}
+      />
 
       {/* Commercial conversion */}
       <div className="mt-12 mb-8 space-y-4">

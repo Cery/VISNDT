@@ -263,22 +263,19 @@ function RfqList() {
       title: '需求',
       dataIndex: 'demand',
       key: 'demand',
+      onCell: (record: Rfq) => ({ rowSpan: demandRowSpanMap.get(record.id) ?? 1 }),
       render: (demand: Rfq['demand'], record: Rfq) => {
-        const rowSpan = demandRowSpanMap.get(record.id) ?? 1;
         const demandId = demand?.id ?? record.demandId;
-        return {
-          children: (
-            <div>
-              <div style={{ fontWeight: 500 }}>{demand?.title || '-'}</div>
-              {demandId && (
-                <div style={{ marginTop: 4 }}>
-                  <BusinessIdentityBadge type="DEMAND" id={demandId} variant="plain" />
-                </div>
-              )}
-            </div>
-          ),
-          props: { rowSpan },
-        };
+        return (
+          <div>
+            <div style={{ fontWeight: 500 }}>{demand?.title || '-'}</div>
+            {demandId && (
+              <div style={{ marginTop: 4 }}>
+                <BusinessIdentityBadge type="DEMAND" id={demandId} variant="plain" />
+              </div>
+            )}
+          </div>
+        );
       },
     },
     {

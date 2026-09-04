@@ -15,6 +15,7 @@ import {
   Settings,
   Tag,
   Target,
+  Users,
 } from 'lucide-react';
 import { IconWrapper } from '@visndt/design-system';
 
@@ -43,6 +44,7 @@ export const UI_ICONS = {
   inbox: Inbox, // 📭
   attachment: Paperclip, // 📎
   factory: Factory, // 🏭
+  users: Users, // 👥
 } as const;
 
 export type UiIconName = keyof typeof UI_ICONS;

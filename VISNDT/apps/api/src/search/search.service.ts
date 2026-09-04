@@ -93,13 +93,6 @@ interface SupplierProductDiscoveryItem {
     status: string;
     platformProductId: string;
   };
-  commercialSummary: {
-    offerCount: number;
-    activeOfferCount: number;
-    priceFrom: number | null;
-    priceTo: number | null;
-    currency: string | null;
-  };
   inquiryAvailable: boolean;
 }
 
@@ -371,9 +364,6 @@ export class SearchService {
           platformProduct: {
             select: { id: true, name: true, slug: true, categoryId: true },
           },
-          offers: {
-            select: { id: true, status: true, price: true, currency: true },
-          },
           organization: {
             select: { id: true, name: true },
           },
@@ -383,13 +373,6 @@ export class SearchService {
     ]);
 
     const projected: SupplierProductDiscoveryItem[] = items.map((sp) => {
-      const offers = sp.offers ?? [];
-      const activeOffers = offers.filter((o) => o.status === 'ACTIVE');
-      const prices = activeOffers
-        .map((o) => Number(o.price))
-        .filter((p) => Number.isFinite(p) && p > 0)
-        .sort((a, b) => a - b);
-
       return {
         capability: sp.platformProduct
           ? {
@@ -415,16 +398,6 @@ export class SearchService {
           organization: sp.organization
             ? { id: sp.organization.id, name: sp.organization.name }
             : null,
-        },
-        commercialSummary: {
-          offerCount: offers.length,
-          activeOfferCount: activeOffers.length,
-          priceFrom: prices.length > 0 ? prices[0] : null,
-          priceTo: prices.length > 0 ? prices[prices.length - 1] : null,
-          currency:
-            activeOffers.find((o) => o.currency)?.currency ??
-            offers.find((o) => o.currency)?.currency ??
-            null,
         },
         inquiryAvailable: true,
       };

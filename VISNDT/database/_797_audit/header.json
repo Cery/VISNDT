@@ -1,0 +1,70 @@
+{
+  "375": {
+    "diag": {
+      "found": true,
+      "display": "block",
+      "visibility": "visible",
+      "w": 40,
+      "h": 40,
+      "x": 296,
+      "y": 16,
+      "inlineNavVisible": false,
+      "ariaExpanded": "false"
+    },
+    "drawer": {
+      "navCount": 2,
+      "visibleNavCount": 1,
+      "visibleLinkCount": 19
+    }
+  },
+  "768": {
+    "diag": {
+      "found": true,
+      "display": "block",
+      "visibility": "visible",
+      "w": 40,
+      "h": 40,
+      "x": 689,
+      "y": 16,
+      "inlineNavVisible": false,
+      "ariaExpanded": "false"
+    },
+    "drawer": {
+      "navCount": 2,
+      "visibleNavCount": 1,
+      "visibleLinkCount": 19
+    }
+  },
+  "1024": {
+    "diag": {
+      "found": true,
+      "display": "block",
+      "visibility": "visible",
+      "w": 40,
+      "h": 40,
+      "x": 945,
+      "y": 16,
+      "inlineNavVisible": false,
+      "ariaExpanded": "false"
+    },
+    "drawer": {
+      "navCount": 2,
+      "visibleNavCount": 1,
+      "visibleLinkCount": 19
+    }
+  },
+  "1440": {
+    "diag": {
+      "found": true,
+      "display": "none",
+      "visibility": "visible",
+      "w": 0,
+      "h": 0,
+      "x": 0,
+      "y": 0,
+      "inlineNavVisible": true,
+      "ariaExpanded": "false"
+    },
+    "drawer": null
+  }
+}

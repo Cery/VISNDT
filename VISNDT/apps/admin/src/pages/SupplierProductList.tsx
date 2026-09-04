@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Table, Spin, Alert, Button, Typography, Select, Space } from 'antd';
 import type { Key } from 'react';
-import { ReloadOutlined } from '@ant-design/icons';
+import { ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import { supplierProductService } from '../api';
@@ -112,6 +112,13 @@ function SupplierProductList() {
       />
       <Button icon={<ReloadOutlined />} onClick={handleReset}>
         重置
+      </Button>
+      <Button
+        type="primary"
+        icon={<PlusOutlined />}
+        onClick={() => navigate('/supplier-products/create')}
+      >
+        新建能力型号
       </Button>
     </Space>
   );

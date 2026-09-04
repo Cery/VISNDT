@@ -2,10 +2,10 @@
 
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import type { SearchDomain } from '@/services/search.service';
 import { unifiedSearch } from '@/services/search.service';
 import type { UnifiedSearchResults } from '@/services/search.service';
-import type { SupplierProductFacetBundle } from '@/lib/api/search';
 import { trackEvent, buildEvent } from '@/lib/analytics';
 import GlobalSearchBar from '@/components/search/GlobalSearchBar';
 import SearchTypeTabs from '@/components/search/SearchTypeTabs';
@@ -19,15 +19,18 @@ import ErrorState from '@/components/common/ErrorState';
 import ProductResultCard from '@/components/search/ProductResultCard';
 import KnowledgeResultCard from '@/components/search/KnowledgeResultCard';
 import SolutionResultCard from '@/components/search/SolutionResultCard';
-import SupplierProductResultCard from '@/components/search/SupplierProductResultCard';
-import SupplierResultCard from '@/components/search/SupplierResultCard';
-import SupplierModelFacetPanel from '@/components/search/SupplierModelFacetPanel';
+import ProductSupplierContext from '@/components/search/ProductSupplierContext';
+import type { SupplierModelCtx } from '@/components/search/ProductSupplierContext';
 import { useSearchContext } from '@/hooks/useSearchContext';
 import { useFacetFilterState } from '@/hooks/useFacetFilterState';
 import type { FilterValues, FacetFilterState } from '@/hooks/useFacetFilterState';
 import ParameterFacet from '@/components/search/ParameterFacet';
+import EngineeringDiscoveryFraming from '@/components/search/EngineeringDiscoveryFraming';
+import type { Product } from '@/types/product';
 
-const VALID_TYPES: SearchDomain[] = ['all', 'product', 'knowledge', 'solution', 'supplier-product', 'supplier'];
+// 814 — Supplier / SupplierProduct are no longer active search types. Old URLs
+// carrying type=supplier or type=supplier-product are gracefully ignored (→ all).
+const VALID_TYPES: SearchDomain[] = ['all', 'product', 'knowledge', 'solution'];
 const PAGE_SIZE = 20;
 
 function parseType(raw: string | null): SearchDomain {
@@ -35,6 +38,15 @@ function parseType(raw: string | null): SearchDomain {
     return raw as SearchDomain;
   }
   return 'all';
+}
+
+/** 814 — one Product-centered search entry: platform product + matching supplier-model context. */
+interface SearchProductEntry {
+  product: Product;
+  /** true when the card is synthesized from a matching SupplierProduct's capability
+   *  (products group was empty for a pure model / brand / series query). */
+  derived: boolean;
+  models: SupplierModelCtx[];
 }
 
 // ============================================
@@ -97,12 +109,6 @@ export default function SearchPageContent() {
   const query = searchParams.get('q') ?? '';
   const type = parseType(searchParams.get('type'));
 
-  // M28.0 M661.5 — SupplierProduct dimension facet inputs (brand / series / hasOffer).
-  // Kept on the URL so deep-links and back/forward work; derived from searchParams.
-  const spBrand = searchParams.get('sb') ?? undefined;
-  const spSeries = searchParams.get('ss') ?? undefined;
-  const spHasOffer = searchParams.get('sh') === 'true';
-
   const [results, setResults] = useState<UnifiedSearchResults | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -112,12 +118,6 @@ export default function SearchPageContent() {
   // a single `page` state derived from the URL search param. There is no second
   // local pagination state. Refresh / deep-link restore `page` from the URL.
   const page = Math.max(1, Number(searchParams.get('page')) || 1);
-
-  // M28.0 M661.6 — SupplierProduct dimension facet bundle (brand / series /
-  // commercial) served by the unified `/search` response. SearchPage never calls
-  // the legacy `/search/supplier-models` endpoint.
-  const [spFacets, setSpFacets] = useState<SupplierProductFacetBundle | null>(null);
-  const [spFacetLoading, setSpFacetLoading] = useState(false);
 
   // Guards: skip the effect-triggered replace right after a load-more page bump.
   const skipNextPageEffect = useRef(false);
@@ -135,6 +135,12 @@ export default function SearchPageContent() {
   // ─── M24.1.4: Search Context + Facet Filter State ───
 
   const { context, loading: contextLoading } = useSearchContext(query);
+
+  // M36 Engineering Discovery — query-level common technical parameters (the
+  // intersection of the candidate capabilities' relevant parameter dimensions),
+  // surfaced on Product / SupplierProduct result cards so the engineer sees
+  // WHY each result is relevant. Sourced from the existing /search/context.
+  const searchRelevantParams = useMemo(() => context?.commonFilters ?? [], [context]);
 
   const {
     state: filterState,
@@ -223,66 +229,12 @@ export default function SearchPageContent() {
       }
     });
 
-    // SupplierProduct dimension facets (brand / series / hasOffer)
-    if (spBrand) params.set('sb', spBrand);
-    else params.delete('sb');
-    if (spSeries) params.set('ss', spSeries);
-    else params.delete('ss');
-    if (spHasOffer) params.set('sh', 'true');
-    else params.delete('sh');
-
     const newSearch = params.toString();
     const newUrl = `/search${newSearch ? `?${newSearch}` : ''}`;
     if (newUrl !== `${window.location.pathname}${window.location.search}`) {
       window.history.replaceState(null, '', newUrl);
     }
-  }, [filterState, query, type, spBrand, spSeries, spHasOffer]);
-
-  // M28.0 M661.5 — SupplierProduct facet toggle handlers (URL-driven, deep-linkable)
-  const updateSpFacet = useCallback(
-    (patch: { brand?: string; series?: string; hasOffer?: boolean }) => {
-      const params = new URLSearchParams(window.location.search);
-      if (patch.brand !== undefined) {
-        if (patch.brand) params.set('sb', patch.brand);
-        else params.delete('sb');
-      }
-      if (patch.series !== undefined) {
-        if (patch.series) params.set('ss', patch.series);
-        else params.delete('ss');
-      }
-      if (patch.hasOffer !== undefined) {
-        if (patch.hasOffer) params.set('sh', 'true');
-        else params.delete('sh');
-      }
-      const qs = params.toString();
-      const url = `/search${qs ? `?${qs}` : ''}`;
-      if (url !== `${window.location.pathname}${window.location.search}`) {
-        router.replace(url, { scroll: false });
-      }
-    },
-    [router],
-  );
-
-  const toggleSpBrand = useCallback(
-    (value: string) => updateSpFacet({ brand: spBrand === value ? undefined : value }),
-    [spBrand, updateSpFacet],
-  );
-  const toggleSpSeries = useCallback(
-    (value: string) => updateSpFacet({ series: spSeries === value ? undefined : value }),
-    [spSeries, updateSpFacet],
-  );
-  const toggleSpHasOffer = useCallback(
-    () => updateSpFacet({ hasOffer: spHasOffer ? false : true }),
-    [spHasOffer, updateSpFacet],
-  );
-  const clearSpFacet = useCallback(
-    () => updateSpFacet({ brand: undefined, series: undefined, hasOffer: false }),
-    [updateSpFacet],
-  );
-
-  // M28.0 M661.6 — SupplierProduct dimension facets are served by the unified
-  // `/search` response (pagination-independent). No legacy `/search/supplier-models`
-  // call: the facet bundle is captured inside executeSearch below.
+  }, [filterState, query, type]);
 
   const executeSearch = useCallback(
     async (currentPage: number, append: boolean = false) => {
@@ -303,23 +255,16 @@ export default function SearchPageContent() {
           pageSize: PAGE_SIZE,
           category: activeFacet.category,
           filters: activeFacet.filters,
-          brand: spBrand,
-          series: spSeries,
-          hasOffer: spHasOffer,
         });
 
         if (!append) {
+          // 814 — Supplier / SupplierProduct are supporting context, not top-level
+          // result authorities. Total reflects Product + Knowledge + Solution only.
+          const productLikeCount = data.products.items.length + data.supplierProducts.items.length;
           trackEvent(buildEvent('search', {
             source: '/search',
-            metadata: { query: query.trim(), type, totalResults: data.products.total + data.supplierProducts.total + data.suppliers.total + data.knowledge.total + data.solutions.total },
+            metadata: { query: query.trim(), type, totalResults: productLikeCount + data.knowledge.total + data.solutions.total },
           }));
-        }
-
-        // M28.0 M661.6 — SupplierProduct dimension facets come from the unified
-        // `/search` response (pagination-independent), not a legacy endpoint.
-        if (data.supplierProductFacets) {
-          setSpFacets(data.supplierProductFacets);
-          setSpFacetLoading(false);
         }
 
         if (append && results) {
@@ -360,13 +305,13 @@ export default function SearchPageContent() {
         setLoadingMore(false);
       }
     },
-    [query, type, results, activeFacet, hasActiveFacetFilter, spBrand, spSeries, spHasOffer],
+    [query, type, results, activeFacet, hasActiveFacetFilter],
   );
 
   // M28.0 M661.6 — Unified Search State: the search context key captures
-  // query / type / facet / supplier facets. A context change resets page to 1;
-  // a pure `page` change (deep-link / refresh / load-more) restores that page.
-  const searchContextKey = `${query}|${type}|${facetKey}|${spBrand}|${spSeries}|${spHasOffer}`;
+  // query / type / facet. A context change resets page to 1; a pure `page`
+  // change (deep-link / refresh / load-more) restores that page.
+  const searchContextKey = `${query}|${type}|${facetKey}`;
 
   useEffect(() => {
     if (!query.trim()) {
@@ -410,7 +355,7 @@ export default function SearchPageContent() {
     }
 
     executeSearch(page, false);
-  }, [query, type, facetKey, spBrand, spSeries, spHasOffer, page, searchContextKey, router]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [query, type, facetKey, page, searchContextKey, router]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleLoadMore = useCallback(() => {
     const nextPage = page + 1;
@@ -453,20 +398,72 @@ export default function SearchPageContent() {
     };
   }, [results, filter]);
 
+  // 814 — Product-centered aggregation. SupplierProduct matching models are folded
+  // into the Platform Product as supporting context (WHICH MODEL / WHO), never as
+  // independent primary results. Order preserves Product ranking; models from the
+  // supplierProducts group attach to the matching capability id when present.
+  const productEntries = useMemo<SearchProductEntry[]>(() => {
+    if (!results) return [];
+    const entries: SearchProductEntry[] = [];
+    const entryById = new Map<string, SearchProductEntry>();
+    const pushEntry = (p: Product, derived: boolean) => {
+      const entry: SearchProductEntry = { product: p, derived, models: [] };
+      entries.push(entry);
+      entryById.set(p.id, entry);
+    };
+    for (const p of results.products.items) pushEntry(p, false);
+
+    for (const item of results.supplierProducts.items ?? []) {
+      const sp = item.supplierProduct;
+      if (!sp) continue;
+      const capId = item.capability?.id || sp.platformProductId;
+      let entry = capId ? entryById.get(capId) : undefined;
+      if (!entry) {
+        // Products group had no match for this query (pure model / brand / series).
+        // Derive the Platform Product card from the matching capability so the
+        // model stays discoverable without SupplierProduct becoming an authority.
+        const cap = item.capability;
+        const pseudo: Product = {
+          id: cap?.id || sp.platformProductId,
+          categoryId: cap?.categoryId ?? '',
+          name: cap?.name || sp.modelNumber || '能力型号',
+          model: null,
+          description: null,
+          status: 'ACTIVE',
+          createdAt: '',
+          updatedAt: '',
+          category: {
+            id: cap?.categoryId ?? '',
+            name: '',
+            slug: '',
+            parentId: null,
+            createdAt: '',
+            updatedAt: '',
+          },
+        };
+        pushEntry(pseudo, true);
+        entry = entryById.get(pseudo.id)!;
+      }
+      entry.models.push({
+        organization: sp.organization ?? null,
+        brand: sp.brand,
+        series: sp.series,
+        modelNumber: sp.modelNumber,
+      });
+    }
+    return entries;
+  }, [results]);
+
   const counts = results
     ? {
-        product: results.products.total,
-        'supplier-product': results.supplierProducts.total,
-        supplier: results.suppliers.total,
+        product: productEntries.length,
         knowledge: results.knowledge.total,
         solution: results.solutions.total,
       }
     : undefined;
 
   const hasAnyResults = results
-    ? results.products.total > 0 ||
-      results.supplierProducts.total > 0 ||
-      results.suppliers.total > 0 ||
+    ? productEntries.length > 0 ||
       results.knowledge.total > 0 ||
       results.solutions.total > 0
     : false;
@@ -475,8 +472,8 @@ export default function SearchPageContent() {
 
   const hasMore = results
     ? results.products.items.length < results.products.total ||
+      // SupplierProducts still drive pagination of the supporting model context.
       results.supplierProducts.items.length < results.supplierProducts.total ||
-      results.suppliers.items.length < results.suppliers.total ||
       results.knowledge.items.length < results.knowledge.total ||
       results.solutions.items.length < results.solutions.total
     : false;
@@ -489,10 +486,8 @@ export default function SearchPageContent() {
   const displayResults = filteredResults ?? results;
 
   // M24.1.4: Show facet when product results are visible and context is available
-  // M28.0 M661.5: also show the parameter facet + supplier-model facet panel on
-  // the supplier-product tab (capability category + tech params + brand/series).
   const showFacet =
-    hasKeyword && (type === 'product' || type === 'supplier-product' || type === 'all') && !error;
+    hasKeyword && (type === 'product' || type === 'all') && !error;
 
   // 702_M29.2 — Search Hero: when no keyword is present, the first screen is the
   // Hero (the core capability-discovery entry). Results render only after a query.
@@ -532,9 +527,7 @@ export default function SearchPageContent() {
                   搜索 &ldquo;<strong className="text-foreground">{query}</strong>&rdquo;
                   &nbsp;共找到{' '}
                   <strong className="text-foreground">
-                    {results.products.total +
-                      results.supplierProducts.total +
-                      results.suppliers.total +
+                    {productEntries.length +
                       results.knowledge.total +
                       results.solutions.total}
                   </strong>{' '}
@@ -568,21 +561,78 @@ export default function SearchPageContent() {
                 capability counts, grounded in existing /search response counts. */}
             {!loading && !error && results && hasAnyResults && (
               <SearchResultSummary
-                total={
-                  results.products.total +
-                  results.supplierProducts.total +
-                  results.suppliers.total +
-                  results.knowledge.total +
-                  results.solutions.total
-                }
+                total={productEntries.length + results.knowledge.total + results.solutions.total}
                 counts={[
-                  { label: '产品', value: results.products.total },
+                  { label: '产品', value: productEntries.length },
                   { label: '检测方案', value: results.solutions.total },
-                  { label: '能力型号', value: results.supplierProducts.total },
-                  { label: '供应商', value: results.suppliers.total },
                   { label: '知识', value: results.knowledge.total },
                 ]}
               />
+            )}
+
+            {/* M36 Engineering Discovery IA framing — answers the discoverer's
+                questions: what capability are you inspecting / which technical
+                constraints matter. Derived from the existing /search/context. */}
+            {!loading && !error && results && hasAnyResults && context && (
+              <EngineeringDiscoveryFraming
+                categories={context.relevantCategories}
+                paramCount={context.commonFilters.length}
+                totalParamValues={context.commonFilters.reduce(
+                  (acc, p) => acc + p.availableValues.length,
+                  0,
+                )}
+              />
+            )}
+
+            {/* 802 — Engineering Discovery Workbench intent band: query → facets → grouped
+                results → parameter/supplier context → next discovery */}
+            {!loading && !error && results && hasAnyResults && (
+              <div className="mt-4 rounded-xl border border-slate-200/80 bg-white overflow-hidden">
+                <div className="flex items-center gap-3 px-4 py-3 bg-industrial-dark/95">
+                  <span className="h-3 w-1 rounded-sm bg-industrial-cyan" aria-hidden="true" />
+                  <span className="font-mono text-[11px] uppercase tracking-widest text-slate-300">
+                    ENGINEERING DISCOVERY WORKBENCH
+                  </span>
+                  <span className="hidden md:inline ml-auto font-mono text-[10px] uppercase tracking-widest text-slate-500">
+                    SCOPE · FACET · EVALUATE · CONNECT
+                  </span>
+                </div>
+                <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+                    {[
+                      { mono: '01', label: '范围界定' },
+                      { mono: '02', label: '参数约束' },
+                      { mono: '03', label: '能力/方案/供应商' },
+                      { mono: '04', label: '工程连接' },
+                    ].map((s) => (
+                      <span key={s.mono} className="inline-flex items-center gap-1.5">
+                        <span className="font-mono text-[10px] uppercase tracking-widest text-industrial-cyan">{s.mono}</span>
+                        <span className="text-foreground">{s.label}</span>
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap gap-2 shrink-0">
+                    <Link
+                      href="/products/compare"
+                      className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80"
+                    >
+                      评估对比<span aria-hidden="true">→</span>
+                    </Link>
+                    <Link
+                      href="/workspace/demands/create"
+                      className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80"
+                    >
+                      发起检测需求<span aria-hidden="true">→</span>
+                    </Link>
+                    <Link
+                      href="/categories"
+                      className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80"
+                    >
+                      能力分类<span aria-hidden="true">→</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
             )}
 
             {/* M24.1.4: Two-column layout — Facet Sidebar + Results */}
@@ -601,19 +651,7 @@ export default function SearchPageContent() {
                       onClearAll={clearAllFilters}
                     />
 
-                    {/* M28.0 M661.5 — SupplierProduct dimension (brand / series / commercial) */}
-                    {type === 'supplier-product' && (
-                      <SupplierModelFacetPanel
-                        facets={spFacets}
-                        loading={spFacetLoading}
-                        selected={{ brand: spBrand, series: spSeries, hasOffer: spHasOffer }}
-                        onToggleBrand={toggleSpBrand}
-                        onToggleSeries={toggleSpSeries}
-                        onToggleHasOffer={toggleSpHasOffer}
-                        onClear={clearSpFacet}
-                      />
-                    )}
-                  </div>
+                    </div>
                 </div>
               )}
 
@@ -631,24 +669,30 @@ export default function SearchPageContent() {
                   />
                 )}
 
-                {/* 703_M29.3 — Capability Discovery IA ordering:
-                    Product Capability → Solution → SupplierProduct Capability →
-                    Knowledge. Presentation order only; backend ranking unchanged. */}
+                {/* 703_M29.3 — Capability Discovery IA ordering (814 aligned):
+                    Product (Capability) primary → Solution → Knowledge.
+                    SupplierProduct / Supplier appear only as context under Product. */}
 
-                {/* Product Capability Section */}
-                {shouldRenderSection('product', results?.products.total ?? 0) && (
+                {/* Product Capability Section — 814 primary result authority.
+                    SupplierProducts fold in as matching-model context; Suppliers
+                    as contextual providers. Never rendered as independent cards. */}
+                {shouldRenderSection('product', productEntries.length) && (
                   <SearchResultSection
                     title="产品"
-                    count={displayResults?.products.total ?? 0}
+                    count={productEntries.length}
                     loading={loading}
                     error={error}
                   >
-                    {displayResults?.products.items.map((product) => (
-                      <ProductResultCard
-                        key={product.id}
-                        product={product}
-                        highlight={query}
-                      />
+                    {productEntries.map((entry) => (
+                      <div key={entry.product.id} className="space-y-3">
+                        <ProductResultCard
+                          product={entry.product}
+                          highlight={query}
+                          relevantParams={searchRelevantParams}
+                          activeParamFilters={activeFacet.filters}
+                        />
+                        <ProductSupplierContext models={entry.models} />
+                      </div>
                     ))}
                   </SearchResultSection>
                 )}
@@ -666,42 +710,6 @@ export default function SearchPageContent() {
                         key={content.id}
                         content={content}
                         highlight={query}
-                      />
-                    ))}
-                  </SearchResultSection>
-                )}
-
-                {/* SupplierProduct Section — M28.0 M661.5 unified discovery,
-                    frontend label converged to 能力型号 */}
-                {shouldRenderSection('supplier-product', results?.supplierProducts.total ?? 0) && (
-                  <SearchResultSection
-                    title="能力型号"
-                    count={displayResults?.supplierProducts.total ?? 0}
-                    loading={loading}
-                    error={error}
-                  >
-                    {displayResults?.supplierProducts.items.map((item) => (
-                      <SupplierProductResultCard
-                        key={item.supplierProduct.id}
-                        item={item}
-                      />
-                    ))}
-                  </SearchResultSection>
-                )}
-
-                {/* Supplier Section — 758 Public Supplier Discovery Surface.
-                    Supplier = Organization(type=SUPPLIER) from PUBLISHED SupplierProduct. */}
-                {shouldRenderSection('supplier', results?.suppliers.total ?? 0) && (
-                  <SearchResultSection
-                    title="供应商"
-                    count={displayResults?.suppliers.total ?? 0}
-                    loading={loading}
-                    error={error}
-                  >
-                    {displayResults?.suppliers.items.map((item) => (
-                      <SupplierResultCard
-                        key={item.organizationId}
-                        item={item}
                       />
                     ))}
                   </SearchResultSection>

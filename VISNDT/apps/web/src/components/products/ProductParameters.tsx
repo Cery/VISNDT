@@ -1,15 +1,20 @@
 import type { ProductParameterValue, ParameterGroup } from '@/types/product';
 import ParameterHighlight from '@/components/capability/ParameterHighlight';
+import InsightAnnotation from '@/components/engineering/InsightAnnotation';
+import type { EngineeringAnnotation } from '@/lib/engineering-insight/annotation';
 
 interface ProductParametersProps {
   parameters: ProductParameterValue[];
   /** Optional group lookup for grouping display (map from groupId to group) */
   parameterGroups?: ParameterGroup[];
+  /** Optional engineering-context annotations keyed by parameter definition name (M37 Insight Annotation) */
+  annotations?: Record<string, EngineeringAnnotation>;
 }
 
 export default function ProductParameters({
   parameters,
   parameterGroups,
+  annotations,
 }: ProductParametersProps) {
   if (parameters.length === 0) {
     return (
@@ -78,6 +83,9 @@ export default function ProductParameters({
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 <span className="text-slate-600">{pv.parameterDefinition.name}</span>
+                {annotations?.[pv.parameterDefinition.name] && (
+                  <InsightAnnotation annotation={annotations[pv.parameterDefinition.name]} />
+                )}
                 {pv.parameterDefinition.unit && (
                   <span className="ml-1.5 inline-block font-mono text-[10px] text-slate-400 border border-slate-200 rounded px-1 py-0.5 align-middle">
                     {pv.parameterDefinition.unit}

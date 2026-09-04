@@ -1,0 +1,711 @@
+﻿[
+  {
+    "ok": true,
+    "label": "products",
+    "value": [
+      {
+        "id": "38a711ff-9352-40ea-978b-90ecd566b826",
+        "name": "MetroY Ultra 高精度三维扫描仪",
+        "categoryId": "9ff5f3df-c21b-454d-b885-259f8539a94a",
+        "_count": {
+          "offers": 0,
+          "parameterValues": 8
+        }
+      },
+      {
+        "id": "98fe9224-12b1-4b2e-ba5d-f17f23f7e9e2",
+        "name": "ZB-TJ095 光纤检测内窥镜",
+        "categoryId": "99f71332-98e5-417c-899a-1573b2b9184d",
+        "_count": {
+          "offers": 0,
+          "parameterValues": 8
+        }
+      },
+      {
+        "id": "a5a26d69-320f-4c95-a480-3d15f2faea2a",
+        "name": "POP 4 便携式三维扫描仪",
+        "categoryId": "9ff5f3df-c21b-454d-b885-259f8539a94a",
+        "_count": {
+          "offers": 0,
+          "parameterValues": 8
+        }
+      },
+      {
+        "id": "ebb1c034-4280-480b-89ce-29753660e126",
+        "name": "ZB-K60 工业检测内窥镜",
+        "categoryId": "bce3336c-ec10-4dca-a71d-78aec866c993",
+        "_count": {
+          "offers": 0,
+          "parameterValues": 8
+        }
+      }
+    ]
+  },
+  {
+    "ok": true,
+    "label": "offers",
+    "value": []
+  },
+  {
+    "ok": true,
+    "label": "paramDefs",
+    "value": [
+      {
+        "id": "11f38c23-4f59-40bd-a171-6155e500366b",
+        "name": "显示屏尺寸",
+        "code": "screen_size",
+        "dataType": "NUMBER",
+        "unit": "英寸"
+      },
+      {
+        "id": "1a8b6168-5db2-486d-b3d0-00e723859bb9",
+        "name": "水平线性误差",
+        "code": "horizontal_linearity_error",
+        "dataType": "NUMBER",
+        "unit": "%"
+      },
+      {
+        "id": "1f1f7071-bd19-4592-9b42-aecf9013ac8f",
+        "name": "探头类型",
+        "code": "probe_type",
+        "dataType": "STRING",
+        "unit": null
+      },
+      {
+        "id": "202f2fed-bbc6-4775-abf5-b55758c52895",
+        "name": "工作长度",
+        "code": "working_length",
+        "dataType": "NUMBER",
+        "unit": "m"
+      },
+      {
+        "id": "207d49bb-3c68-4af9-af5d-58ed2bf6baec",
+        "name": "整机重量",
+        "code": "ie_weight",
+        "dataType": "NUMBER",
+        "unit": "kg"
+      },
+      {
+        "id": "34d16f15-4008-46e6-8c7b-be9e28f07f4e",
+        "name": "防水等级",
+        "code": "waterproof",
+        "dataType": "STRING",
+        "unit": null
+      },
+      {
+        "id": "3674b459-ec93-4531-9cfd-622442691a1e",
+        "name": "图像传感器",
+        "code": "image_sensor",
+        "dataType": "STRING",
+        "unit": null
+      },
+      {
+        "id": "38484c22-2d96-4c2d-a73d-9b6deff5fa7d",
+        "name": "防护等级",
+        "code": "ie_ip_rating",
+        "dataType": "STRING",
+        "unit": null
+      },
+      {
+        "id": "3949584f-0327-474e-9632-4670a93e53ad",
+        "name": "焦距类型",
+        "code": "focus_type",
+        "dataType": "STRING",
+        "unit": null
+      },
+      {
+        "id": "408c8552-b48e-48d4-86ef-60811aeeab27",
+        "name": "存储容量",
+        "code": "ie_storage",
+        "dataType": "NUMBER",
+        "unit": "GB"
+      },
+      {
+        "id": "4395f4cc-bc2b-4966-8061-4669a3ff62ee",
+        "name": "像素",
+        "code": "pixel",
+        "dataType": "NUMBER",
+        "unit": "万"
+      },
+      {
+        "id": "4a9df924-a964-4563-9706-c0ca0f8a21ca",
+        "name": "电池容量",
+        "code": "battery_capacity",
+        "dataType": "NUMBER",
+        "unit": "mAh"
+      },
+      {
+        "id": "4c275242-ae72-45dd-b742-191a37d80ff8",
+        "name": "外形尺寸",
+        "code": "dimensions",
+        "dataType": "STRING",
+        "unit": "mm"
+      },
+      {
+        "id": "519cc910-b8d9-4044-b7ee-568f1c512c1c",
+        "name": "相对湿度",
+        "code": "relative_humidity",
+        "dataType": "STRING",
+        "unit": "%RH"
+      },
+      {
+        "id": "532c763d-565d-4360-b85e-a4af2ed7ee14",
+        "name": "照明方式",
+        "code": "illumination_type",
+        "dataType": "STRING",
+        "unit": null
+      },
+      {
+        "id": "5432d430-c40e-4c2d-a193-8c55594780c5",
+        "name": "图像分辨率",
+        "code": "image_resolution",
+        "dataType": "STRING",
+        "unit": "像素"
+      },
+      {
+        "id": "55b421e6-3390-4827-b42e-ef4c065248c4",
+        "name": "图像处理功能",
+        "code": "image_processing",
+        "dataType": "STRING",
+        "unit": null
+      },
+      {
+        "id": "567026aa-bd7a-4254-88a5-9afd924a87b2",
+        "name": "变焦倍数",
+        "code": "zoom_factor",
+        "dataType": "NUMBER",
+        "unit": "x"
+      },
+      {
+        "id": "5a7b0a6f-673f-4431-ba06-40ef052c4236",
+        "name": "工作频率",
+        "code": "operating_frequency",
+        "dataType": "STRING",
+        "unit": "MHz"
+      },
+      {
+        "id": "5f477e89-6076-4aae-9445-385f02d674a9",
+        "name": "存储温度范围",
+        "code": "storage_temperature",
+        "dataType": "STRING",
+        "unit": "℃"
+      },
+      {
+        "id": "762e86ed-bb2f-47a9-9b7e-5f47c2d535c5",
+        "name": "弯曲角度(上/下/左/右)",
+        "code": "articulation_angle",
+        "dataType": "STRING",
+        "unit": "°"
+      },
+      {
+        "id": "78508feb-813e-4da2-9633-29b2a416c08d",
+        "name": "整机重量",
+        "code": "weight",
+        "dataType": "NUMBER",
+        "unit": "kg"
+      },
+      {
+        "id": "78d69de7-108e-4b1f-91ac-89c1e6ea84df",
+        "name": "供电方式",
+        "code": "power_supply",
+        "dataType": "STRING",
+        "unit": null
+      },
+      {
+        "id": "85f684f1-1721-48ea-8a17-f70099470927",
+        "name": "重复频率",
+        "code": "repetition_rate",
+        "dataType": "STRING",
+        "unit": "Hz"
+      },
+      {
+        "id": "8c412e1e-63a7-41d6-8775-c409b6469510",
+        "name": "屏幕分辨率",
+        "code": "screen_resolution",
+        "dataType": "STRING",
+        "unit": "px"
+      },
+      {
+        "id": "8c854b27-0ab7-4c20-994f-6ed5f61b3c15",
+        "name": "增益范围",
+        "code": "gain_range",
+        "dataType": "STRING",
+        "unit": "dB"
+      },
+      {
+        "id": "8f7ff0c2-3e86-4c7f-898f-0ac6291f1912",
+        "name": "视场角",
+        "code": "fov",
+        "dataType": "NUMBER",
+        "unit": "°"
+      },
+      {
+        "id": "921898f6-1833-4804-8017-011605d53ab0",
+        "name": "工作温度",
+        "code": "operating_temp",
+        "dataType": "STRING",
+        "unit": "°C"
+      },
+      {
+        "id": "935f39d3-f862-4840-ba40-ce7ff08e0e06",
+        "name": "镜头类型",
+        "code": "lens_type",
+        "dataType": "STRING",
+        "unit": null
+      },
+      {
+        "id": "9aab3df1-6acf-4c18-ab0b-4cde1e804064",
+        "name": "TC715-1787693599528 枚举参数",
+        "code": "enum-tc715-1787693599528",
+        "dataType": "ENUM",
+        "unit": null
+      },
+      {
+        "id": "9e277e0b-7093-4f61-a9ee-5775a6f727bc",
+        "name": "检测通道数",
+        "code": "channel_count",
+        "dataType": "NUMBER",
+        "unit": "个"
+      },
+      {
+        "id": "a1ddc73d-cfa6-4700-a80a-bb6285c48ec2",
+        "name": "数据接口",
+        "code": "ie_data_interface",
+        "dataType": "STRING",
+        "unit": null
+      },
+      {
+        "id": "a89a3ba0-98fe-413d-9081-514b9cfa85db",
+        "name": "E2E测试参数",
+        "code": "e2e_test_param",
+        "dataType": "STRING",
+        "unit": null
+      },
+      {
+        "id": "ab3825f8-bd23-48d4-bdfa-8ae69c71f961",
+        "name": "工作温度范围",
+        "code": "operating_temperature",
+        "dataType": "STRING",
+        "unit": "℃"
+      },
+      {
+        "id": "b22343be-5d44-405f-b8b6-b6a7bca84b55",
+        "name": "数据接口",
+        "code": "data_interface",
+        "dataType": "STRING",
+        "unit": null
+      },
+      {
+        "id": "b58dd673-e700-4ac2-ac92-95f8fe7758be",
+        "name": "插入管材质",
+        "code": "insertion_tube_material",
+        "dataType": "STRING",
+        "unit": null
+      },
+      {
+        "id": "b7a4e18c-1d16-44f3-a47d-16453506d636",
+        "name": "工作温度",
+        "code": "ie_operating_temp",
+        "dataType": "STRING",
+        "unit": "℃"
+      },
+      {
+        "id": "b895517a-a9c0-4f5c-a166-a33a9ef587a7",
+        "name": "视频分辨率",
+        "code": "video_resolution",
+        "dataType": "STRING",
+        "unit": "像素"
+      },
+      {
+        "id": "bea406c4-e519-4e2a-b2b8-03e1604a77ab",
+        "name": "防护等级",
+        "code": "ip_rating",
+        "dataType": "STRING",
+        "unit": null
+      },
+      {
+        "id": "c1341d4a-28dc-4c44-8efc-4f4f8d001a17",
+        "name": "测量功能",
+        "code": "measurement_function",
+        "dataType": "STRING",
+        "unit": null
+      },
+      {
+        "id": "c793bbae-694f-4e35-89ea-e41b3a25aba5",
+        "name": "弯曲半径",
+        "code": "bend_radius",
+        "dataType": "NUMBER",
+        "unit": "mm"
+      },
+      {
+        "id": "cdc907fa-5578-46df-8a47-c96a258e6074",
+        "name": "显示屏尺寸",
+        "code": "ie_display_size",
+        "dataType": "STRING",
+        "unit": "英寸"
+      },
+      {
+        "id": "d2d9ad99-127b-4307-a8d6-91f04cd2ec26",
+        "name": "视场角",
+        "code": "field_of_view",
+        "dataType": "NUMBER",
+        "unit": "°"
+      },
+      {
+        "id": "d63565ad-4319-409c-b5ab-b2fd4dedc359",
+        "name": "探头直径",
+        "code": "probe_diameter",
+        "dataType": "NUMBER",
+        "unit": "mm"
+      },
+      {
+        "id": "dd67c076-82e2-4b5e-95d1-d4416cdd0e83",
+        "name": "景深",
+        "code": "depth_of_field",
+        "dataType": "STRING",
+        "unit": "mm"
+      },
+      {
+        "id": "de714203-b497-4bb5-91fe-e06d78877d5e",
+        "name": "检测范围",
+        "code": "detection_range",
+        "dataType": "STRING",
+        "unit": "mm"
+      },
+      {
+        "id": "e2115ba6-007e-4974-8dfb-cd1fca971017",
+        "name": "光源类型",
+        "code": "light_source",
+        "dataType": "ENUM",
+        "unit": null
+      },
+      {
+        "id": "eb4730e8-d349-4f55-bf71-6ec75cdd44cf",
+        "name": "电池续航",
+        "code": "ie_battery_life",
+        "dataType": "NUMBER",
+        "unit": "h"
+      },
+      {
+        "id": "ecf7c9b9-cc46-4e62-a9bb-0b0c4b131291",
+        "name": "灵敏度余量",
+        "code": "sensitivity_margin",
+        "dataType": "NUMBER",
+        "unit": "dB"
+      },
+      {
+        "id": "ef27176f-4216-4533-839c-2566b952252b",
+        "name": "导向方式",
+        "code": "steering_mode",
+        "dataType": "ENUM",
+        "unit": null
+      },
+      {
+        "id": "f464ee4f-6c73-4a7b-a126-54bb1966d630",
+        "name": "分辨率",
+        "code": "resolution",
+        "dataType": "STRING",
+        "unit": null
+      },
+      {
+        "id": "f50e51d1-4d17-4c14-aace-e7b809ad2a7b",
+        "name": "存储容量",
+        "code": "storage_capacity",
+        "dataType": "NUMBER",
+        "unit": "GB"
+      },
+      {
+        "id": "f9b20d9d-8f37-4008-a094-9a8bb1b34bee",
+        "name": "垂直线性误差",
+        "code": "vertical_linearity_error",
+        "dataType": "NUMBER",
+        "unit": "%"
+      },
+      {
+        "id": "fea93cbb-18ec-4054-9bf5-53748b740dc2",
+        "name": "续航时间",
+        "code": "battery_life",
+        "dataType": "NUMBER",
+        "unit": "h"
+      }
+    ]
+  },
+  {
+    "ok": true,
+    "label": "supplierOrgs",
+    "value": [
+      {
+        "id": "926d5a96-e1be-455c-8d58-8f4a79b6735d",
+        "name": "明视工业检测设备有限公司"
+      }
+    ]
+  },
+  {
+    "ok": true,
+    "label": "buyerOrgs",
+    "value": [
+      {
+        "id": "8b0e7521-b98b-42ab-8005-4f32f0063551",
+        "name": "江南航空检测技术中心"
+      }
+    ]
+  },
+  {
+    "ok": true,
+    "label": "supplierProducts",
+    "value": [
+      {
+        "id": "02507f4c-34fa-4aef-aabe-79fc409986e8",
+        "platformProductId": "ebb1c034-4280-480b-89ce-29753660e126",
+        "organizationId": "697c99b2-1447-491a-a68a-566f51ca9181",
+        "status": "PUBLISHED"
+      },
+      {
+        "id": "12e1816e-7719-40bc-a671-c2b469a2f683",
+        "platformProductId": "a5a26d69-320f-4c95-a480-3d15f2faea2a",
+        "organizationId": "be7e5cd7-b86e-4e75-9eb2-8d28ec41af42",
+        "status": "PUBLISHED"
+      },
+      {
+        "id": "371a9160-e1f3-44f8-abbf-a1d4d48e08fc",
+        "platformProductId": "98fe9224-12b1-4b2e-ba5d-f17f23f7e9e2",
+        "organizationId": "697c99b2-1447-491a-a68a-566f51ca9181",
+        "status": "PUBLISHED"
+      },
+      {
+        "id": "48acc93b-0418-4f76-ad71-67f213a82234",
+        "platformProductId": "38a711ff-9352-40ea-978b-90ecd566b826",
+        "organizationId": "be7e5cd7-b86e-4e75-9eb2-8d28ec41af42",
+        "status": "PUBLISHED"
+      },
+      {
+        "id": "55fc1fc5-8c21-4646-8de3-5b9dea1f3744",
+        "platformProductId": "ebb1c034-4280-480b-89ce-29753660e126",
+        "organizationId": "697c99b2-1447-491a-a68a-566f51ca9181",
+        "status": "PUBLISHED"
+      }
+    ]
+  },
+  {
+    "ok": true,
+    "label": "productParamValues",
+    "value": [
+      {
+        "productId": "38a711ff-9352-40ea-978b-90ecd566b826",
+        "n": 8,
+        "values": [
+          {
+            "def": "pixel",
+            "value": "200",
+            "valueNumber": 200,
+            "unit": "万"
+          },
+          {
+            "def": "fov",
+            "value": "49×38",
+            "valueNumber": null,
+            "unit": "°"
+          },
+          {
+            "def": "weight",
+            "value": "0.45",
+            "valueNumber": 0.45,
+            "unit": "kg"
+          },
+          {
+            "def": "dimensions",
+            "value": "211×94×47mm",
+            "valueNumber": null,
+            "unit": "mm"
+          },
+          {
+            "def": "battery_life",
+            "value": "2.5",
+            "valueNumber": 2.5,
+            "unit": "h"
+          },
+          {
+            "def": "data_interface",
+            "value": "Type-C to Type-C",
+            "valueNumber": null,
+            "unit": null
+          },
+          {
+            "def": "resolution",
+            "value": "0.015mm 单帧精度",
+            "valueNumber": null,
+            "unit": null
+          },
+          {
+            "def": "operating_temp",
+            "value": "0~40",
+            "valueNumber": null,
+            "unit": "°C"
+          }
+        ]
+      },
+      {
+        "productId": "98fe9224-12b1-4b2e-ba5d-f17f23f7e9e2",
+        "n": 8,
+        "values": [
+          {
+            "def": "probe_type",
+            "value": "光纤内窥镜探头",
+            "valueNumber": null,
+            "unit": null
+          },
+          {
+            "def": "probe_diameter",
+            "value": "3.9",
+            "valueNumber": 3.9,
+            "unit": "mm"
+          },
+          {
+            "def": "working_length",
+            "value": "1.0",
+            "valueNumber": 1,
+            "unit": "m"
+          },
+          {
+            "def": "steering_mode",
+            "value": "360°全方位摆头",
+            "valueNumber": null,
+            "unit": null
+          },
+          {
+            "def": "articulation_angle",
+            "value": "≥180",
+            "valueNumber": null,
+            "unit": "°"
+          },
+          {
+            "def": "ie_ip_rating",
+            "value": "IP67",
+            "valueNumber": null,
+            "unit": null
+          },
+          {
+            "def": "ie_operating_temp",
+            "value": "-20~70",
+            "valueNumber": null,
+            "unit": "℃"
+          },
+          {
+            "def": "insertion_tube_material",
+            "value": "软性（钨丝编织管）",
+            "valueNumber": null,
+            "unit": null
+          }
+        ]
+      },
+      {
+        "productId": "a5a26d69-320f-4c95-a480-3d15f2faea2a",
+        "n": 8,
+        "values": [
+          {
+            "def": "pixel",
+            "value": "130",
+            "valueNumber": 130,
+            "unit": "万"
+          },
+          {
+            "def": "fov",
+            "value": "46×37",
+            "valueNumber": null,
+            "unit": "°"
+          },
+          {
+            "def": "weight",
+            "value": "0.286",
+            "valueNumber": 0.286,
+            "unit": "kg"
+          },
+          {
+            "def": "dimensions",
+            "value": "160×30×72mm",
+            "valueNumber": null,
+            "unit": "mm"
+          },
+          {
+            "def": "battery_life",
+            "value": "4",
+            "valueNumber": 4,
+            "unit": "h"
+          },
+          {
+            "def": "data_interface",
+            "value": "Type-C to Type-C USB 3.0",
+            "valueNumber": null,
+            "unit": null
+          },
+          {
+            "def": "resolution",
+            "value": "0.05mm 最小点距",
+            "valueNumber": null,
+            "unit": null
+          },
+          {
+            "def": "operating_temp",
+            "value": "0~40",
+            "valueNumber": null,
+            "unit": "°C"
+          }
+        ]
+      },
+      {
+        "productId": "ebb1c034-4280-480b-89ce-29753660e126",
+        "n": 8,
+        "values": [
+          {
+            "def": "probe_type",
+            "value": "电子内窥镜探头",
+            "valueNumber": null,
+            "unit": null
+          },
+          {
+            "def": "probe_diameter",
+            "value": "8",
+            "valueNumber": 8,
+            "unit": "mm"
+          },
+          {
+            "def": "working_length",
+            "value": "2.0",
+            "valueNumber": 2,
+            "unit": "m"
+          },
+          {
+            "def": "steering_mode",
+            "value": "360°全方位摆头",
+            "valueNumber": null,
+            "unit": null
+          },
+          {
+            "def": "articulation_angle",
+            "value": "≥180",
+            "valueNumber": null,
+            "unit": "°"
+          },
+          {
+            "def": "ie_ip_rating",
+            "value": "IP67",
+            "valueNumber": null,
+            "unit": null
+          },
+          {
+            "def": "ie_operating_temp",
+            "value": "-20~70",
+            "valueNumber": null,
+            "unit": "℃"
+          },
+          {
+            "def": "insertion_tube_material",
+            "value": "软性（钨丝编织管）",
+            "valueNumber": null,
+            "unit": null
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,117 @@
+{
+  "task": "807_M39_Workflow_Notification_Evidence",
+  "generatedAt": "2026-09-02T16:19:48.549Z",
+  "chain": {
+    "demand": "e0672785-9e4e-4d61-8b48-454f0e1a6f33",
+    "match": "40f68c3c-2c92-4a3b-9300-3776e1759a81",
+    "rfq": "d3604b3f-dc15-4801-a7e0-5857066aa7e7",
+    "response": "d9ed1fa5-bd91-484b-9578-a77aacf31f44",
+    "inquiry": "f866c67c-7850-4efa-80d2-5c3ee5e91eab",
+    "offer": "ba16e230-9abf-4397-bd64-f3b018b4c281"
+  },
+  "events": {
+    "demand": [
+      {
+        "entityType": "DEMAND",
+        "action": "OPENED",
+        "actor": "张检测",
+        "organizationId": "926d5a96-e1be-455c-8d58-8f4a79b6735d",
+        "createdAt": "2026-09-02T16:10:10.502Z"
+      },
+      {
+        "entityType": "DEMAND",
+        "action": "CREATED",
+        "actor": "张检测",
+        "organizationId": "926d5a96-e1be-455c-8d58-8f4a79b6735d",
+        "createdAt": "2026-09-02T16:10:10.416Z"
+      }
+    ],
+    "match": [
+      {
+        "entityType": "MATCH",
+        "action": "ACCEPTED",
+        "actor": "张检测",
+        "organizationId": "926d5a96-e1be-455c-8d58-8f4a79b6735d",
+        "createdAt": "2026-09-02T16:10:11.589Z"
+      },
+      {
+        "entityType": "MATCH",
+        "action": "RESPONDED",
+        "actor": "张检测",
+        "organizationId": "926d5a96-e1be-455c-8d58-8f4a79b6735d",
+        "createdAt": "2026-09-02T16:10:11.556Z"
+      },
+      {
+        "entityType": "MATCH",
+        "action": "SUBMITTED",
+        "actor": "张检测",
+        "organizationId": "926d5a96-e1be-455c-8d58-8f4a79b6735d",
+        "createdAt": "2026-09-02T16:10:11.515Z"
+      },
+      {
+        "entityType": "MATCH",
+        "action": "CREATED",
+        "actor": "张检测",
+        "organizationId": "926d5a96-e1be-455c-8d58-8f4a79b6735d",
+        "createdAt": "2026-09-02T16:10:10.550Z"
+      }
+    ],
+    "rfq": [
+      {
+        "entityType": "RFQ",
+        "action": "OPENED",
+        "actor": "张检测",
+        "organizationId": "926d5a96-e1be-455c-8d58-8f4a79b6735d",
+        "createdAt": "2026-09-02T16:10:11.653Z"
+      },
+      {
+        "entityType": "RFQ",
+        "action": "CREATED",
+        "actor": "张检测",
+        "organizationId": "926d5a96-e1be-455c-8d58-8f4a79b6735d",
+        "createdAt": "2026-09-02T16:10:11.629Z"
+      }
+    ],
+    "response": [
+      {
+        "entityType": "RFQ_RESPONSE",
+        "action": "ACCEPTED",
+        "actor": "张检测",
+        "organizationId": "926d5a96-e1be-455c-8d58-8f4a79b6735d",
+        "createdAt": "2026-09-02T16:10:11.742Z"
+      },
+      {
+        "entityType": "RFQ_RESPONSE",
+        "action": "REVIEWED",
+        "actor": "张检测",
+        "organizationId": "926d5a96-e1be-455c-8d58-8f4a79b6735d",
+        "createdAt": "2026-09-02T16:10:11.719Z"
+      },
+      {
+        "entityType": "RFQ_RESPONSE",
+        "action": "CREATED",
+        "actor": "王明视",
+        "organizationId": "926d5a96-e1be-455c-8d58-8f4a79b6735d",
+        "createdAt": "2026-09-02T16:10:11.684Z"
+      }
+    ]
+  },
+  "notifications": {
+    "buyer": {
+      "orgId": "8b0e7521-b98b-42ab-8005-4f32f0063551",
+      "count": 12,
+      "related": []
+    },
+    "supplier": {
+      "orgId": "926d5a96-e1be-455c-8d58-8f4a79b6735d",
+      "count": 3,
+      "related": [
+        {
+          "title": "New Product Inquiry: MetroY Ultra 高精度三维扫描仪",
+          "refType": "INQUIRY",
+          "status": "UNREAD"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "login": {
+    "ok": true,
+    "email": "demo.admin@visndt.local"
+  },
+  "probes": [
+    {
+      "name": "home/stats",
+      "path": "/admin/dashboard/stats",
+      "status": 200,
+      "message": "OK"
+    },
+    {
+      "name": "home/activities",
+      "path": "/admin/dashboard/activities",
+      "status": 200,
+      "message": "OK"
+    },
+    {
+      "name": "home/pending",
+      "path": "/admin/dashboard/pending",
+      "status": 200,
+      "message": "OK"
+    },
+    {
+      "name": "operation(stats)",
+      "path": "/admin/dashboard/stats",
+      "status": 200,
+      "message": "OK"
+    },
+    {
+      "name": "analytics/dashboard",
+      "path": "/analytics/dashboard",
+      "status": 200,
+      "message": "{\"summary\":{\"totalPageViews\":0,\"totalProductViews\":0,\"totalContentViews\":0,\"totalSearches\":0,\"totalInquiries\":0},\"trend\""
+    },
+    {
+      "name": "analytics/statistics",
+      "path": "/analytics/statistics",
+      "status": 200,
+      "message": "data:2 items"
+    },
+    {
+      "name": "business-analytics/funnel",
+      "path": "/admin/analytics/business/funnel",
+      "status": 200,
+      "message": "OK"
+    },
+    {
+      "name": "monitoring/overview",
+      "path": "/admin/monitoring/overview",
+      "status": 200,
+      "message": "OK"
+    },
+    {
+      "name": "matching/stats",
+      "path": "/admin/matching/stats",
+      "status": 200,
+      "message": "OK"
+    },
+    {
+      "name": "users",
+      "path": "/users",
+      "status": 200,
+      "message": "OK"
+    },
+    {
+      "name": "organizations",
+      "path": "/organizations",
+      "status": 200,
+      "message": "OK"
+    },
+    {
+      "name": "supplier-products",
+      "path": "/admin/supplier-products",
+      "status": 200,
+      "message": "SupplierProducts listed"
+    },
+    {
+      "name": "inquiries",
+      "path": "/admin/inquiries",
+      "status": 200,
+      "message": "OK"
+    },
+    {
+      "name": "audit-logs",
+      "path": "/admin/audit-logs",
+      "status": 200,
+      "message": "OK"
+    },
+    {
+      "name": "embedding/status",
+      "path": "/embedding/status",
+      "status": 200,
+      "message": "{\"providerAvailable\":true,\"providerName\":\"OpenAI text-embedding-3-small\",\"contentStats\":{\"total\":8,\"withEmbedding\":8,\"wi"
+    },
+    {
+      "name": "files",
+      "path": "/files",
+      "status": 200,
+      "message": "OK"
+    },
+    {
+      "name": "files/orphans",
+      "path": "/files/orphans",
+      "status": 200,
+      "message": "Orphan files retrieved"
+    },
+    {
+      "name": "content",
+      "path": "/content",
+      "status": 200,
+      "message": "OK"
+    }
+  ]
+}

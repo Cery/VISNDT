@@ -1024,3 +1024,36 @@ Entity  →  Discovery  →  Evaluation  →  Connection  →  Governance / Disc
 **M33=CLOSED；M34.0=CONDITIONAL；M34.1/2/3=COMPLETE·CONDITIONAL；M34.4·M34.4R·M34.5·758·759=CONDITIONAL PASS（保持）；760=NOT AUTHORIZED（保持）；761=NOT AUTHORIZED（保持）；762=STRUCTURALLY READY·INSTANCE NOT READY（保持）；763=CONTROLLED TEST DATA ONBOARDING·PASS（保持）；764=CONDITIONAL（保持）；765=PASS（保持，不写作 AUTHORIZED）；766=CURRENT（INDEPENDENT AUTHORIZATION RECHECK·M34.6=AUTHORIZED）；M34.7=NOT AUTHORIZED；M34-FINAL=NOT STARTED。C1·C2·C4=CLOSED / C7=CORRECTED；C3=OPTIONAL·DEFERRED / C5=DEFERRED / C6=OPTIONAL·DEFERRED / M=Mobile UI Implementation=Deferred。**
 
 - 报告：`docs/_review/766_M34.6_Authorization_Recheck_Report.md`
+
+## 27. M34.6 Implementation & Post-Implementation（767 / 768）与 M34.7 Architecture Gate（770）
+
+### 27.1 M34.6 Implementation（767）→ Post-Implementation Recheck + Closeout（768）
+
+- **767（M34.6 Implementation）**：在 766 AUTHORIZED 基础上实施 Evaluation + Connection 后端。新增 `BuyerEvaluation` 受控表（落实 ADR-M34-13 Option B，评估断面 **NOT Domain Authority**）+ enums `EvaluationTargetType(PRODUCT/SUPPLIER_PRODUCT)` / `EvaluationState(INTERESTED/SHORTLISTED/COMPARING/CONTACTED)`，Migration `20260831090000_017_buyer_evaluation`，Integration `app.module`。RBAC=BUYER-only，owner isolation 403，duplicate 409，Connection 复用既有 Inquiry 权威（不新建第二套）。
+- **768（Post-Implementation Recheck + Closeout）**：独立复核（不继承 767 PASS）+ **Product Connection Authority 最小修正（Case A）**——依 §10.3，Supplier 连接 = **PUBLISHED SupplierProduct → Organization(type=SUPPLIER)**（备选 Offer，零 Offer 依赖）；修正 `evaluations.service.ts` 后 Product Connection orgId 正确。Runtime 21/21 PASS；Migration Artifact=**CLEAN**。**M34.6 = CLOSED**（Closeout Gate G1–G18 全 PASS）。
+- **Continuing authority**：BuyerEvaluation 保持 NOT Domain Authority；Evaluation ≠ Inquiry（Connection 走既有 Inquiry 单一权威）。
+
+### 27.2 M34.7 Buyer Workspace Evaluation Experience Architecture Gate（770）
+
+- **性质**：Architecture Gate（READ-ONLY · NO UI · NO Code）。定义 Buyer Workspace **消费** BuyerEvaluation 的 Target-State，不实施 UI。
+- **Target IA / Route**：单一一级 **`/workspace/evaluations`**（认证 BUYER 私有）；Interested / Shortlisted / Comparing / Contacted 为 **UI Filter / Tab**（query param `?state=`），**非独立路由**。禁止 `/shortlists` `/favorites` `/watchlists` `/comparisons` `/buyer-evaluation-system` 平行架构。
+- **Evaluation State**：INTERESTED/SHORTLISTED/COMPARING/CONTACTED 4 状态（§2.1 语义矩阵）；**COMPARING = persistent state（DB 枚举成员）**，UI Comparing 视图 = 对该状态下评估的过滤；临时对比选中集为 Frontend transient（`compare=<ids>` query），**不写 DB**。NOT_EVALUATED = UI 派生（非 DB 枚举）。
+- **Connection**：**Evaluation → connectionContext → 既有 Inquiry flow**（单一入口），Evaluation ≠ Inquiry，不创建第二套。
+- **Mobile**：Mobile = 与 Desktop 同等级约束（Desktop IA = Mobile IA，Layout 自适应）；窄屏 **COMPARING 禁止 unbounded 横向对比表**，改纵向/翻页对比，无 horizontal overflow / desktop-only interaction。
+- **API**：复用 M34.6 六端点（POST/GET/GET:id/GET:id/connection/PATCH:id/DELETE:id），**禁止新增/修改**；服务端按 `state` 过滤（若需）记为 **API GAP → Future / Separate Authorization**。
+- **Scope/Expansion**：New Domain / Authority / API / Schema / Migration / Business Model / Transaction = **NONE**；UI Component / 页面 / 路由实现 = **NONE**。代码改动 = `NONE`。
+- **Decision**：M34.7 Architecture Gate = **DECIDED**（Target-State 成立）；**M34.7 Implementation Gate = READY WITH CONDITIONS**（Conditions：① server side state-filter → Future if needed；② 768≈140px 历史溢出 NON-BLOCKING，不得新增溢出回归；③ 复用公开 Compare 组件须重新派生自 BuyerEvaluation 过滤集；④ Workspace 走 Tailwind 体系，避免 AntD 耦合）。
+- **M34.7 Roadmap State（770）**：**M34.6=CLOSED；770=CURRENT（ARCHITECTURE GATE · DECIDED · READY WITH CONDITIONS）；M34.7 Implementation=NOT STARTED**。即使 Gate READY 也不得自动实施 UI；须新独立指令授权。
+- 报告：`docs/_review/770_M34.7_Buyer_Workspace_Evaluation_Experience_Target_State_And_IA_Architecture_Gate_Report.md`
+
+### 28.1 End-State Search Authority & Public Discovery Model（FROZEN · 813 对齐审计 + 814 收敛实施确认）
+
+本契约冻结最终公开发现模型，覆盖（并取代）上文历史日志中与下述边界冲突的旧表述（历史流水保留原状，以本节为当前现状）：
+
+- **FROZEN AUTHORITY**：**Product = PRIMARY SEARCH AUTHORITY（WHAT）**；**SupplierProduct = SUPPORTING SEARCH SIGNAL（WHICH MODEL）**；**Supplier = CONTEXTUAL PROVIDER（WHO）**；**Offer = PRIVATE COMMERCIAL / BUSINESS RESPONSE**。
+- **Search 口径（814 实施后）**：`/search` 为唯一统一公共搜索权威。公开结果以 **Platform Product 为主权威卡**，SupplierProduct 型号与供应商经 `platformProductId` 聚合为 Product 卡下的 **ProductSupplierContext（匹配型号 / 相关供应商）** 上下文呈现；**不再存在** Supplier / SupplierProduct 主动搜索类型、独立分页计数、独立结果卡或独立 SEO 权威。旧 `?type=supplier`/`type=supplier-product` URL 优雅归一为 `all`（向后兼容，非权威）。
+- **Public Commerce Boundary（813-G5 → RESOLVED）**：**公开展示不含价格 / 货币 / Offer 计数 / 商业可购状态**；**且公共 `/search` 与遗留 `/search/supplier-models` 的 API JSON 载荷层亦不含 `commercialSummary`（offerCount/activeOfferCount/priceFrom/priceTo/currency）**（2026-09-03 授权载荷级修复）；**Offer 及其价格仅存于私有商业工作流（RFQ / Inquiry / Workspace）**。
+- **SupplierProduct self-service 未声明完成**：SupplierProduct 写路径仍为 ADMIN-only；供应商自服务 / attach / claim / media / parameter 管理 **NOT IMPLEMENTED、不得标 COMPLETE**；后续治理候选须独立授权。
+- **Semantic / SEO / LLM 层级**：公开语义层次必须保持 **WHAT（Product）→ WHICH MODEL（SupplierProduct）→ WHO（Supplier）**，且 Offer 置于最底层商业语境；任何公开面不得将 Supplier / SupplierProduct / Price / Inventory 置于 Discovery 优先级前。
+- **Do NOT**：构建 SupplierProduct 目录 / 独立 Search 类型 / 公共价格库存 / SEO 洪泛 / 权威重复；不得改变 Offer 模型 / 价格存储 / RFQ / Inquiry / Product 权威。
+- 验证：`docs/_review/814_Post_M39_Search_Authority_And_Public_Display_Convergence_Implementation_Report.md`（DECISION=A CLOSED）。

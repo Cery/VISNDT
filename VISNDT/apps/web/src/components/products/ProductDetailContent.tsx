@@ -5,7 +5,8 @@ import Link from 'next/link';
 import type { Product, ProductDetail, ParameterGroup } from '@/types/product';
 import type { RelatedKnowledgeItem } from '@/types/knowledge-base';
 import type { Content } from '@/types/content';
-import type { CapabilitySupplierProductWithOffers } from '@/types/capability';
+import type { CapabilitySupplierProduct } from '@/types/capability';
+import type { EngineeringAnnotation } from '@/lib/engineering-insight/annotation';
 import { buildCapabilityContext } from '@/lib/capability-context';
 import { buildSupplierRelationshipContext } from '@/lib/supplier-context';
 import ProductGallery from './ProductGallery';
@@ -24,6 +25,8 @@ import CapabilitySection from '@/components/capability/CapabilitySection';
 import ApplicationScenario from '@/components/capability/ApplicationScenario';
 import CapabilitySummary from '@/components/capability/CapabilitySummary';
 import CapabilityBadge from '@/components/capability/CapabilityBadge';
+import EngineeringContextTags from '@/components/capability/EngineeringContextTags';
+import RelevantEngineeringDiscovery from '@/components/engineering/RelevantEngineeringDiscovery';
 
 interface ProductDetailContentProps {
   product: ProductDetail;
@@ -32,8 +35,10 @@ interface ProductDetailContentProps {
   relatedProducts?: Product[];
   /** Related solutions feed (deterministic public Content API, type=SOLUTION) */
   relatedSolutions?: Content[];
-  /** Public Capability Discovery — published Supplier Models with commercial summary (M28.0) */
-  supplierModels?: CapabilitySupplierProductWithOffers[];
+  /** Public Capability Discovery — published Supplier Models as non-commercial model context (M28.0 / P2) */
+  supplierModels?: CapabilitySupplierProduct[];
+  /** Engineering-context annotation lookup keyed by parameter name (M37 Insight Annotation) */
+  parameterAnnotations?: Record<string, EngineeringAnnotation>;
 }
 
 export default function ProductDetailContent({
@@ -43,6 +48,7 @@ export default function ProductDetailContent({
   relatedProducts = [],
   relatedSolutions = [],
   supplierModels = [],
+  parameterAnnotations,
 }: ProductDetailContentProps) {
   const [descExpanded, setDescExpanded] = useState(false);
   const descShouldTruncate = (product.description?.length ?? 0) > 200;
@@ -218,6 +224,10 @@ export default function ProductDetailContent({
               >
                 <div className="space-y-4">
                   <ApplicationScenario categoryName={product.category?.name} />
+                  <EngineeringContextTags
+                    application={capability.engineeringContext.application}
+                    detectionObject={capability.engineeringContext.detectionObject}
+                  />
                   <CapabilitySummary parameters={product.parameterValues} />
 
                   {/* M34.1 — 能力提供商上下文：基于已发布 SupplierProduct / Organization，非 Offer / 交易 */}
@@ -306,6 +316,7 @@ export default function ProductDetailContent({
                   <ProductParameters
                     parameters={product.parameterValues}
                     parameterGroups={parameterGroups}
+                    annotations={parameterAnnotations}
                   />
                 ) : (
                   <EmptyState
@@ -439,6 +450,66 @@ export default function ProductDetailContent({
             targetLabel={product.name}
             productId={product.id}
             className="mt-12"
+          />
+
+          {/* 803_M39 — Capability → Parameters → Application → Knowledge → Solution →
+              Capability Provider → Compare/Evaluate → Inquiry 的相关工程发现层（收口 802 BR-802-01）。
+              复用既有导出的确定性相关数据（relatedProducts / relatedKnowledge / relatedSolutions /
+              已发布供应商能力），折叠为分组的跨面工程发现，含跨面下一步发现 + 询价连接。
+              非购物推荐，未引入 recommendation domain / 新数据源。 */}
+          <RelevantEngineeringDiscovery
+            capabilityAnchor={
+              product.category
+                ? translateCategoryName(product.category.name)
+                : product.name
+            }
+            groups={[
+              {
+                label: '相关检测能力',
+                mono: 'PRODUCT',
+                items: relatedProducts.map((p) => ({
+                  href: `/products/${p.id}`,
+                  title: p.name,
+                  sub: p.status === 'ACTIVE' ? '可用' : undefined,
+                })),
+                seeAllHref: `/products${
+                  product.category ? `?categoryId=${product.category.id}` : ''
+                }`,
+              },
+              {
+                label: '相关技术知识',
+                mono: 'KNOWLEDGE',
+                items: relatedKnowledge.map((k) => ({
+                  href: `/knowledge-base/${k.slug}`,
+                  title: k.title,
+                })),
+                seeAllHref: '/knowledge-base',
+              },
+              {
+                label: '相关解决方案',
+                mono: 'SOLUTION',
+                items: relatedSolutions.map((s) => ({
+                  href: `/solutions/${s.slug}`,
+                  title: s.title,
+                })),
+                seeAllHref: '/solutions',
+              },
+              {
+                label: '能力提供方',
+                mono: 'SUPPLIER',
+                items: supplierRel.suppliers.map((sup) => ({
+                  href: `/suppliers/${sup.organizationId}`,
+                  title: sup.name,
+                  sub: `${sup.publishedSupplyProductCount} 个供应型号`,
+                })),
+                seeAllHref: `/search?q=${encodeURIComponent(product.name ?? '')}`,
+              },
+            ]}
+            nextActions={[
+              { href: '/products/compare', label: '评估对比检测能力' },
+              { href: '/search', label: '统一检索相关参数' },
+              { href: `#suppliers`, label: '在该能力下发起询价' },
+            ]}
           />
         </>
       )}

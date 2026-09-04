@@ -1,0 +1,85 @@
+{
+  "ts": "2026-09-02T05:26:12.337Z",
+  "results": [
+    {
+      "surface": "guest_search",
+      "viewport": 1440,
+      "path": "/search",
+      "overflow": false,
+      "sw": 1425,
+      "cw": 1425,
+      "h1": "搜索工业检测能力",
+      "nav": true,
+      "links": 21,
+      "loginForm": false
+    },
+    {
+      "surface": "guest_products",
+      "viewport": 1024,
+      "path": "/products",
+      "overflow": false,
+      "sw": 1009,
+      "cw": 1009,
+      "h1": "工业检测能力注册表",
+      "nav": true,
+      "links": 41,
+      "loginForm": false
+    },
+    {
+      "surface": "buyer_login",
+      "status": 201
+    },
+    {
+      "surface": "buyer_dashboard",
+      "viewport": 1440,
+      "path": "/dashboard/buyer",
+      "overflow": false,
+      "sw": 1425,
+      "cw": 1425,
+      "h1": "组织工作区",
+      "nav": true,
+      "links": 33,
+      "loginForm": false
+    },
+    {
+      "surface": "buyer_dashboard_mobile",
+      "viewport": 375,
+      "path": "/dashboard/buyer",
+      "overflow": false,
+      "sw": 375,
+      "cw": 375,
+      "h1": "组织工作区",
+      "nav": true,
+      "links": 33,
+      "loginForm": false
+    },
+    {
+      "surface": "supplier_login",
+      "status": 201
+    },
+    {
+      "surface": "supplier_dashboard",
+      "viewport": 1440,
+      "path": "/dashboard/supplier",
+      "overflow": false,
+      "sw": 1425,
+      "cw": 1425,
+      "h1": "组织工作区",
+      "nav": true,
+      "links": 47,
+      "loginForm": false
+    },
+    {
+      "surface": "supplier_opportunities",
+      "viewport": 1024,
+      "path": "/workspace/supplier/opportunities",
+      "overflow": false,
+      "sw": 1009,
+      "cw": 1009,
+      "h1": "组织工作区",
+      "nav": true,
+      "links": 33,
+      "loginForm": false
+    }
+  ]
+}

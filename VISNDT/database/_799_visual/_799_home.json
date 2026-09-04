@@ -1,0 +1,70 @@
+{
+  "ts": "2026-09-02T05:24:16.698Z",
+  "role": "public-home",
+  "results": [
+    {
+      "viewport": 375,
+      "path": "/",
+      "overflow": false,
+      "sw": 375,
+      "cw": 375,
+      "bodyScrollWidth": 375,
+      "h1": "工业无损检测产品与技术方案 平台",
+      "sections": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "viewport": 768,
+      "path": "/",
+      "overflow": false,
+      "sw": 768,
+      "cw": 768,
+      "bodyScrollWidth": 768,
+      "h1": "工业无损检测产品与技术方案 平台",
+      "sections": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "viewport": 1024,
+      "path": "/",
+      "overflow": false,
+      "sw": 1009,
+      "cw": 1009,
+      "bodyScrollWidth": 1009,
+      "h1": "工业无损检测产品与技术方案 平台",
+      "sections": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    },
+    {
+      "viewport": 1440,
+      "path": "/",
+      "overflow": false,
+      "sw": 1425,
+      "cw": 1425,
+      "bodyScrollWidth": 1425,
+      "h1": "工业无损检测产品与技术方案 平台",
+      "sections": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ]
+    }
+  ]
+}

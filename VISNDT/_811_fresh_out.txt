@@ -1,0 +1,92 @@
+﻿{
+  "initialLinkCount": 0,
+  "createTemp": {
+    "status": 201,
+    "tmpId": "87924883-a590-4685-af3b-7c28c6ee0a6e"
+  },
+  "staleWaitMs": 65000,
+  "freshness": {
+    "requestFired": false,
+    "beforeFocusGets": 0,
+    "afterFocusGets": 0,
+    "slugTmp": "811-focus-fresh-1788400866897",
+    "renderedTempInPage": false
+  },
+  "cleanup": {
+    "status": 200
+  },
+  "mobile": [
+    {
+      "surface": "categories",
+      "viewport": 375,
+      "path": "/",
+      "overflow": false,
+      "scrollW": 375,
+      "clientW": 375,
+      "err": false
+    },
+    {
+      "surface": "home",
+      "viewport": 375,
+      "path": "/",
+      "overflow": false,
+      "scrollW": 375,
+      "clientW": 375,
+      "err": false
+    },
+    {
+      "surface": "categories",
+      "viewport": 768,
+      "path": "/",
+      "overflow": false,
+      "scrollW": 768,
+      "clientW": 768,
+      "err": false
+    },
+    {
+      "surface": "home",
+      "viewport": 768,
+      "path": "/",
+      "overflow": false,
+      "scrollW": 768,
+      "clientW": 768,
+      "err": false
+    },
+    {
+      "surface": "categories",
+      "viewport": 1024,
+      "path": "/",
+      "overflow": false,
+      "scrollW": 1024,
+      "clientW": 1024,
+      "err": false
+    },
+    {
+      "surface": "home",
+      "viewport": 1024,
+      "path": "/",
+      "overflow": false,
+      "scrollW": 1024,
+      "clientW": 1024,
+      "err": false
+    },
+    {
+      "surface": "categories",
+      "viewport": 1440,
+      "path": "/",
+      "overflow": false,
+      "scrollW": 1440,
+      "clientW": 1440,
+      "err": false
+    },
+    {
+      "surface": "home",
+      "viewport": 1440,
+      "path": "/",
+      "overflow": false,
+      "scrollW": 1440,
+      "clientW": 1440,
+      "err": false
+    }
+  ]
+}

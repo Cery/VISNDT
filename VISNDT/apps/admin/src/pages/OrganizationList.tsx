@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Space, Spin, Alert, Button, Typography, message, Modal } from 'antd';
+import { Table, Space, Spin, Alert, Button, Typography, message, Modal, Switch } from 'antd';
 import { EyeOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { organizationService } from '../api';
@@ -166,6 +166,30 @@ function OrganizationList() {
     }
   }, [fetchOrganizations]);
 
+  // 819 Permission Foundation — toggle SupplierProduct self-service for a supplier org
+  const [toggleIds, setToggleIds] = useState<string[]>([]);
+  const handleToggleEnable = useCallback(async (id: string, checked: boolean) => {
+    setToggleIds((prev) => [...prev, id]);
+    try {
+      await organizationService.setSupplierProductEnablement(id, checked);
+      message.success(checked ? '已开放 SupplierProduct 自助管理' : '已关闭 SupplierProduct 自助管理');
+      setPageState((prev) =>
+        prev.status === 'success'
+          ? {
+              ...prev,
+              data: prev.data.map((org) =>
+                org.id === id ? { ...org, supplierProductManagementEnabled: checked } : org,
+              ),
+            }
+          : prev,
+      );
+    } catch (err) {
+      message.error(err instanceof Error ? err.message : '更新失败');
+    } finally {
+      setToggleIds((prev) => prev.filter((x) => x !== id));
+    }
+  }, []);
+
   if (pageState.status === 'loading') {
     return (
       <div style={{ textAlign: 'center', padding: '120px 0' }}>
@@ -213,6 +237,23 @@ function OrganizationList() {
       render: (status: string) => (
         <StatusTag status={status} label={STATUS_LABEL_MAP[status] || status} />
       ),
+    },
+    {
+      title: 'SupplierProduct 自助管理',
+      key: 'spEnable',
+      width: 170,
+      render: (_: unknown, record: Organization) =>
+        record.type === 'SUPPLIER' ? (
+          <Switch
+            checked={!!record.supplierProductManagementEnabled}
+            loading={toggleIds.includes(record.id)}
+            checkedChildren="已开放"
+            unCheckedChildren="未开放"
+            onChange={(checked) => handleToggleEnable(record.id, checked)}
+          />
+        ) : (
+          <Text type="secondary">—</Text>
+        ),
     },
     {
       title: '成员数',

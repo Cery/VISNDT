@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger'
 import { OrganizationsService } from './organizations.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
+import { UpdateSupplierProductEnablementDto } from './dto/update-supplier-product-enablement.dto';
 import { SearchParamsDto } from '../common/dto/search-params.dto';
 import { BatchDeleteDto } from '../common/dto/batch-delete.dto';
 import { BatchStatusDto } from '../common/dto/batch-status.dto';
@@ -44,6 +45,28 @@ export class OrganizationsController {
   @ApiOperation({ summary: 'Batch update organization status (ADMIN only)' })
   async batchStatus(@Body() dto: BatchStatusDto) {
     return ApiResponse.ok(await this.orgsService.batchStatus(dto.ids, dto.status), 'Batch status updated');
+  }
+
+  @Patch(':id/supplier-product-enablement')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      '819 Permission Foundation — Enable/disable SupplierProduct self-service for an organization (ADMIN only). Non-gating for Admin attach/governance.',
+  })
+  @ApiParam({ name: 'id', description: 'Organization UUID' })
+  async setSupplierProductEnablement(
+    @Param('id') id: string,
+    @Body() dto: UpdateSupplierProductEnablementDto,
+  ) {
+    const org = await this.orgsService.setSupplierProductEnablement(id, dto.enabled);
+    return ApiResponse.ok(
+      org,
+      dto.enabled
+        ? 'Supplier product self-service enabled'
+        : 'Supplier product self-service disabled',
+    );
   }
 
   @Get(':id')

@@ -1,0 +1,42 @@
+{
+  "probe": "804_M39_Final_Closure_Gate_READ_ONLY",
+  "date": "2026-09-02",
+  "environment": { "postgres": "UP", "api_4000": "UP", "web_3000": "DOWN", "chrome_cdp": "not_run_web_down" },
+  "api_data_state": [
+    { "resource": "/product-categories", "status": 200, "note": "PUBLIC: categories exist" },
+    { "resource": "/products", "status": 200, "note": "PUBLIC: products exist" },
+    { "resource": "/demands", "status": 200, "note": "PUBLIC search (documented discovery semantic); list items do NOT expose createdByUser" },
+    { "resource": "/demands/{id}", "status": 200, "note": "PUBLIC detail -> SECURITY FINDING: returns createdByUser.passwordHash to guest" },
+    { "resource": "/demands/my", "status": 401, "note": "AUTH-GATED (RBAC ok) when guest" },
+    { "resource": "/evaluations", "status": 401, "note": "AUTH-GATED (RBAC ok) when guest" },
+    { "resource": "/notifications", "status": 401, "note": "AUTH-GATED (RBAC ok) when guest" },
+    { "resource": "/rfqs", "status": 200, "note": "returns data/total; guest-accessible list" },
+    { "resource": "/offers", "status": 200, "note": "data=[], total=0 (sparse, kept真实)" },
+    { "resource": "/workflow-events", "status": 200, "note": "DEMAND CREATED workflow-event exists (real runtime evidence)" }
+  ],
+  "security_finding": {
+    "id": "SEC-804-P0-01",
+    "severity": "P0",
+    "type": "Security / Data Integrity / Authorization-boundary violation",
+    "endpoint": "GET /api/v1/demands/{id} (public, unauthenticated)",
+    "evidence": {
+      "status": 200,
+      "leaked_field": "createdByUser.passwordHash",
+      "sample_hash_prefix": "$2b$10$2f044I32DRptDoxegRPjP.tRZfn3iW5yiye55CWV9KvG5oPIJNh1u",
+      "request_authenticated": false
+    },
+    "root_cause": "demands.service.findOne(id) uses include:{ createdByUser: true } with no safe projection/select strips passwordHash; contact redaction exists (!demand.contactVisible) but no credential hash redaction; no global @Exclude()/sanitizer strips passwordHash on serialization.",
+    "closure_impact": "Violates Security/RBAC closure criterion (protected content exposed to Guest) + Data Integrity. Per 804 §26 Option C => Security issue => M39 = BLOCKED. NOT fixed in this READ-ONLY gate (804=VERIFY not FIX); handed to independently-authorized fix task.",
+    "scope_of_leak": "Demand detail (findOne) leak confirmed. List (findAll) items do NOT expose createdByUser. Other findOne-based public detail surfaces should be audited in the remediation task."
+  },
+  "business_loop_runtime": {
+    "sparse_real_data": {
+      "demand": "DEMO_可视化E2E_需求_1788279750024 (status=DRAFT, matches=[])",
+      "rfq": "exists, sourceMatchId=null, targetOrganizationId=null",
+      "offers": "0",
+      "matches": "0 under demand",
+      "workflow_event": "DEMAND CREATED exists"
+    },
+    "note": "Full Evaluation->Demand->Match->RFQ->Response->Offer->Inquiry chain NOT fully runtime-exercised in this READ-ONLY pass (offers/matches/inquiry runtime absent, web server down). Remaining transitions recorded as VERIFIED BY CODE where implemented; full-chain runtime reconciliation deferred to remediation/fix task."
+  }
+}

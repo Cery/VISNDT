@@ -1,6 +1,7 @@
 import type { Content } from '@/types/content';
 import ContentCard from './ContentCard';
 import EmptyState from '@/components/common/EmptyState';
+import EngineeringDiscoveryNav from '@/components/engineering/EngineeringDiscoveryNav';
 
 interface ContentListLayoutProps {
   /** 顶部小标（如 Solutions），可选 */
@@ -24,6 +25,8 @@ interface ContentListLayoutProps {
   countLabel?: (count: number) => string;
   /** 可选技术索引台账（仅传入时渲染，不影响 Solutions/Insights 等其余内容页） */
   techIndex?: { code: string; label: string };
+  /** M38 跨面发现收束：可选「工程信息发现」导航（分类/产品/知识/方案/检索跨面互连），传入时在内容区顶部渲染 */
+  crossSurfaceNav?: { activeLabel?: string };
 }
 
 /**
@@ -39,6 +42,7 @@ export default function ContentListLayout({
   empty,
   countLabel,
   techIndex,
+  crossSurfaceNav,
 }: ContentListLayoutProps) {
   return (
     <div>
@@ -114,6 +118,13 @@ export default function ContentListLayout({
           )}
         </div>
         <div className="flex-1 border-t border-slate-200 mb-6 sm:mb-8 -mt-3" aria-hidden="true" />
+
+        {/* M38 跨面发现收束：方案/内容表面顶部提供分类/产品/知识/检索跨面互连入口（可选） */}
+        {crossSurfaceNav && (
+          <div className="mb-6">
+            <EngineeringDiscoveryNav activeLabel={crossSurfaceNav.activeLabel} />
+          </div>
+        )}
 
         {/* Technical index ledger — industrial content library frame (optional, articles only) */}
         {techIndex && (

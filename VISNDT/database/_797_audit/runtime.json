@@ -1,0 +1,184 @@
+{
+  "public": {
+    "home": {
+      "375": {
+        "overflow": -15,
+        "sw": 360,
+        "iw": 375,
+        "burgerVisible": true,
+        "inlineNavVisible": false
+      },
+      "768": {
+        "overflow": -15,
+        "sw": 753,
+        "iw": 768,
+        "burgerVisible": true,
+        "inlineNavVisible": false
+      },
+      "1024": {
+        "overflow": -15,
+        "sw": 1009,
+        "iw": 1024,
+        "burgerVisible": true,
+        "inlineNavVisible": false
+      },
+      "1440": {
+        "overflow": -15,
+        "sw": 1425,
+        "iw": 1440,
+        "burgerVisible": false,
+        "inlineNavVisible": true
+      }
+    },
+    "products": {
+      "375": {
+        "overflow": -15,
+        "sw": 360,
+        "iw": 375,
+        "burgerVisible": true,
+        "inlineNavVisible": false
+      },
+      "768": {
+        "overflow": -15,
+        "sw": 753,
+        "iw": 768,
+        "burgerVisible": true,
+        "inlineNavVisible": false
+      },
+      "1024": {
+        "overflow": -15,
+        "sw": 1009,
+        "iw": 1024,
+        "burgerVisible": true,
+        "inlineNavVisible": false
+      },
+      "1440": {
+        "overflow": -15,
+        "sw": 1425,
+        "iw": 1440,
+        "burgerVisible": false,
+        "inlineNavVisible": true
+      }
+    },
+    "search": {
+      "375": {
+        "overflow": -15,
+        "sw": 360,
+        "iw": 375,
+        "burgerVisible": true,
+        "inlineNavVisible": false
+      },
+      "768": {
+        "overflow": -15,
+        "sw": 753,
+        "iw": 768,
+        "burgerVisible": true,
+        "inlineNavVisible": false
+      },
+      "1024": {
+        "overflow": -15,
+        "sw": 1009,
+        "iw": 1024,
+        "burgerVisible": true,
+        "inlineNavVisible": false
+      },
+      "1440": {
+        "overflow": -15,
+        "sw": 1425,
+        "iw": 1440,
+        "burgerVisible": false,
+        "inlineNavVisible": true
+      }
+    }
+  },
+  "workspace": {
+    "buyer": [
+      {
+        "route": "/dashboard",
+        "path": "/dashboard",
+        "h1": null,
+        "notFound": false
+      },
+      {
+        "route": "/workspace",
+        "path": "/workspace",
+        "h1": null,
+        "notFound": false
+      },
+      {
+        "route": "/workspace/demands",
+        "path": "/workspace/demands",
+        "h1": null,
+        "notFound": false
+      },
+      {
+        "route": "/workspace/matches",
+        "path": "/workspace/matches",
+        "h1": null,
+        "notFound": false
+      },
+      {
+        "route": "/workspace/rfqs",
+        "path": "/workspace/rfqs",
+        "h1": null,
+        "notFound": false
+      }
+    ],
+    "supplier": [
+      {
+        "route": "/dashboard/supplier",
+        "path": "/dashboard/supplier",
+        "h1": null,
+        "notFound": false
+      },
+      {
+        "route": "/workspace/supplier/rfqs",
+        "path": "/workspace/supplier/rfqs",
+        "h1": null,
+        "notFound": false
+      },
+      {
+        "route": "/workspace/supplier/responses",
+        "path": "/workspace/supplier/responses",
+        "h1": null,
+        "notFound": false
+      },
+      {
+        "route": "/workspace/supplier/offers",
+        "path": "/workspace/supplier/offers",
+        "h1": null,
+        "notFound": false
+      },
+      {
+        "route": "/workspace/supplier/inquiries",
+        "path": "/workspace/supplier/inquiries",
+        "h1": null,
+        "notFound": false
+      },
+      {
+        "route": "/workspace/supplier/opportunities",
+        "path": "/workspace/supplier/opportunities",
+        "h1": null,
+        "notFound": false
+      },
+      {
+        "route": "/workspace/supplier/profile",
+        "path": "/workspace/supplier/profile",
+        "h1": null,
+        "notFound": false
+      },
+      {
+        "route": "/workspace/supplier/display",
+        "path": "/workspace/supplier/display",
+        "h1": null,
+        "notFound": false
+      },
+      {
+        "route": "/workspace/supplier/members",
+        "path": "/workspace/supplier/members",
+        "h1": null,
+        "notFound": false
+      }
+    ]
+  }
+}

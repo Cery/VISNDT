@@ -10,6 +10,7 @@ import { translateCategoryName } from '@/lib/translate';
 import IndustrialBadge from '@/components/brand/IndustrialBadge';
 import SectionHeader from '@/components/brand/SectionHeader';
 import PageContainer from '@/components/common/PageContainer';
+import EngineeringDiscoveryNav from '@/components/engineering/EngineeringDiscoveryNav';
 
 /**
  * M33.3 — 能力分类（/categories，726 Contract，Industrial Tech Visual Language）
@@ -30,6 +31,10 @@ export default function CategoriesPage() {
   } = useQuery({
     queryKey: ['categories'],
     queryFn: () => getCategories(1, 100),
+    // 811 Batch A (D1): 公共目录焦点回归自动刷新。
+    // 811 修补 (D1 跟进): refetchOnMount:'always' 覆盖客户端路由跳转时目录残留。
+    refetchOnWindowFocus: true,
+    refetchOnMount: 'always',
   });
 
   const categories = categoriesData?.data ?? [];
@@ -75,6 +80,11 @@ export default function CategoriesPage() {
           className="mb-10 animate-slide-up"
         />
 
+        {/* M38/M38 最终实现补齐 — 跨面发现收束：分类 → 能力 → 产品 → 知识 → 方案 → 统一检索 */}
+        <div className="mb-8">
+          <EngineeringDiscoveryNav />
+        </div>
+
         {isLoading ? (
           <Loading />
         ) : isError ? (
@@ -99,6 +109,33 @@ export default function CategoriesPage() {
                 <span className="ml-auto font-mono text-[10px] uppercase tracking-widest text-slate-500 hidden md:inline">
                   NO · ROUTE · SUB-CAP
                 </span>
+              </div>
+            </div>
+
+            {/* Capability Discovery Journey — semantic platform model: from category to connection */}
+            <div className="mb-6 rounded-xl border border-slate-200/80 bg-surface-1 overflow-hidden">
+              <div className="bg-industrial-dark/95 px-4 py-3 flex items-center gap-3">
+                <span className="h-3 w-1 rounded-sm bg-industrial-cyan" aria-hidden="true" />
+                <span className="font-mono text-[11px] uppercase tracking-widest text-slate-300">
+                  CAPABILITY DISCOVERY JOURNEY
+                </span>
+                <span className="hidden sm:inline font-mono text-[10px] uppercase tracking-widest text-slate-500 ml-auto">
+                  DISCOVER · EVALUATE · CONNECT
+                </span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-slate-100 border-t border-slate-100">
+                {[
+                  { mono: '01', label: '能力分类', hint: '界定检测范围' },
+                  { mono: '02', label: '技术参数', hint: '确定工程约束' },
+                  { mono: '03', label: '产品与知识', hint: '评估适用性' },
+                  { mono: '04', label: '提供方与连接', hint: '推进需求闭环' },
+                ].map((s) => (
+                  <div key={s.mono} className="px-4 py-3">
+                    <p className="font-mono text-[10px] uppercase tracking-widest text-industrial-cyan">{s.mono}</p>
+                    <p className="text-sm font-semibold text-foreground mt-1">{s.label}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{s.hint}</p>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -153,6 +190,22 @@ export default function CategoriesPage() {
                       浏览能力索引
                       <svg className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </span>
+                  </div>
+
+                  {/* 802 — discovery trail footer: capability → products → knowledge/solutions */}
+                  <div className="mt-3 pt-3 border-t border-slate-200/70 flex flex-wrap gap-1.5">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-600 text-[11px] px-2 py-0.5">
+                      检测产品
+                      <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-slate-600 text-[11px] px-2 py-0.5">
+                      {translateCategoryName(cat.name)} 能力检索
+                      <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                       </svg>
                     </span>
                   </div>

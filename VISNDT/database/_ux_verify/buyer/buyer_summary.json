@@ -1,0 +1,158 @@
+{
+  "role": "BUYER",
+  "generatedAt": "2026-09-04T02:12:43.039Z",
+  "total": 14,
+  "pass": 14,
+  "fail": 0,
+  "mobilePass": true,
+  "screenshots": [
+    "buyer_01_login_1440.png",
+    "buyer_02_dashboard_1440.png",
+    "buyer_03_real_search_1440.png",
+    "buyer_04_real_product_1440.png",
+    "buyer_05_real_supplier_1440.png",
+    "buyer_06_knowledge_1440.png",
+    "buyer_07_solutions_1440.png",
+    "buyer_08_demand_created_1440.png",
+    "buyer_09_real_inquiry_1440.png",
+    "buyer_10_rfq_created_1440.png",
+    "buyer_11_workspace_1440.png",
+    "buyer_12_notifications_1440.png",
+    "buyer_13_matches_empty_1440.png",
+    "buyer_mobile_375_dashboard.png",
+    "buyer_mobile_375_product.png",
+    "buyer_mobile_375_search.png",
+    "buyer_mobile_375_login.png",
+    "buyer_mobile_375_knowledge.png"
+  ],
+  "evidence": "buyer_evidence.jsonl (consolidated) + buyer_evidence_mobile.jsonl",
+  "markerNote": "steps 3/4/5/9 completed with 内窥镜 search -> real product. All controlled rows cleaned via Prisma. No leftover UXB data.",
+  "issues": [],
+  "mobileDetails": [
+    {
+      "w": 375,
+      "name": "dashboard",
+      "path": "/dashboard/buyer",
+      "overflow": false,
+      "screenshot": "buyer_mobile_375_dashboard.png"
+    },
+    {
+      "w": 375,
+      "name": "search",
+      "path": "/search?q=%E5%86%85%E7%AA%A5%E9%95%9C",
+      "overflow": false,
+      "screenshot": "buyer_mobile_375_search.png"
+    },
+    {
+      "w": 375,
+      "name": "login",
+      "path": "/login",
+      "overflow": false,
+      "screenshot": "buyer_mobile_375_login.png"
+    },
+    {
+      "w": 375,
+      "name": "knowledge",
+      "path": "/knowledge-base",
+      "overflow": false,
+      "screenshot": "buyer_mobile_375_knowledge.png"
+    },
+    {
+      "w": 375,
+      "name": "product",
+      "path": "/products/ebb1c034-4280-480b-89ce-29753660e126",
+      "overflow": false,
+      "screenshot": "buyer_mobile_375_product.png"
+    },
+    {
+      "w": 768,
+      "name": "dashboard",
+      "path": "/dashboard/buyer",
+      "overflow": false
+    },
+    {
+      "w": 768,
+      "name": "search",
+      "path": "/search?q=%E5%86%85%E7%AA%A5%E9%95%9C",
+      "overflow": false
+    },
+    {
+      "w": 768,
+      "name": "login",
+      "path": "/login",
+      "overflow": false
+    },
+    {
+      "w": 768,
+      "name": "knowledge",
+      "path": "/knowledge-base",
+      "overflow": false
+    },
+    {
+      "w": 768,
+      "name": "product",
+      "path": "/products/ebb1c034-4280-480b-89ce-29753660e126",
+      "overflow": false
+    },
+    {
+      "w": 1024,
+      "name": "dashboard",
+      "path": "/dashboard/buyer",
+      "overflow": false
+    },
+    {
+      "w": 1024,
+      "name": "search",
+      "path": "/search?q=%E5%86%85%E7%AA%A5%E9%95%9C",
+      "overflow": false
+    },
+    {
+      "w": 1024,
+      "name": "login",
+      "path": "/login",
+      "overflow": false
+    },
+    {
+      "w": 1024,
+      "name": "knowledge",
+      "path": "/knowledge-base",
+      "overflow": false
+    },
+    {
+      "w": 1024,
+      "name": "product",
+      "path": "/products/ebb1c034-4280-480b-89ce-29753660e126",
+      "overflow": false
+    },
+    {
+      "w": 1440,
+      "name": "dashboard",
+      "path": "/dashboard/buyer",
+      "overflow": false
+    },
+    {
+      "w": 1440,
+      "name": "search",
+      "path": "/search?q=%E5%86%85%E7%AA%A5%E9%95%9C",
+      "overflow": false
+    },
+    {
+      "w": 1440,
+      "name": "login",
+      "path": "/login",
+      "overflow": false
+    },
+    {
+      "w": 1440,
+      "name": "knowledge",
+      "path": "/knowledge-base",
+      "overflow": false
+    },
+    {
+      "w": 1440,
+      "name": "product",
+      "path": "/products/ebb1c034-4280-480b-89ce-29753660e126",
+      "overflow": false
+    }
+  ]
+}

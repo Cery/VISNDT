@@ -126,6 +126,21 @@ function ProductCategoryList() {
     setSearchKeyword('');
   }, []);
 
+  // 811 Batch A (D2)：依赖守卫拦截（CATEGORY_HAS_PRODUCTS / CATEGORY_HAS_CHILDREN）→ 结构化弹窗清晰展示依赖项。
+  const isBlockedDelete = useCallback((err: unknown) => {
+    const m = extractErrorMessage(err, '');
+    return m.includes('无法删除该分类') || m.includes('CATEGORY_HAS_');
+  }, []);
+
+  const extractDependencyCounts = useCallback((message: string) => {
+    const productMatch = message.match(/(\d+)\s*个产品/);
+    const childMatch = message.match(/(\d+)\s*个子分类/);
+    return {
+      productCount: productMatch ? Number(productMatch[1]) : null,
+      childCount: childMatch ? Number(childMatch[1]) : null,
+    };
+  }, []);
+
   const handleDelete = useCallback((id: string) => {
     modal.confirm({
       title: '确认删除',
@@ -139,11 +154,29 @@ function ProductCategoryList() {
           message.success('分类已删除');
           fetchData();
         } catch (err) {
-          message.error(extractErrorMessage(err, '删除失败'));
+          const msg = extractErrorMessage(err, '删除失败');
+          if (isBlockedDelete(err)) {
+            const { productCount, childCount } = extractDependencyCounts(msg);
+            modal.error({
+              title: '无法删除该分类',
+              content: (
+                <div>
+                  <p>该分类被依赖关系阻止，无法删除。请先解除以下依赖后再删除：</p>
+                  <ul style={{ marginTop: 8, paddingLeft: 20 }}>
+                    {productCount !== null && <li>{productCount} 个产品关联到此分类</li>}
+                    {childCount !== null && <li>{childCount} 个子分类</li>}
+                    {productCount === null && childCount === null && <li>{msg}</li>}
+                  </ul>
+                </div>
+              ),
+            });
+          } else {
+            message.error(msg);
+          }
         }
       },
     });
-  }, [fetchData]);
+  }, [extractDependencyCounts, fetchData, isBlockedDelete]);
 
   const handleBatchDelete = useCallback(async (ids: string[]) => {
     setBatchLoading(true);

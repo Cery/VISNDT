@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import IndustrialBadge from '@/components/brand/IndustrialBadge';
+import GlobalSearchBar from '@/components/search/GlobalSearchBar';
 
 const CORE_CAPABILITIES = [
   { key: 'discovery', label: '能力发现', code: 'DSC-01: 能力发现' },
@@ -67,6 +68,19 @@ export default function HeroSection() {
               连接工业检测需求方与能力提供商——发现高精度内窥镜、检测相机、测量系统，
               获取面向航空航天、汽车、管道、制造等行业的专业检测解决方案。
             </p>
+
+            {/* M38 统一发现入口 — 首屏搜索（复用统一 /search Authority，与 SearchHero 视觉语言一致） */}
+            <div className="max-w-2xl mb-8">
+              <GlobalSearchBar
+                placeholder="搜索能力型号、检测参数、技术知识或方案..."
+              />
+              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className="font-mono text-[11px] text-slate-500">UNIFIED DISCOVERY</span>
+                <Link href="/search" className="text-xs text-industrial-cyan/80 hover:text-industrial-cyan transition-colors">
+                  进入统一检索 →
+                </Link>
+              </div>
+            </div>
 
             {/* Capability Context — 技术能力条（mono 字段标签，VT-R5） */}
             <div className="flex flex-wrap gap-3 mb-8">

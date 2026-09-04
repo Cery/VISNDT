@@ -264,9 +264,6 @@ export class SupplierModelFacetSearchService {
             category: { select: { name: true } },
           },
         },
-        offers: {
-          select: { id: true, status: true, price: true, currency: true },
-        },
       },
     });
 
@@ -279,13 +276,6 @@ export class SupplierModelFacetSearchService {
       .sort((a, b) => orderMap.get(a.id)! - orderMap.get(b.id)!);
 
     return ordered.map((sp) => {
-      const offers = sp.offers ?? [];
-      const activeOffers = offers.filter((o) => o.status === 'ACTIVE');
-      const prices = activeOffers
-        .map((o) => Number(o.price))
-        .filter((p) => Number.isFinite(p) && p > 0)
-        .sort((a, b) => a - b);
-
       return {
         capability: {
           id: sp.platformProduct?.id ?? sp.platformProductId,
@@ -305,16 +295,6 @@ export class SupplierModelFacetSearchService {
         facetSummary: {
           parameterCount: sp.parameterValues?.length ?? 0,
           primaryCategoryName: sp.platformProduct?.category?.name ?? null,
-        },
-        commercialSummary: {
-          offerCount: offers.length,
-          activeOfferCount: activeOffers.length,
-          priceFrom: prices.length > 0 ? prices[0] : null,
-          priceTo: prices.length > 0 ? prices[prices.length - 1] : null,
-          currency:
-            activeOffers.find((o) => o.currency)?.currency ??
-            offers.find((o) => o.currency)?.currency ??
-            null,
         },
         inquiryAvailable: true,
       };

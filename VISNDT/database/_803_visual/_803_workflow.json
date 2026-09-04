@@ -1,0 +1,268 @@
+[
+  {
+    "phase": "buyer_login",
+    "ok": true,
+    "dest": "/dashboard",
+    "me": {
+      "status": 0,
+      "role": null,
+      "err": "SyntaxError: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON"
+    }
+  },
+  {
+    "label": "buyer-dashboard",
+    "viewport": 1440,
+    "path": "/dashboard/buyer",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": true,
+    "err": false
+  },
+  {
+    "label": "buyer-demands",
+    "viewport": 1440,
+    "path": "/workspace/demands",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": true,
+    "err": false
+  },
+  {
+    "label": "buyer-matches",
+    "viewport": 1440,
+    "path": "/workspace/matches",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": false,
+    "err": false
+  },
+  {
+    "label": "buyer-rfqs",
+    "viewport": 1440,
+    "path": "/workspace/rfqs",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": true,
+    "err": false
+  },
+  {
+    "label": "buyer-notifications",
+    "viewport": 1440,
+    "path": "/workspace/notifications",
+    "keep": true,
+    "overflow": false,
+    "h1": "",
+    "ctx": false,
+    "next": false,
+    "err": false
+  },
+  {
+    "label": "buyer-dashboard",
+    "viewport": 375,
+    "path": "/dashboard/buyer",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": true,
+    "err": false
+  },
+  {
+    "label": "buyer-demands",
+    "viewport": 375,
+    "path": "/workspace/demands",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": true,
+    "err": false
+  },
+  {
+    "label": "buyer-matches",
+    "viewport": 375,
+    "path": "/workspace/matches",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": false,
+    "err": false
+  },
+  {
+    "label": "buyer-rfqs",
+    "viewport": 375,
+    "path": "/workspace/rfqs",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": true,
+    "err": false
+  },
+  {
+    "label": "buyer-notifications",
+    "viewport": 375,
+    "path": "/workspace/notifications",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": false,
+    "err": false
+  },
+  {
+    "phase": "logout_for_supplier",
+    "logout": 404
+  },
+  {
+    "phase": "supplier_login",
+    "ok": true,
+    "dest": "/dashboard",
+    "me": {
+      "status": 0,
+      "role": null,
+      "err": "SyntaxError: Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON"
+    }
+  },
+  {
+    "label": "sup-dashboard",
+    "viewport": 1440,
+    "path": "/dashboard/supplier",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": true,
+    "err": false
+  },
+  {
+    "label": "sup-opportunities",
+    "viewport": 1440,
+    "path": "/workspace/supplier/opportunities",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": false,
+    "err": false
+  },
+  {
+    "label": "sup-rfqs",
+    "viewport": 1440,
+    "path": "/workspace/supplier/rfqs",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": false,
+    "err": false
+  },
+  {
+    "label": "sup-responses",
+    "viewport": 1440,
+    "path": "/workspace/supplier/responses",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": false,
+    "err": false
+  },
+  {
+    "label": "sup-offers",
+    "viewport": 1440,
+    "path": "/workspace/supplier/offers",
+    "keep": true,
+    "overflow": false,
+    "h1": "",
+    "ctx": false,
+    "next": false,
+    "err": false
+  },
+  {
+    "label": "sup-inquiries",
+    "viewport": 1440,
+    "path": "/workspace/supplier/inquiries",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": false,
+    "err": false
+  },
+  {
+    "label": "sup-dashboard",
+    "viewport": 375,
+    "path": "/dashboard/supplier",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": true,
+    "err": false
+  },
+  {
+    "label": "sup-opportunities",
+    "viewport": 375,
+    "path": "/workspace/supplier/opportunities",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": false,
+    "err": false
+  },
+  {
+    "label": "sup-rfqs",
+    "viewport": 375,
+    "path": "/workspace/supplier/rfqs",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": true,
+    "err": false
+  },
+  {
+    "label": "sup-responses",
+    "viewport": 375,
+    "path": "/workspace/supplier/responses",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": false,
+    "err": false
+  },
+  {
+    "label": "sup-offers",
+    "viewport": 375,
+    "path": "/workspace/supplier/offers",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": true,
+    "err": false
+  },
+  {
+    "label": "sup-inquiries",
+    "viewport": 375,
+    "path": "/workspace/supplier/inquiries",
+    "keep": true,
+    "overflow": false,
+    "h1": "组织工作区",
+    "ctx": true,
+    "next": false,
+    "err": false
+  }
+]

@@ -25,6 +25,8 @@ export interface Organization {
   name: string;
   type: string;
   status: OrganizationStatus;
+  /** 819 Permission Foundation — Admin-controlled opt-in for SupplierProduct self-service. */
+  supplierProductManagementEnabled: boolean;
   createdAt: string;
   updatedAt: string;
   members?: OrganizationMember[];

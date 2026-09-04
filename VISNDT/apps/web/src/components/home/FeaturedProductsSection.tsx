@@ -10,6 +10,10 @@ export default function FeaturedProductsSection() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['featured-products'],
     queryFn: () => getProducts({ status: 'ACTIVE', page: 1, pageSize: 4 }),
+    // 811 Batch A (D1): 公共目录焦点回归自动刷新（与 categories 一致）。
+    // 811 修补 (D1 跟进): refetchOnMount:'always' 覆盖客户端路由跳转时目录残留。
+    refetchOnWindowFocus: true,
+    refetchOnMount: 'always',
   });
 
   const products = data?.data ?? [];

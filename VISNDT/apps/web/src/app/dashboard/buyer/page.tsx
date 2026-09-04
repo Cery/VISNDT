@@ -204,7 +204,13 @@ function BuyerDashboardContent() {
               />
 
               {visibleDecisions.length === 0 ? (
-                <EmptyState message="当前没有待处理的 RFQ 响应决策。" />
+                <EmptyState
+                  icon="search"
+                  title="暂无待决策的 RFQ 响应"
+                  message="当前没有正在等待您决策的供应商响应。"
+                  description="可继续通过统一检索发现检测能力，或前往匹配结果查看可发起的询价链路。"
+                  action={{ label: '发现检测能力', href: '/search' }}
+                />
               ) : (
                 <div className="grid gap-3 lg:grid-cols-3">
                   {visibleDecisions.map((decision) => (

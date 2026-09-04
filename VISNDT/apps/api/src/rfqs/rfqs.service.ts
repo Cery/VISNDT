@@ -5,6 +5,7 @@ import { CreateRfqDto } from './dto/create-rfq.dto';
 import { CreateRfqFromMatchDto } from './dto/create-rfq-from-match.dto';
 import { UpdateRfqDto } from './dto/update-rfq.dto';
 import { SearchParamsDto } from '../common/dto/search-params.dto';
+import { PUBLIC_USER_SELECT } from '../common/projection/user.projection';
 import { NotificationsService } from '../notifications/notifications.service';
 
 const RFQ_TRANSITIONS: Record<RFQStatus, RFQStatus[]> = {
@@ -186,7 +187,7 @@ export class RfqsService {
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
-        include: { demand: true, createdByUser: true },
+        include: { demand: true, createdByUser: { select: PUBLIC_USER_SELECT } },
       }),
       this.prisma.rFQ.count({ where }),
     ]);
@@ -206,7 +207,7 @@ export class RfqsService {
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
-        include: { demand: true, createdByUser: true },
+        include: { demand: true, createdByUser: { select: PUBLIC_USER_SELECT } },
       }),
       this.prisma.rFQ.count({
         where: {
@@ -271,7 +272,7 @@ export class RfqsService {
     },
   ) {
     const baseInclude = {
-      createdByUser: true,
+      createdByUser: { select: PUBLIC_USER_SELECT },
       demand: {
         include: {
           organization: true,

@@ -21,17 +21,23 @@ export async function generateMetadata({
     const org = await getOrganization(id);
     const typeLabel = org.type || '供应商';
     const statusLabel = org.status === 'ACTIVE' ? '活跃' : org.status;
+    // M38 统一 Discoverability：Supplier 公开 Profile（Capability Provider Profile）规范地址，
+    // 闭合机器可读 canonical（与 Breadcrumb/Structured Data/导航一致）。
+    const canonical = absoluteUrl(`/suppliers/${id}`);
 
     return {
       title: `${org.name} ${typeLabel} Profile`,
       description:
         `${org.name}（${typeLabel}，${statusLabel}）在 VISNDT 平台提供的工业检测设备供应能力。` ||
         SITE_DESCRIPTION,
+      alternates: { canonical },
+      robots: { index: true, follow: true },
       openGraph: {
         title: `${org.name} ${typeLabel} Profile | ${SITE_NAME}`,
         description:
           `${org.name}（${typeLabel}，${statusLabel}）在 VISNDT 平台提供的工业检测设备供应能力。`,
         type: 'website',
+        url: canonical,
       },
     };
   } catch {
@@ -84,6 +90,21 @@ export default async function SupplierPage({ params }: SupplierPageProps) {
         </span>
       </nav>
 
+      {/* 802 — Capability Provider context frame: engineering role, not storefront */}
+      <div className="mb-6 rounded-xl border border-slate-200/80 bg-industrial-dark/95 px-4 py-3 flex items-center gap-3">
+        <span className="h-3 w-1 rounded-sm bg-industrial-cyan shrink-0" aria-hidden="true" />
+        <span className="font-mono text-[11px] uppercase tracking-widest text-slate-300">
+          CAPABILITY PROVIDER
+        </span>
+        <span className="text-slate-600">/</span>
+        <span className="font-mono text-[11px] uppercase tracking-widest text-industrial-cyan">
+          {organization.type || 'Supplier'}
+        </span>
+        <span className="hidden sm:inline ml-auto font-mono text-[10px] uppercase tracking-widest text-slate-500">
+          CAPABILITY · PRODUCTS · CONNECTION
+        </span>
+      </div>
+
       {/* Supplier Profile */}
       <section className="mb-8">
         <SupplierPublicProfile organization={organization} />
@@ -99,6 +120,38 @@ export default async function SupplierPage({ params }: SupplierPageProps) {
         </h2>
         <SupplierOfferList offers={offers} />
       </section>
+
+      {/* 802 — Cross-surface Next Connection：能力提供方的工程连接下一步 */}
+      <div className="mt-10 rounded-xl border border-slate-200/80 bg-surface-1 p-5 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
+          <div>
+            <p className="font-semibold text-foreground">与该能力提供方的下一步工程连接</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              核对供应能力型号、评估能力适配性，或通过询价建立工程连接（Inquiry = Connection）。
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/search?type=supplier-product"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80"
+            >
+              检索其能力型号<span aria-hidden="true">→</span>
+            </Link>
+            <Link
+              href="/products/compare"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80"
+            >
+              评估对比能力<span aria-hidden="true">→</span>
+            </Link>
+            <Link
+              href="/categories"
+              className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80"
+            >
+              能力分类<span aria-hidden="true">→</span>
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

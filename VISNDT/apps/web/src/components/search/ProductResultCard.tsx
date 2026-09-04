@@ -1,14 +1,20 @@
 import Link from 'next/link';
 import type { Product } from '@/types/product';
+import type { ParameterFacet } from '@/lib/api/search';
 import { highlightText } from '@/lib/search-utils';
 import { translateCategoryName } from '@/lib/translate';
 import MediaImage from '@/components/common/MediaImage';
 import CapabilityBadge from '@/components/capability/CapabilityBadge';
+import RelevantParameters from '@/components/search/RelevantParameters';
 
 interface ProductResultCardProps {
   product: Product;
   /** Keyword to highlight in name/description */
   highlight?: string;
+  /** M36 — query-level relevant technical parameters (engineering relevance) */
+  relevantParams?: ParameterFacet[];
+  /** M36 — parameterId → selected values (active technical filters) */
+  activeParamFilters?: Record<string, string[]>;
 }
 
 /**
@@ -20,7 +26,7 @@ interface ProductResultCardProps {
  * result (name / model / description / category); no fabricated key parameters
  * or application scenarios.
  */
-export default function ProductResultCard({ product, highlight }: ProductResultCardProps) {
+export default function ProductResultCard({ product, highlight, relevantParams, activeParamFilters }: ProductResultCardProps) {
   return (
     <Link
       href={`/products/${product.id}`}
@@ -57,6 +63,11 @@ export default function ProductResultCard({ product, highlight }: ProductResultC
                 ? highlightText(product.description, highlight)
                 : product.description}
             </p>
+          )}
+
+          {/* M36 Engineering Discovery — surface relevant technical parameters */}
+          {relevantParams && relevantParams.length > 0 && (
+            <RelevantParameters params={relevantParams} activeFilters={activeParamFilters} />
           )}
 
           <div className="flex items-center justify-between gap-3">

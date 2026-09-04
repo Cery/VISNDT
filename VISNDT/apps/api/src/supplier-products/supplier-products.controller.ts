@@ -2,11 +2,12 @@ import {
   Controller,
   Post,
   Get,
+  Patch,
+  Delete,
   Param,
   Body,
   Query,
   UseGuards,
-  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -17,6 +18,7 @@ import {
 } from '@nestjs/swagger';
 import { SupplierProductsService } from './supplier-products.service';
 import { CreateSupplierProductDto } from './dto/create-supplier-product.dto';
+import { UpdateSupplierProductDto } from './dto/update-supplier-product.dto';
 import { RejectSupplierProductDto } from './dto/reject-supplier-product.dto';
 import { ApiResponse } from '../common/dto/api-response.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -37,21 +39,11 @@ export class SupplierProductsController {
   @Post()
   @ApiOperation({
     summary:
-      'Create a SupplierProduct DRAFT (ADMIN). organizationId is derived from the authenticated user context.',
+      'Create a SupplierProduct DRAFT under a selected Supplier Organization (ADMIN). organizationId must be an existing ACTIVE SUPPLIER org.',
   })
-  async create(
-    @Body() dto: CreateSupplierProductDto,
-    @CurrentUser() user: AuthRequest['user'],
-  ) {
-    if (!user.organizationId) {
-      throw new BadRequestException(
-        'Authenticated admin must belong to an organization to create a supplier product',
-      );
-    }
-    const result = await this.service.createDraft({
-      ...dto,
-      organizationId: user.organizationId,
-    });
+  @ApiBody({ type: CreateSupplierProductDto })
+  async create(@Body() dto: CreateSupplierProductDto) {
+    const result = await this.service.createDraft(dto);
     return ApiResponse.ok(result, 'SupplierProduct created');
   }
 
@@ -151,6 +143,52 @@ export class SupplierProductsController {
     return ApiResponse.ok(
       await this.service.publish(id, user.id),
       'SupplierProduct published',
+    );
+  }
+
+  @Patch(':id')
+  @ApiOperation({
+    summary:
+      'Edit SupplierProduct content fields (ADMIN). Editable in DRAFT or APPROVED only. Ownership anchors are immutable.',
+  })
+  @ApiParam({ name: 'id', description: 'SupplierProduct UUID' })
+  @ApiBody({ type: UpdateSupplierProductDto })
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateSupplierProductDto,
+  ) {
+    return ApiResponse.ok(
+      await this.service.update(id, dto),
+      'SupplierProduct updated',
+    );
+  }
+
+  @Post(':id/unpublish')
+  @ApiOperation({
+    summary:
+      'Unpublish SupplierProduct (PUBLISHED → APPROVED, non-public). Expresses withdrawal via existing status; no UNPUBLISHED enum.',
+  })
+  @ApiParam({ name: 'id', description: 'SupplierProduct UUID' })
+  async unpublish(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(
+      await this.service.unpublish(id, user.id),
+      'SupplierProduct unpublished',
+    );
+  }
+
+  @Delete(':id')
+  @ApiOperation({
+    summary:
+      'Delete SupplierProduct (ADMIN). Blocked by dependency protection when referenced by Offer (onDelete: Restrict).',
+  })
+  @ApiParam({ name: 'id', description: 'SupplierProduct UUID' })
+  async remove(@Param('id') id: string) {
+    return ApiResponse.ok(
+      await this.service.remove(id),
+      'SupplierProduct deleted',
     );
   }
 }

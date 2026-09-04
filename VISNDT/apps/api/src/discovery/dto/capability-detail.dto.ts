@@ -3,15 +3,16 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 /**
  * CapabilityDetailDTO families — M28.0 Hybrid Model C capability read contract.
  *
- * Response shape (transport boundary only; NO raw Prisma relations, NO DB joins,
- * NO bare Offer list — every supplier product carries only its own offers[]):
+ * P2 — Public Capability commercial payload cleanup (frozen). The public capability
+ * read exposes ONLY the non-commercial discovery context. Offer remains a
+ * private/commercial response and is NEVER part of this public transport:
  *
  *   {
  *     platformProduct,
- *     supplierProducts: [
- *       { supplierProduct, offers: [] }
- *     ]
+ *     supplierProducts: [ ...published SupplierProduct model context... ]
  *   }
+ *
+ * No price / currency / commercialSummary / offer payload is exposed here.
  */
 
 export class CapabilityPlatformProductDTO {
@@ -51,28 +52,6 @@ class CapabilitySupplierProductMediaDTO {
 
   @ApiPropertyOptional({ example: 'Front view' })
   title?: string | null;
-}
-
-/**
- * CapabilityCommercialSummaryDTO — the commercial layer summary for a published
- * SupplierProduct. Derived from its offers; reveals only commercial availability
- * (count + price band), never internal governance data.
- */
-export class CapabilityCommercialSummaryDTO {
-  @ApiProperty({ example: 3 })
-  offerCount: number;
-
-  @ApiProperty({ example: 2 })
-  activeOfferCount: number;
-
-  @ApiPropertyOptional({ example: 1200.0 })
-  priceFrom?: number | null;
-
-  @ApiPropertyOptional({ example: 2600.0 })
-  priceTo?: number | null;
-
-  @ApiPropertyOptional({ example: 'CNY' })
-  currency?: string | null;
 }
 
 /**
@@ -156,9 +135,6 @@ export class CapabilitySupplierProductDTO {
   @ApiPropertyOptional({ type: CapabilitySupplierProductMediaDTO, isArray: true })
   media?: CapabilitySupplierProductMediaDTO[];
 
-  @ApiPropertyOptional({ type: CapabilityCommercialSummaryDTO })
-  commercialSummary?: CapabilityCommercialSummaryDTO;
-
   @ApiPropertyOptional({
     type: CapabilitySupplierProductParameterValueDTO,
     isArray: true,
@@ -166,47 +142,10 @@ export class CapabilitySupplierProductDTO {
   parameterValues?: CapabilitySupplierProductParameterValueDTO[];
 }
 
-export class CapabilityOfferDTO {
-  @ApiProperty({ example: 'uuid' })
-  id: string;
-
-  @ApiProperty({ example: 'uuid' })
-  organizationId: string;
-
-  @ApiPropertyOptional({ example: 'uuid' })
-  productId?: string | null;
-
-  @ApiPropertyOptional({ example: 'uuid' })
-  supplierProductId?: string | null;
-
-  @ApiProperty({ example: 'Premium Widget Offer' })
-  title: string;
-
-  @ApiPropertyOptional({ example: 'Detailed offer description' })
-  description?: string | null;
-
-  @ApiPropertyOptional({ example: 1999.99 })
-  price?: number | null;
-
-  @ApiPropertyOptional({ example: 'CNY' })
-  currency?: string | null;
-
-  @ApiPropertyOptional({ example: 'ACTIVE' })
-  status?: string;
-}
-
-export class CapabilitySupplierProductWithOffersDTO {
-  @ApiProperty({ type: CapabilitySupplierProductDTO })
-  supplierProduct: CapabilitySupplierProductDTO;
-
-  @ApiProperty({ type: CapabilityOfferDTO, isArray: true })
-  offers: CapabilityOfferDTO[];
-}
-
 export class CapabilityDetailDTO {
   @ApiProperty({ type: CapabilityPlatformProductDTO })
   platformProduct: CapabilityPlatformProductDTO;
 
-  @ApiProperty({ type: CapabilitySupplierProductWithOffersDTO, isArray: true })
-  supplierProducts: CapabilitySupplierProductWithOffersDTO[];
+  @ApiProperty({ type: CapabilitySupplierProductDTO, isArray: true })
+  supplierProducts: CapabilitySupplierProductDTO[];
 }

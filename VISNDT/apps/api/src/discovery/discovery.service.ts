@@ -9,11 +9,10 @@ import { PrismaService } from '../prisma/prisma.service';
  *   Capability (Platform Product)
  *        ↓
  *     SupplierProducts   (SupplierProduct.platformProductId -> Product.id)
- *        ↓
- *     Offers             (Offer.supplierProductId -> SupplierProduct.id)
  *
- * This is an internal read/aggregation foundation. It intentionally does NOT
- * modify Search, Matching, or any other module. No transport layer here.
+ * P2 (frozen): this PUBLIC graph is non-commercial. Offers are aggregated only by
+ * the ownership-isolated `findSupplierProductCommercials` (private surface), never
+ * by the public capability read.
  */
 @Injectable()
 export class DiscoveryService {
@@ -21,9 +20,10 @@ export class DiscoveryService {
 
   /**
    * Aggregate the capability graph for a Platform Product:
-   *   Capability → SupplierProducts → Offers (commercial sources).
+   *   Capability → SupplierProducts (published, model context only).
    *
    * Only PUBLISHED supplier products are surfaced by default (reviewed content).
+   * No Offer / commercial data is fetched or returned here (P2 — commercial cleanup).
    * SupplierProducts are ordered deterministically (createdAt desc, then id).
    */
   async findCapabilityGraph(
@@ -96,44 +96,23 @@ export class DiscoveryService {
       },
     });
 
-    const supplierProductIds = supplierProducts.map((sp) => sp.id);
-
-    const offers =
-      supplierProductIds.length > 0
-        ? await this.prisma.offer.findMany({
-            where: { supplierProductId: { in: supplierProductIds } },
-            orderBy: { createdAt: 'desc' },
-            select: {
-              id: true,
-              organizationId: true,
-              productId: true,
-              supplierProductId: true,
-              title: true,
-              description: true,
-              price: true,
-              currency: true,
-              status: true,
-            },
-          })
-        : [];
-
     return {
       capability: product,
       supplierProducts,
-      offers,
       _meta: {
         capabilityId: platformProductId,
         supplierProductCount: supplierProducts.length,
-        offerCount: offers.length,
       },
     };
   }
 
   /**
-   * Aggregate the commercial layer for a SupplierProduct:
+   * Aggregate the commercial layer for a SupplierProduct (PRIVATE surface):
    *   SupplierProduct → Offers (its commercial records) → Capability.
    *
    * Ownership-isolated consumer: pass the owning organizationId to keep reads scoped.
+   * This is the ONLY place Offers are aggregated; it is never called by the public
+   * capability read (P2 — Offer remains commercial/private).
    */
   async findSupplierProductCommercials(
     supplierProductId: string,

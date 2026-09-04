@@ -21,14 +21,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const url = (path: string) => new URL(path, SITE_URL).toString();
 
   // 静态核心路由（含 SEO 元数据：更新频率 + 优先级）
+  // M38 GA: 能力分类（/categories）= 高价值公开能力发现索引面，纳入 sitemap 索引边界
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: url('/'), changeFrequency: 'daily', priority: 1.0 },
     { url: url('/products'), changeFrequency: 'daily', priority: 0.9 },
+    { url: url('/categories'), changeFrequency: 'daily', priority: 0.8 },
     { url: url('/knowledge-base'), changeFrequency: 'weekly', priority: 0.9 },
     { url: url('/knowledge'), changeFrequency: 'weekly', priority: 0.4 },
     { url: url('/solutions'), changeFrequency: 'weekly', priority: 0.8 },
     { url: url('/articles'), changeFrequency: 'weekly', priority: 0.7 },
-    { url: url('/insights'), changeFrequency: 'weekly', priority: 0.7 },
     { url: url('/business'), changeFrequency: 'monthly', priority: 0.5 },
     { url: url('/about'), changeFrequency: 'yearly', priority: 0.4 },
   ];
@@ -66,18 +67,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // 知识库条目拉取失败时跳过
   }
 
-  // 3. 内容详情页（Knowledge / Article / Insight / Solution）
-  const contentTypes = ['KNOWLEDGE', 'ARTICLE', 'INSIGHT', 'SOLUTION'] as const;
+  // 3. 内容详情页（Knowledge / Article / Solution）
+  //    Insight 内容（ContentType.INSIGHT）不作为公开 SEO 落地页收录（788：Insight = Contextual Annotation，
+  //    非公开内容频道，无独立 sitemap / canonical / 外部可发现；其公开详情面已退役/重定向）。
+  const contentTypes = ['KNOWLEDGE', 'ARTICLE', 'SOLUTION'] as const;
   const contentPaths: Record<string, string> = {
     KNOWLEDGE: '/knowledge',
     ARTICLE: '/articles',
-    INSIGHT: '/insights',
     SOLUTION: '/solutions',
   };
   const contentPriority: Record<string, number> = {
     KNOWLEDGE: 0.4,
     ARTICLE: 0.6,
-    INSIGHT: 0.6,
     SOLUTION: 0.7,
   };
 

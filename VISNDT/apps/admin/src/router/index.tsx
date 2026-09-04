@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { RequireAuth } from '../auth';
 import AdminLayout from '../layouts/AdminLayout';
-import { DemandDetail, DemandEdit, DemandList, EmbeddingManagement, FileAssetOrphanList, Home, Analytics, BusinessAnalytics, Monitoring, AuditIntelligence, InquiryDetail, InquiryList, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ParameterDefinitionCreate, ParameterDefinitionDetail, ParameterDefinitionEdit, ParameterDefinitionList, ParameterGroupCreate, ParameterGroupDetail, ParameterGroupEdit, ParameterGroupList, ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList, OperationCenter, ProductCreate, ProductDetail, ProductEdit, ProductList, ProductMediaCreate, ProductMediaEdit, ProductMediaList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, AuditLogList, UserCreate, UserDetail, UserEdit, UserList, ContentList, ContentCreate, ContentEdit, ContentTagList, ContentTagCreate, ContentTagEdit, KnowledgeDomainList, KnowledgeDomainCreate, KnowledgeDomainEdit, KnowledgeCategoryList, KnowledgeCategoryCreate, KnowledgeCategoryEdit, KnowledgeEntryList, KnowledgeEntryCreate, KnowledgeEntryEdit, MediaList, ProductCategoryKnowledgeMappingList, ProductCategoryKnowledgeMappingCreate, ProductCategoryKnowledgeMappingEdit, SupplierProductList, SupplierProductDetail } from '../pages';
+import { DemandDetail, DemandEdit, DemandList, EmbeddingManagement, FileAssetOrphanList, Analytics, BusinessAnalytics, Monitoring, AuditIntelligence, InquiryDetail, InquiryList, Login, MatchDetail, MatchingMonitor, NotFound, NotificationDetail, NotificationList, OfferDetail, OfferList, OrganizationCreate, OrganizationDetail, OrganizationEdit, OrganizationList, ParameterDefinitionCreate, ParameterDefinitionDetail, ParameterDefinitionEdit, ParameterDefinitionList, ParameterGroupCreate, ParameterGroupDetail, ParameterGroupEdit, ParameterGroupList, ProductCategoryCreate, ProductCategoryEdit, ProductCategoryList, OperationCenter, ProductCreate, ProductDetail, ProductEdit, ProductList, ProductMediaCreate, ProductMediaEdit, ProductMediaList, RfqCreate, RfqDetail, RfqList, RfqResponseDetail, AuditLogList, UserCreate, UserDetail, UserEdit, UserList, ContentList, ContentCreate, ContentEdit, ContentTagList, ContentTagCreate, ContentTagEdit, KnowledgeDomainList, KnowledgeDomainCreate, KnowledgeDomainEdit, KnowledgeCategoryList, KnowledgeCategoryCreate, KnowledgeCategoryEdit, KnowledgeEntryList, KnowledgeEntryCreate, KnowledgeEntryEdit, MediaList, ProductCategoryKnowledgeMappingList, ProductCategoryKnowledgeMappingCreate, ProductCategoryKnowledgeMappingEdit, SupplierProductList, SupplierProductDetail, SupplierProductCreate } from '../pages';
 
 const router = createBrowserRouter([
   {
@@ -17,8 +17,9 @@ const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <Navigate to="/home" replace /> },
-      { path: 'home', element: <Home /> },
-      { path: 'operation-center', element: <OperationCenter /> },
+      // 首页（工作台）：运营中心业务工作台作为首页运营大盘；保留旧 /operation-center 兼容深链。
+      { path: 'home', element: <OperationCenter /> },
+      { path: 'operation-center', element: <Navigate to="/home" replace /> },
       { path: 'analytics', element: <Analytics /> },
       { path: 'business-analytics', element: <BusinessAnalytics /> },
       { path: 'monitoring', element: <Monitoring /> },
@@ -52,6 +53,7 @@ const router = createBrowserRouter([
       { path: 'offers', element: <OfferList /> },
       { path: 'offers/:id', element: <OfferDetail /> },
       { path: 'supplier-products', element: <SupplierProductList /> },
+      { path: 'supplier-products/create', element: <SupplierProductCreate /> },
       { path: 'supplier-products/:id', element: <SupplierProductDetail /> },
       { path: 'inquiries', element: <InquiryList /> },
       { path: 'inquiries/:id', element: <InquiryDetail /> },

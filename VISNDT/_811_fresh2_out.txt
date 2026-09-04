@@ -1,0 +1,21 @@
+﻿{
+  "pageReadyBodyLen": 378,
+  "publicCategoriesRendered": true,
+  "createTemp": {
+    "status": 201,
+    "tmpId": "87b0da89-a6d8-4e26-97b8-4f4bfe8e95f2",
+    "slug": "811focus1788401375666"
+  },
+  "staleWaitMs": 65000,
+  "freshness": {
+    "initialNet": 0,
+    "netBeforeFocus": 2,
+    "netAfter": 2,
+    "requestFired": false,
+    "tempShownBeforeFocus": true,
+    "tempShownAfterFocus": true
+  },
+  "cleanup": {
+    "status": 200
+  }
+}

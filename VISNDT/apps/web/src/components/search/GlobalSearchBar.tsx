@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation';
 import type { SearchDomain } from '@/services/search.service';
 import SearchSuggestionDropdown from '@/components/search/SearchSuggestionDropdown';
 
+// 814 — Public search taxonomy: Supplier/SupplierProduct are NOT active search
+// types. They remain supporting context (matching models + providers) under the
+// Product (Capability) primary result. 812 keeps header search = pure keyword.
 const SEARCH_DOMAINS: { value: SearchDomain; label: string }[] = [
   { value: 'all', label: '全部' },
   { value: 'product', label: '产品' },
-  { value: 'supplier-product', label: '能力型号' },
-  { value: 'supplier', label: '供应商' },
   { value: 'knowledge', label: '知识' },
   { value: 'solution', label: '方案' },
 ];
@@ -74,11 +75,16 @@ export default function GlobalSearchBar({
       } else {
         const params = new URLSearchParams();
         params.set('q', trimmed);
-        params.set('type', searchType);
+        // 812 Batch B: only inject `type` when a type selector is actually shown.
+        // A selector-less header search is a pure entry point → /search?q=...（省略 type=all，
+        // /search 页缺省即 all），避免注入冗余/陈旧 type 状态。/search 仍负责域过滤。
+        if (showTypeSelector) {
+          params.set('type', searchType);
+        }
         router.push(`/search?${params.toString()}`);
       }
     },
-    [keyword, searchType, onSearch, router],
+    [keyword, searchType, showTypeSelector, onSearch, router],
   );
 
   const handleClear = useCallback(() => {

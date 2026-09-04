@@ -2,18 +2,26 @@ import Link from 'next/link';
 
 const FOOTER_SECTIONS = [
   {
-    title: '产品',
+    title: '能力发现',
     links: [
-      { href: '/products', label: '产品中心' },
-      { href: '/categories', label: '产品分类' },
+      { href: '/search', label: '统一检索' },
+      { href: '/categories', label: '能力分类' },
+      { href: '/search?type=supplier-product', label: '能力型号 / 供应商' },
+    ],
+  },
+  {
+    title: '产品评估',
+    links: [
+      { href: '/products', label: '检测产品' },
       { href: '/products/compare', label: '产品对比' },
     ],
   },
   {
-    title: '解决方案',
+    title: '技术内容',
     links: [
-      { href: '/solutions', label: '行业方案' },
-      { href: '/knowledge', label: '知识中心' },
+      { href: '/solutions', label: '解决方案' },
+      // M38 GA: 知识中心主入口统一到 canonical /knowledge-base
+      { href: '/knowledge-base', label: '知识中心' },
     ],
   },
   {

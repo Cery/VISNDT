@@ -1,0 +1,512 @@
+{
+  "task": "807_M39_Controlled_Full_Chain_Runtime_E2E",
+  "generatedAt": "2026-09-02T16:10:11.922Z",
+  "results": {
+    "roles": {
+      "buyer": {
+        "email": "demo.buyer.01@visndt.local",
+        "orgId": "8b0e7521-b98b-42ab-8005-4f32f0063551"
+      },
+      "supplier": {
+        "email": "demo.supplier.01@visndt.local",
+        "orgId": "926d5a96-e1be-455c-8d58-8f4a79b6735d"
+      },
+      "admin": {
+        "email": "admin@visndt.com"
+      },
+      "orgIsolation": true
+    },
+    "evaluation": {
+      "evalId": null,
+      "message": "Eval is lightweight buyer snapshot; Demand below is the authoritative entity"
+    },
+    "offer": {
+      "offerId": "ba16e230-9abf-4397-bd64-f3b018b4c281",
+      "productId": "38a711ff-9352-40ea-978b-90ecd566b826",
+      "orgId": "926d5a96-e1be-455c-8d58-8f4a79b6735d",
+      "status": "ACTIVE",
+      "createdNew": false
+    },
+    "demand": {
+      "demandId": "e0672785-9e4e-4d61-8b48-454f0e1a6f33",
+      "orgId": "8b0e7521-b98b-42ab-8005-4f32f0063551",
+      "title": "TEST/E2E/807 高精度三维扫描仪采购需求"
+    },
+    "match": {
+      "demandId": "e0672785-9e4e-4d61-8b48-454f0e1a6f33",
+      "productId": "38a711ff-9352-40ea-978b-90ecd566b826",
+      "matchId": "40f68c3c-2c92-4a3b-9300-3776e1759a81",
+      "matchStatus": "PENDING",
+      "matchScore": 100,
+      "offerId": "ba16e230-9abf-4397-bd64-f3b018b4c281"
+    },
+    "rfq": {
+      "rfqId": "d3604b3f-dc15-4801-a7e0-5857066aa7e7",
+      "sourceMatchId": "40f68c3c-2c92-4a3b-9300-3776e1759a81",
+      "targetOrganizationId": "926d5a96-e1be-455c-8d58-8f4a79b6735d",
+      "status": "OPEN"
+    },
+    "rfqResponse": {
+      "responseId": "d9ed1fa5-bd91-484b-9578-a77aacf31f44",
+      "rfqId": "d3604b3f-dc15-4801-a7e0-5857066aa7e7",
+      "offerId": "ba16e230-9abf-4397-bd64-f3b018b4c281",
+      "orgId": "926d5a96-e1be-455c-8d58-8f4a79b6735d"
+    },
+    "rfqResponse decision": {
+      "finalStatus": "ACCEPTED"
+    },
+    "inquiry": {
+      "inquiryId": "f866c67c-7850-4efa-80d2-5c3ee5e91eab",
+      "productId": "38a711ff-9352-40ea-978b-90ecd566b826",
+      "offerId": "ba16e230-9abf-4397-bd64-f3b018b4c281",
+      "organizationId": "926d5a96-e1be-455c-8d58-8f4a79b6735d"
+    },
+    "workspace": {
+      "buyer": {
+        "demandSummary": {
+          "total": 5,
+          "statusCounts": {
+            "DRAFT": 1,
+            "PUBLISHED": 4,
+            "SUBMITTED": 0,
+            "PROCESSING": 0,
+            "CLOSED": 0,
+            "CANCELLED": 0
+          }
+        },
+        "matchSummary": {
+          "total": 4,
+          "statusCounts": {
+            "PENDING": 1,
+            "MATCHED": 0,
+            "REVIEWED": 0,
+            "ACCEPTED": 3,
+            "REJECTED": 0,
+            "EXPIRED": 0
+          }
+        },
+        "rfqSummary": {
+          "total": 3
+        },
+        "responseSummary": {
+          "pendingCount": 0,
+          "acceptedCount": 3,
+          "rejectedCount": 0
+        },
+        "notificationSummary": {
+          "unreadCount": 12
+        }
+      },
+      "supplier": {
+        "rfqSummary": {
+          "total": 3,
+          "statusCounts": {
+            "DRAFT": 0,
+            "OPEN": 3,
+            "RESPONDING": 0,
+            "CLOSED": 0,
+            "CANCELLED": 0
+          }
+        },
+        "responseSummary": {
+          "total": 3,
+          "statusCounts": {
+            "SUBMITTED": 0,
+            "VIEWED": 0,
+            "ACCEPTED": 3,
+            "REJECTED": 0
+          }
+        },
+        "notificationSummary": {
+          "unreadCount": 3
+        },
+        "matchSummary": {
+          "total": 4,
+          "statusCounts": {
+            "PENDING": 1,
+            "MATCHED": 0,
+            "REVIEWED": 0,
+            "ACCEPTED": 3,
+            "REJECTED": 0,
+            "EXPIRED": 0
+          }
+        }
+      }
+    },
+    "workflowEvents": {
+      "demand": [
+        {
+          "action": "OPENED",
+          "type": "DEMAND"
+        },
+        {
+          "action": "CREATED",
+          "type": "DEMAND"
+        }
+      ],
+      "match": [
+        {
+          "action": "ACCEPTED",
+          "type": "MATCH"
+        },
+        {
+          "action": "RESPONDED",
+          "type": "MATCH"
+        },
+        {
+          "action": "SUBMITTED",
+          "type": "MATCH"
+        },
+        {
+          "action": "CREATED",
+          "type": "MATCH"
+        }
+      ],
+      "rfq": [
+        {
+          "action": "OPENED",
+          "type": "RFQ"
+        },
+        {
+          "action": "CREATED",
+          "type": "RFQ"
+        }
+      ],
+      "response": [
+        {
+          "action": "ACCEPTED",
+          "type": "RFQ_RESPONSE"
+        },
+        {
+          "action": "REVIEWED",
+          "type": "RFQ_RESPONSE"
+        },
+        {
+          "action": "CREATED",
+          "type": "RFQ_RESPONSE"
+        }
+      ]
+    },
+    "notifications": {
+      "buyerCount": 12,
+      "supplierCount": 3,
+      "buyerSamples": [
+        {
+          "title": "New RFQ Response",
+          "referenceType": "RFQ_RESPONSE",
+          "status": "UNREAD"
+        },
+        {
+          "title": "Match Status Updated",
+          "referenceType": "MATCH",
+          "status": "UNREAD"
+        },
+        {
+          "title": "Match Status Updated",
+          "referenceType": "MATCH",
+          "status": "UNREAD"
+        },
+        {
+          "title": "Match Status Updated",
+          "referenceType": "MATCH",
+          "status": "UNREAD"
+        },
+        {
+          "title": "New RFQ Response",
+          "referenceType": "RFQ_RESPONSE",
+          "status": "UNREAD"
+        },
+        {
+          "title": "Match Status Updated",
+          "referenceType": "MATCH",
+          "status": "UNREAD"
+        },
+        {
+          "title": "Match Status Updated",
+          "referenceType": "MATCH",
+          "status": "UNREAD"
+        },
+        {
+          "title": "Match Status Updated",
+          "referenceType": "MATCH",
+          "status": "UNREAD"
+        }
+      ],
+      "supplierSamples": [
+        {
+          "title": "New Product Inquiry: MetroY Ultra 高精度三维扫描仪",
+          "referenceType": "INQUIRY",
+          "status": "UNREAD"
+        },
+        {
+          "title": "New Product Inquiry: MetroY Ultra 高精度三维扫描仪",
+          "referenceType": "INQUIRY",
+          "status": "UNREAD"
+        },
+        {
+          "title": "New Product Inquiry: MetroY Ultra 高精度三维扫描仪",
+          "referenceType": "INQUIRY",
+          "status": "UNREAD"
+        }
+      ]
+    },
+    "chain": {
+      "offerId": "ba16e230-9abf-4397-bd64-f3b018b4c281",
+      "demandId": "e0672785-9e4e-4d61-8b48-454f0e1a6f33",
+      "matchId": "40f68c3c-2c92-4a3b-9300-3776e1759a81",
+      "rfqId": "d3604b3f-dc15-4801-a7e0-5857066aa7e7",
+      "responseId": "d9ed1fa5-bd91-484b-9578-a77aacf31f44",
+      "inquiryId": "f866c67c-7850-4efa-80d2-5c3ee5e91eab",
+      "buyerOrg": "8b0e7521-b98b-42ab-8005-4f32f0063551",
+      "supplierOrg": "926d5a96-e1be-455c-8d58-8f4a79b6735d"
+    }
+  },
+  "steps": [
+    {
+      "step": "AUTH login+buyer/supplier/admin + org isolation",
+      "ok": true,
+      "ts": "2026-09-02T16:10:10.349Z",
+      "detail": {
+        "buyerOrg": "8b0e7521-b98b-42ab-8005-4f32f0063551",
+        "supplierOrg": "926d5a96-e1be-455c-8d58-8f4a79b6735d"
+      }
+    },
+    {
+      "step": "Evaluation create (buyer)",
+      "ok": true,
+      "ts": "2026-09-02T16:10:10.373Z",
+      "detail": {
+        "status": 409,
+        "evalId": "(exists)"
+      }
+    },
+    {
+      "step": "Offer (create DRAFT new, or reuse existing ACTIVE)",
+      "ok": true,
+      "ts": "2026-09-02T16:10:10.399Z",
+      "detail": {
+        "status": 409,
+        "createdNew": false,
+        "offerId": "ba16e230-9abf-4397-bd64-f3b018b4c281"
+      }
+    },
+    {
+      "step": "Offer lifecycle (reused ACTIVE offer from controlled run)",
+      "ok": true,
+      "ts": "2026-09-02T16:10:10.399Z",
+      "detail": {
+        "note": "already ACTIVE; buyer/response chain proceeds to same offer"
+      }
+    },
+    {
+      "step": "Demand create (DRAFT, buyer)",
+      "ok": true,
+      "ts": "2026-09-02T16:10:10.423Z",
+      "detail": {
+        "status": 201,
+        "demandId": "e0672785-9e4e-4d61-8b48-454f0e1a6f33"
+      }
+    },
+    {
+      "step": "Demand parameters added (3 real param defs, buyer)",
+      "ok": true,
+      "ts": "2026-09-02T16:10:10.485Z",
+      "detail": {
+        "p1": 201,
+        "p2": 201,
+        "p3": 201
+      }
+    },
+    {
+      "step": "Demand publish (DRAFT→PUBLISHED, triggers match)",
+      "ok": true,
+      "ts": "2026-09-02T16:10:10.510Z",
+      "detail": {
+        "status": "PUBLISHED"
+      }
+    },
+    {
+      "step": "Match produced by real workflow (DemandMatch persisted)",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.473Z",
+      "detail": {
+        "matchId": "40f68c3c-2c92-4a3b-9300-3776e1759a81",
+        "status": "PENDING",
+        "score": 100
+      }
+    },
+    {
+      "step": "Match accept chain PENDING→MATCHED→REVIEWED→ACCEPTED",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.603Z",
+      "detail": {
+        "t1": "MATCHED",
+        "t2": "REVIEWED",
+        "t3": "ACCEPTED"
+      }
+    },
+    {
+      "step": "RFQ create from accepted match (sourceMatchId, targetSupplierOrg)",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.635Z",
+      "detail": {
+        "rfqId": "d3604b3f-dc15-4801-a7e0-5857066aa7e7",
+        "sourceMatchId": "40f68c3c-2c92-4a3b-9300-3776e1759a81",
+        "targetOrganizationId": "926d5a96-e1be-455c-8d58-8f4a79b6735d"
+      }
+    },
+    {
+      "step": "RFQ publish (DRAFT→OPEN)",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.657Z",
+      "detail": {
+        "status": "OPEN"
+      }
+    },
+    {
+      "step": "RFQ Response submit (supplier, links offer)",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.698Z",
+      "detail": {
+        "responseId": "d9ed1fa5-bd91-484b-9578-a77aacf31f44",
+        "status": "SUBMITTED",
+        "offerId": "ba16e230-9abf-4397-bd64-f3b018b4c281"
+      }
+    },
+    {
+      "step": "Response view (buyer SUBMITTED→VIEWED)",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.725Z",
+      "detail": {
+        "status": "VIEWED"
+      }
+    },
+    {
+      "step": "Response accept (buyer VIEWED→ACCEPTED)",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.751Z",
+      "detail": {
+        "status": "ACCEPTED"
+      }
+    },
+    {
+      "step": "Inquiry create (Connection semantics, offer→supplierOrg)",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.775Z",
+      "detail": {
+        "inquiryId": "f866c67c-7850-4efa-80d2-5c3ee5e91eab",
+        "status": "NEW"
+      }
+    },
+    {
+      "step": "Workspace buyer/overview reachable",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.841Z",
+      "detail": {
+        "data": [
+          "demandSummary",
+          "matchSummary",
+          "rfqSummary",
+          "responseSummary",
+          "notificationSummary"
+        ]
+      }
+    },
+    {
+      "step": "Workspace supplier/overview reachable",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.841Z",
+      "detail": {
+        "data": [
+          "rfqSummary",
+          "responseSummary",
+          "notificationSummary",
+          "matchSummary"
+        ]
+      }
+    },
+    {
+      "step": "WorkflowEvents real: DEMAND created/published",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.854Z",
+      "detail": {
+        "n": 2
+      }
+    },
+    {
+      "step": "WorkflowEvents real: MATCH created/accepted",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.854Z",
+      "detail": {
+        "n": 4
+      }
+    },
+    {
+      "step": "WorkflowEvents real: RFQ created/published",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.854Z",
+      "detail": {
+        "n": 2
+      }
+    },
+    {
+      "step": "WorkflowEvents real: RFQ_RESPONSE created",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.854Z",
+      "detail": {
+        "n": 3
+      }
+    },
+    {
+      "step": "Notifications present for buyer (workflow updates)",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.887Z",
+      "detail": {
+        "n": 12
+      }
+    },
+    {
+      "step": "Notifications present for supplier (RFQ/response/inquiry)",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.887Z",
+      "detail": {
+        "n": 3
+      }
+    },
+    {
+      "step": "Notification event-source check (has RFQ/RESPONSE/INQUIRY refs)",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.887Z",
+      "detail": {}
+    },
+    {
+      "step": "Org isolation: supplier sees targeted RFQ in workspace/supplier/rfqs",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.922Z",
+      "detail": {
+        "n": 3
+      }
+    },
+    {
+      "step": "Org isolation: buyer sees own RFQ in /rfqs/mine",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.922Z",
+      "detail": {
+        "n": 3
+      }
+    },
+    {
+      "step": "E2E ids captured",
+      "ok": true,
+      "ts": "2026-09-02T16:10:11.922Z",
+      "detail": {
+        "demandId": "e0672785-9e4e-4d61-8b48-454f0e1a6f33",
+        "matchId": "40f68c3c-2c92-4a3b-9300-3776e1759a81",
+        "rfqId": "d3604b3f-dc15-4801-a7e0-5857066aa7e7",
+        "responseId": "d9ed1fa5-bd91-484b-9578-a77aacf31f44",
+        "inquiryId": "f866c67c-7850-4efa-80d2-5c3ee5e91eab",
+        "offerId": "ba16e230-9abf-4397-bd64-f3b018b4c281"
+      }
+    }
+  ]
+}

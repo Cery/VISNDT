@@ -11,6 +11,9 @@ import CompareTable from '@/components/products/CompareTable';
 import SupplierCompareTable from '@/components/products/SupplierCompareTable';
 import ErrorState from '@/components/common/ErrorState';
 import Loading from '@/components/common/Loading';
+import IndustrialBadge from '@/components/brand/IndustrialBadge';
+import PageContainer from '@/components/common/PageContainer';
+import EngineeringDiscoveryNav from '@/components/engineering/EngineeringDiscoveryNav';
 
 /**
  * Compare page — M28.0 Platform Product compare + M28.1 M667 SupplierProduct
@@ -18,10 +21,91 @@ import Loading from '@/components/common/Loading';
  *
  * Both modes share the same URL state (/products/compare?ids=...) so deep links,
  * refresh, back/forward and remove/add stay stable. No comparison domain entity.
+ *
+ * 801_M39 page-level reconstruction — reframed from a bare list page into an
+ * Engineering Evaluation Workspace: platform context header (brand identity +
+ * evaluation context), capability/parameter suitability intent, and a
+ * cross-surface next-action discovery strip. Comparison is engineering
+ * evaluation, not price/shopping comparison.
  */
 
 const MAX_COMPARE_PRODUCT = 4;
 const MAX_COMPARE_SUPPLIER = 7;
+
+/** 801: shared platform context header — engineering evaluation workspace framing. */
+function CompareContextHeader({
+  mode,
+  count,
+}: {
+  mode: 'product' | 'supplier';
+  count: number;
+}) {
+  return (
+    <div className="bg-industrial-dark relative overflow-hidden border-b border-slate-200/80">
+      <div className="absolute inset-0 bg-grid-pattern bg-grid-md opacity-20" aria-hidden="true" />
+      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-primary/0 via-industrial-cyan/50 to-primary/0" aria-hidden="true" />
+      <PageContainer variant="content" paddingY={32}>
+        <div className="max-w-4xl relative">
+          <IndustrialBadge
+            label={mode === 'product' ? '产品评估 · 参数级横向对比' : '能力评估 · 供应商型号对比'}
+            tone="cyan"
+          />
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white mt-5 tracking-tight">
+            {mode === 'product' ? '产品对比' : '供应商型号对比'}
+          </h1>
+          <p className="text-slate-400 mt-3 text-sm sm:text-base max-w-2xl leading-relaxed">
+            以技术参数、能力异同与工程适用性维度开展评估对比——面向工程师的确定性评估工作台，
+            {mode === 'product'
+              ? `当前选择 ${count} 个检测能力产品进行横向评估。`
+              : `在同一检测能力锚点下对 ${count} 个供应商型号逐一核验。`}
+          </p>
+          <div className="mt-5">
+            <EngineeringDiscoveryNav activeLabel="检测产品" />
+          </div>
+        </div>
+      </PageContainer>
+    </div>
+  );
+}
+
+/** 801: cross-surface next-action strip — where comparison leads engineers onward. */
+function CompareNextAction() {
+  return (
+    <section className="mt-8 rounded-xl border border-slate-200/80 bg-surface-1 p-5 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
+        <div>
+          <p className="font-semibold text-foreground">下一步工程发现</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            对比收敛后，前往能力分类规整需求，或进入统一检索核对相关参数、方案与供应商。
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/categories"
+            className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80"
+          >
+            能力分类
+            <span aria-hidden="true">→</span>
+          </Link>
+          <Link
+            href="/search"
+            className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80"
+          >
+            统一检索
+            <span aria-hidden="true">→</span>
+          </Link>
+          <Link
+            href="/products"
+            className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80"
+          >
+            产品注册表
+            <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function ComparePageContent() {
   const searchParams = useSearchParams();
@@ -60,9 +144,7 @@ function ComparePageContent() {
   // Selected SupplierProducts within the fetched capability graph (supplier mode).
   const validItems = useMemo(() => {
     if (!capability) return [];
-    return capability.supplierProducts.filter(({ supplierProduct }) =>
-      ids.includes(supplierProduct.id),
-    );
+    return capability.supplierProducts.filter((sp) => ids.includes(sp.id));
   }, [capability, ids]);
 
   // Platform Product compare mode — fetch each product.
@@ -85,12 +167,14 @@ function ComparePageContent() {
     const missingCapability =
       capabilityParam.length === 0 || (ids.length > 0 && !capabilityLoading && !capabilityError && !capability);
 
-    const missingIds = ids.filter(
-      (id) => !validItems.some((it) => it.supplierProduct.id === id),
-    );
+    const missingIds = ids.filter((id) => !validItems.some((it) => it.id === id));
 
     return (
-      <div className="max-w-[1200px] mx-auto px-6 py-8 pb-24">
+      <div className="pb-24">
+        {/* 801: Engineering Evaluation Workspace platform context header */}
+        <CompareContextHeader mode="supplier" count={validItems.length} />
+
+        <div className="max-w-[1200px] mx-auto px-6 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
           <Link href="/" className="hover:text-primary transition-colors">
@@ -103,15 +187,6 @@ function ComparePageContent() {
           <span className="text-slate-300">/</span>
           <span className="text-foreground">供应商型号对比</span>
         </nav>
-
-        <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-foreground">
-            供应商型号对比
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            同一检测能力下比较 {validItems.length} 个供应商型号的技术参数与商业信息
-          </p>
-        </div>
 
         {ids.length === 0 && (
           <div className="text-center py-20">
@@ -227,6 +302,7 @@ function ComparePageContent() {
               </div>
             </>
           )}
+        </div>
       </div>
     );
   }
@@ -235,7 +311,11 @@ function ComparePageContent() {
   const validProducts = products ?? [];
 
   return (
-    <div className="max-w-[1200px] mx-auto px-6 py-8">
+    <div className="pb-24">
+      {/* 801: Engineering Evaluation Workspace platform context header */}
+      <CompareContextHeader mode="product" count={validProducts.length} />
+
+      <div className="max-w-[1200px] mx-auto px-6 py-8">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
         <Link href="/" className="hover:text-primary transition-colors">
@@ -248,13 +328,6 @@ function ComparePageContent() {
         <span className="text-slate-300">/</span>
         <span className="text-foreground">产品对比</span>
       </nav>
-
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold text-foreground">产品对比</h1>
-        <p className="text-muted-foreground mt-1">
-          对比 {validProducts.length} 个产品的技术参数
-        </p>
-      </div>
 
       {/* Loading */}
       {productsLoading && (
@@ -311,6 +384,10 @@ function ComparePageContent() {
           />
         </div>
       )}
+
+      {/* 801: cross-surface next-action strip — evaluation converges into discovery */}
+      <CompareNextAction />
+      </div>
     </div>
   );
 }

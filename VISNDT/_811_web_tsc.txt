@@ -1,0 +1,1 @@
+﻿src/app/knowledge-base/[slug]/page.tsx(322,22): error TS2339: Property 'status' does not exist on type 'RelatedProductItem'.

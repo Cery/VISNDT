@@ -206,6 +206,25 @@ export interface WorkspaceSupplierInquiryContext {
   total: number;
 }
 
+// ── Supplier Attach (817) ─────────────────────────────────────────────────
+// Supplier associate an existing Platform Product with its own organization
+// by creating a NEW organization-owned SupplierProduct DRAFT.
+
+export interface WorkspaceSupplierAttachResult {
+  alreadyAttached: boolean;
+  supplierProduct: {
+    id: string;
+    organizationId: string;
+    platformProductId: string;
+    brand: string;
+    modelNumber: string;
+    slug?: string | null;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+}
+
 /**
  * Get buyer workspace overview aggregates.
  * GET /workspace/buyer/overview (JWT)
@@ -287,6 +306,22 @@ export async function getSupplierRuntimeInquiryContext(
 ): Promise<WorkspaceSupplierInquiryContext> {
   const res = await apiClient<ApiResponse<WorkspaceSupplierInquiryContext>>(
     `/workspace/supplier/runtime/products/${supplierProductId}/inquiry-context`,
+  );
+  return res.data;
+}
+
+/**
+ * 817 — Supplier Attach: associate an existing Platform Product with the
+ * authenticated supplier organization by creating a NEW SupplierProduct DRAFT.
+ * organizationId is server-derived from the authenticated context.
+ * POST /workspace/supplier/products/attach (JWT, SUPPLIER)
+ */
+export async function attachSupplierProduct(
+  platformProductId: string,
+): Promise<WorkspaceSupplierAttachResult> {
+  const res = await apiClient<ApiResponse<WorkspaceSupplierAttachResult>>(
+    '/workspace/supplier/products/attach',
+    { method: 'POST', body: JSON.stringify({ platformProductId }) },
   );
   return res.data;
 }

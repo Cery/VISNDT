@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { Layout, Menu, Button, Breadcrumb, Dropdown, Avatar, Badge, Space, Drawer, Tag } from 'antd';
 import type { MenuProps } from 'antd';
@@ -35,21 +35,30 @@ const { Header, Sider, Content } = Layout;
 // ============================================
 // Sectioned Menu Configuration — Operational IA
 // ============================================
-// 目标结构（M26.3 Extension + 663 Optimization）：
-// 首页 / 能力中心 / 业务中心 / 用户与供应商 / 内容中心 / 媒体中心 / 数据与分析 / 系统管理
-// 媒体中心：恢复一级入口（663 D5），页面基于既有 FileAsset entityType/entityId 归属展示。
-type MenuGroup = 'home' | 'product' | 'business' | 'permission' | 'content' | 'media' | 'data' | 'system';
+// 目标结构（773 IA Decision Gate AUTHORIZED）：
+// 工作台 / 业务中心 / 能力主数据 / 合作方管理 / 内容与知识库 / 数据与监控 / 系统管理
+// 运营中心并入首页工作台（/home）；媒体管理并入内容与知识库；AI 数据准备并入数据与监控。
+type MenuGroup = 'workbench' | 'business' | 'product' | 'permission' | 'content' | 'data' | 'system';
 
+// 推荐优化 IA（773 Decision Gate AUTHORIZED）：按【工作台 → 业务 → 主数据 → 合作方 → 内容媒体 → 数据监控 → 系统】排序。
+// 运营中心并入首页工作台（/home），不再作为独立侧边栏菜单项。
 const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }> = {
-  home: {
-    label: '首页',
+  workbench: {
+    label: '工作台',
+    items: [{ key: '/home', icon: <DashboardOutlined />, label: '首页' }],
+  },
+  business: {
+    label: '业务中心',
     items: [
-      { key: '/home', icon: <DashboardOutlined />, label: '首页' },
-      { key: '/operation-center', icon: <FundOutlined />, label: '运营中心' },
+      { key: '/demands', icon: <FileTextOutlined />, label: '需求管理' },
+      { key: '/rfqs', icon: <SnippetsOutlined />, label: 'RFQ 管理' },
+      { key: '/inquiries', icon: <MailOutlined />, label: '能力询价' },
+      { key: '/offers', icon: <TagsOutlined />, label: '报价管理' },
+      { key: '/matching', icon: <NodeIndexOutlined />, label: '匹配管理' },
     ],
   },
   product: {
-    label: '能力中心',
+    label: '能力主数据',
     items: [
       { key: '/products', icon: <AppstoreOutlined />, label: '能力管理' },
       { key: '/supplier-products', icon: <ExperimentOutlined />, label: '能力型号审核' },
@@ -65,25 +74,15 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
       },
     ],
   },
-  business: {
-    label: '业务中心',
-    items: [
-      { key: '/demands', icon: <FileTextOutlined />, label: '需求管理' },
-      { key: '/rfqs', icon: <SnippetsOutlined />, label: 'RFQ 管理' },
-      { key: '/offers', icon: <TagsOutlined />, label: '报价管理' },
-      { key: '/inquiries', icon: <MailOutlined />, label: '能力询价' },
-      { key: '/matching', icon: <NodeIndexOutlined />, label: '匹配管理' },
-    ],
-  },
   permission: {
-    label: '用户与供应商',
+    label: '合作方管理',
     items: [
       { key: '/users', icon: <TeamOutlined />, label: '用户管理' },
       { key: '/organizations', icon: <BankOutlined />, label: '企业管理' },
     ],
   },
   content: {
-    label: '内容中心',
+    label: '内容与知识库',
     items: [
       { key: '/content', icon: <ReadOutlined />, label: '内容管理' },
       {
@@ -98,19 +97,17 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
         ],
       },
       { key: '/content/tags', label: '标签管理' },
+      { key: '/media', icon: <PictureOutlined />, label: '媒体管理' },
     ],
   },
-  media: {
-    label: '媒体中心',
-    items: [{ key: '/media', icon: <PictureOutlined />, label: '媒体管理' }],
-  },
   data: {
-    label: '数据与分析',
+    label: '数据与监控',
     items: [
       { key: '/analytics', icon: <DatabaseOutlined />, label: '数据分析' },
       { key: '/business-analytics', icon: <FundOutlined />, label: '业务分析' },
       { key: '/monitoring', icon: <DashboardOutlined />, label: '运营监控' },
       { key: '/audit-intelligence', icon: <AuditOutlined />, label: '审计智能' },
+      { key: '/embedding', icon: <ExperimentOutlined />, label: 'AI 数据准备' },
     ],
   },
   system: {
@@ -118,15 +115,35 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
     items: [
       { key: '/notifications', icon: <BellOutlined />, label: '通知管理' },
       { key: '/audit-logs', icon: <AuditOutlined />, label: '审计日志' },
-      { key: '/embedding', icon: <ExperimentOutlined />, label: 'AI 数据准备' },
     ],
   },
 };
 
+// 可展开子菜单的父 key → 子路由，用于深层链接时自动展开。
+const submenuParentKeys: Record<string, string[]> = {
+  parameters: ['/parameter-groups', '/parameter-definitions'],
+  knowledge: [
+    '/knowledge/entries',
+    '/knowledge/domains',
+    '/knowledge/categories',
+    '/product-category-knowledge-mappings',
+  ],
+};
+
+// 所有叶子菜单路由 key（用于 active-menu 前缀匹配，详情/编辑页高亮父项）。
+const menuKeys: string[] = [
+  '/home',
+  '/demands', '/rfqs', '/inquiries', '/offers', '/matching',
+  '/products', '/supplier-products', '/product-categories', '/parameter-groups', '/parameter-definitions',
+  '/users', '/organizations',
+  '/content', '/knowledge/entries', '/knowledge/domains', '/knowledge/categories', '/product-category-knowledge-mappings', '/content/tags', '/media',
+  '/analytics', '/business-analytics', '/monitoring', '/audit-intelligence', '/embedding',
+  '/notifications', '/audit-logs',
+];
+
 // Breadcrumb route mapping
 const breadcrumbMap: Record<string, string> = {
   '/home': '首页',
-  '/operation-center': '运营中心',
   '/analytics': '数据分析',
   '/business-analytics': '业务分析',
   '/monitoring': '运营监控',
@@ -147,7 +164,7 @@ const breadcrumbMap: Record<string, string> = {
   '/parameter-definitions': '参数定义',
   '/notifications': '通知管理',
   '/audit-logs': '审计日志',
-  '/media': '媒体中心',
+  '/media': '媒体管理',
   '/embedding': 'AI 数据准备',
   '/knowledge/entries': '知识条目',
   '/knowledge/domains': '知识领域',
@@ -166,7 +183,7 @@ const allMenuItems: MenuProps['items'] = (Object.entries(menuGroups) as [MenuGro
 function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const [openKeys, setOpenKeys] = useState<string[]>(['knowledge']);
+  const [openKeys, setOpenKeys] = useState<string[]>([]);
   const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -207,6 +224,27 @@ function AdminLayout() {
     },
     [navigate, isMobile],
   );
+
+  // Active menu：详情/编辑/动态子路由按最长前缀匹配到菜单父项，保证进入子页仍高亮。
+  const selectedKey = useMemo(() => {
+    if (menuKeys.includes(location.pathname)) return location.pathname;
+    const matched = menuKeys
+      .filter((k) => location.pathname.startsWith(k + '/'))
+      .sort((a, b) => b.length - a.length)[0];
+    return matched || location.pathname;
+  }, [location.pathname]);
+
+  // 深层链接自动展开所在子菜单（参数体系 / 知识库）。
+  useEffect(() => {
+    const toOpen = Object.keys(submenuParentKeys).filter((parent) =>
+      submenuParentKeys[parent].some(
+        (child) => location.pathname === child || location.pathname.startsWith(child + '/'),
+      ),
+    );
+    if (toOpen.length) {
+      setOpenKeys((prev) => Array.from(new Set([...prev, ...toOpen])));
+    }
+  }, [location.pathname]);
 
   // Breadcrumb generation
   const pathSnippets = location.pathname.split('/').filter(Boolean);
@@ -261,7 +299,7 @@ function AdminLayout() {
     <Menu
       theme="dark"
       mode="inline"
-      selectedKeys={[location.pathname]}
+      selectedKeys={[selectedKey]}
       openKeys={collapsed ? [] : openKeys}
       onOpenChange={(keys) => setOpenKeys(keys)}
       items={allMenuItems}

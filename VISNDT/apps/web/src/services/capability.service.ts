@@ -2,7 +2,8 @@
  * Capability Service Layer
  *
  * Public Capability Discovery read — delegates to lib/api/capabilities.ts.
- * Returns only PUBLISHED SupplierProducts with their commercial summary.
+ * Returns ONLY PUBLISHED SupplierProducts as non-commercial model context
+ * (P2 frozen: no price / currency / commercialSummary / offer payload).
  */
 import { getCapability as fetchCapability } from '@/lib/api/capabilities';
 import type { CapabilityDetail } from '@/types/capability';

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getEntryBySlug, getEntryRelatedProducts } from '@/services/knowledge-base.service';
 import type { KnowledgeEntryDetail, RelatedProductItem } from '@/types/knowledge-base';
-import RelatedProducts from '@/components/products/RelatedProducts';
+import RelevantEngineeringDiscovery from '@/components/engineering/RelevantEngineeringDiscovery';
 import { SITE_URL, absoluteUrl, buildKnowledgeEntryJsonLd, buildBreadcrumbListJsonLd, JsonLdScript } from '@/lib/seo';
 
 interface EntryDetailPageProps {
@@ -307,11 +307,42 @@ export default async function KnowledgeEntryDetailPage({ params }: EntryDetailPa
         )}
       </article>
 
-      {/* Related Products — Knowledge → Product discovery (M24.1.7) */}
-      <section className="mt-10 pt-8 border-t border-slate-200">
-        <h2 className="text-lg font-bold text-foreground mb-4">相关产品</h2>
-        <RelatedProducts items={relatedProducts} />
-      </section>
+      {/* 802_M39 — Relevant Engineering Discovery：把“相关产品”重构为分组的“相关工程发现”——
+          把知识关联与相关检测能力产品折叠为单一发现面，提供工程相关性框架 + 跨面下一步发现。
+          非购物推荐，未引入 recommendation domain。 */}
+      <RelevantEngineeringDiscovery
+        capabilityAnchor={entry.title}
+        groups={[
+          {
+            label: '相关检测能力产品',
+            mono: 'PRODUCT',
+            items: relatedProducts.map((p) => ({
+              href: `/products/${p.id}`,
+              title: p.name,
+              sub: p.status === 'ACTIVE' ? '可用' : undefined,
+            })),
+            seeAllHref: '/products',
+          },
+          {
+            label: '关联技术知识',
+            mono: 'KNOWLEDGE',
+            items: allRelations
+              .map((rel) => {
+                const re = rel.direction === 'source' ? rel.target : rel.source;
+                return re
+                  ? { href: `/knowledge-base/${re.slug}`, title: re.title }
+                  : null;
+              })
+              .filter(Boolean) as { href: string; title: string }[],
+            seeAllHref: '/knowledge-base',
+          },
+        ]}
+        nextActions={[
+          { href: '/search', label: '统一检索相关参数' },
+          { href: '/products/compare', label: '评估对比检测能力' },
+          { href: '/categories', label: '回到能力分类' },
+        ]}
+      />
 
       {/* Back to Knowledge Base */}
       <div className="mt-12 pt-8 border-t border-slate-200">

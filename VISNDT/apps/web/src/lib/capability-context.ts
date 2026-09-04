@@ -18,9 +18,9 @@
  */
 
 import type { ProductDetail } from '@/types/product';
-import type { CapabilitySupplierProductWithOffers } from '@/types/capability';
+import type { CapabilitySupplierProduct } from '@/types/capability';
 import { translateCategoryName } from '@/lib/translate';
-import { getCategoryScenario } from '@/lib/capability-glossary';
+import { getCategoryScenario, getDetectionObject } from '@/lib/capability-glossary';
 
 /** 能力规格：始终为 Product-derived 原始参数值，绝不携带伪造的典型值。 */
 export interface CapabilitySpecification {
@@ -59,6 +59,16 @@ export interface CapabilityDiscoveryContext {
   capabilityUrl: string;
 }
 
+/** 工程上下文 —— M35：Application / Detection Object 均为 SEMANTIC / DERIVED（无独立 Entity）。 */
+export interface CapabilityEngineeringContext {
+  /** 检测应用场景（基于分类确定性推导）。 */
+  application: string | null;
+  /** 检测对象（基于分类确定性推导的语义角色）。 */
+  detectionObject: string | null;
+  /** 溯源声明：两者均由现有 Product/Category 派生，不创建任何持久化 Entity。 */
+  source: 'SEMANTIC_DERIVED';
+}
+
 /** Capability Context —— Capability = Product 语义角色的可执行表达。 */
 export interface CapabilityContext {
   /** 唯一 identity = product.id（无第二套身份）。 */
@@ -70,6 +80,8 @@ export interface CapabilityContext {
   category: CapabilityDiscoveryContext;
   /** 基于 Category 的确定性检测场景解读（展示层词表，非 AI）。 */
   scenario: string | null;
+  /** M35 — 工程上下文：Application / Detection Object 语义派生。 */
+  engineeringContext: CapabilityEngineeringContext;
   /** 能力规格（Product-derived 原始参数）。 */
   specifications: CapabilitySpecification[];
   /** 能力提供商上下文（Published SupplyProduct + Organization）。 */
@@ -82,7 +94,7 @@ export interface CapabilityContext {
  */
 export function buildCapabilityContext(
   product: ProductDetail,
-  supplierModels: CapabilitySupplierProductWithOffers[],
+  supplierModels: CapabilitySupplierProduct[],
 ): CapabilityContext {
   const category = product.category ?? null;
 
@@ -100,7 +112,7 @@ export function buildCapabilityContext(
 
   const providerMap = new Map<string, string>();
   for (const model of supplierModels) {
-    const org = model.supplierProduct?.organization;
+    const org = model.organization;
     if (org?.id && org.name && !providerMap.has(org.id)) providerMap.set(org.id, org.name);
   }
   const providers = Array.from(providerMap.entries()).map(([id, name]) => ({ id, name }));
@@ -123,6 +135,12 @@ export function buildCapabilityContext(
       capabilityUrl: `/products/${product.id}`,
     },
     scenario: category && category.name ? getCategoryScenario(category.name) : null,
+    // M35 — Application / Detection Object = SEMANTIC / DERIVED（展示层确定性派生，无独立 Entity）。
+    engineeringContext: {
+      application: category && category.name ? getCategoryScenario(category.name) : null,
+      detectionObject: category && category.name ? getDetectionObject(category.name) : null,
+      source: 'SEMANTIC_DERIVED',
+    },
     specifications: specs,
     supplier: {
       providerCount: providers.length,

@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { PUBLIC_USER_SELECT } from '../common/projection/user.projection';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { SearchProductDto } from './dto/search-product.dto';
@@ -106,7 +107,7 @@ export class ProductsService {
         skip,
         take: pageSize,
         orderBy: { [field]: dir },
-        include: { category: true, createdBy: { include: { organization: true } } },
+        include: { category: true, createdBy: { select: { ...PUBLIC_USER_SELECT, organization: true } } },
       }),
       this.prisma.product.count({ where }),
     ]);
@@ -229,7 +230,7 @@ export class ProductsService {
           include: { parameterDefinition: { include: { options: true } } },
         },
         media: true,
-        createdBy: { include: { organization: true } },
+        createdBy: { select: { ...PUBLIC_USER_SELECT, organization: true } },
         // 公开询价链路：产品详情页需根据 offers 推导询价对象（offer + 组织）
         offers: {
           include: { organization: true },

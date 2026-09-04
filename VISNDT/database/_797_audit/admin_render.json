@@ -1,0 +1,178 @@
+[
+  {
+    "route": "/home",
+    "path": "/home",
+    "btns": 11,
+    "rows": 0,
+    "hasRetry": false,
+    "hasReload": false,
+    "empty": false,
+    "bodyLen": 1007,
+    "snippet": "VISNDT 工业运营中心 首页 首页 运营中心 能力中心 能力管理 能力型号审核 能力分类 参数体系 业务中心 需求管理 RFQ 管理 报价管理 能力询价 匹配管理 用户与供应商 用户管理 企业管理 内容中心 内容管理 知识库 知识条目 "
+  },
+  {
+    "route": "/operation-center",
+    "path": "/operation-center",
+    "btns": 4,
+    "rows": 0,
+    "hasRetry": false,
+    "hasReload": false,
+    "empty": false,
+    "bodyLen": 860,
+    "snippet": "VISNDT 工业运营中心 首页 首页 运营中心 能力中心 能力管理 能力型号审核 能力分类 参数体系 业务中心 需求管理 RFQ 管理 报价管理 能力询价 匹配管理 用户与供应商 用户管理 企业管理 内容中心 内容管理 知识库 知识条目 "
+  },
+  {
+    "route": "/analytics",
+    "path": "/analytics",
+    "btns": 3,
+    "rows": 2,
+    "hasRetry": false,
+    "hasReload": false,
+    "empty": true,
+    "bodyLen": 480,
+    "snippet": "VISNDT 工业运营中心 首页 首页 运营中心 能力中心 能力管理 能力型号审核 能力分类 参数体系 业务中心 需求管理 RFQ 管理 报价管理 能力询价 匹配管理 用户与供应商 用户管理 企业管理 内容中心 内容管理 知识库 知识条目 "
+  },
+  {
+    "route": "/business-analytics",
+    "path": "/business-analytics",
+    "btns": 3,
+    "rows": 0,
+    "hasRetry": false,
+    "hasReload": false,
+    "empty": false,
+    "bodyLen": 455,
+    "snippet": "VISNDT 工业运营中心 首页 首页 运营中心 能力中心 能力管理 能力型号审核 能力分类 参数体系 业务中心 需求管理 RFQ 管理 报价管理 能力询价 匹配管理 用户与供应商 用户管理 企业管理 内容中心 内容管理 知识库 知识条目 "
+  },
+  {
+    "route": "/monitoring",
+    "path": "/monitoring",
+    "btns": 2,
+    "rows": 0,
+    "hasRetry": false,
+    "hasReload": false,
+    "empty": false,
+    "bodyLen": 803,
+    "snippet": "VISNDT 工业运营中心 首页 首页 运营中心 能力中心 能力管理 能力型号审核 能力分类 参数体系 业务中心 需求管理 RFQ 管理 报价管理 能力询价 匹配管理 用户与供应商 用户管理 企业管理 内容中心 内容管理 知识库 知识条目 "
+  },
+  {
+    "route": "/matching",
+    "path": "/matching",
+    "btns": 4,
+    "rows": 0,
+    "hasRetry": false,
+    "hasReload": false,
+    "empty": false,
+    "bodyLen": 370,
+    "snippet": "VISNDT 工业运营中心 首页 首页 运营中心 能力中心 能力管理 能力型号审核 能力分类 参数体系 业务中心 需求管理 RFQ 管理 报价管理 能力询价 匹配管理 用户与供应商 用户管理 企业管理 内容中心 内容管理 知识库 知识条目 "
+  },
+  {
+    "route": "/users",
+    "path": "/users",
+    "btns": 67,
+    "rows": 20,
+    "hasRetry": false,
+    "hasReload": false,
+    "empty": false,
+    "bodyLen": 1811,
+    "snippet": "VISNDT 工业运营中心 首页 首页 运营中心 能力中心 能力管理 能力型号审核 能力分类 参数体系 业务中心 需求管理 RFQ 管理 报价管理 能力询价 匹配管理 用户与供应商 用户管理 企业管理 内容中心 内容管理 知识库 知识条目 "
+  },
+  {
+    "route": "/organizations",
+    "path": "/organizations",
+    "btns": 58,
+    "rows": 17,
+    "hasRetry": false,
+    "hasReload": false,
+    "empty": false,
+    "bodyLen": 1248,
+    "snippet": "VISNDT 工业运营中心 首页 首页 运营中心 能力中心 能力管理 能力型号审核 能力分类 参数体系 业务中心 需求管理 RFQ 管理 报价管理 能力询价 匹配管理 用户与供应商 用户管理 企业管理 内容中心 内容管理 知识库 知识条目 "
+  },
+  {
+    "route": "/supplier-products",
+    "path": "/supplier-products",
+    "btns": 10,
+    "rows": 6,
+    "hasRetry": false,
+    "hasReload": false,
+    "empty": false,
+    "bodyLen": 747,
+    "snippet": "VISNDT 工业运营中心 首页 首页 运营中心 能力中心 能力管理 能力型号审核 能力分类 参数体系 业务中心 需求管理 RFQ 管理 报价管理 能力询价 匹配管理 用户与供应商 用户管理 企业管理 内容中心 内容管理 知识库 知识条目 "
+  },
+  {
+    "route": "/inquiries",
+    "path": "/inquiries",
+    "btns": 9,
+    "rows": 2,
+    "hasRetry": false,
+    "hasReload": false,
+    "empty": false,
+    "bodyLen": 473,
+    "snippet": "VISNDT 工业运营中心 首页 首页 运营中心 能力中心 能力管理 能力型号审核 能力分类 参数体系 业务中心 需求管理 RFQ 管理 报价管理 能力询价 匹配管理 用户与供应商 用户管理 企业管理 内容中心 内容管理 知识库 知识条目 "
+  },
+  {
+    "route": "/audit-logs",
+    "path": "/audit-logs",
+    "btns": 10,
+    "rows": 23,
+    "hasRetry": false,
+    "hasReload": false,
+    "empty": false,
+    "bodyLen": 3342,
+    "snippet": "VISNDT 工业运营中心 首页 首页 运营中心 能力中心 能力管理 能力型号审核 能力分类 参数体系 业务中心 需求管理 RFQ 管理 报价管理 能力询价 匹配管理 用户与供应商 用户管理 企业管理 内容中心 内容管理 知识库 知识条目 "
+  },
+  {
+    "route": "/embedding",
+    "path": "/embedding",
+    "btns": 6,
+    "rows": 1,
+    "hasRetry": false,
+    "hasReload": false,
+    "empty": false,
+    "bodyLen": 708,
+    "snippet": "VISNDT 工业运营中心 首页 首页 运营中心 能力中心 能力管理 能力型号审核 能力分类 参数体系 业务中心 需求管理 RFQ 管理 报价管理 能力询价 匹配管理 用户与供应商 用户管理 企业管理 内容中心 内容管理 知识库 知识条目 "
+  },
+  {
+    "route": "/media",
+    "path": "/media",
+    "btns": 7,
+    "rows": 2,
+    "hasRetry": false,
+    "hasReload": false,
+    "empty": false,
+    "bodyLen": 473,
+    "snippet": "VISNDT 工业运营中心 首页 首页 运营中心 能力中心 能力管理 能力型号审核 能力分类 参数体系 业务中心 需求管理 RFQ 管理 报价管理 能力询价 匹配管理 用户与供应商 用户管理 企业管理 内容中心 内容管理 知识库 知识条目 "
+  },
+  {
+    "route": "/files/orphans",
+    "path": "/files/orphans",
+    "btns": 3,
+    "rows": 0,
+    "hasRetry": false,
+    "hasReload": false,
+    "empty": false,
+    "bodyLen": 284,
+    "snippet": "VISNDT 工业运营中心 首页 首页 运营中心 能力中心 能力管理 能力型号审核 能力分类 参数体系 业务中心 需求管理 RFQ 管理 报价管理 能力询价 匹配管理 用户与供应商 用户管理 企业管理 内容中心 内容管理 知识库 知识条目 "
+  },
+  {
+    "route": "/product-category-knowledge-mappings",
+    "path": "/product-category-knowledge-mappings",
+    "btns": 3,
+    "rows": 0,
+    "hasRetry": true,
+    "hasReload": false,
+    "empty": false,
+    "bodyLen": 317,
+    "snippet": "VISNDT 工业运营中心 首页 首页 运营中心 能力中心 能力管理 能力型号审核 能力分类 参数体系 业务中心 需求管理 RFQ 管理 报价管理 能力询价 匹配管理 用户与供应商 用户管理 企业管理 内容中心 内容管理 知识库 知识条目 "
+  },
+  {
+    "route": "/content",
+    "path": "/content",
+    "btns": 19,
+    "rows": 9,
+    "hasRetry": false,
+    "hasReload": false,
+    "empty": false,
+    "bodyLen": 1272,
+    "snippet": "VISNDT 工业运营中心 首页 首页 运营中心 能力中心 能力管理 能力型号审核 能力分类 参数体系 业务中心 需求管理 RFQ 管理 报价管理 能力询价 匹配管理 用户与供应商 用户管理 企业管理 内容中心 内容管理 知识库 知识条目 "
+  }
+]

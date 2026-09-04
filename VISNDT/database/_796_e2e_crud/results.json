@@ -1,0 +1,143 @@
+{
+  "at": "2026-09-01T15:57:35.233Z",
+  "results": [
+    {
+      "role": "buyer",
+      "op": "render /dashboard/buyer",
+      "ok": true,
+      "detail": "组织工作区"
+    },
+    {
+      "role": "buyer",
+      "op": "render /workspace/demands",
+      "ok": true,
+      "detail": "组织工作区"
+    },
+    {
+      "role": "buyer",
+      "op": "render /workspace/demands/create",
+      "ok": true,
+      "detail": "组织工作区"
+    },
+    {
+      "role": "supplier",
+      "op": "render /dashboard/supplier (D1)",
+      "ok": true,
+      "detail": "组织工作区"
+    },
+    {
+      "role": "admin",
+      "op": "render RFQ(D5)",
+      "ok": true,
+      "detail": "VISNDT 工业运营中心"
+    },
+    {
+      "role": "admin",
+      "op": "render Demands",
+      "ok": true,
+      "detail": "VISNDT 工业运营中心"
+    },
+    {
+      "role": "admin",
+      "op": "render Users",
+      "ok": true,
+      "detail": "VISNDT 工业运营中心"
+    },
+    {
+      "role": "admin",
+      "op": "render Organizations",
+      "ok": true,
+      "detail": "VISNDT 工业运营中心"
+    },
+    {
+      "role": "admin",
+      "op": "render Content",
+      "ok": true,
+      "detail": "VISNDT 工业运营中心"
+    },
+    {
+      "role": "admin",
+      "op": "render Matching",
+      "ok": true,
+      "detail": "VISNDT 工业运营中心"
+    },
+    {
+      "role": "admin",
+      "op": "render Offers",
+      "ok": true,
+      "detail": "VISNDT 工业运营中心"
+    },
+    {
+      "role": "admin",
+      "op": "render Analytics",
+      "ok": true,
+      "detail": "VISNDT 工业运营中心"
+    },
+    {
+      "role": "admin",
+      "op": "render SupplierProducts",
+      "ok": true,
+      "detail": "VISNDT 工业运营中心"
+    },
+    {
+      "role": "supplier",
+      "op": "READ runtime products",
+      "ok": true,
+      "detail": "200 items=0"
+    },
+    {
+      "role": "buyer",
+      "op": "CREATE demand",
+      "ok": true,
+      "detail": "201 Demand created id=91d3b824-fe0b-4424-9266-a94a7d207410"
+    },
+    {
+      "role": "buyer",
+      "op": "READ demand",
+      "ok": true,
+      "detail": "200 title_ok=true"
+    },
+    {
+      "role": "buyer",
+      "op": "READ my-list contains created",
+      "ok": true,
+      "detail": "200 total=1"
+    },
+    {
+      "role": "buyer",
+      "op": "UPDATE demand",
+      "ok": true,
+      "detail": "200 quantity=5"
+    },
+    {
+      "role": "admin",
+      "op": "READ kit (D2/D3 smoke: nested module loads)",
+      "ok": true,
+      "detail": "browser-render covers admin modules"
+    },
+    {
+      "role": "admin",
+      "op": "READ demand (admin)",
+      "ok": true,
+      "detail": 200
+    },
+    {
+      "role": "admin",
+      "op": "UPDATE demand (admin bypass)",
+      "ok": true,
+      "detail": "200 quantity=7"
+    },
+    {
+      "role": "admin",
+      "op": "DELETE demand",
+      "ok": true,
+      "detail": 200
+    },
+    {
+      "role": "buyer",
+      "op": "VERIFY demand deleted",
+      "ok": true,
+      "detail": "after admin delete GET status=404"
+    }
+  ]
+}

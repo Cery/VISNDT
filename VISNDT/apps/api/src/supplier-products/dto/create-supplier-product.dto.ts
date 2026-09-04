@@ -2,12 +2,22 @@ import { IsString, IsOptional, IsUUID, MaxLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
- * CreateSupplierProductDto — M28.0 Hybrid Model C.
+ * CreateSupplierProductDto — M28.0 Hybrid Model C / 816 Governance Foundation.
  *
- * Admin-governance create contract. organizationId is omitted on purpose:
- * it is derived from the authenticated user's organization context server-side.
+ * Admin-governance create contract. The owning Supplier Organization is now
+ * explicitly selected by the Platform Admin (organizationId).
+ *
+ * 816 correction: organizationId is NO LONGER derived from the authenticated
+ * admin's own organization. Platform Admin selects a target SUPPLIER org.
+ * Server-side validation enforces: org exists + ACTIVE + type is SUPPLIER.
+ *
+ * Ownership anchors (organizationId + platformProductId) are immutable via edit.
  */
 export class CreateSupplierProductDto {
+  @ApiProperty({ description: 'Owning Supplier Organization UUID the model is assigned to', example: 'uuid' })
+  @IsUUID()
+  organizationId: string;
+
   @ApiProperty({ description: 'Platform Product (capability node) UUID the model binds to', example: 'uuid' })
   @IsUUID()
   platformProductId: string;

@@ -1,0 +1,241 @@
+{
+  "task": "807_Browser_E2E",
+  "generatedAt": "2026-09-02T16:18:11.066Z",
+  "logins": [
+    null,
+    null,
+    null
+  ],
+  "steps": [
+    {
+      "s": "guest home render",
+      "ok": true,
+      "d": {
+        "path": "/"
+      }
+    },
+    {
+      "s": "login page render",
+      "ok": true,
+      "d": {
+        "path": "/login"
+      }
+    },
+    {
+      "s": "login page render",
+      "ok": true,
+      "d": {
+        "path": "/login"
+      }
+    },
+    {
+      "s": "guest products list render",
+      "ok": true,
+      "d": {
+        "path": "/products"
+      }
+    },
+    {
+      "s": "login submit (demo.buyer.01@visndt.local)",
+      "ok": true,
+      "d": {
+        "clicked": true,
+        "url": "http://localhost:3000/dashboard"
+      }
+    },
+    {
+      "s": "login submit (demo.supplier.01@visndt.local)",
+      "ok": true,
+      "d": {
+        "clicked": true,
+        "url": "http://localhost:3000/dashboard"
+      }
+    },
+    {
+      "s": "guest opens product detail (real action)",
+      "ok": true,
+      "d": {
+        "href": "/products/ebb1c034-4280-480b-89ce-29753660e126",
+        "landed": "http://localhost:3000/products"
+      }
+    },
+    {
+      "s": "buyer dashboard render",
+      "ok": true,
+      "d": {
+        "path": "/dashboard/buyer"
+      }
+    },
+    {
+      "s": "supplier dashboard render",
+      "ok": true,
+      "d": {
+        "path": "/dashboard/supplier"
+      }
+    },
+    {
+      "s": "guest products 375 render",
+      "ok": true,
+      "d": {
+        "path": "/products"
+      }
+    },
+    {
+      "s": "supplier opportunities render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/supplier/opportunities"
+      }
+    },
+    {
+      "s": "buyer demands list render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/demands"
+      }
+    },
+    {
+      "s": "supplier rfqs list render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/supplier/rfqs"
+      }
+    },
+    {
+      "s": "buyer demand detail render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/demands/e0672785-9e4e-4d61-8b48-454f0e1a6f33"
+      }
+    },
+    {
+      "s": "supplier rfq detail (open RFQ) render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/supplier/rfqs/d3604b3f-dc15-4801-a7e0-5857066aa7e7"
+      }
+    },
+    {
+      "s": "buyer matches list render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/matches"
+      }
+    },
+    {
+      "s": "supplier responses list render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/supplier/responses"
+      }
+    },
+    {
+      "s": "buyer match detail render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/matches/40f68c3c-2c92-4a3b-9300-3776e1759a81"
+      }
+    },
+    {
+      "s": "supplier offers list render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/supplier/offers"
+      }
+    },
+    {
+      "s": "buyer rfqs list render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/rfqs"
+      }
+    },
+    {
+      "s": "supplier inquiries list render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/supplier/inquiries"
+      }
+    },
+    {
+      "s": "buyer rfq detail render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/rfqs/d3604b3f-dc15-4801-a7e0-5857066aa7e7"
+      }
+    },
+    {
+      "s": "supplier inquiry detail render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/supplier/inquiries/f866c67c-7850-4efa-80d2-5c3ee5e91eab"
+      }
+    },
+    {
+      "s": "buyer notifications render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/notifications"
+      }
+    },
+    {
+      "s": "supplier notifications render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/notifications"
+      }
+    },
+    {
+      "s": "buyer demands 375 render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/demands"
+      }
+    },
+    {
+      "s": "supplier rfqs 375 render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/supplier/rfqs"
+      }
+    },
+    {
+      "s": "buyer matches 375 render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/matches"
+      }
+    },
+    {
+      "s": "supplier responses 375 render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/supplier/responses"
+      }
+    },
+    {
+      "s": "buyer rfqs 375 render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/rfqs"
+      }
+    },
+    {
+      "s": "buyer session complete",
+      "ok": true,
+      "d": {}
+    },
+    {
+      "s": "supplier inquiries 375 render",
+      "ok": true,
+      "d": {
+        "path": "/workspace/supplier/inquiries"
+      }
+    },
+    {
+      "s": "supplier session complete",
+      "ok": true,
+      "d": {}
+    }
+  ]
+}

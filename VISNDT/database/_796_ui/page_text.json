@@ -1,0 +1,42 @@
+{
+  "buyer": {
+    "pages": {
+      "dash": {
+        "url": "http://localhost:3000/dashboard/buyer",
+        "text": "工作区\n仪表盘\n我的需求\n我的询价请求\n匹配结果\n我的评估\n通知中心\n设置\n组织工作区\n张检测\n退出登录\n采购方工作台\n欢迎回来，张检测。管理您的检测需求、询价与供应商响应。\nBUYER\n业务概览\n需求\n1\n草稿 1\n询价请求\n0\nRFQ 总量\n匹配\n0\n暂无状态统计\n待决策响应\n0\n待处理 0 / 已接受 0 / 已拒绝 0\n待处理事项\nPENDING ACTIONS\n待处理供应商响应\n您有 RFQ 响应等待查看和决策，进入询价请求页面进行处理。\n当前数量\n0\n查看待决策响应\n当前没有待处理的 RFQ 响应决策。\n业务导航\n我的需求\n查看 Demand 列表、状态和详情页入口。\n进入\n我的询价请求\n进入 RFQ 列表，查看询价请求进度与待决策响应。\n进入\n匹配结果\n查看当前 Matching 汇总与关联结果。\n进入\n通知中心\n进入通知页面查看当前消息和提醒。\n进入"
+      },
+      "demands": {
+        "url": "http://localhost:3000/workspace/demands",
+        "text": "工作区\n仪表盘\n我的需求\n我的询价请求\n匹配结果\n我的评估\n通知中心\n设置\n组织工作区\n张检测\n退出登录\n我的需求\n查看和管理您的需求列表。\n+ 创建需求\nDEMO_可视化E2E_需求_1788279750024\n草稿\nVIS-DEM-20260902-1857066221\n数量: 3 台\n2026/9/2"
+      }
+    }
+  },
+  "supplier": {
+    "pages": {
+      "dash": {
+        "url": "http://localhost:3000/dashboard/supplier",
+        "text": "工作区\n仪表盘\nRFQ 机会\n我的响应\n我的报价\n收到的询价\n商机\n运行时能力\n企业资料\n组织成员\n通知中心\n能力展示\n组织工作区\n王明视\n退出登录\n供应商工作台\n欢迎回来，王明视。管理您的 RFQ 机会、响应状态与能力展示。\nSUPPLIER\n业务概览\n待处理 RFQ\n0\n暂无状态统计\n已提交响应\n0\n暂无状态统计\n匹配机会\n0\n暂无状态统计\n公开 RFQ\n1\n可参与响应\n我的 OFFER\n0\n供应能力 Offer\n未读通知\n0\n条未读消息\n快捷操作\n查看 RFQ\n0 个待处理\n商机中心\n1 个公开 RFQ\n我的响应\n0 条记录\n我的 Offer\n0 个 Offer\n企业资料\n管理组织信息\n展示管理\n管理能力展示\n通知中心\n0 条未读\n定向询价快照\n当前暂无可展示的定向 RFQ。\n响应跟踪\n已提交\n0\n当前处于已提交状态的响应数\n处理中\n0\n尚未进入最终结果的响应数\n已接受\n0\n已接受的响应数\n当前暂无可展示的响应记录。\n最近活动\n暂无最近业务活动。\n业务导航\nRFQ机会\n进入定向 RFQ 列表，查看当前可跟进的询价机会。\n进入\n商机中心\n发现公开 RFQ 机会、查看匹配机会和定向询价，把握业务先机。\n进入\n我的响应\n查看已提交响应的状态跟踪与历史记录。\n进入\n我的 Offer\n查看和管理供应能力 Offer，创建新 Offer 并提交。\n进入\n企业资料\n查看和编辑组织基础信息，维护企业身份与公开资料。\n进入\n展示管理\n查看和管理供应商公开展示能力，包括企业身份、产品能力和供应管理。\n进入\n通知中心\n进入通知页面查看当前消息和提醒。\n进入\n设置\n进入工作区设置查看当前账号与偏好配置。\n进入"
+      },
+      "runtime": {
+        "url": "http://localhost:3000/workspace/supplier/runtime",
+        "text": "工作区\n仪表盘\nRFQ 机会\n我的响应\n我的报价\n收到的询价\n商机\n运行时能力\n企业资料\n组织成员\n通知中心\n能力展示\n组织工作区\n王明视\n退出登录\n供应商运行时（Supplier Runtime）\n供应商能力操作边界 — 只读查看自身 SupplierProduct、商用汇总与买方兴趣。不是商城、不是卖家中心。\n能力概览\n能力型号\n0\n自身 SupplierProduct\n已发布\n0\n可供公开发现\n有效 OFFER\n0\n商用层汇总\n审核中\n0\n待治理确认\n能力型号状态\n搜索\n全部状态\n草稿\n已提交\n审核中\n已批准\n已发布\n已拒绝\n全部系列\n共 0 条，第 1/1 页\n当前筛选条件下暂无可展示的 SupplierProduct。\n买方兴趣快照\n买方 Inquiry 在能力层（Platform Product）聚合呈现。选择上方某个型号的「查看买方兴趣」进入具体 Inquiry 上下文。\n点击型号卡片中的「查看买方兴趣」按钮，查看关联 Inquiries 的只读列表。"
+      }
+    }
+  },
+  "admin": {
+    "pages": {
+      "home": {
+        "url": "http://localhost:3001/home",
+        "text": "INDUSTRIAL OPERATIONS / COMPLEX · VISNDT\n平台运营总览\nVISNDT 工业检测能力发现平台 · 工业运营中心 · 实时掌握平台能力资产、业务流转与系统运行状态\n能力资产 4\n业务实体 43\nLC:2026/9/2 00:22:47\n刷新\n数据库\nAPI\n能力\n4\n匹配引擎\n0\n活跃用户\n19\n需要关注\n2/5\n运营概览\n数据图表\n最近活动\n能力总览\n平台核心能力资产与覆盖\n能力\n4\n能力目录中已登记的工业检测能力与参数上下文\n内容资产\n8\n已发布的知识 / 检测内容资产\n注册用户\n19\n19 活跃\n平台注册用户规模（含活跃口径）\n组织\n16\n参与能力撮合的供需机构\n能力分类\n13\n能力分类目录节点（导向分类上下文）\n参数定义\n54\n可用筛选参数定义（能力匹配上下文）\n业务流转\n需求 → 匹配的工业闭环运营信号\n询价\n1\n买家发起的检测咨询请求\n需求\n4\n0 已发布\n进入撮合的能力需求\nRFQ\n2\n进入询价流程的正式询价单\n报价\n0\n供应商提交的能力报价\n匹配\n0\n确定性生成的匹配结果\n未读通知\n0\n已清零\n待消费的平台运营通知\n匹配引擎状态\n确定性匹配引擎运行指标\n总匹配数\n0\n确定性匹配引擎已生成的结果总量\n平均匹配度\n0\n%\n建议关注匹配口径\n各需求平均匹配得分\n硬失败\n0\n无法生成匹配的需求数\n重新匹配\n6\n需重新匹配的处理数\n待处理事项\n共 27 项待处理\nQ:27\n待处理用户\n0\n待审核 / 激活的注册用户\n待处理询价\n1\n待处理的咨询请求\n待处理需求\n2\n待处理的能力需求\n待处理 RFQ\n2\n待处理的询价单\n未读通知\n22\n未读的平台通知\n快捷操作\n常用运营动作入口\n创建用户\n创建组织\n创建产品\n创建内容\n通知中心\n查看用户\n查看组织"
+      },
+      "rfqs": {
+        "url": "http://localhost:3001/rfqs",
+        "text": "RFQ 管理\n管理 RFQ 生命周期、状态与供应商响应\n按状态筛选\n重置\n创建 RFQ\n勾选数据行后，可进行批量操作\n\tRFQ 编号\t状态\t需求\t目标能力提供商\t创建者\t发布时间\t关闭时间\t创建时间\t操作\n\t\nRFQ 编号\n\t\n状态\n\t\n需求\n\t\n目标能力提供商\n\t\n创建者\n\t\n发布时间\n\t\n关闭时间\n\t\n创建时间\n\t\n操作\n\tVIS-RFQ-20260808-1057012882\t\n开放\t\n发动机缸盖检测\nVIS-DEM-00000000-2709043359\n\t公开\tAdmin\t2026/8/9\t-\t2026/8/8\t\n查看\n删除\n\tVIS-RFQ-20260824-3586844520\t\n草稿\t\nTest: 发动机缸体检测-2套-工业内窥镜\nVIS-DEM-00000000-3490337216\n\t公开\tBuyer 采购方\t-\t-\t2026/8/24\t\n查看\n删除\n1-2 / 2\n1\n20 条/页"
+      },
+      "users": {
+        "url": "http://localhost:3001/users",
+        "text": "用户管理\n管理平台用户、角色与账户状态\n创建用户\n导出\n选择状态\n搜索\n重置\n勾选数据行后，可进行批量操作\n\t邮箱\t姓名\t组织\t角色\t状态\t创建时间\t操作\n\t\n邮箱\n\t\n姓名\n\t\n组织\n\t\n角色\n\t\n状态\n\t\n创建时间\n\t\n操作\n\tadmin.zx.763@visndt.local\t知象测试管理员(zx)\t西安知象光电科技有限公司\t未分配\t\n活跃\t2026/8/31\t\n查看\n编辑\n删除\n\tzhaoliu.763@visndt.local\t赵六\t西安知象光电科技有限公司\t未分配\t\n活跃\t2026/8/31\t\n查看\n编辑\n删除\n\twangwu.763@visndt.local\t王五\t西安知象光电科技有限公司\t未分配\t\n活跃\t2026/8/31\t\n查看\n编辑\n删除\n\tlisi.763@visndt.local\t李四\t深圳市微视光电科技有限公司\t未分配\t\n活跃\t2026/8/31\t\n查看\n编辑\n删除\n\tadmin.vs.763@visndt.local\t微视测试管理员(vs)\t深圳市微视光电科技有限公司\t未分配\t\n活跃\t2026/8/31\t\n查看\n编辑\n删除\n\tzhangsan.763@visndt.local\t张三\t深圳市微视光电科技有限公司\t未分配\t\n活跃\t2026/8/31\t\n查看\n编辑\n删除\n\ttest.user.647@visndt.local\tE2E测试用户\tVISNDT 采购方企业\t未分配\t\n活跃\t2026/8/22\t\n查看\n编辑\n删除\n\tsupplier@visndt.com\tSupplier 供应商\t深圳市微视光电科技有限公司\t未分配\t\n活跃\t2026/8/21\t\n查看\n编辑\n删除\n\tbuyer@visndt.com\tBuyer 采购方\tVISNDT 采购方企业\t未分配\t\n活跃\t2026/8/21\t\n查看\n编辑\n删除\n\tdemo.supplier.03@visndt.local\t陈中科\t中科检测设备有限公司\t未分配\t\n活跃\t2026/8/16\t\n查看\n编辑\n删除\n\tdemo.supplier.02@visndt.local\t赵锐视\t锐视检测技术有限公司\t未分配\t\n活跃\t2026/8/16\t\n查看\n编辑\n删除\n\tdemo.supplier.01@visndt.local\t王明视\t明视工业检测设备有限公司\t未分配\t\n活跃\t2026/8/16\t\n查看\n编辑\n删除\n\tdemo.buyer.02@visndt.local\t李质检\t江南航空检测技术中心\t未分配\t\n活跃\t2026/8/16\t\n查看\n编辑\n删除\n\tdemo.buyer.01@visndt.local\t张检测\t江南航空检测技术中心\t未分配\t\n活跃\t2026/8/16\t\n查看\n编辑\n删除\n\tdemo.admin@visndt.local\tDemo Admin\tVISNDT 平台运营中心\t未分配\t\n活跃\t2026/8/16\t\n查看\n编辑\n删除\n\tsystem@visndt.com\tSystem Scheduler\t-\t未分配\t\n活跃\t2026/8/12\t\n查看\n编辑\n删除\n\tvsndt@sz-wise.cn\tVSNDT Supplier\tSZ Wise Supplier\t未分配\t\n活跃\t2026/8/9\t\n查看\n编辑\n删除\n\tadmin@vip.com\tAdmin\tAdmin Organization\t未分配\t\n活跃\t2026/8/7\t\n查看\n编辑\n删除\n\tadmin@visndt.com\tAdmin\tVISNDT 平台运营中心\t未分配\t\n活跃\t2026/8/4\t\n查看\n编辑\n删除\n共 19 条，第 1-19 条\n1\n20 条/页"
+      }
+    }
+  }
+}

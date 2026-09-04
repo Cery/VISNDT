@@ -1,0 +1,19 @@
+﻿{
+  "createTemp": {
+    "status": 201,
+    "tmpId": "2b53c886-ef57-4a6e-b0ae-1e761aa85ef1",
+    "slug": "811focus1788401815771"
+  },
+  "freshness": {
+    "netBeforeFocus": 0,
+    "netBeforeWait": 0,
+    "netAfter": 0,
+    "requestFired": false,
+    "tempShownBeforeFocus": false,
+    "tempShownDuringStaleJustBeforeFocus": false,
+    "tempShownAfterFocus": false
+  },
+  "cleanup": {
+    "status": 200
+  }
+}

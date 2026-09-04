@@ -1,0 +1,40 @@
+﻿{
+  "login": {
+    "status": 201
+  },
+  "cases": [
+    {
+      "case": "delete-blocked-by-products",
+      "expected": "400 / CATEGORY_HAS_PRODUCTS",
+      "actualStatus": 400,
+      "message": "无法删除该分类：分类下存在 2 个产品，请先移除依赖项后再删除。"
+    },
+    {
+      "case": "blocked-products-persistence",
+      "expected": "category remains in DB + public",
+      "inDB": true,
+      "publicVisible": true,
+      "publicStatus": 200
+    },
+    {
+      "case": "delete-blocked-by-children",
+      "expected": "400 / CATEGORY_HAS_CHILDREN",
+      "actualStatus": 400,
+      "message": "无法删除该分类：分类下存在 4 个子分类，请先移除依赖项后再删除。"
+    },
+    {
+      "case": "create-temp",
+      "expected": "201 + visible public",
+      "actualStatus": 201,
+      "publicVisible": true,
+      "tmpId": "045ecfc0-30b1-4850-a3e8-6a820bcdaa1a"
+    },
+    {
+      "case": "delete-temp-success",
+      "expected": "200 + removed from DB + public",
+      "actualStatus": 200,
+      "inDB": true,
+      "publicVisibleAfter": false
+    }
+  ]
+}

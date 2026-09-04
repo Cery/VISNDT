@@ -11,6 +11,7 @@ import { trackEvent, buildEvent } from '@/lib/analytics';
 import { translateCategoryName } from '@/lib/translate';
 import IndustrialBadge from '@/components/brand/IndustrialBadge';
 import PageContainer from '@/components/common/PageContainer';
+import EngineeringDiscoveryNav from '@/components/engineering/EngineeringDiscoveryNav';
 import SearchBar from '@/components/products/SearchBar';
 import ProductFilter from '@/components/products/ProductFilter';
 import MobileFilterDrawer from '@/components/products/MobileFilterDrawer';
@@ -96,6 +97,10 @@ function ProductsPageContent() {
   const { data: categoriesData } = useQuery({
     queryKey: ['categories'],
     queryFn: () => getCategories(1, 100),
+    // 811 Batch A (D1): 公共目录焦点回归自动刷新。
+    // 811 修补 (D1 跟进): refetchOnMount:'always' —— 修复「产品中心页分类筛选」在纯客户端路由跳转下仍命中 60s 新鲜缓存、不重拉导致的删除分类残留。
+    refetchOnWindowFocus: true,
+    refetchOnMount: 'always',
   });
 
   // 参数定义：有分类上下文时仅加载该分类 ACTIVE 产品实际使用的参数；
@@ -128,6 +133,8 @@ function ProductsPageContent() {
         status: 'ACTIVE',
         parameterFilters,
       }),
+    // 811 Batch A (D1): 公共产品列表焦点回归自动刷新。
+    refetchOnWindowFocus: true,
   });
 
   const handleSearch = useCallback(
@@ -277,6 +284,47 @@ function ProductsPageContent() {
       </div>
 
       <PageContainer variant="content" paddingY={28}>
+        {/* M38 最终实现补齐 — 跨面发现收束：产品中心 → 分类 → 知识 → 方案 → 统一检索 */}
+        <div className="mb-6">
+          <EngineeringDiscoveryNav activeLabel="检测产品" />
+        </div>
+
+        {/* 802 — Capability Evaluation ribbon: contextual + next-action（工程评估语境，非电商价格） */}
+        <div className="mb-6 rounded-xl border border-slate-200/80 bg-surface-1 p-4 sm:p-5">
+          <div className="flex flex-col lg:flex-row lg:items-center gap-3 lg:justify-between">
+            <div className="min-w-0">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-industrial-cyan mb-1">
+                CAPABILITY EVALUATION
+              </p>
+              <p className="text-sm text-foreground">
+                {categoryId && categories.length
+                  ? `正在评估“${categories.find((c) => c.id === categoryId)?.name ? translateCategoryName(categories.find((c) => c.id === categoryId)!.name) : '所选能力'}”检测能力`
+                  : '从工程语义出发，按能力、参数与状态评估注册检测能力'}
+                {parameterFilters.length > 0 ? ` · ${parameterFilters.length} 项参数约束` : ''}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                以技术参数与工程适用性开展确定性能力评估，不做商品化比价。
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={() => router.push('/products/compare')}
+                className="inline-flex items-center gap-1 rounded-lg border border-primary/30 text-primary text-sm font-medium px-3 py-1.5 hover:border-primary hover:bg-primary/5 transition-colors"
+              >
+                评估对比<span aria-hidden="true">→</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push('/search')}
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 text-foreground text-sm font-medium px-3 py-1.5 hover:border-primary/40 hover:text-primary transition-colors"
+              >
+                统一检索相关参数<span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Search */}
         <div className="mb-6 max-w-full sm:max-w-lg">
           <SearchBar

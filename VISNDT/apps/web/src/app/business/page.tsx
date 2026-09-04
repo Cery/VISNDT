@@ -4,11 +4,23 @@ import { getContentBySlug } from '@/services/content.service';
 import MarkdownRenderer from '@/components/markdown/MarkdownRenderer';
 import MediaGallery from '@/components/content/MediaGallery';
 import ContentCommercialCTA from '@/components/content/ContentCommercialCTA';
+import { SITE_URL } from '@/lib/seo';
 
 export const metadata: Metadata = {
   title: '商务合作',
   description:
     '与VISNDT合作开展工业检测设备制造、技术协作和行业合作。',
+  // M38 统一 Discoverability：/business（平台能力合作 + Supplier 参与 + 技术协作）为公开索引面，
+  // 补全 canonical + robots，闭合机器可读规范地址（sitemap priority 0.5）。
+  alternates: { canonical: `${SITE_URL}/business` },
+  robots: { index: true, follow: true },
+  openGraph: {
+    title: '商务合作 – VISNDT',
+    description:
+      '与VISNDT合作开展工业检测设备制造、技术协作和行业合作。',
+    type: 'website',
+    url: `${SITE_URL}/business`,
+  },
 };
 
 // Legacy static content — fallback when no ARTICLE slug='business' exists

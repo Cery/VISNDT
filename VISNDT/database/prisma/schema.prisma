@@ -291,6 +291,12 @@ model Organization {
   type   String             @map("organization_type")
   status OrganizationStatus @default(ACTIVE)
 
+  // 819 Permission Foundation: Admin-controlled enablement for SupplierProduct
+  // self-service. Opt-in (default false). Gates SUPPLIER self-service actions only;
+  // Admin attach/governance and Platform Product authority are NOT gated by this flag.
+  // No second RBAC / no new claim — reuses existing auth + workspaceRole + membership.
+  supplierProductManagementEnabled Boolean @default(false) @map("supplier_product_management_enabled")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

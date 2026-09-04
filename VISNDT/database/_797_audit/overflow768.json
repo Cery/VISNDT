@@ -1,0 +1,20 @@
+{
+  "home768": {
+    "vw": 768,
+    "docScrollWidth": 753,
+    "count": 0,
+    "top": []
+  },
+  "home1024": {
+    "vw": 1024,
+    "docScrollWidth": 1009,
+    "count": 0,
+    "top": []
+  },
+  "products768": {
+    "vw": 768,
+    "docScrollWidth": 753,
+    "count": 0,
+    "top": []
+  }
+}

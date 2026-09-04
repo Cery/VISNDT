@@ -1,0 +1,1 @@
+{"role":"BUYER","step":"MOBILE","url":"http://localhost:3000","action":"多视口溢出检测","expected":"无横向溢出","actual":"[]","pass":true,"note":"waves 375/768/1024/1440 over 5 key pages"}

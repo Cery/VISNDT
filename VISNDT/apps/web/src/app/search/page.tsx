@@ -1,10 +1,13 @@
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
+import { SITE_URL } from '@/lib/seo';
 import SearchPageContent from './SearchPageContent';
 
 export const metadata: Metadata = {
   title: '搜索',
   description: '搜索工业检测设备、技术知识、解决方案和供应商能力',
+  // 797: 补全统一检索 Authority 的 canonical，闭合机器可读规范地址
+  alternates: { canonical: `${SITE_URL}/search` },
 };
 
 export default function SearchPage() {

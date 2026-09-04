@@ -352,7 +352,13 @@ function SupplierDashboardContent() {
               onRetry={retryRfqs}
             />
           ) : visibleRfqs.length === 0 ? (
-            <EmptyState message="当前暂无可展示的定向 RFQ。" />
+            <EmptyState
+              icon="search"
+              title="暂无可展示的定向 RFQ"
+              message="当前没有指向您组织的定向询价单。"
+              description="可前往商机中心浏览公开 RFQ 机会，或返回 RFQ 列表发起可响应的询价流程。"
+              action={{ label: '发现 RFQ 机会', href: '/workspace/supplier/opportunities' }}
+            />
           ) : (
             <div className="space-y-4">
               {visibleRfqs.map((rfq) => (
@@ -447,7 +453,13 @@ function SupplierDashboardContent() {
               </div>
 
               {visibleResponses.length === 0 ? (
-                <EmptyState message="当前暂无可展示的响应记录。" />
+                <EmptyState
+                  icon="document"
+                  title="暂无响应记录"
+                  message="当前暂无可展示的报价响应。"
+                  description="确定供应能力并不再发起响应时，可前往 RFQ 机会页对可响应的询价提交技术方案。"
+                  action={{ label: '查看可响应询价', href: '/workspace/supplier/rfqs' }}
+                />
               ) : (
                 <div className="space-y-4">
                   {visibleResponses.map((response) => (
@@ -517,7 +529,13 @@ function SupplierDashboardContent() {
           ) : (
             <div className="space-y-3">
               {visibleRfqs.length === 0 && visibleResponses.length === 0 ? (
-                <EmptyState message="暂无最近业务活动。" />
+                <EmptyState
+                  icon="default"
+                  title="暂无最近业务活动"
+                  message="尚未产生 RFQ 或响应的业务活动记录。"
+                  description="从商机中心开始：发现匹配机会并对可响应的询价提交方案，活动将在此沉淀为时间线。"
+                  action={{ label: '前往商机中心', href: '/workspace/supplier/opportunities' }}
+                />
               ) : (
                 <>
                   {visibleRfqs.slice(0, 3).map((rfq) => (
