@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
+import BuyerJourneySteps from '@/components/workspace/BuyerJourneySteps';
+import ReturnToDiscovery from '@/components/workspace/ReturnToDiscovery';
 import RFQDetail from '@/components/rfq/RFQDetail';
 import RFQResponseList from '@/components/rfq/RFQResponseList';
 import {
@@ -176,14 +178,17 @@ function RfqDetailContent({ id }: { id: string }) {
 
   return (
     <WorkspaceLayout>
-      <div className="max-w-[1200px] mx-auto">
+      <div className="max-w-[1200px] mx-auto space-y-6">
         {/* Back button */}
         <button
           onClick={() => router.push('/workspace/rfqs')}
-          className="text-sm text-slate-500 hover:text-slate-700 mb-6 flex items-center gap-1 transition-colors"
+          className="text-sm text-slate-500 hover:text-slate-700 flex items-center gap-1 transition-colors"
         >
           ← 返回询价请求列表
         </button>
+
+        <BuyerJourneySteps currentStep="rfq" />
+        <ReturnToDiscovery context="RFQ" />
 
             {isLoading ? (
               <div className="space-y-4">

@@ -16,8 +16,7 @@ import MarkdownRenderer from '@/components/markdown/MarkdownRenderer';
 import MediaGallery from '@/components/content/MediaGallery';
 import ContentProductCTA from '@/components/common/ContentProductCTA';
 import DemandCTA from '@/components/conversion/DemandCTA';
-import RelatedProducts from '@/components/relation/RelatedProducts';
-import RelatedSolutions from '@/components/relation/RelatedSolutions';
+import RelevantEngineeringDiscovery from '@/components/engineering/RelevantEngineeringDiscovery';
 import type { Content } from '@/types/content';
 import type { Product } from '@/types/product';
 
@@ -108,6 +107,15 @@ export default async function KnowledgeDetailPage({
     relatedSolutions = res.data;
   } catch {
     relatedSolutions = [];
+  }
+
+  // Other knowledge in the same content channel — cross-content discovery continuity.
+  let otherKnowledge: Content[] = [];
+  try {
+    const res = await getContentList({ type: 'KNOWLEDGE', pageSize: 8, sort: 'publishedAt', order: 'desc' });
+    otherKnowledge = res.data.filter((k) => k.slug !== slug).slice(0, 3);
+  } catch {
+    otherKnowledge = [];
   }
 
   // JSON-LD Structured Data（Article；无敏感字段，无内部 ID）
@@ -204,9 +212,46 @@ export default async function KnowledgeDetailPage({
         <MediaGallery media={content.media} />
       </article>
 
-      {/* Commercial relation feeds — deterministic product / solution discovery */}
-      <RelatedProducts items={relatedProducts} className="mt-12" />
-      <RelatedSolutions items={relatedSolutions} className="mt-2" />
+      {/* Engineering Discovery — unify Knowledge into the cross-surface discovery ecosystem
+          (related capability products / technical knowledge / solutions folded into one frame). */}
+      <RelevantEngineeringDiscovery
+        capabilityAnchor={content.title}
+        groups={[
+          {
+            label: '相关检测能力产品',
+            mono: 'PRODUCT',
+            items: relatedProducts.map((p) => ({
+              href: `/products/${p.id}`,
+              title: p.name,
+              sub: p.status === 'ACTIVE' ? '可用' : undefined,
+            })),
+            seeAllHref: '/products',
+          },
+          {
+            label: '相关技术知识',
+            mono: 'KNOWLEDGE',
+            items: otherKnowledge.map((k) => ({
+              href: `/knowledge/${k.slug}`,
+              title: k.title,
+            })),
+            seeAllHref: '/knowledge',
+          },
+          {
+            label: '相关解决方案',
+            mono: 'SOLUTION',
+            items: relatedSolutions.map((s) => ({
+              href: `/solutions/${s.slug}`,
+              title: s.title,
+            })),
+            seeAllHref: '/solutions',
+          },
+        ]}
+        nextActions={[
+          { href: '/search', label: '统一检索相关参数' },
+          { href: '/products/compare', label: '评估对比检测能力' },
+          { href: '/solutions', label: '继续查看解决方案' },
+        ]}
+      />
 
       {/* Commercial conversion — application / demand entry */}
       <div className="mt-12 mb-8 space-y-4">

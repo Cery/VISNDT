@@ -6,6 +6,7 @@ import { useMutation } from '@tanstack/react-query';
 import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
+import WorkspaceSectionHeader from '@/components/workspace/WorkspaceSectionHeader';
 import DemandParameterEditor, {
   type DemandParameterDraft,
 } from '@/components/demand/DemandParameterEditor';
@@ -153,12 +154,11 @@ function DemandCreateContent() {
   return (
     <WorkspaceLayout>
       <div className="max-w-[1200px] mx-auto space-y-6">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">创建需求</h2>
-          <p className="text-slate-500 text-sm mt-1">
-            描述您的检测设备需求。
-          </p>
-        </div>
+        <WorkspaceSectionHeader
+          title="创建需求"
+          eyebrow="BUYER · DEMAND"
+          description="描述您的检测设备需求，作为采购旅程的起点。"
+        />
 
         <form
           onSubmit={handleSubmit}

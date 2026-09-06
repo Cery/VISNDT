@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/auth/AuthProvider';
 import GlobalSearchBar from '@/components/search/GlobalSearchBar';
+import { Drawer } from '@/components/ui/Drawer';
 
 // 800_M39 Whole-site frontend platformization — Global Navigation reconstruction.
 // 目标：VISNDT = Industrial Inspection Capability Discovery Platform（工业检测能力发现平台），
@@ -74,13 +75,34 @@ export default function PublicHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [openLayer, setOpenLayer] = useState<string | null>(null);
+  const [isStrictMobile, setIsStrictMobile] = useState(false);
   const pathname = usePathname();
   const searchParams = typeof window !== 'undefined' ? window.location.search : '';
   const router = useRouter();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
 
+  // WP-3A.1 — 移动菜单复用 Foundation Drawer：<640px 底部抽屉，≥sm 右侧抽屉（§9.2）。
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 639px)');
+    const apply = () => setIsStrictMobile(mq.matches);
+    apply();
+    mq.addEventListener('change', apply);
+    return () => mq.removeEventListener('change', apply);
+  }, []);
+
+  // Drawer 打开时锁定 body 滚动（移动导航覆盖内容的可访问体验）。
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [mobileOpen]);
+
   const handleLogout = async () => {
     await logout();
+    setMobileOpen(false);
     router.push('/');
     router.refresh();
   };
@@ -263,90 +285,94 @@ export default function PublicHeader() {
         </div>
       </div>
 
-      {/* Mobile / Tablet Drawer — grouped platform layers */}
-      {mobileOpen && (
-        <div className="xl:hidden border-t bg-white/95 backdrop-blur-sm">
-          <div className="max-w-[1200px] mx-auto px-6 py-3 space-y-3">
-            {/* Mobile Search — 812 Batch B: header entry point, no type selector */}
-            <div className="pb-3 border-b border-slate-100">
-              <GlobalSearchBar showTypeSelector={false} />
-            </div>
-            <nav className="space-y-4" aria-label="平台导航（移动）">
-              {PLATFORM_LAYERS.map((layer) => (
-                <div key={layer.key}>
-                  <div className="px-3 text-[11px] font-semibold uppercase tracking-widest text-slate-400 mb-1">
-                    {layer.label}
-                  </div>
-                  <div className="space-y-0.5">
-                    {layer.items.map((it) => {
-                      const [p] = it.href.split('?');
-                      const active = p === '/' ? pathname === '/' : p && pathname.startsWith(p);
-                      return (
-                        <Link
-                          key={it.href}
-                          href={it.href}
-                          onClick={() => setMobileOpen(false)}
-                          className={`block rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                            active
-                              ? 'bg-primary/5 text-primary'
-                              : 'text-slate-700 hover:bg-slate-50'
-                          }`}
-                        >
-                          {it.label}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-              <div className="border-t pt-4 mt-3 flex gap-3">
-                {isLoading ? (
-                  <div className="flex-1 h-10 bg-slate-100 rounded-lg animate-pulse" />
-                ) : isAuthenticated && user ? (
-                  <>
-                    <div className="flex-1 text-center text-sm font-medium text-slate-700 py-2.5 rounded-lg border bg-slate-50 truncate px-2">
-                      {user.name || user.email}
-                    </div>
-                    <Link
-                      href="/dashboard"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex-1 text-center text-sm font-medium bg-gradient-to-r from-primary to-industrial-cyan text-white py-2.5 rounded-lg hover:opacity-90 transition-opacity"
-                    >
-                      工作台
-                    </Link>
-                    <button
-                      onClick={() => {
-                        setMobileOpen(false);
-                        handleLogout();
-                      }}
-                      className="flex-1 text-center text-sm font-medium text-red-600 py-2.5 rounded-lg border border-red-200 hover:bg-red-50 transition-colors"
-                    >
-                      退出
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      href="/login"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex-1 text-center text-sm font-medium text-muted-foreground hover:text-foreground py-2.5 rounded-lg border transition-colors"
-                    >
-                      登录
-                    </Link>
-                    <Link
-                      href="/register"
-                      onClick={() => setMobileOpen(false)}
-                      className="flex-1 text-center text-sm font-medium bg-gradient-to-r from-primary to-industrial-cyan text-white py-2.5 rounded-lg hover:opacity-90 transition-opacity"
-                    >
-                      注册
-                    </Link>
-                  </>
-                )}
-              </div>
-            </nav>
-          </div>
+      {/* Mobile / Tablet Nav — WP-3A.1 复用 Foundation Drawer（§9.2 §17）：
+          <640px 底部抽屉，≥sm 右侧抽屉；Dialog 语义 + Escape + 焦点返回 + body 滚动锁定。 */}
+      <Drawer
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        title="菜单"
+        placement={isStrictMobile ? 'bottom' : 'right'}
+        headerFooter
+      >
+        {/* Mobile Search — 812 Batch B: header pure entry point, no type selector */}
+        <div className="pb-3 mb-3 border-b border-border">
+          <GlobalSearchBar showTypeSelector={false} />
         </div>
-      )}
+        <nav aria-label="平台导航（移动）">
+          {PLATFORM_LAYERS.map((layer) => (
+            <div key={layer.key} className="mb-4">
+              <div className="px-1 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
+                {layer.label}
+              </div>
+              <div className="space-y-0.5">
+                {layer.items.map((it) => {
+                  const [p] = it.href.split('?');
+                  const active = p === '/' ? pathname === '/' : p && pathname.startsWith(p);
+                  return (
+                    <Link
+                      key={it.href}
+                      href={it.href}
+                      onClick={() => setMobileOpen(false)}
+                      aria-current={active ? 'page' : undefined}
+                      className={`block rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                        active
+                          ? 'bg-primary/5 text-primary'
+                          : 'text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      {it.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </nav>
+        <div className="border-t border-border pt-4 mt-3 flex gap-3">
+          {isLoading ? (
+            <div className="flex-1 h-10 bg-slate-100 rounded-lg animate-pulse" />
+          ) : isAuthenticated && user ? (
+            <>
+              <div className="flex-1 text-center text-sm font-medium text-slate-700 py-2.5 rounded-lg border bg-slate-50 truncate px-2">
+                {user.name || user.email}
+              </div>
+              <Link
+                href="/dashboard"
+                onClick={() => setMobileOpen(false)}
+                className="flex-1 text-center text-sm font-medium bg-gradient-to-r from-primary to-industrial-cyan text-white py-2.5 rounded-lg hover:opacity-90 transition-opacity"
+              >
+                工作台
+              </Link>
+              <button
+                onClick={() => {
+                  setMobileOpen(false);
+                  handleLogout();
+                }}
+                className="flex-1 text-center text-sm font-medium text-red-600 py-2.5 rounded-lg border border-red-200 hover:bg-red-50 transition-colors"
+              >
+                退出
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                onClick={() => setMobileOpen(false)}
+                className="flex-1 text-center text-sm font-medium text-muted-foreground hover:text-foreground py-2.5 rounded-lg border transition-colors"
+              >
+                登录
+              </Link>
+              <Link
+                href="/register"
+                onClick={() => setMobileOpen(false)}
+                className="flex-1 text-center text-sm font-medium bg-gradient-to-r from-primary to-industrial-cyan text-white py-2.5 rounded-lg hover:opacity-90 transition-opacity"
+              >
+                注册
+              </Link>
+            </>
+          )}
+        </div>
+      </Drawer>
     </header>
   );
 }

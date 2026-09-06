@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
@@ -481,24 +482,32 @@ function SupplierProductsContent() {
                       </p>
                       <p className="text-xs text-slate-400">创建：{formatDateTime(p.createdAt)}</p>
                     </div>
-                    {(p.status === 'DRAFT' || p.status === 'APPROVED') && (
-                      <button
-                        type="button"
-                        onClick={() => openEdit(p.id)}
-                        className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700"
+                    <div className="flex shrink-0 flex-wrap items-center gap-2">
+                      <Link
+                        href={`/workspace/supplier/products/${p.id}`}
+                        className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
                       >
-                        编辑
-                      </button>
-                    )}
-                    {p.status === 'DRAFT' && (
-                      <button
-                        type="button"
-                        onClick={() => void submitProduct(p.id)}
-                        className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-500"
-                      >
-                        提交审核
-                      </button>
-                    )}
+                        详情
+                      </Link>
+                      {(p.status === 'DRAFT' || p.status === 'APPROVED') && (
+                        <button
+                          type="button"
+                          onClick={() => openEdit(p.id)}
+                          className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700"
+                        >
+                          编辑
+                        </button>
+                      )}
+                      {p.status === 'DRAFT' && (
+                        <button
+                          type="button"
+                          onClick={() => void submitProduct(p.id)}
+                          className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-500"
+                        >
+                          提交审核
+                        </button>
+                      )}
+                    </div>
                   </div>
                   {p.description ? <p className="mt-2 text-xs text-slate-600">{p.description}</p> : null}
                 </article>

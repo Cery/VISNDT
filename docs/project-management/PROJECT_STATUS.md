@@ -3879,8 +3879,8 @@ M18.5 进入前要求：
 
 ### 811_Batch_A_Data_Consistency_And_Category_Visibility_Implementation（Batch A 实施 · D1 公共目录焦点刷新 + D2 分类删除失败 UX · IMPLEMENTED + VERIFIED）
 - **性质** ✅：**IMPLEMENT Batch A**（Task 810 授权的 D1/D2 两个 P2 项）。不改 schema/migration/API 签名/权限边界；不扩展 Batch B/C 范围。
-- **D1 公共目录焦点回归刷新** ✅：全局 `providers.tsx` 为 `refetchOnWindowFocus:false` + `staleTime 60s`（810 认定缺口）。已对 4 处公共目录查询显式覆盖为 `true` + `refetchOnMount:'always'`（query-key 粒度）：首页能力分类 `['categories']`、首页推荐产品 `['featured-products']`、`/categories`、`/products`（categories+products）。staleTime 仍全局约束→仅"过期(>60s)且焦点回归"时刷新，不会空转。
-- **D1 跟进修复（用户报障：/products 筛选分类仍不同步）** ✅：复现确认根因=纯客户端路由跳转时标签页持续聚焦、无 focus 事件，`['categories']` 仍在 60s 新鲜缓存内，`refetchOnWindowFocus` 不触发→已删分类残留。补 `refetchOnMount:'always'` 后重验：客户端导航触发 2 次重拉、**deletedStillShownAfterSpaNav=false（删除不再残留）**。改动集=7 文件 +140/−2。
+- **D1 公共目录即时刷新（首页分类 + 产品中心筛选）** ✅：全局 `providers.tsx` 原为 `refetchOnWindowFocus:false` + `staleTime 60s`（810 认定缺口）。已对 4 处公共目录查询显式覆盖为 `refetchOnWindowFocus:true` + `refetchOnMount:'always'` + **`staleTime:0`**（query-key 粒度，始终视为过期，每次挂载/聚焦/路由进入都重拉）：首页能力分类 `['categories']`、首页推荐产品 `['featured-products']`、`/categories`、`/products`（categories+products）。
+- **D1 跟进修复（用户报障：/products 筛选分类、首页分类 section 仍不同步）** ✅：复现确认根因=纯客户端路由跳转/缓存回访时无 focus 事件、组件未必 remount，`refetchOnWindowFocus`/`refetchOnMount` 均可能不触发→已删分类残留。补常驻 Provider 路由感知失效器 `CatalogRouteInvalidator`（`usePathname` 监听进入 `/`·`/categories`·`/products` 时 `invalidateQueries(['categories'|'featured-products'|'products'], refetchType:'all')`），即便 Next 缓存还原时观察者非 active 也强制刷入缓存。**最终运行时验证（健全 el.click 客户端导航）**：管理端删除临时分类→客户端往返 `home→/products→home`，首页分类铁轨与 `/products` 筛选/侧栏/能力轨道均**不再显示已删分类**（服务器 hard-delete 同步从公共 GET 移除）。改动集=5 源文件 +对探查脚本修正。
 - **D1 后端/持久化实时性（运行时）** ✅：headless+admin 变更探针——新建分类→公共 GET 立即可见；删除临时分类→DB 行清除、公共 GET 不再可见。后端为一致单一事实源、公共读即时反映管理端变更。
 - **D1 焦点刷新运行时注记（非缺陷）** ⚠️：headless Chrome `document.hasFocus()` 恒 false，无法在无头自动化中复现“标签页焦点回归刷新”；已通过源码配置 + React Query v5 语义 + “新鲜期不产生多余请求（baseCount 恒 2）”观察交叉验证。建议上线前真实浏览器 5 秒抽查（`/categories` 停留>60s→切走→切回→显示新增分类）。
 - **D2 分类删除失败 UX（依赖计数）** ✅：后端守卫不变（有产品/子分类→`BadRequestException` 400，message 含「N 个产品」「N 个子分类」）。运行时：`DELETE` 有产品分类→400 message「分类下存在 2 个产品…」；有子分类→400「…存在 4 个子分类…」，与前端正则 `(\d+)\s*个产品|个子分类` 完全匹配、持久化未删除。Admin `ProductCategoryList.tsx` 新增 `isBlockedDelete` + `extractDependencyCounts`：守卫拦截时以**结构化 modal**（列出产品数/子分类数）替代仅 toast。
@@ -4027,3 +4027,191 @@ M18.5 进入前要求：
 - **回归（§8）** ✅：API typecheck PASS（exit 0）· Admin typecheck PASS（exit 0）· Web 唯一错误 pre-existing `knowledge-base/[slug]/page.tsx:322`（非 P2 引入）· 产品详情/对比页冒烟渲染正常 · 无 schema migration。
 - **分级** ✅：P0=0 · P1=0 · 无新缺陷；DRAFT/SUBMITTED/REVIEWING/APPROVED 不产生任何公开商业数据。
 - **Next** ⏸️：**STOP——P2 完成（CLOSED），进入最终验收**。
+
+### 822_Post_M39_Full_Experience_Functional_Graph_Audit（POST-M39 · 全体验/功能图谱审计运行层补强 · AUDITED + CONDITIONAL PASS · REPORT ONLY）
+- **性质** ✅：**AUDIT ONLY（821 报告的运行层补强复验）**。继承 821 静态全图谱 CONDITIONAL PASS；补齐因宿主内存 OOM 未完成的六项运行层验证（UX-1/UX-3 人工复核、移动端 768/1024/1440、纵向生命周期、角色边界、回归构建）。未做任何开发。
+- **UX-1（821 UNVERIFIED→VERIFIED PASS）** ✅：Buyer 真实浏览器创建需求（标题 `UXR-823`，分类=电子视频内窥镜，预算=15000-30000）→ Save → Detail → Reload，分类/预算均正确持久化 → **非缺陷**。
+- **UX-3（821 UNVERIFIED→VERIFIED PASS）** ✅：Admin Products 搜索「内窥镜」→ 过滤=2 行（ZB-K60、ZB-TJ095）→ **非缺陷**。
+- **UX-2（保持 P3/待修）** ✅：SupplierProduct 表单 6 必填文本框缺可见中文 Label 仍存在，未变更（不实施）。
+- **纵向生命周期（运行闭环）** ✅：受控测试数据 `UX-K60-TEST` 走通 SUBMITTED→REVIEWING→APPROVED→PUBLISHED（Supplier 提交 → Admin 审核 → 发布），完成后 Admin 删除（cleanup）→ 数据库恢复预期。
+- **角色边界（运行 PASS）** ✅：Buyer 会话访问 Supplier 私有路由 `/workspace/supplier/products` → 被门户守卫拦截（`Workspace role not configured`），无数据显示/菜单泄露。
+- **移动端（Responsive FULL PASS）** ✅：既有 375 + 新增 768/1024/1440 三视口，Public/Buyer/Supplier/Admin 代表性核心页均无水平溢出。
+- **回归** ✅：API typecheck/build PASS · Admin typecheck/build PASS；Web `next build` 唯一错误 `knowledge-base/[slug]/page.tsx:322 RelatedProductItem.status` = **PRE-EXISTING/NON-BLOCKING 基线**（自 816 起一致，非本审计回归）。构建前关闭 dev server 规避 OOM。
+- **分级** ✅：**P0=0 · P1=0 · 无新增缺陷**；残余项（Buyer Demand→RFQ→Offer 纵向、Admin 逐域 Status、逐端点 Guard 契约形状）均为审计/覆盖缺口（PARTIAL/NON-BLOCKING），归 WP-0/候选。
+- **Docs** ✅：新建 `docs/_review/822_POST_M39_FULL_EXPERIENCE_FUNCTIONAL_GRAPH_AUDIT_AND_ROADMAP_REVALIDATION_REPORT.md`；STATUS/ROADMAP/MATRIX 追加 822。
+- **Next** ⏸️：**STOP——822 AUDIT 完成（CONDITIONAL PASS）；不自动启动任何实现；WP-0（Gap Closure/Contract Freeze）或补强验证任务须独立授权后启动**。
+
+### 823_Post_M39_Core_Functional_Integrity_Closure（POST-M39 · 核心功能完整性闭合 · CLOSED + PASS · READY FOR FRONTEND PRODUCTIZATION · REPORT ONLY）
+- **性质** ✅：**Core Functional Integrity Closure（AUDIT + 验证 ONLY）**。基于 V3.3.2 指令，闭合 822 CONDITIONAL PASS 保留的三类运行层覆盖缺口：Buyer Demand→Match→RFQ→Offer 纵向真实运行、Admin 逐域 Status 动作、逐端点 Guard 契约/授权代表复验。未做任何开发。
+- **Buyer 纵向业务链（822 PARTIAL→VERIFIED）** ✅：真实 headed 浏览器全链路串联 `Buyer登录 → Demand(d6d8b4f7…) → Matching → Candidate → RFQ(a24806ee…, OPEN) → RFQ Response → Offer → Decision → Workspace → 重载持久化`；匹配 ACCEPTED、RFQ OPEN 状态重载保持。链路产生真实可处理对象并进入下一实体均成立。
+- **Supplier RFQ 参与（VERIFIED）** ✅：`Supplier → RFQ Opportunity → 查看 → Response → Submit` 真实运行（demo.supplier.01）。
+- **Admin 高价值状态动作（VERIFIED，含 CSRF 契约 NEW）** ✅：SupplierProduct 受控域走通 `DRAFT→SUBMITTED→REVIEWING→APPROVED→PUBLISHED→APPROVED(unpublish)` 与 `reject(REVIEWED note)→REJECTED` 全状态跃迁；定位并验证全局 CSRF double-submit cookie（`GET /auth/csrf` 取 token，变更请求须 `X-CSRF-Token` header + `csrf_token` cookie，否则 403）——所有状态动作经真实验证执行。
+- **授权负向 / 组织隔离（VERIFIED）** ✅：3 条越权路径全部 DENIED（Buyer→Supplier 私有、Supplier→Admin 治理、跨组织对象），无数据泄露；`organizationId` 由服务端可信上下文注入（roles.guard 成员关系）。
+- **代表契约 / 持久化（VERIFIED）** ✅：`/auth/login`、`/auth/csrf`、`/rfqs/{id}`、`/rfqs/{id}/responses`、`/demands/{id}/matches`、`/offers`、`/admin/supplier-products/*` 外壳 `{success,data,message}` 一致；状态动作落库→回读双证一致（No phantom/UI-only/API-only）。探测路径 `/demands/matches`、`/workspace/offers` 已修正为正确契约（非缺陷）。
+- **移动端（375/768 PASS）** ✅：新增 Buyer/Supplier RFQ（含 Response/Offer）核心页在 375/768 可访问可操作、无横向溢出。
+- **回归** ✅：API typecheck/build PASS · Admin typecheck/build PASS；Web `next build` 唯一错误 `knowledge-base/[slug]/page.tsx:322 RelatedProductItem.status` = **PRE-EXISTING/NON-BLOCKING**（V3.3.2 §19 明示；回归中曾做 1 行临时类型修复验证构建可达 PASS，随即按「不得顺手修复」回退，源码维持冻结基线）。
+- **Cleanup / 恢复** ✅：负向 reject 受控产品 `UX-REJ-TEST-001` 已删除（0 残留）；治理链受控产品 `e037dea8…(UX-TJ095-TEST)` 由 DRAFT 推进至 APPROVED（受控治理残留，留痕记录，非真实业务数据）；3 受控账号 ACTIVE；未删真实数据。
+- **分级** ✅：**P0=0 · P1=0 · P2=0（本轮新增）**；P3：Web 类型错误 PRE-EXISTING/NON-BLOCKING。残余项均为契约/审计覆盖类（逐端点全量、逐页四视口、设计系统/中文化/SEO/Search）归 STEP/候选。
+- **Readiness / Final** ✅：**READY FOR FRONTEND PRODUCTIZATION；Final = PASS**（Core Functional Integrity Closed AND Ready；无 P0/P1；§28 Gate 全项 VERIFIED）。
+- **Docs** ✅：新建 `docs/_review/823_POST_M39_CORE_FUNCTIONAL_INTEGRITY_CLOSURE_REPORT.md`；STATUS/ROADMAP/MATRIX 追加 823；路线图 STEP 0 与 STEP 0.5 → COMPLETED（STEP 1–9 不提前标记）。
+- **Next** ⏸️：**STOP——823 CLOSED（PASS）。WP-1（Frontend Productization Contract + Design Foundation，仅规划不实施）或后续开发步骤须独立授权后启动**。
+
+### 824_Post_M39_Frontend_Productization_Contract_Freeze（POST-M39 · WP-1 前端产品化契约冻结 · CONDITIONAL PASS · DOCUMENT）
+- **性质** ✅：**Productization Contract FREEZE（AUDIT + CONTRACT + DOCUMENT，不重构）**。基于 V3.3.3（WP-1），在 820–823 基线 + Readiness=READY 上，统一冻结 Role→Page→Section→Action→Destination→Route→API→Permission→Data→Lifecycle→UI→Responsive→Terminology→Browser Gate 契约。
+- **Page Contract** ✅：Web 60 页 / Admin 57 路由（基于真实路由枚举，未虚构）；Page Type + Canonical Route + Primary Entity + Allowed Role + Entry/Exit 已登记。
+- **Role × Page Matrix** ✅：PUBLIC/BUYER/SUPPLIER/ADMIN（区分 Visible/Accessible/Operable/Authorized）。
+- **Nav / Action / Destination** ✅：基于真实 Header/WorkspaceSidebar/AdminLayout(7组菜单)登记；Action→API/Destination、Action→Destination 无 NoDestination 矛盾。
+- **Frontend↔Backend Contract Registry** ✅：核心端点（Auth/Demand/DemandMatch/RFQ/RFQResponse/Offer/Inquiry/SupplierProduct/Workspace/Product/Knowledge/Media）+ 外壳 `{success,data,message}` + **CSRF double-submit（`GET /auth/csrf`→`csrf_token` cookie + `X-CSRF-Token` header）**；Contract Status 诚实标注（FROZEN/KNOWN/PARTIAL），不虚标 FULL。
+- **Permission / Lifecycle / Data Contract** ✅：RolesGuard（organizationId+成员关系）、Prisma 状态机（§16 Lifecycle）、模型归属语义全部继承冻结，不重定义。
+- **四端 IA** ✅：Public(Product-centered)/Buyer/Supplier/Admin（Admin 基于真实菜单：工作台/业务/主数据/合作方/内容知识/数据监控/系统）。
+- **Design System / Component / 中文术语 / Responsive / Browser Gate** ✅：token 事实源 `packages/design-tokens`；组件契约；术语词表（modelNumber=型号 等，内部标识不重命名）；375/768/1024/1440；7 级渐进 Browser Gate。
+- **Batch Plan** ✅：BATCH A–E（Public Discovery / Buyer Workspace / Supplier Workspace / Admin Core Ops / Admin Master-Content-Monitor）+ 依赖 + Gate + 判据；SupplierProduct Media/Parameter 依赖置于 Backend→Frontend→Page 之后（§33 指令）。
+- **分级** ✅：**P0=0 · P1=0 · P2=0（新增）**；P3：`knowledge-base/[slug]/page.tsx:322 RelatedProductItem.status` = **PRE-EXISTING/NON-BLOCKING**（V3.3.3 §44，不顺手修复）；G-2..6 为覆盖/体验/未来候选类，非阻断。
+- **回归** ✅：API/Admin typecheck+build PASS；Web 仅既有类型错误（pre-existing）。无业务代码变更。
+- **Final** ✅：**CONDITIONAL PASS**（契约完全形成可供引用；少量非阻断契约项，不影响 WP-2）。
+- **Docs** ✅：新建 `docs/_review/824_POST_M39_FRONTEND_PRODUCTIZATION_CONTRACT_FREEZE_REPORT.md`；STATUS/ROADMAP/MATRIX 追加 824；STEP 1 契约冻结 → COMPLETED；WP-2 标记 NEXT（仅规划）。
+- **Next** ⏸️：**STOP——824 CONDITIONAL PASS（契约冻结）。WP-2（Frontend Reconstruction Foundation，仅规划不实施）或 BATCH A–E / Search / SEO / Media / Parameter 须独立授权后启动**。
+
+### 825_首页分类数据刷新问题修复与运行时验证（POST-M39 · 修复确认 + 运行时验收 · PASS · DOCUMENT）
+- **性质** ✅：对 811 D1/D2「首页分类即时刷新」修复的**确认收口 + 运行时验收**（TRAE 内置浏览器 agent-browser 驱动，非外部浏览器）。
+- **修复承载** ✅：沿用已提交修复——[CategorySection.tsx](file:///f:/Desktop/VISNDT/VISNDT/apps/web/src/components/home/CategorySection.tsx)(首页分类)、[FeaturedProductsSection.tsx](file:///f:/Desktop/VISNDT/VISNDT/apps/web/src/components/home/FeaturedProductsSection.tsx)(推荐产品)、[categories/page.tsx](file:///f:/Desktop/VISNDT/VISNDT/apps/web/src/app/categories/page.tsx)、[products/page.tsx](file:///f:/Desktop/VISNDT/VISNDT/apps/web/src/app/products/page.tsx) 的 `staleTime:0` + `refetchOnWindowFocus:true` + `refetchOnMount:'always'`；[providers.tsx](file:///f:/Desktop/VISNDT/VISNDT/apps/web/src/app/providers.tsx) `CatalogRouteInvalidator` `refetchType:'all'`。
+- **运行时验收** ✅：服务端 `/product-categories` 基线 13 条，首页 rail 13 条。新建临时分类（14）→ 首页 rail 14 出现（闭环 A PASS）；删除后（13）→ 首页 rail 13 消失（闭环 B PASS）。
+- **静态验证** ✅：`tsc --noEmit` exit 0；ESLint（改动 5 文件）0 warning/0 error；`pnpm build` exit 0（48/48）。
+- **范围说明（超出 824 约定）** ✅：824 P3 约定 `knowledge-base/[slug]/page.tsx:322 RelatedProductItem.status`（PRE-EXISTING/NON-BLOCKING，§44 不顺手修复）不顺手修复。本任务为满足「build exit 0」规约，经确认后以**常量 `sub:'可用'`（后端仅返回 ACTIVE 产品，无行为变化）**低风险收口该类型错误，解除 build 阻塞。已记录为超出 824 约定的低风险收口。
+- **Docs** ✅：新建 `docs/_review/825_首页分类数据刷新问题修复与运行时验证报告.md`；STATUS 追加 825。
+- **Next** ⏸️：**STOP——825 CLOSED（PASS）。后续（WP-2 / BATCH A–E / Search / SEO / Media / Parameter）须独立授权后启动**。
+
+### 826_Post_M39_Frontend_Reconstruction_Foundation（POST-M39 · WP-2 前端重构基础 · CONDITIONAL PASS · IMPLEMENTED）
+- **性质** ✅：**Frontend Reconstruction Foundation（IMPLEMENT，纯基础能力，不重构业务页面 / 不改后端）**。基于 V3.3.4（WP-2）+ 824 契约冻结执行。
+- **Foundation** ✅：Web/Admin 浏览、移动、回归门禁通过为何，见 `docs/_review/826…`。
+- **Design Tokens** ✅：`packages/design-tokens` 语义层（Color/Surface/Interaction/Typography/Spacing/Radius/Shadow/Border/Motion/Focus/Status）+ 确定性 `STATUS_TONE` 映射 + CSS 变量；Web（Tailwind）/Admin（AntD ConfigProvider）双端语义统一。
+- **Web Foundation** ✅：`apps/web/src/components/ui`（13 原语：Form/Table/Search/Modal/Drawer/Tabs/Checkbox/Radio/Textarea/Select/Input/Layout/fieldStyles）；`/foundation` Showcase。
+- **Admin Foundation** ✅：沿用 AntD 未替换；`ConfigProvider` 接入 `VISNDT_COLORS`，`StatusTag` 经 `STATUS_TONE→TONE_TO_ANTD_COLOR` 语义映射；`/foundation` Showcase（鉴权私有）。
+- **Component Registry** ✅：`docs/contracts/component-registry.md`（Token/Primitive/Provider/Gate 全量登记，代码实存佐证）。
+- **Browser Foundation Gate** ✅：Web 27/28 PASS（唯一 FAIL=`g-console` React dev-mode 样式合并警告，判 P2 NON-BLOCKING，多探针干净加载 0 错误，无功能/视觉影响）；Admin 真实浏览器登录验证 PASS（0 console error）。
+- **Mobile Foundation Gate** ✅：375 加载/无溢出/表单/底部抽屉 + 768 表格无溢出，均 PASS。
+- **Regression** ✅：Web typecheck+build exit 0；Admin typecheck+build exit 0；API typecheck+build（基线）exit 0。
+- **Files Changed** ✅：Business Page Changed=NO；Backend=NO；Schema=NO；API=NO（详见报告 §25）。
+- **Known Issue** ✅：唯一非阻断项为 `g-console` dev-mode console 警告（§27#1，P2，Future Candidate）；既有 knowledge-base 已知错误已在 825 收口，非 WP-2 引入。
+- **Final** ✅：**CONDITIONAL PASS**（Foundation Complete + Browser/Mobile Gate Pass + No New Blocking；唯一 Minor Non-Blocking Gap=dev-only console 警告）。
+- **Docs** ✅：新建 `docs/_review/826_POST_M39_FRONTEND_RECONSTRUCTION_FOUNDATION_REPORT.md`；STATUS/ROADMAP/MATRIX 追加 826。
+- **Next** ⏸️：**STOP——826 WP-2 COMPLETE（CONDITIONAL PASS）。WP-3A（Public Discovery Reconstruction）READY 但**不自动启动**，须独立授权**。
+
+### 827_WP-3A.1_Public_Discovery_Shell_Home_Navigation（POST-M39 · WP-3A.1 公共壳+首页+导航重构 · PASS · IMPLEMENTED）
+- **性质** ✅：**WP-3A.1 Public Shell + Home + Navigation（IMPLEMENT，仅重构公共发现表现层与入口，不深入业务页面主体/不改后端）**。基于 V3.3.5 + 824（WP-1 契约）+ 826（WP-2 基础）执行。
+- **Public Shell** ✅：根布局 `PublicHeader + PublicFooter` 三态一致；Product = Primary Public Discovery Authority 保持，未退化为供应商目录/商城/CMS 首页。
+- **Header / Navigation** ✅：桌面 xl 四层平台分组 mega（发现/评估/技术内容/连接）+ 全量搜索/认证；`<640px` 底部抽屉、`≥sm` 右侧抽屉，复用 Foundation `Drawer`（Dialog 语义 + Escape + 焦点返回 + body 滚动锁定 + Accessible Name）。
+- **Home** ✅：Hero/Discover → Category → 推荐产品 → Solutions → 知识 → 供应商上下文 → 连接 CTA；分层 Section 均有业务目的/用户价值/数据源（现有 API），loading/empty/error 齐备。
+- **Unified Search** ✅：Header 与首屏均连接既有 `GlobalSearchBar`，未建第二套检索；搜索 Authority 未变（`/search?q=`）。
+- **Browser Gate** ✅：Real headed Chrome **30/30 PASS**（1440/1024/768/375），含真实搜索提交、抽屉开关、抽屉导航、浏览器 back/forward；图片 alt 缺口 0、console error 0、四断点无水平溢出。
+- **Mobile Gate** ✅：375/768 真实操作（Open Menu→Navigate / Open Search / Escape Close）全过。
+- **Regression** ✅：Web `tsc --noEmit` exit 0；Web `next build` exit 0；未触共享 package（无需额外 validation）。
+- **Files Changed** ✅：仅 `apps/web` Public Shell/Home/Nav（PublicHeader / 首页 Section）；新增复用 826 Drawer（未新建重复原语）；Backend=NO；Schema=NO；API=NO。
+- **Known Issue** ✅：`g-console` 仍为 826 P2 Future Candidate，无证据由 WP-3A.1 引入，维持 PRE-EXISTING。
+- **Final** ✅：**PASS**（Shell/Home/Nav 产品化 + Browser/Mobile Gate Pass + Regression Pass + No New Blocking）。
+- **Docs** ✅：新建 `docs/_review/827_POST_M39_WP3A1_PUBLIC_DISCOVERY_SHELL_HOME_RECONSTRUCTION_REPORT.md`；STATUS/ROADMAP/MATRIX 追加 827。
+- **Next** ⏸️：**STOP——827 WP-3A.1 COMPLETE（PASS）。WP-3A.2（Search + Categories + Product List）READY 但**不自动启动**，须独立授权**。
+
+### 831_WP-3A.4_Knowledge_Solution_Public_Content（POST-M39 · WP-3A.4 知识+方案+公共内容 · PASS · CLOSED）
+
+- **性质** ✅：**WP-3A.4 Knowledge + Solution + Public Content（Frontend Reconstruction，仅公共内容体验表现层）**。基于 V3.3.9 + 824 契约 + 826 Foundation + 827/828/829/830。前端最小有效重构，不改后端/Schema/API。
+- **Knowledge 平台化对齐** ✅：`/knowledge` 列表页由孤立内容频道重构为工程发现面（对齐 `/solutions` 模式）：Engineering Context Header（WHY→KNOWLEDGE→CAPABILITY→SOLUTION 主链）+ `EngineeringDiscoveryNav` 跨面导航 + 知识语境快捷入口（CAP/PRD/SOL/SPL/SRC）+ KNOWLEDGE INDEX 计数 + 下一步工程发现。数据源（`getContentList type=KNOWLEDGE`，3 篇真实内容）与路由语义未变。
+- **Knowledge 详情闭环统一** ✅：`/knowledge/[slug]` 由平铺 RelatedProducts+RelatedSolutions 重构为全站统一 `RelevantEngineeringDiscovery`（相关检测能力产品/相关技术知识/相关解决方案分组 + 跨面下一步发现），与 `/solutions/[slug]`、`/knowledge-base/[slug]`、`/products/[slug]` 闭环模式一致——消除知识频道孤岛感（§5.1）。
+- **Product ↔ Content 闭环** ✅：真实链路验证 Knowledge Detail → Product Detail（ZB-K60 内窥镜）、Product Detail → Related Knowledge（`/knowledge-base/structured-light-3d-scanning`）双向闭环成立；Solution List → Detail → Product/Knowledge 闭环成立。
+- **Browser Gate** ✅：Real headed Chrome **30/30 PASS**——Knowledge/Solution List+Detail 结构、工程发现帧、闭环导航、Security 扫描、console error 0、runtime exceptions 0、无 5xx/4xx。
+- **Responsive** ✅：1440/1024/768/375 知识/方案列表与详情均无横向溢出；375 导航可见；375/1440 截图存档。
+- **Security** ✅：内容列表/详情/产品列表 API 凭据词扫描（password/passwordHash/hashedPassword/refreshToken/accessToken/secret/privateContact/internalNote/adminOnly）= NONE。
+- **A11y** ✅：heading 结构有效（H1 唯一 + H2 章节 + H3 卡片）；链接可访问名称 0 缺失；工程发现导航 `aria-label` 语义齐备；Tabs 沿用 830 契约。既有 Markdown 正文顶层 `#` 与页面 H1 重复为 P2 记录（非本 WP 引入）。
+- **Empty / 数据限制** ✅：`/articles`（ARTICLE=0）空态正确；KNOWLEDGE=3 / SOLUTION=2 以真实数据验证，未伪造内容。
+- **Regression** ✅：Web `tsc --noEmit` exit 0；Web `next build` exit 0；API `tsc --noEmit` exit 0（API 无源码变化，baseline confirmation）。
+- **Files Changed** ✅：仅 `apps/web/src/app/knowledge/page.tsx`、`apps/web/src/app/knowledge/[slug]/page.tsx` + 验证脚本 `database/_ux_verify/827/_wp3a4_gate.mjs`、`_wp3a4_a11y.mjs`（工具）；Business Source=NO；Schema=NO；API=NO；Backend=NO。
+- **Known Issue** ✅：`g-console` 维持 826 P2 Future Candidate；Markdown 正文顶层标题与页面 H1 重复为既有 P2（非阻断，延续）。
+- **Final** ✅：**PASS——Knowledge/Solution 平台化对齐 + Content↔Product 双向闭环 + Browser Gate 30/30 + Responsive 全过 + Security NONE + Regression 全过 + 无 P0/P1 阻断。**
+- **Docs** ✅：新建 `docs/_review/831_WP-3A.4_Knowledge_Solution_Public_Content_Report.md`；STATUS/ROADMAP/MATRIX 追加 831。
+- **Next** ⏸️：**STOP——831 WP-3A.4 COMPLETE（PASS / CLOSED）。WP-3B（Buyer Workspace）= READY / NEXT，但**不自动启动**，须独立授权**。
+
+### 832_WP-3B_Buyer_Workspace（POST-M39 · WP-3B 采购方工作空间重构 · PASS · CLOSED）
+
+- **性质** ✅：**WP-3B Buyer Workspace（Frontend Reconstruction，仅采购方工作空间表现层与交互结构）**。基于 V3.3.10 + 824 契约 + 826 Foundation + 827/828/829/830/831 基线。最小有效重构，不改业务语义/后端/Schema/API，不重开既有 WP。
+- **采购旅程 IA（消灭 Statistics-only Dashboard）** ✅：新增 `BuyerJourneySteps`，将工作台由统计卡片重构为可理解采购旅程 **DEMAND → MATCH → RFQ → DECISION**；各步骤计数全部来自真实 API（`GET /workspace/buyer/overview` 的 demandSummary/matchSummary/rfqSummary/responseSummary.pendingCount），不伪造业务数据，回答「正在做什么 / 下一步去哪里」。
+- **统一页面身份** ✅：新增 `WorkspaceSectionHeader`（H1 + mono 眉标 + 说明 + 主操作），修复既有列表/创建页以 H2 作为页面标题导致的标题层级断层；运营 `/dashboard/buyer`（采购方工作台）、`/workspace/demands`（列表）、`/workspace/demands/create`、`/workspace/demands/[id]`（详情 + 查看匹配结果入口）、`/workspace/matches`、`/workspace/matches/[matchId]`、`/workspace/rfqs`、`/workspace/rfqs/create`、`/workspace/rfqs/[id]`、`/workspace/demands/[id]/edit` 统一身份。
+- **Public ↔ Workspace 边界连续性** ✅：新增 `ReturnToDiscovery`（WORKSPACE/DEMAND/MATCHING/RFQ 各上下文），各工作区页均可返回能力发现（`/search`），保持发现→采购→返回发现的连续性；不重新设计 WP-3A 公共页。
+- **Browser Gate** ✅：Real headed Chrome **22/22 PASS**——登录→工作台→Demand→Match→RFQ→Response/Offer/Decision 上下文、权限负向、四视口无溢出均过；要求项 console error 0、runtime exception 0、未出现 5xx/坏路由；正确 Empty State 不算错误。
+- **Permission / Ownership** ✅：Buyer 访问供应商私有 `/workspace/supplier/products` 与 Admin `/admin` 均被拦截且 **无数据/菜单泄露**（RoleGuard fallback + 后端 BUYER 限定）；Own Demand 可见，后端按 `organizationId` 组织隔离。
+- **Responsive / Mobile** ✅：1440/1024/768/375 全过，无横向溢出；修复 Demand 列表卡片 metadata 行 375 横向溢出（`flex-wrap`）；375 为强制门禁 PASS。
+- **Security** ✅：Buyer 私有响应凭据词扫描（password/passwordHash/hashedPassword/refreshToken/accessToken/secret/privateContact/internalNote/adminOnly）= NONE；DTO 为显式 allow-list 投影，`workspace.service` 全程 `select` 白名单 + `organizationId` 隔离 + BUYER role 校验（ForbiddenException），无跨租户/跨角色泄露。
+- **Regression** ✅：Web `tsc --noEmit` exit 0；Web `next build` exit 0；API `tsc --noEmit` exit 0（无源码变化）；API `nest build` exit 0；WP-3A 代表性公开回归（Home/Search?q=三维/Product List/Knowledge/Solution/Product Detail）**6/6 PASS**（Real Chrome，console error 0）。
+- **Files Changed** ✅：仅 `apps/web` Workspace/Component（新增 `BuyerJourneySteps.tsx`、`WorkspaceSectionHeader.tsx`、`ReturnToDiscovery.tsx`；修改 `dashboard/buyer/page.tsx`、`workspace/demands/page.tsx`、`workspace/demands/create/page.tsx`、`workspace/demands/[id]/page.tsx`、`workspace/demands/[id]/edit/page.tsx`、`workspace/matches/page.tsx`、`workspace/matches/[matchId]/page.tsx`、`workspace/rfqs/page.tsx`、`workspace/rfqs/create/page.tsx`、`workspace/rfqs/[id]/page.tsx`、`components/demand/DemandList.tsx`）+ 验证脚本 `database/_ux_verify/buyer/_buyer_runner_wp3b.mjs`、`_public_regression_wp3b.mjs`（受控测试数据）；Business Source=NO；Backend=NO；Schema=NO；API=NO。
+- **Known Issue** ✅：`g-console` 维持 826 P2 Future Candidate（PRE-EXISTING）；受控测试数据编号带 `823_` 前缀仅作受控留痕，非伪造业务数据（见 823 治理约定）。
+- **Final** ✅：**PASS——Buyer Workspace 产品化/IA/闭环 + Browser Gate 22/22 + Responsive 375 门禁 PASS + Permission/Security PASS + Build/Regression 全过 + 无 P0/P1。**
+- **Next** ⏸️：**STOP——832 WP-3B COMPLETE（PASS / CLOSED）。WP-4（SupplierProduct Media + Parameter）= READY / NEXT，但**不自动启动**，须独立授权**。
+
+### 833_WP-4_SupplierProduct_Media_Parameter（POST-M39 · WP-4 供应商产品媒体+参数产品化 · CONDITIONAL PASS）
+
+- **性质** ✅：**WP-4 SupplierProduct Media + Parameter Productization（Frontend Reconstruction + SupplierProduct Capability Presentation）**。基于 V3.3.11 + 824/826/827/828/829/830/831/832 基线。仅将现有 SupplierProduct 的 **Media + Technical Parameters + Model-specific Capability** 形成稳定可读可运行的**只读呈现**。沿用语义：Product=WHAT / SupplierProduct=WHICH MODEL / Organization=OWNER / Supplier=OPERATIONAL USER。**不改后端 / Schema / API / 生命周期 / 产品权威**。
+- **SupplierProduct Authority** ✅：保持 `organizationId`（ownership）+ `platformProductId`（平台权威）+ `modelNumber`（供应商真实型号）三角；未将 SupplierProduct 升级为新的公共 Product / Catalog / Store / Marketplace。
+- **Media 呈现** ✅：新增 `SupplierModelMediaParameters`（媒体区）：`isPrimary` + `displayOrder` 排序、主媒体徽标、含 alt/aria 可访问名；无 fileAsset 时**不渲染断图**（broken image=0）；正确 Empty State（“该型号暂未配置媒体”）；无 undefined/null/blank；不新增不存在的上传/替换/删除/排序动作（后端无写 API）。
+- **Parameter 呈现** ✅：同组件参数区：按 `ParameterGroup` 分组（参数组名 + 参数名 + 值 + 单位）；缺失值展示 `— / Not Provided`，**不伪造默认工程值**；值全部来自真实 API（`GET /supplier-products/my/:id` + `/parameter-groups`），无硬编码。
+- **详情路由** ✅：新增 `/workspace/supplier/products/[id]` 型号详情页（H1 身份 + 型号身份卡 + 媒体/参数区 + 只读说明）；列表页 `/workspace/supplier/products` 增加「详情」入口（其余动作未改）。
+- **Ownership 边界** ✅：Own=ALLOWED；Cross-org=DENIED——跨组织详情 UI 渲染错误态（无泄露），API `GET /supplier-products/my/:id` 跨组织返回 **404**（`not found in organization`）。
+- **Publication 边界** ✅：公共能力图（`GET /capabilities/:id`）仅返回 **PUBLISHED** SupplierProduct；运行时抽查 `zb-tj095` 仅返回已发布 `ZB-TJ095`，**APPROVED UX-TJ095-TEST / SUBMITTED revopoint-pop-4 均不在公共发现**；未发布媒体的未发布参数值不可达。
+- **Browser Gate** ✅：Real headed Chrome **全 PASS**——Supplier 登录 → My Products → 型号详情（媒体+参数区 + 空态）→ 1440 无断图无溢出 → **375 门禁无横向溢出** → 1024/768 无溢出 → Cross-org UI DENIED → Cross-org API 404 → 公共产品页 1440/375 已发布型号上下文可见、未发布不泄露。console error **0**。
+- **Responsive** ✅：1440/1024/768/375 全过，无横向溢出；**375 强制门禁 PASS**。
+- **Security** ✅：WP-4 前端文件 + `supplier-products` API 源关键字扫描（password/passwordHash/hashedPassword/salt/credential/secret/accessToken/refreshToken/privateContact/internalNote/adminOnly/commercial）= NONE；Own 详情响应投影干净（无 user/password/secret/token 字段，含 media/parameterValues）；跨组织越权与未发布泄露=无一。
+- **Build / Typecheck** ✅：Web `tsc --noEmit` exit 0；Web `next build` exit 0；API `tsc --noEmit` exit 0；API `nest build` exit 0（API 无源码变化）。
+- **Regression** ✅：代表性回归（Home / Search?q=内窥镜 / Products / Product Detail / Knowledge / Solutions / Buyer Workspace / Buyer 认证）**8/8 PASS**（Real Chrome，console error 0）；WP-4 未触及 WP-3A/3B 公共与采购方路径。
+- **Capability Gap（P2）** ✅：**无后端写 API** 用于 SupplierProduct 媒体 / 参数（upload/replace/delete/reorder/edit/save）→ 本 WP 按要求只读呈现 + 记录 Capability Gap，**未新建业务 API**；写入能力留待 WP-5（Supplier Workspace）独立授权。
+- **数据不足（非阻断）** ✅：现有 7 个 SupplierProduct 的 `media=0`、`parameterValues=0`，仅能验证空态呈现，无法以真实媒体/参数数据全量演示 → 已记录为数据限制（治理约定，非业务缺陷）。
+- **Files Changed** ✅：Business Source=NO；Schema=NO；Migration=NO；API Contract=NO；API Source=NO；**Frontend Source=YES**（新增 `apps/web/src/components/supplier-product/SupplierModelMediaParameters.tsx`、`apps/web/src/app/workspace/supplier/products/[id]/page.tsx`；修改 `apps/web/src/app/workspace/supplier/products/page.tsx` 加详情入口、`apps/web/src/lib/api/supplier-self-service.ts` 扩展 media/parameterValues 类型）+ 验证脚本 `database/_ux_verify/supplier/_wp4/*.mjs`；Docs=YES。
+- **Known Issue** ✅：`g-console` 维持 826 P2 Future Candidate（PRE-EXISTING）；媒体/参数写入 Capability Gap = P2；数据量不足 = 非阻断数据限制。
+- **Final** ✅：**CONDITIONAL PASS——Core Media 只读体验 PASS + Core Parameter 只读体验 PASS + Ownership PASS + Publication Boundary PASS + Security PASS + Runtime PASS + Build PASS + P0=0 / P1=0；仅存 P2（媒体/参数写入 Capability Gap、数据量不足、错误信息英文）。**
+- **Docs** ✅：新建 `docs/_review/833_WP-4_SupplierProduct_Media_Parameter_Report.md`；STATUS/ROADMAP/MATRIX 追加 833。
+- **Next** ⏸️：**STOP——833 WP-4 COMPLETE（CONDITIONAL PASS）。WP-5A（Supplier Workspace）= BLOCKED BY WP-4**，**不自动启动**，须独立授权。
+
+### 830_WP-3A.3_Product_Detail_Related_Discovery（POST-M39 · WP-3A.3 产品详情+关联发现 · PASS · CLOSED）
+
+- **性质** ✅：**WP-3A.3 Product Detail + Related Discovery（Frontend Reconstruction，仅公共产品详情+关联发现表现层）**。基于 V3.3.8 + 824 契约 + 826 Foundation + 827/828/829。前端最小有效重构，不改后端/Schema/API。
+- **Product Detail** ✅：`/products/[id]`（canonical route 未变）。信息结构完整：Identity（H1+状态+分类徽章）→ Spec Ledger（MODEL/CATEGORY/SPEC FIELDS/REV）→ Summary（能力描述展开/收起）→ Capability Profile（能力档案+工程上下文）→ 参数（8 行真实技术表）→ 供应商/能力型号上下文 → 文档/知识/相关能力。Product-centered，无商业字段。
+- **Related Discovery** ✅：真实链路验证 Product List(17) → A(POP 4) → Related B(MetroY Ultra) → B Detail 闭环；空态正确（ZB-K60 无相关产品 → “暂无相关产品”）；未伪造业务数据。
+- **SupplierProduct Boundary** ✅：仅 PUBLISHED SupplierProduct 作为 supporting context（supplier-models 页签 + 能力提供商与供应关系）；公共详情无 price/currency/offer 载荷；DRAFT/SUBMITTED/REVIEWING/REJECTED/UNPUBLISHED 不可达。
+- **A11y（本 WP 修复）** ✅：`ProductDetailTabs` 补齐契约（component-registry §2 Tabs）要求的 **roving tabindex + Arrow/Home/End 方向键导航 + aria-controls + tabpanel aria-labelledby + focus-visible ring**；Roving=0,-1×6。
+- **Browser Gate** ✅：Real headed Chrome **24/24 PASS**——详情结构/参数表/键盘导航/关联链路 A→B/空态/安全/console error 0。
+- **Responsive** ✅：1440/1024/768/375 详情页无横向溢出、tab 可见。
+- **Security** ✅：浏览器上下文 fetch 详情/列表 API，凭据词（password/passwordHash/refreshToken/accessToken/secret/privateContact）= NONE；`SupplierInfo` 仅用 offer 的 organization（名称/类型/状态），真实 offers=0，无商业泄漏。
+- **Regression** ✅：Web `tsc --noEmit` exit 0；Web `next build` exit 0；API `tsc` exit 0；API `nest build` exit 0（API 无源码变化）。
+- **Files Changed** ✅：仅 `apps/web/src/components/products/ProductDetailTabs.tsx`（a11y）+ 验证脚本 `database/_ux_verify/827/_wp3a3_assess.mjs`、`_wp3a3_gate.mjs`（工具）；Backend=NO；Schema=NO；API=NO。
+- **Known Issue** ✅：`g-console` 维持 826 P2 Future Candidate；真实关联数据仅三维扫描仪分类存在 1 条（内窥镜分类 0 条 → 空态正确），属数据限制非缺陷。
+- **Final** ✅：**PASS——Product Detail + Related Discovery 产品化 + A11y 契约闭合 + Browser Gate 24/24 + Responsive 全过 + Security NONE + Regression 全过 + 无新阻断。**
+- **Docs** ✅：新建 `docs/_review/830_WP_3A3_Product_Detail_Related_Discovery_Report.md`；STATUS/ROADMAP/MATRIX 追加 830。
+- **Next** ⏸️：**STOP——830 WP-3A.3 COMPLETE（PASS / CLOSED）。WP-3A.4（Knowledge + Solution + Public Content）= READY / NEXT，但**不自动启动**，须独立授权**。
+
+### 829_WP-3A.2_CLOSEOUT_RECOVERY_GATE（POST-M39 · 阻断收尾闸门 · PASS · CLOSED）
+
+- **性质** ✅：**829 CLOSEOUT RECOVERY GATE（BLOCKING CLOSEOUT）**。非新开发；目的=关闭 828 遗留 **SEC-828-P0-01（Security）** 与 **ENV-828-E1（Build）**，将 828 从 CONDITIONAL PASS 升级为 PASS/CLOSED，解锁 WP-3A.3（READY，不自动启动）。
+- **源码验证** ✅：`apps/api/src/common/projection/user.projection.ts` 的 `PUBLIC_USER_SELECT` 仍明确**不含** `passwordHash`（仅 id/email/name/status/organizationId/createdAt/updatedAt）。**未修改源码**。
+- **SEC-828-P0-01 Before** ✅：运行实例（镜像 `visndt-api:latest` id `0f5812f…`，容器 `9b180bf…`，构建于 2026-09-05 20:43 UTC≈本地 09-06 04:43，启动 04:44）为**陈旧镜像**（早于关闭闸门启动），public `GET /products` 曾在 828 复核时返回 `createdBy.passwordHash`。
+- **Source = Runtime** ✅：API 工作树 clean（无任何源码改动）；HEAD `8bba999`（2026-09-04）；运行镜像构建时间 > HEAD；`docker top` 确认运行 `node apps/api/dist/main`（dist 来自当前源码构建）。
+- **SEC-828-P0-01 After** ✅：**关闭闸门验证时运行实例已加载当前源码安全投影**——实时探针 `GET /api/v1/products?status=ACTIVE` 返回 `createdBy` keys = `id,email,name,status,organizationId,createdAt,updatedAt,organization`，**passwordHash ABSENT**；浏览器上下文 fetch 复核 **passwordHash ABSENT**。**P0 已从运行实例层面关闭**（无需源码改动，容器已加载当前代码构建产物）。
+- **凭据扫描** ✅：`/products`（含/不含 status）、`/search?q=`、`/product-categories` 响应全文扫描 `password/passwordHash/hashedPassword/salt/credential/secret/accessToken/refreshToken` = **NONE**。无凭据材料泄漏。
+- **ENV-828-E1** ✅：`fonts.googleapis.com` 网络**可达**（无 ETIMEDOUT，root 404 属正常）；Web `tsc --noEmit` exit 0；`next build`（apps/web）**exit 0**，48 静态页生成、Next 15.5.20，`next/font` 不再网络阻断（仅既有非阻断 lint warnings）。**BUILD = PASS**。
+- **API Regression** ✅：API `tsc --noEmit` exit 0；API `nest build` exit 0（baseline confirmation，无源码变化）。
+- **Browser Security/Regression** ✅：Real headed Chrome **12/12 PASS**（1440/375）——`/products` 卡片渲染 + 无溢出 + 浏览器上下文 API 凭据扫描 NONE；`/search?q=内窥镜` 结果渲染 + 提交→`/search?q=` 闭环；`/categories` 13 条真实分类链接 + 分类→`/products?categoryId=` 导航；375 无横向溢出；console error 0。
+- **Cleanup** ✅：N/A（本任务无新增测试业务数据；未删除真实业务数据）。
+- **Files Changed** ✅：Business Source=NO；Schema=NO；API Contract=NO；API Source=NO。仅新增验证脚本 `database/_ux_verify/827/_wp3a2_closeout_sec.mjs`（工具，非业务代码）。
+- **Final** ✅：**PASS——SEC-828-P0-01 CLOSED（运行实例安全投影实证）+ ENV-828-E1 CLOSED（网络可达 + next build PASS）+ Source=Runtime + No New Regression。828 = PASS / CLOSED。**
+- **Docs** ✅：新建 `docs/_review/829_POST_M39_WP3A2_CLOSEOUT_RECOVERY_SECURITY_BUILD_REPORT.md`；STATUS/ROADMAP/MATRIX 追加 829。
+- **Next** ⏸️：**STOP——829 CLOSEOUT GATE COMPLETE（PASS）。WP-3A.2 = CLOSED；WP-3A.3 已由 830 完成（PASS / CLOSED）。WP-3A.4 待独立授权**。
+
+### 828_WP-3A.2_Search_Categories_Product_List（POST-M39 · WP-3A.2 公共检索+分类+产品列表重构 · CONDITIONAL PASS → PASS/CLOSED（经 829））
+- **性质** ✅：**WP-3A.2 Public Search + Categories + Product List（IMPLEMENT，仅重构公共发现表现层，不深入业务页面主体/不改后端/Schema/API）**。基于 V3.3.6 + 824（WP-1 契约）+ 826（WP-2 基础）+ 827（WP-3A.1）执行。
+- **/search** ✅：既有 Unified Search 表现层符合契约（Product = Primary Discovery Authority、`/search?q=` URL、SupplierProduct 为 supporting context），无需重构；真实浏览器 1440/375 提交→结果→详情→返回闭环 PASS。
+- **/categories** ✅：Category → `/products?categoryId=` 导航 13 条真实分类链接，1440/375 均通过；修复 375 分类卡技术路径文本横向溢出（`truncate`）。
+- **/products** ✅：列表/筛选/排序/分页/卡片/加载/空/错误基于现有 API；排序 `sortBy=name`→URL→刷新、分类筛选 `categoryId=`→刷新闭环；分页单页目录正确不渲染；产品卡→详情 PASS。
+- **Filter/Sort/Drawer** ✅：移动端筛选抽屉收敛为复用 826 Foundation `Drawer`（bottom sheet + Escape + Dialog 语义），消除自建重复抽屉；排序 select/搜索框补齐 `aria-label`。
+- **Browser Gate** ✅：Real headed Chrome **25/25 PASS**（1440/1024/768/375），无横向溢出、无新增 console error、a11y（Escape 关闭/可访问名/分页语义）通过。
+- **Regression** ✅：Web `tsc --noEmit` exit 0；`next build` 被环境网络阻断（`next/font` Google Fonts ETIMEDOUT，非代码回归）；未触共享 package。
+- **Known Issue** ✅：`g-console` 维持 826 P2 Future Candidate；分页多页真实路径因 ACTIVE 目录单页（4 条）无法以真实数据触发（组件契约 code 核查成立）。
+- **⚠️ NEW P0**：**SEC-828-P0-01（Security · 部署陈旧）**——运行中 API 容器在公共 `GET /products` 返回 `createdBy.passwordHash`；源码头 `PUBLIC_USER_SELECT` 已正确剔除。**不改后端**（WP-3A.2 仅前端）；处置=重建/重部署 API 容器加载当前源码后复测（后端部署动作，须独立授权）。该 P0 使安全认证暂不可判 PASS。
+- **Final** ✅：**CONDITIONAL PASS → PASS / CLOSED（经 829 CLOSEOUT RECOVERY GATE）**（Search/Categories/Product List 产品化 + Browser/Mobile Gate 25/25 + Regression(typecheck) Pass；依赖项=API 容器重部署清除 passwordHash 泄漏 + `next build` 网络复核，两项均于 829 关闭）。**828 = PASS / CLOSED。**
+- **Docs** ✅：新建 `docs/_review/828_POST_M39_WP3A2_SEARCH_CATEGORIES_PRODUCT_LIST_RECONSTRUCTION_REPORT.md`；STATUS/ROADMAP/MATRIX 追加 828/829。
+- **Next** ⏸️：**STOP——828 WP-3A.2 CLOSED（经 829）。WP-3A.3（Product Detail + Related Discovery）READY / NEXT 但**不自动启动**，须独立授权**。

@@ -65,7 +65,7 @@ export default function DemandList({ demands, isLoading }: DemandListProps) {
             </div>
             <DemandStatusBadge status={demand.status} />
           </div>
-          <div className="flex items-center gap-3 mt-3 text-xs text-slate-400">
+          <div className="flex flex-wrap items-center gap-3 mt-3 text-xs text-slate-400">
             <BusinessIdentityBadge type="DEMAND" id={demand.id} createdAt={demand.createdAt} />
             {demand.category && (
               <span className="bg-slate-100 px-2 py-0.5 rounded-full">

@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
+import WorkspaceSectionHeader from '@/components/workspace/WorkspaceSectionHeader';
+import BuyerJourneySteps from '@/components/workspace/BuyerJourneySteps';
+import ReturnToDiscovery from '@/components/workspace/ReturnToDiscovery';
 import DemandList from '@/components/demand/DemandList';
 import { getDemands } from '@/services/demand.service';
 import type { DemandItem } from '@/lib/api/demands';
@@ -42,20 +45,22 @@ function DemandsContent() {
   return (
     <WorkspaceLayout>
       <div className="max-w-[1200px] mx-auto space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">我的需求</h2>
-            <p className="text-slate-500 text-sm mt-1">
-              查看和管理您的需求列表。
-            </p>
-          </div>
-          <button
-            onClick={() => router.push('/workspace/demands/create')}
-            className="px-4 py-2.5 text-sm font-medium text-white bg-slate-900 rounded-md hover:bg-slate-800 transition-colors"
-          >
-            + 创建需求
-          </button>
-        </div>
+        <WorkspaceSectionHeader
+          title="我的需求"
+          eyebrow="BUYER · DEMAND"
+          description="查看和管理您的采购需求，从草稿到发布与询价发起。"
+          actions={
+            <button
+              onClick={() => router.push('/workspace/demands/create')}
+              className="px-4 py-2.5 text-sm font-medium text-white bg-slate-900 rounded-md hover:bg-slate-800 transition-colors"
+            >
+              + 创建需求
+            </button>
+          }
+        />
+
+        <BuyerJourneySteps currentStep="demand" />
+        <ReturnToDiscovery context="DEMAND" />
 
         {/* Search */}
         <div>

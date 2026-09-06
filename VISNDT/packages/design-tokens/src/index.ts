@@ -64,6 +64,17 @@ export const colors = {
     elevatedBg: '#ffffff',
     overlay: 'rgba(15, 23, 42, 0.5)',
   },
+
+  /** 交互状态色（WP-2 Interaction Semantics，对接 726 §4.5 / a11y） */
+  interaction: {
+    /** 交互态按下/强调 */
+    hover: '#204fd6',
+    active: '#1e40af',
+    /** 禁用前景（WCAG 4.5:1 内已降对比度，属有意的 disabled 视觉降级） */
+    disabledFg: '#94a3b8',
+    disabledBg: '#f1f5f9',
+    disabledBorder: '#e2e8f0',
+  } as const,
 } as const;
 
 /* ============================================================
@@ -363,6 +374,12 @@ export function toCssVariables(prefix = 'vds'): Record<string, string> {
     [`--${prefix}-container-reading-max`]: `${container.width.reading.max}px`,
     // Focus ring（TG-02）
     [`--${prefix}-border-focus`]: border.focus,
+    // Interaction states（WP-2 §7 / §25）
+    [`--${prefix}-interaction-hover`]: colors.interaction.hover,
+    [`--${prefix}-interaction-active`]: colors.interaction.active,
+    [`--${prefix}-interaction-disabled-fg`]: colors.interaction.disabledFg,
+    [`--${prefix}-interaction-disabled-bg`]: colors.interaction.disabledBg,
+    [`--${prefix}-interaction-disabled-border`]: colors.interaction.disabledBorder,
   };
   return vars;
 }

@@ -99,6 +99,8 @@ function ProductsPageContent() {
     queryFn: () => getCategories(1, 100),
     // 811 Batch A (D1): 公共目录焦点回归自动刷新。
     // 811 修补 (D1 跟进): refetchOnMount:'always' —— 修复「产品中心页分类筛选」在纯客户端路由跳转下仍命中 60s 新鲜缓存、不重拉导致的删除分类残留。
+    // 811 修补 (D1 收口): staleTime:0 目录始终过期，焦点回归/重新进入即重拉。
+    staleTime: 0,
     refetchOnWindowFocus: true,
     refetchOnMount: 'always',
   });

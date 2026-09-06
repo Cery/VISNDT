@@ -1,0 +1,14 @@
+{"step":"chain-1","api":"admin/supplier-products","action":"submit (DRAFT→SUBMITTED)","expected":"200 渲染DRAFT→SUBMITTED","actual":"status=403","pass":false,"note":"","role":"ADMIN"}
+{"step":"chain-0","api":"admin/supplier-products","action":"GET admin detail (鉴权探针)","expected":"200","actual":"status=200 st=DRAFT","pass":true,"note":"admin GET authorized","role":"ADMIN"}
+{"step":"chain-1","api":"admin/supplier-products","action":"submit (DRAFT→SUBMITTED)","expected":"200 渲染DRAFT→SUBMITTED","actual":"status=403","pass":false,"note":"","role":"ADMIN"}
+{"step":"chain-0","api":"admin/supplier-products","action":"GET admin detail (鉴权探针)","expected":"200","actual":"status=200 st=DRAFT","pass":true,"note":"admin GET authorized","role":"ADMIN"}
+{"step":"chain-1","api":"admin/supplier-products","action":"submit (DRAFT→SUBMITTED)","expected":"200 渲染DRAFT→SUBMITTED","actual":"status=201","pass":true,"note":"SUBMITTED","role":"ADMIN"}
+{"step":"chain-2","api":"admin/supplier-products","action":"beginReview (SUBMITTED→REVIEWING)","expected":"200","actual":"status=201 new=REVIEWING","pass":true,"note":"now REVIEWING","role":"ADMIN"}
+{"step":"chain-3","api":"admin/supplier-products","action":"approve (REVIEWING→APPROVED)","expected":"200","actual":"status=201 new=APPROVED","pass":true,"note":"now APPROVED","role":"ADMIN"}
+{"step":"chain-p1","api":"admin/supplier-products","action":"publish (APPROVED→PUBLISHED)","expected":"201","actual":"status=201 new=PUBLISHED","pass":true,"note":"now PUBLISHED","role":"ADMIN"}
+{"step":"chain-p2","api":"admin/supplier-products","action":"unpublish (PUBLISHED→APPROVED)","expected":"201","actual":"status=201 new=APPROVED","pass":true,"note":"now APPROVED","role":"ADMIN"}
+{"step":"chain-r0","api":"admin/supplier-products","action":"create controlled DRAFT (reject path)","expected":"201","actual":"status=201 new=DRAFT","pass":true,"note":"193be8cf-56ce-40f5-a067-197075a21717","role":"ADMIN"}
+{"step":"chain-r1","api":"admin/supplier-products","action":"submit (DRAFT→SUBMITTED)","expected":"201","actual":"status=201 new=SUBMITTED","pass":true,"note":"","role":"ADMIN"}
+{"step":"chain-r2","api":"admin/supplier-products","action":"beginReview (SUBMITTED→REVIEWING)","expected":"201","actual":"status=201 new=REVIEWING","pass":true,"note":"","role":"ADMIN"}
+{"step":"chain-r3","api":"admin/supplier-products","action":"reject (REVIEWING→REJECTED, note)","expected":"200/201","actual":"status=201 new=REJECTED","pass":true,"note":"now REJECTED","role":"ADMIN"}
+{"step":"chain-r4","api":"admin/supplier-products","action":"cleanup delete controlled DRAFT","expected":"200","actual":"status=200","pass":true,"note":"controlled test removed","role":"ADMIN"}

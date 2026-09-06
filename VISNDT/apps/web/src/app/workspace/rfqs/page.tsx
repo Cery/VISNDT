@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
+import WorkspaceSectionHeader from '@/components/workspace/WorkspaceSectionHeader';
+import BuyerJourneySteps from '@/components/workspace/BuyerJourneySteps';
+import ReturnToDiscovery from '@/components/workspace/ReturnToDiscovery';
 import RFQList from '@/components/rfq/RFQList';
 import { getRfqs } from '@/services/rfq.service';
 import type { RfqItem } from '@/lib/api/rfqs';
@@ -42,20 +45,22 @@ function RfqsContent() {
   return (
     <WorkspaceLayout>
       <div className="max-w-[1200px] mx-auto space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">询价请求</h2>
-            <p className="text-slate-500 text-sm mt-1">
-              查看已发布的询价请求，并审核供应商响应。
-            </p>
-          </div>
-          <button
-            onClick={() => router.push('/workspace/rfqs/create')}
-            className="px-4 py-2 text-sm font-medium text-white bg-slate-900 rounded-md hover:bg-slate-800 transition-colors"
-          >
-            + 创建询价请求
-          </button>
-        </div>
+        <WorkspaceSectionHeader
+          title="我的询价请求"
+          eyebrow="BUYER · RFQ"
+          description="查看已发布的询价请求，并审核供应商响应、做出报价决策。"
+          actions={
+            <button
+              onClick={() => router.push('/workspace/rfqs/create')}
+              className="px-4 py-2 text-sm font-medium text-white bg-slate-900 rounded-md hover:bg-slate-800 transition-colors"
+            >
+              + 创建询价请求
+            </button>
+          }
+        />
+
+        <BuyerJourneySteps currentStep="rfq" />
+        <ReturnToDiscovery context="RFQ" />
 
         {/* Search */}
         <div>

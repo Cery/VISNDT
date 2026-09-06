@@ -33,6 +33,8 @@ export default function CategoriesPage() {
     queryFn: () => getCategories(1, 100),
     // 811 Batch A (D1): 公共目录焦点回归自动刷新。
     // 811 修补 (D1 跟进): refetchOnMount:'always' 覆盖客户端路由跳转时目录残留。
+    // 811 修补 (D1 收口): staleTime:0 目录始终过期，焦点回归/重新进入即重拉。
+    staleTime: 0,
     refetchOnWindowFocus: true,
     refetchOnMount: 'always',
   });
@@ -163,7 +165,7 @@ export default function CategoriesPage() {
                   </h2>
                   {/* Technical route descriptor — mono grouping derived from existing slug */}
                   <div className="mt-1.5 flex items-center gap-2 min-w-0">
-                    <span className="font-mono text-[10px] uppercase tracking-widest text-slate-400 shrink-0">
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-slate-400 min-w-0 truncate">
                       {cat.slug.replace(/-/g, ' ')} · CAPABILITY
                     </span>
                   </div>

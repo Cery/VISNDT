@@ -260,8 +260,11 @@ function DemandEditContent({ id }: { id: string }) {
               >
                 ← 返回需求详情
               </button>
-              <h2 className="text-xl font-bold text-slate-900">编辑需求</h2>
-              <p className="text-slate-500 text-sm mt-1">{pageSubtitle}</p>
+              <span className="inline-block font-mono text-[11px] uppercase tracking-widest text-industrial-cyan">
+                BUYER · DEMAND
+              </span>
+              <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-foreground">编辑需求</h1>
+              <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{pageSubtitle}</p>
             </div>
 
             {isLoading ? (

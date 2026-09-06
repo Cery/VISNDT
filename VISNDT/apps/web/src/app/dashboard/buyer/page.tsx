@@ -10,6 +10,8 @@ import ErrorState from '@/components/common/ErrorState';
 import Loading from '@/components/common/Loading';
 import BuyerActionSummary from '@/components/workspace/BuyerActionSummary';
 import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
+import BuyerJourneySteps from '@/components/workspace/BuyerJourneySteps';
+import ReturnToDiscovery from '@/components/workspace/ReturnToDiscovery';
 import StatCard from '@/components/workspace/StatCard';
 import UiIcon from '@/lib/ui-icon';
 import { BusinessIdentityBadge } from '@visndt/design-system';
@@ -126,53 +128,8 @@ function BuyerDashboardContent() {
           </div>
         </div>
 
-        {/* Business Status */}
-        <section className="space-y-4">
-          <div className="flex items-center gap-2">
-            <div className="w-1 h-5 bg-primary rounded-full" />
-            <h2 className="text-lg font-semibold text-slate-900">业务概览</h2>
-          </div>
-
-          {overviewQuery.isLoading ? (
-            <div className="rounded-xl border border-slate-200 bg-white">
-              <Loading />
-            </div>
-          ) : overviewQuery.isError || !overviewQuery.data ? (
-            <div className="rounded-xl border border-slate-200 bg-white p-6">
-              <ErrorState
-                message="加载汇总数据失败，请稍后重试。"
-                onRetry={retryOverview}
-              />
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <StatCard
-                label="需求"
-                value={overviewQuery.data.demandSummary.total}
-                description={formatStatusCounts(overviewQuery.data.demandSummary.statusCounts)}
-                icon="list"
-              />
-              <StatCard
-                label="询价请求"
-                value={overviewQuery.data.rfqSummary.total}
-                description="RFQ 总量"
-                icon="file"
-              />
-              <StatCard
-                label="匹配"
-                value={overviewQuery.data.matchSummary.total}
-                description={formatStatusCounts(overviewQuery.data.matchSummary.statusCounts)}
-                icon="link"
-              />
-              <StatCard
-                label="待决策响应"
-                value={overviewQuery.data.responseSummary.pendingCount}
-                description={`待处理 ${overviewQuery.data.responseSummary.pendingCount} / 已接受 ${overviewQuery.data.responseSummary.acceptedCount} / 已拒绝 ${overviewQuery.data.responseSummary.rejectedCount}`}
-                icon="clock"
-              />
-            </div>
-          )}
-        </section>
+        {/* Procurement Journey — Demand → Match → RFQ → Decision（真实计数） */}
+        <BuyerJourneySteps />
 
         {/* Pending Actions */}
         <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
@@ -300,6 +257,8 @@ function BuyerDashboardContent() {
             ))}
           </div>
         </section>
+
+        <ReturnToDiscovery context="WORKSPACE" />
       </div>
     </WorkspaceLayout>
   );

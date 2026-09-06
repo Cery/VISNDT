@@ -1,0 +1,6 @@
+{"step":"Public Home","url":"http://localhost:3000/","action":"公开回归 /","pass":true}
+{"step":"Public Search","url":"http://localhost:3000/search?q=%E4%B8%89%E7%BB%B4","action":"公开回归 /search?q=三维","pass":true}
+{"step":"Product List","url":"http://localhost:3000/products","action":"公开回归 /products","pass":true}
+{"step":"Knowledge List","url":"http://localhost:3000/knowledge","action":"公开回归 /knowledge","pass":true}
+{"step":"Solution List","url":"http://localhost:3000/solutions","action":"公开回归 /solutions","pass":true}
+{"step":"Product Detail (representative)","url":"http://localhost:3000/products/capability-snapshot-04","action":"公开回归 /products/capability-snapshot-04","pass":true}

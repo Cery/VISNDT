@@ -1,0 +1,12 @@
+{"step":"login","url":"http://localhost:3000/","action":"Supplier 认证","pass":true,"note":"auth=true","ts":"2026-09-06T00:31:40.828Z"}
+{"step":"vp-1024-detail","url":"http://localhost:3000/workspace/supplier/products/e037dea8-d486-4732-b495-c855aa668c2c","action":"1024 详情页无横向溢出","pass":true,"note":"overflow=false mediaSec=true","ts":"2026-09-06T00:31:45.955Z"}
+{"step":"vp-768-detail","url":"http://localhost:3000/workspace/supplier/products/e037dea8-d486-4732-b495-c855aa668c2c","action":"768 详情页无横向溢出","pass":true,"note":"overflow=false mediaSec=true","ts":"2026-09-06T00:31:49.694Z"}
+{"step":"login","url":"http://localhost:3000/","action":"Supplier 认证","pass":true,"note":"auth=true","ts":"2026-09-06T00:32:37.436Z"}
+{"step":"vp-1024-detail","url":"http://localhost:3000/workspace/supplier/products/e037dea8-d486-4732-b495-c855aa668c2c","action":"1024 详情页无横向溢出","pass":true,"note":"overflow=false mediaSec=true","ts":"2026-09-06T00:32:41.264Z"}
+{"step":"vp-768-detail","url":"http://localhost:3000/workspace/supplier/products/e037dea8-d486-4732-b495-c855aa668c2c","action":"768 详情页无横向溢出","pass":false,"note":"overflow=false mediaSec=false","ts":"2026-09-06T00:33:11.495Z"}
+{"step":"public-1440","url":"http://localhost:3000/products/zb-tj095","action":"公开产品页 1440 已发布型号上下文、未发布不泄露","pass":true,"note":"published=true leakUnpublished=false overflow=false","ts":"2026-09-06T00:33:16.383Z"}
+{"step":"login","url":"http://localhost:3000/","action":"Supplier 认证","pass":true,"note":"auth=true","ts":"2026-09-06T00:39:44.270Z"}
+{"step":"vp-1024-detail","url":"http://localhost:3000/workspace/supplier/products/e037dea8-d486-4732-b495-c855aa668c2c","action":"1024 详情页无横向溢出","pass":true,"note":"overflow=false mediaSec=true","ts":"2026-09-06T00:39:50.725Z"}
+{"step":"vp-768-detail","url":"http://localhost:3000/workspace/supplier/products/e037dea8-d486-4732-b495-c855aa668c2c","action":"768 详情页无横向溢出","pass":true,"note":"overflow=false mediaSec=true","ts":"2026-09-06T00:39:54.472Z"}
+{"step":"public-1440","url":"http://localhost:3000/products/zb-tj095","action":"公开产品页 1440 已发布型号上下文、未发布不泄露","pass":true,"note":"published=true leakUnpublished=false overflow=false","ts":"2026-09-06T00:40:00.678Z"}
+{"step":"public-375","url":"http://localhost:3000/products/zb-tj095","action":"公开产品页 375 已发布型号上下文、未发布不泄露","pass":true,"note":"published=true leakUnpublished=false overflow=false","ts":"2026-09-06T00:40:04.546Z"}

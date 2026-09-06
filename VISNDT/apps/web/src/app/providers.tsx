@@ -23,9 +23,12 @@ function CatalogRouteInvalidator() {
       return;
     }
     if (pathname && CATALOG_ROUTE.test(pathname)) {
-      qc.invalidateQueries({ queryKey: ['categories'] });
-      qc.invalidateQueries({ queryKey: ['featured-products'] });
-      qc.invalidateQueries({ queryKey: ['products'] });
+      // 811 收口(D2): invalidateQueries 默认 refetchType:'active' 只重拉"活跃观察者"挂载中的查询，
+      // Next App Router 缓存还原导航时观察者未必处于 active；改为 refetchType:'all' 防御性强制刷入缓存，
+      // 确保无论组件是否 remount/observer 是否 active，任何渲染都读到最新目录，删除分类不残留。
+      qc.invalidateQueries({ queryKey: ['categories'], refetchType: 'all' });
+      qc.invalidateQueries({ queryKey: ['featured-products'], refetchType: 'all' });
+      qc.invalidateQueries({ queryKey: ['products'], refetchType: 'all' });
     }
   }, [pathname, qc]);
   return null;

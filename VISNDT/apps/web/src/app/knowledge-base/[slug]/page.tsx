@@ -319,7 +319,9 @@ export default async function KnowledgeEntryDetailPage({ params }: EntryDetailPa
             items: relatedProducts.map((p) => ({
               href: `/products/${p.id}`,
               title: p.name,
-              sub: p.status === 'ACTIVE' ? '可用' : undefined,
+              // 后端 findRelatedProducts 已按 status:'ACTIVE' 过滤（M24.1.7 确定性映射），
+              // 返回项均为可用能力；RelatedProductItem 类型不含 status，故此处恒为「可用」。
+              sub: '可用',
             })),
             seeAllHref: '/products',
           },

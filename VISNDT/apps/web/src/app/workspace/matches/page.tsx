@@ -4,6 +4,9 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
+import WorkspaceSectionHeader from '@/components/workspace/WorkspaceSectionHeader';
+import BuyerJourneySteps from '@/components/workspace/BuyerJourneySteps';
+import ReturnToDiscovery from '@/components/workspace/ReturnToDiscovery';
 import MatchList from '@/components/match/MatchList';
 import {
   getAllMatches,
@@ -85,12 +88,14 @@ function MatchesContent() {
   return (
     <WorkspaceLayout>
       <div className="max-w-[1200px] mx-auto space-y-6">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">匹配结果</h2>
-          <p className="text-slate-500 text-sm mt-1">
-            查看需求与产品的匹配结果。
-          </p>
-        </div>
+        <WorkspaceSectionHeader
+          title="匹配结果"
+          eyebrow="BUYER · MATCHING"
+          description="查看需求与检测能力的匹配结果，定位可发起询价的产品与供应商。"
+        />
+
+        <BuyerJourneySteps currentStep="match" />
+        <ReturnToDiscovery context="MATCHING" />
 
         {/* Search with debounce */}
         <div>

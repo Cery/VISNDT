@@ -2,9 +2,12 @@
 
 import { useEffect, useState, use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
+import BuyerJourneySteps from '@/components/workspace/BuyerJourneySteps';
+import ReturnToDiscovery from '@/components/workspace/ReturnToDiscovery';
 import DemandDetail from '@/components/demand/DemandDetail';
 import { getDemand, getDemandMatches, publishDemand, closeDemand } from '@/services/demand.service';
 import type { DemandDetailItem } from '@/lib/api/demands';
@@ -77,14 +80,17 @@ function DemandDetailContent({ id }: { id: string }) {
 
   return (
     <WorkspaceLayout>
-      <div className="max-w-[1200px] mx-auto">
+      <div className="max-w-[1200px] mx-auto space-y-6">
         {/* Back button */}
         <button
           onClick={() => router.push('/workspace/demands')}
-          className="text-sm text-slate-500 hover:text-slate-700 mb-6 flex items-center gap-1 transition-colors"
+          className="text-sm text-slate-500 hover:text-slate-700 flex items-center gap-1 transition-colors"
         >
           ← 返回需求列表
         </button>
+
+        <BuyerJourneySteps currentStep="demand" />
+        <ReturnToDiscovery context="DEMAND" />
 
             {isLoading ? (
               <div className="space-y-4">
@@ -126,6 +132,14 @@ function DemandDetailContent({ id }: { id: string }) {
                       >
                         {actionLoading === 'close' ? '关闭中...' : '关闭'}
                       </button>
+                    )}
+                    {matchesCount > 0 && (
+                      <Link
+                        href="/workspace/matches"
+                        className="px-3 py-1.5 text-xs font-medium text-primary border border-primary/30 rounded-md hover:bg-primary/5 transition-colors"
+                      >
+                        查看匹配结果（{matchesCount}）
+                      </Link>
                     )}
                   </div>
                 )}

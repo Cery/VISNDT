@@ -46,6 +46,7 @@ export default function SearchBar({
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder={placeholder}
+          aria-label={placeholder || '搜索产品关键词'}
           className="w-full pl-4 pr-9 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
         />
         {hasValue && (

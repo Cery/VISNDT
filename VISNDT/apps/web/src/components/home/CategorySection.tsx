@@ -22,6 +22,8 @@ export default function CategorySection() {
     queryFn: () => getCategories(1, 100),
     // 811 Batch A (D1): 公共目录针对焦点回归自动刷新；staleTime(全局60s) 已约束，仅过期(query)时触发。
     // 811 修补 (D1 跟进): refetchOnMount:'always' —— 覆盖纯客户端路由跳转(标签页持续聚焦、无 focus 事件)时目录仍新鲜导致分类筛选残留。
+    // 811 修补 (D1 收口): staleTime:0 —— 目录数据始终视为过期，切回标签页/重新进入页面即重拉，根治「首页分类版块不刷新」。
+    staleTime: 0,
     refetchOnWindowFocus: true,
     refetchOnMount: 'always',
   });

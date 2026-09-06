@@ -1,0 +1,4 @@
+{"step":1,"url":"http://localhost:3000/dashboard","action":"登录 Supplier 账号","expected":"进入供应商端","actual":"url=http://localhost:3000/dashboard","pass":true,"screenshot":"823_sup_01_login_1440.png"}
+{"step":2,"url":"http://localhost:3000/workspace/supplier/rfqs/f82f8c8f-23b5-4e8d-b846-95aa3956f48b","action":"Supplier 打开分配到的 OPEN RFQ 详情","expected":"渲染RFQ需求与响应入口","actual":"len=1266 has807=true","pass":true,"screenshot":"823_sup_02_rfq_detail_1440.png"}
+{"step":3,"url":"http://localhost:3000/workspace/supplier/responses","action":"Supplier 打开我的响应列表","expected":"渲染我司响应记录","actual":"len=1335 hasMing=true","pass":true,"screenshot":"823_sup_03_responses_1440.png"}
+{"step":4,"url":"http://localhost:3000/workspace/supplier/opportunities","action":"Supplier 打开商机/机会列表","expected":"渲染机会或空态","actual":"len=1418","pass":true,"screenshot":"823_sup_04_opportunities_1440.png"}

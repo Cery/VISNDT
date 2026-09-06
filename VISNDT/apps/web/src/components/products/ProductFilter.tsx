@@ -222,6 +222,7 @@ export default function ProductFilter({
       <div>
         <h3 className="font-semibold text-sm mb-3">排序方式</h3>
         <select
+          aria-label="排序方式"
           value={`${sortBy}:${sortOrder}`}
           onChange={(e) => {
             const [field, order] = e.target.value.split(':');

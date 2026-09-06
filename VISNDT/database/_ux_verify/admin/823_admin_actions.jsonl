@@ -1,0 +1,4 @@
+{"step":1,"url":"http://localhost:3001/home","action":"Admin 登录管理后台","expected":"进入后台首页","actual":"url=http://localhost:3001/home","pass":true,"screenshot":"823_adm_01_login_1440.png"}
+{"step":2,"url":"http://localhost:3001/supplier-products","action":"Admin 打开供应商产品管理列表","expected":"渲染发布/审批状态与操作入口","actual":"len=803 hasPublish=true","pass":true,"screenshot":"823_adm_02_supplier_products_1440.png"}
+{"step":3,"url":"http://localhost:3001/rfqs","action":"Admin 打开询价请求管理列表","expected":"渲染 RFQ 管理列表","actual":"len=0","pass":false,"screenshot":"823_adm_03_rfqs_1440.png"}
+{"step":4,"url":"http://localhost:3001/rfqs/f82f8c8f-23b5-4e8d-b846-95aa3956f48b","action":"Admin 打开 RFQ 详情(含响应)","expected":"渲染 RFQ 与响应管理视图","actual":"len=859 has807=true","pass":true,"screenshot":"823_adm_04_rfq_detail_1440.png"}

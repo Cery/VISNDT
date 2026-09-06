@@ -6,6 +6,8 @@ import Link from 'next/link';
 import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
+import BuyerJourneySteps from '@/components/workspace/BuyerJourneySteps';
+import ReturnToDiscovery from '@/components/workspace/ReturnToDiscovery';
 import MatchStatusBadge from '@/components/match/MatchStatusBadge';
 import MatchScore from '@/components/match/MatchScore';
 import KnowledgeContextSection from '@/components/match/KnowledgeContextSection';
@@ -191,7 +193,7 @@ function MatchDetailContent({ matchId }: { matchId: string }) {
 
   return (
     <WorkspaceLayout>
-      <div className="max-w-[800px] mx-auto space-y-6">
+      <div className="max-w-[1200px] mx-auto space-y-6">
         {/* Back navigation */}
         <button
           onClick={() => router.push('/workspace/matches')}
@@ -199,6 +201,24 @@ function MatchDetailContent({ matchId }: { matchId: string }) {
         >
           ← 返回匹配列表
         </button>
+
+        {/* Journey context */}
+        <BuyerJourneySteps currentStep="match" />
+        <ReturnToDiscovery context="MATCHING" />
+
+        <div className="max-w-[800px] mx-auto space-y-6">
+        {/* Page identity */}
+        <div>
+          <span className="inline-block font-mono text-[11px] uppercase tracking-widest text-industrial-cyan">
+            BUYER · MATCHING
+          </span>
+          <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-foreground">
+            匹配详情
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            查看该需求与检测能力的匹配评分、解释与参数匹配概览。
+          </p>
+        </div>
 
         {/* Match Summary */}
         <div className="rounded-lg border border-slate-200 bg-white p-5">
@@ -336,6 +356,7 @@ function MatchDetailContent({ matchId }: { matchId: string }) {
             >
               返回匹配列表
             </Link>
+          </div>
           </div>
         </div>
       </div>

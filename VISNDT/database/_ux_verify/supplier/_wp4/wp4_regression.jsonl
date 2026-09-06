@@ -1,0 +1,16 @@
+{"step":"pub-home","url":"http://localhost:3000/","action":"公开 home 200 渲染(回归)","pass":true,"note":"keys=true overflow=false len=4655","ts":"2026-09-06T00:45:46.328Z"}
+{"step":"pub-search","url":"http://localhost:3000/search?q=%E5%86%85%E7%AA%A5%E9%95%9C","action":"公开 search 200 渲染(回归)","pass":false,"note":"keys=false overflow=false len=1436","ts":"2026-09-06T00:46:20.702Z"}
+{"step":"pub-products","url":"http://localhost:3000/products","action":"公开 products 200 渲染(回归)","pass":true,"note":"keys=true overflow=false len=2125","ts":"2026-09-06T00:46:25.693Z"}
+{"step":"pub-product-detail","url":"http://localhost:3000/products/zb-tj095","action":"公开 product-detail 200 渲染(回归)","pass":true,"note":"keys=true overflow=false len=1435","ts":"2026-09-06T00:46:29.392Z"}
+{"step":"pub-knowledge","url":"http://localhost:3000/knowledge","action":"公开 knowledge 200 渲染(回归)","pass":true,"note":"keys=true overflow=false len=917","ts":"2026-09-06T00:46:34.379Z"}
+{"step":"pub-solutions","url":"http://localhost:3000/solutions","action":"公开 solutions 200 渲染(回归)","pass":true,"note":"keys=true overflow=false len=819","ts":"2026-09-06T00:46:39.044Z"}
+{"step":"buyer-login","url":"http://localhost:3000/login","action":"Buyer 认证(回归)","pass":true,"note":"buyerOk=true","ts":"2026-09-06T00:46:43.490Z"}
+{"step":"buyer-workspace","url":"chrome-error://chromewebdata/","action":"Buyer Workspace 渲染(回归)","pass":false,"note":"overflow=false len=91","ts":"2026-09-06T00:47:19.777Z"}
+{"step":"pub-home","url":"http://localhost:3000/","action":"公开 home 200 渲染(回归)","pass":true,"note":"keys=true overflow=false len=4655","ts":"2026-09-06T00:56:37.101Z"}
+{"step":"pub-search","url":"http://localhost:3000/search?q=%E5%86%85%E7%AA%A5%E9%95%9C","action":"公开 search 200 渲染(回归)","pass":true,"note":"keys=true overflow=false len=1446","ts":"2026-09-06T00:56:40.630Z"}
+{"step":"pub-products","url":"http://localhost:3000/products","action":"公开 products 200 渲染(回归)","pass":true,"note":"keys=true overflow=false len=2125","ts":"2026-09-06T00:56:44.164Z"}
+{"step":"pub-product-detail","url":"http://localhost:3000/products/zb-tj095","action":"公开 product-detail 200 渲染(回归)","pass":true,"note":"keys=true overflow=false len=1440","ts":"2026-09-06T00:56:47.738Z"}
+{"step":"pub-knowledge","url":"http://localhost:3000/knowledge","action":"公开 knowledge 200 渲染(回归)","pass":true,"note":"keys=true overflow=false len=917","ts":"2026-09-06T00:56:51.268Z"}
+{"step":"pub-solutions","url":"http://localhost:3000/solutions","action":"公开 solutions 200 渲染(回归)","pass":true,"note":"keys=true overflow=false len=819","ts":"2026-09-06T00:56:54.804Z"}
+{"step":"buyer-login","url":"http://localhost:3000/login","action":"Buyer 认证(回归)","pass":true,"note":"buyerOk=true","ts":"2026-09-06T00:56:58.458Z"}
+{"step":"buyer-workspace","url":"http://localhost:3000/dashboard/buyer","action":"Buyer Workspace 渲染(回归)","pass":true,"note":"overflow=false len=805","ts":"2026-09-06T00:57:01.992Z"}

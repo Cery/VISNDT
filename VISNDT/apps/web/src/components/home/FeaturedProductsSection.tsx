@@ -12,6 +12,8 @@ export default function FeaturedProductsSection() {
     queryFn: () => getProducts({ status: 'ACTIVE', page: 1, pageSize: 4 }),
     // 811 Batch A (D1): 公共目录焦点回归自动刷新（与 categories 一致）。
     // 811 修补 (D1 跟进): refetchOnMount:'always' 覆盖客户端路由跳转时目录残留。
+    // 811 修补 (D1 收口): staleTime:0 目录始终过期，焦点回归/重新进入即重拉。
+    staleTime: 0,
     refetchOnWindowFocus: true,
     refetchOnMount: 'always',
   });

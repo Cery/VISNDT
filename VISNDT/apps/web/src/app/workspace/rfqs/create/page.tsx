@@ -6,6 +6,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
+import WorkspaceSectionHeader from '@/components/workspace/WorkspaceSectionHeader';
 import { getDemands } from '@/services/demand.service';
 import { createRfq } from '@/services/rfq.service';
 
@@ -56,14 +57,11 @@ function RfqCreateContent() {
   return (
     <WorkspaceLayout>
       <div className="max-w-[1200px] mx-auto space-y-6">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">
-            创建询价
-          </h2>
-          <p className="text-slate-500 text-sm mt-1">
-            从您的需求中创建询价单。
-          </p>
-        </div>
+        <WorkspaceSectionHeader
+          title="创建询价"
+          eyebrow="BUYER · RFQ"
+          description="从您的需求中创建询价单，向供应商发起询价请求。"
+        />
 
         <form
           onSubmit={handleSubmit}

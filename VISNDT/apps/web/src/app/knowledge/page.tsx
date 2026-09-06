@@ -1,9 +1,13 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { getContentList } from '@/services/content.service';
 import type { Content } from '@/types/content';
 import { SITE_URL } from '@/lib/seo';
 import ContentCard from '@/components/content/ContentCard';
 import EmptyState from '@/components/common/EmptyState';
+import IndustrialBadge from '@/components/brand/IndustrialBadge';
+import PageContainer from '@/components/common/PageContainer';
+import EngineeringDiscoveryNav from '@/components/engineering/EngineeringDiscoveryNav';
 
 export const metadata: Metadata = {
   title: '知识中心',
@@ -20,6 +24,19 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * 804_M39 — Knowledge list recomposition (WP-3A.4 platformization alignment).
+ *
+ * The page no longer renders as an isolated content channel. It is aligned with
+ * the cross-surface engineering discovery ecosystem (same pattern as /solutions):
+ *
+ *   Engineering Problem → Inspection Context → Knowledge
+ *        → Capability / Product / Solution / Search
+ *
+ * Data source (getContentList type=KNOWLEDGE), route semantics and Content cards
+ * are unchanged. This is a page-level structural recomposition reusing existing
+ * Foundation components (EngineeringDiscoveryNav / IndustrialBadge / PageContainer).
+ */
 export default async function KnowledgePage() {
   let contents: Content[] = [];
   try {
@@ -30,25 +47,77 @@ export default async function KnowledgePage() {
     contents = [];
   }
 
-  return (
-    <div>
-      {/* Hero */}
-      <section className="bg-industrial-dark text-white py-12 sm:py-20 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-pattern bg-grid-md opacity-30" />
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-industrial-cyan/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4">
-            知识<span className="text-industrial-cyan">中心</span>
-          </h1>
-          <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto">
-            为工业检测专业人士提供的专家资源。指南、文章、案例研究和设备选型建议。
-          </p>
-        </div>
-      </section>
+  const knowledgeCount = contents.length;
 
-      {/* Content List */}
-      <section className="max-w-[1100px] mx-auto px-4 sm:px-6 py-10 sm:py-16">
+  return (
+    <div className="min-h-screen bg-surface-0">
+      {/* Engineering Context Header — knowledge as technical information discovery surface */}
+      <div className="bg-industrial-dark relative overflow-hidden border-b border-slate-200/80">
+        <div className="absolute inset-0 bg-grid-pattern bg-grid-md opacity-20" aria-hidden="true" />
+        <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-primary/0 via-industrial-cyan/50 to-primary/0" aria-hidden="true" />
+        <PageContainer variant="content" paddingY={40}>
+          <div className="max-w-4xl relative">
+            <IndustrialBadge label="工程信息发现 · 技术知识" tone="cyan" />
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mt-5 tracking-tight">
+              技术知识中心
+            </h1>
+            {/* Knowledge journey line — understanding → capability → solution (mono) */}
+            <p className="mt-3 font-mono text-[11px] uppercase tracking-widest text-slate-500">
+              <span className="text-slate-400">WHY</span>
+              <span className="text-slate-600"> → </span>
+              <span className="text-industrial-cyan">KNOWLEDGE</span>
+              <span className="text-slate-600"> → </span>
+              <span className="text-slate-400">CAPABILITY</span>
+              <span className="text-slate-600"> → </span>
+              <span className="text-slate-400">SOLUTION</span>
+            </p>
+            <p className="text-slate-400 mt-3 text-sm sm:text-base max-w-2xl leading-relaxed">
+              面向工业检测专业人士的技术指南、应用案例与设备选型知识。从「为什么 / 怎么理解」出发，
+              沿知识语境收敛到检测能力、产品与解决方案——而非仅浏览一份文章清单。
+            </p>
+            <div className="mt-5 inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5">
+              <span className="font-mono text-lg font-bold text-white tabular-nums">
+                {String(knowledgeCount).padStart(2, '0')}
+              </span>
+              <span className="text-xs text-slate-400">已收录技术知识</span>
+            </div>
+          </div>
+        </PageContainer>
+      </div>
+
+      <PageContainer variant="content" paddingY={32}>
+        {/* Cross-surface discovery — knowledge sits inside the engineering discovery ecosystem */}
+        <div className="mb-8">
+          <EngineeringDiscoveryNav activeLabel="知识中心" />
+        </div>
+
+        {/* Engineering context quick entry — governed capabilities / products / solutions / provider / search */}
+        <div className="mb-8">
+          <p className="font-mono text-[11px] uppercase tracking-widest text-slate-500 mb-3">
+            从知识语境进入
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { href: '/categories', label: '能力分类', mono: 'CAP' },
+              { href: '/products', label: '检测产品', mono: 'PRD' },
+              { href: '/solutions', label: '解决方案', mono: 'SOL' },
+              { href: '/search?type=supplier-product', label: '能力提供方', mono: 'SPL' },
+              { href: '/search', label: '统一检索', mono: 'SRC' },
+            ].map((t) => (
+              <Link
+                key={t.href}
+                href={t.href}
+                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-surface-1 px-3 py-1.5 text-xs font-medium text-foreground hover:border-primary/40 hover:text-primary transition-colors"
+              >
+                <span className="font-mono text-[10px] uppercase tracking-widest text-industrial-cyan">
+                  {t.mono}
+                </span>
+                <span>{t.label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+
         {contents.length === 0 ? (
           <EmptyState
             icon="document"
@@ -57,13 +126,52 @@ export default async function KnowledgePage() {
             description="技术文章、检测指南与应用案例正在筹备中，敬请期待。"
           />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {contents.map((item) => (
-              <ContentCard key={item.id} item={item} />
-            ))}
-          </div>
+          <>
+            <div className="flex items-center gap-3 mb-6">
+              <span className="h-5 w-1 rounded-sm bg-industrial-cyan shrink-0" aria-hidden="true" />
+              <span className="font-mono text-[11px] uppercase tracking-widest text-slate-400">
+                <span className="text-industrial-cyan">KNOWLEDGE INDEX</span>
+                <span className="mx-2 text-slate-300">/</span>
+                Technical Knowledge Registry
+              </span>
+              <span className="ml-auto font-mono text-xs text-slate-500 tabular-nums">
+                共 {knowledgeCount} 篇技术知识
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {contents.map((item) => (
+                <ContentCard key={item.id} item={item} />
+              ))}
+            </div>
+          </>
         )}
-      </section>
+
+        {/* Next action — carry the reader onward into evaluation & discovery */}
+        <div className="mt-10 rounded-xl border border-slate-200/80 bg-surface-1 p-5 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:justify-between">
+            <div>
+              <p className="font-semibold text-foreground">对技术知识的下一步工程发现</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                理解检测原理与参数后，进入能力分类界定检测范围，或通过统一检索核对参数、产品与解决方案。
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/search" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80">
+                统一检索<span aria-hidden="true">→</span>
+              </Link>
+              <Link href="/products" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80">
+                检测产品<span aria-hidden="true">→</span>
+              </Link>
+              <Link href="/solutions" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80">
+                解决方案<span aria-hidden="true">→</span>
+              </Link>
+              <Link href="/categories" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80">
+                能力分类<span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </PageContainer>
     </div>
   );
 }

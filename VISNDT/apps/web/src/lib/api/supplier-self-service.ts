@@ -7,6 +7,34 @@ import type { ApiResponse } from '@/types/api';
  * server-side to the authenticated supplier organization.
  */
 
+export interface MySupplierProductMedia {
+  id: string;
+  fileAssetId: string | null;
+  mediaType?: string;
+  documentType?: string | null;
+  title?: string | null;
+  altText?: string | null;
+  isPrimary: boolean;
+  displayOrder: number;
+}
+
+export interface MySupplierProductParameterDefinition {
+  id: string;
+  name: string;
+  code?: string | null;
+  dataType?: string;
+  unit?: string | null;
+  parameterGroupId?: string | null;
+}
+
+export interface MySupplierProductParameterValue {
+  id: string;
+  parameterDefinitionId: string;
+  value: string | null;
+  valueNumber?: number | null;
+  parameterDefinition?: MySupplierProductParameterDefinition | null;
+}
+
 export interface MySupplierProduct {
   id: string;
   organizationId: string;
@@ -29,6 +57,10 @@ export interface MySupplierProduct {
     slug?: string | null;
   } | null;
   organization?: { id: string; name: string } | null;
+  /** SupplierProduct 归属的型号级媒体（getMySupplierProduct 返回；顺序遵循 isPrimary / displayOrder）。 */
+  media?: MySupplierProductMedia[] | null;
+  /** 型号级技术参数覆盖（parameterDefinition 联动平台参数定义）。 */
+  parameterValues?: MySupplierProductParameterValue[] | null;
 }
 
 export interface MySupplierProducts {

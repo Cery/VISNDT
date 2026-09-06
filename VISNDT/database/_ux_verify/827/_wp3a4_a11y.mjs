@@ -1,0 +1,17 @@
+import { Driver, launchChrome, sleep } from '../../../_ux_browser_helper.mjs';
+const PORT = 9377, UD = '.edge-cdp-3a4a11y';
+const pid = launchChrome(PORT, UD);
+const d = new Driver(PORT);
+await d.connect(); await sleep(1000);
+const BASE = 'http://localhost:3000';
+const out = [];
+await d.goto(BASE + '/knowledge/industrial-video-borescope-introduction'); await d.waitFor('document.querySelector("h1")', 15000); await sleep(800);
+let r = await d.evaluate('(() => { const hs=Array.from(document.querySelectorAll("h1,h2,h3")).map(h=>h.tagName+":"+(h.innerText||"").trim().slice(0,20)); const firstH1=!!document.querySelector("h1"); const links=Array.from(document.querySelectorAll("a")).filter(a=>!(a.getAttribute("aria-label")||a.innerText||"").trim()).length; return {hs:hs.slice(0,12), firstH1, emptyLinks: links}; })()');
+console.log('KD HEADINGS:', JSON.stringify(r));
+await d.goto(BASE + '/solutions/aero-engine-internal-inspection-solution'); await d.waitFor('document.querySelector("h1")', 15000); await sleep(800);
+r = await d.evaluate('(() => { const hs=Array.from(document.querySelectorAll("h1,h2,h3")).map(h=>h.tagName+":"+(h.innerText||"").trim().slice(0,20)); const firstH1=!!document.querySelector("h1"); const links=Array.from(document.querySelectorAll("a")).filter(a=>!(a.getAttribute("aria-label")||a.innerText||"").trim()).length; return {hs:hs.slice(0,12), firstH1, emptyLinks: links}; })()');
+console.log('SD HEADINGS:', JSON.stringify(r));
+await d.goto(BASE + '/knowledge'); await d.waitFor('document.querySelector("h1")', 15000); await sleep(800);
+r = await d.evaluate('(() => { const hs=Array.from(document.querySelectorAll("h1,h2,h3")).map(h=>h.tagName+":"+(h.innerText||"").trim().slice(0,20)); return {hs:hs.slice(0,10)}; })()');
+console.log('KL HEADINGS:', JSON.stringify(r));
+process.exit(0);
