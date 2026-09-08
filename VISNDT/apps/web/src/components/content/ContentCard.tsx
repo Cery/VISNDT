@@ -1,5 +1,13 @@
 import Link from 'next/link';
 import type { Content } from '@/types/content';
+import { stripGovernanceLabels } from '@/lib/display-text';
+
+const CONTENT_TYPE_LABEL: Record<string, string> = {
+  ARTICLE: '文章',
+  KNOWLEDGE: '知识',
+  SOLUTION: '方案',
+  INSIGHT: '洞察',
+};
 
 const TYPE_HREF: Record<string, (slug: string) => string> = {
   ARTICLE: (slug) => `/articles/${slug}`,
@@ -28,7 +36,7 @@ export default function ContentCard({ item }: ContentCardProps) {
   return (
     <Link
       href={href}
-      className="group relative rounded-xl border border-slate-200/80 shadow-industrial-sm bg-white overflow-hidden hover:shadow-industrial-md hover:-translate-y-1 transition-all duration-300 flex flex-col"
+      className="group relative rounded-xl border border-slate-200/80 shadow-industrial-sm bg-white overflow-hidden hover:shadow-industrial-md transition-all duration-300 flex flex-col"
     >
       {/* Industrial accent edge — structural top rail */}
       <span className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-industrial-cyan via-primary to-industrial-cyan opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10" aria-hidden="true" />
@@ -51,21 +59,23 @@ export default function ContentCard({ item }: ContentCardProps) {
         <div className="flex items-center gap-2 mb-3">
           <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-widest">
             <span className="h-3 w-1 rounded-sm bg-industrial-cyan" aria-hidden="true" />
-            <span className="text-slate-400">TYPE</span>
+            <span className="text-slate-400">分类</span>
             <span className="text-slate-300">/</span>
-            <span className="text-primary font-semibold">{item.type}</span>
+            <span className="text-primary font-semibold">
+              {CONTENT_TYPE_LABEL[item.type] ?? '内容'}
+            </span>
           </span>
         </div>
 
-        {/* Title */}
+        {/* 846 §60：剥离治理前缀 */}
         <h3 className="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2 text-base">
-          {item.title}
+          {stripGovernanceLabels(item.title)}
         </h3>
 
         {/* Summary */}
         {item.summary && (
-          <p className="text-sm text-slate-500 leading-relaxed mb-4 line-clamp-3 flex-1">
-            {item.summary}
+          <p className="text-sm text-slate-500 leading-relaxed mb-4 line-clamp-2 flex-1">
+            {stripGovernanceLabels(item.summary)}
           </p>
         )}
 
@@ -97,14 +107,14 @@ export default function ContentCard({ item }: ContentCardProps) {
           </span>
           {item.author?.name && (
             <span className="font-mono text-[11px] text-slate-400">
-              <span className="text-slate-500">AUTHOR</span>
+              <span className="text-slate-500">作者</span>
               <span className="mx-1.5 text-slate-300">/</span>
               {item.author.name}
             </span>
           )}
         </div>
         <span className="mt-3 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-widest text-primary/70 group-hover:text-primary transition-colors">
-          VIEW DOC
+          查看文档
           <span aria-hidden="true">→</span>
         </span>
       </div>

@@ -71,6 +71,7 @@ export interface ProductFormData {
 export interface SearchProductParams {
   keyword?: string;
   categoryId?: string;
+  includeSubcategories?: boolean;
   status?: string;
   sortBy?: 'createdAt' | 'updatedAt' | 'name';
   sortOrder?: 'asc' | 'desc';

@@ -34,8 +34,8 @@ export default function SupplierCompareBar({
     .join(',')}&type=supplier-product&capability=${capabilityId}`;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 shadow-industrial-lg">
-      <div className="max-w-[1200px] mx-auto px-6 py-3 flex items-center justify-between">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-200 shadow-industrial-lg pb-[env(safe-area-inset-bottom)]">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <span className="text-sm font-medium text-slate-700 whitespace-nowrap">
             已选择 {selected.length} 个供应商型号
@@ -48,15 +48,13 @@ export default function SupplierCompareBar({
           </span>
           <div className="flex items-center gap-2 overflow-x-auto min-w-0">
             {selected.map((s) => (
-              <span
-                key={s.id}
-                className="inline-flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-1 rounded-full whitespace-nowrap"
-              >
-                <span className="max-w-[120px] truncate">{s.label}</span>
+              <span key={s.id} className="inline-flex items-center bg-primary/10 text-primary text-xs px-2 py-1 rounded-full whitespace-nowrap">
+                <span className="max-w-[120px] sm:max-w-[160px] truncate">{s.label}</span>
+                {/* 移除：p-1 扩大热区，移动端便于点按 */}
                 <button
                   type="button"
                   onClick={() => onRemove(s.id)}
-                  className="hover:text-primary/70 flex-shrink-0"
+                  className="ml-1 p-1 rounded hover:text-primary/70 hover:bg-primary/10 transition-colors"
                   aria-label={`移除 ${s.label}`}
                 >
                   <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.2">

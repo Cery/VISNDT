@@ -9,7 +9,7 @@ export default function HeroBanner() {
           工业检测能力发现平台
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-          发现工业检测能力与能力型号，对比技术参数，连接专业能力提供商。
+          发现工业检测产品与产品型号，对比技术参数，连接专业供应商。
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link

@@ -27,7 +27,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: url('/products'), changeFrequency: 'daily', priority: 0.9 },
     { url: url('/categories'), changeFrequency: 'daily', priority: 0.8 },
     { url: url('/knowledge-base'), changeFrequency: 'weekly', priority: 0.9 },
-    { url: url('/knowledge'), changeFrequency: 'weekly', priority: 0.4 },
     { url: url('/solutions'), changeFrequency: 'weekly', priority: 0.8 },
     { url: url('/articles'), changeFrequency: 'weekly', priority: 0.7 },
     { url: url('/business'), changeFrequency: 'monthly', priority: 0.5 },
@@ -70,14 +69,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // 3. 内容详情页（Knowledge / Article / Solution）
   //    Insight 内容（ContentType.INSIGHT）不作为公开 SEO 落地页收录（788：Insight = Contextual Annotation，
   //    非公开内容频道，无独立 sitemap / canonical / 外部可发现；其公开详情面已退役/重定向）。
-  const contentTypes = ['KNOWLEDGE', 'ARTICLE', 'SOLUTION'] as const;
+  //    842 WP-7：移除 KNOWLEDGE 类型——/knowledge/* 为 legacy 内容树（已 noindex），
+  //    知识公开索引入口统一为 /knowledge-base/*（上方 getEntries 已生成 canonical URL），
+  //    故此处仅保留 ARTICLE / SOLUTION 两类公开内容详情。
+  const contentTypes = ['ARTICLE', 'SOLUTION'] as const;
   const contentPaths: Record<string, string> = {
-    KNOWLEDGE: '/knowledge',
     ARTICLE: '/articles',
     SOLUTION: '/solutions',
   };
   const contentPriority: Record<string, number> = {
-    KNOWLEDGE: 0.4,
     ARTICLE: 0.6,
     SOLUTION: 0.7,
   };

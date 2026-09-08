@@ -3,6 +3,7 @@ import { getOffers } from '@/services/offer.service';
 import SupplierPublicProfile from '@/components/supplier/SupplierPublicProfile';
 import SupplierOfferList from '@/components/supplier/SupplierOfferList';
 import SupplierCapability from '@/components/commercial/SupplierCapability';
+import PageContainer from '@/components/common/PageContainer';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -68,21 +69,21 @@ export default async function SupplierPage({ params }: SupplierPageProps) {
 
   const breadcrumbItems = [
     { name: '首页', url: absoluteUrl('/') },
-    { name: '产品列表', url: absoluteUrl('/products') },
+    { name: '检测产品', url: absoluteUrl('/products') },
     { name: organization.name, url: absoluteUrl(`/suppliers/${id}`) },
   ];
 
   return (
-    <div className="max-w-[1200px] mx-auto px-6 py-8">
+    <PageContainer variant="content" paddingY={32}>
       <JsonLdScript data={buildBreadcrumbListJsonLd(breadcrumbItems)} />
-      {/* Breadcrumb */}
+      {/* Breadcrumb — 846 §53: Home → Domain → Object */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
         <Link href="/" className="hover:text-primary transition-colors">
           首页
         </Link>
         <span className="text-slate-300">/</span>
         <Link href="/products" className="hover:text-primary transition-colors">
-          产品列表
+          检测产品
         </Link>
         <span className="text-slate-300">/</span>
         <span className="text-foreground truncate max-w-[200px]">
@@ -127,15 +128,15 @@ export default async function SupplierPage({ params }: SupplierPageProps) {
           <div>
             <p className="font-semibold text-foreground">与该能力提供方的下一步工程连接</p>
             <p className="text-sm text-muted-foreground mt-1">
-              核对供应能力型号、评估能力适配性，或通过询价建立工程连接（Inquiry = Connection）。
+              核对供应产品型号、评估能力适配性，或通过询价建立工程连接（Inquiry = Connection）。
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link
-              href="/search?type=supplier-product"
+              href="/products"
               className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80"
             >
-              检索其能力型号<span aria-hidden="true">→</span>
+              浏览能力注册表<span aria-hidden="true">→</span>
             </Link>
             <Link
               href="/products/compare"
@@ -152,6 +153,6 @@ export default async function SupplierPage({ params }: SupplierPageProps) {
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

@@ -120,7 +120,7 @@ export default async function KnowledgeDomainPage({ params }: DomainPageProps) {
               <p className="text-lg">该领域暂无已发布的知识条目。</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-start">
               {entries.map((entry) => (
                 <Link
                   key={entry.id}

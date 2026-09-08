@@ -11,7 +11,7 @@ export class ParameterGroupsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(params: SearchParamsDto) {
-    const { page = 1, pageSize = 20, keyword } = params;
+    const { page = 1, pageSize = 20, keyword, categoryId } = params;
     const skip = (page - 1) * pageSize;
 
     const where: Prisma.ParameterGroupWhereInput = {};
@@ -21,6 +21,9 @@ export class ParameterGroupsService {
         { code: { contains: keyword } },
       ];
     }
+    if (categoryId) {
+      where.categoryId = categoryId;
+    }
 
     const [data, total] = await Promise.all([
       this.prisma.parameterGroup.findMany({
@@ -28,6 +31,7 @@ export class ParameterGroupsService {
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
+        include: { category: true },
       }),
       this.prisma.parameterGroup.count({ where }),
     ]);
@@ -38,7 +42,7 @@ export class ParameterGroupsService {
   async findOne(id: string) {
     const group = await this.prisma.parameterGroup.findUnique({
       where: { id },
-      include: { definitions: true },
+      include: { definitions: true, category: true },
     });
     if (!group) throw new NotFoundException(`参数组 ${id} 未找到`);
     return group;

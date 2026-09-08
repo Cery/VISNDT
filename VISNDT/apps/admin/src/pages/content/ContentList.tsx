@@ -90,8 +90,8 @@ const SEO_LEVEL_CONFIG: Record<SeoLevel, { color: string; label: string }> = {
 
 const CONTENT_EXPORT_COLUMNS: ExportColumn<Content>[] = [
   { key: 'title', title: '标题' },
-  { key: 'type', title: '类型', render: (item) => TYPE_LABEL_MAP[item.type] || item.type },
-  { key: 'status', title: '状态', render: (item) => STATUS_LABEL_MAP[item.status] || item.status },
+  { key: 'type', title: '类型', render: (item) => TYPE_LABEL_MAP[item.type] || '未知' },
+  { key: 'status', title: '状态', render: (item) => STATUS_LABEL_MAP[item.status] || '未知' },
   { key: 'createdAt', title: '创建时间', render: (item) => new Date(item.createdAt).toLocaleDateString() },
   { key: 'updatedAt', title: '更新时间', render: (item) => new Date(item.updatedAt).toLocaleDateString() },
 ];
@@ -212,7 +212,7 @@ function ContentList() {
       key: 'type',
       width: 120,
       render: (type: ContentType) => (
-        <Tag color="blue">{TYPE_LABEL_MAP[type] || type}</Tag>
+        <Tag color="blue">{TYPE_LABEL_MAP[type] || '未知类型'}</Tag>
       ),
     },
     {
@@ -222,7 +222,7 @@ function ContentList() {
       width: 120,
       render: (status: ContentStatus) => (
         <Tag color={STATUS_COLOR_MAP[status] || 'default'}>
-          {STATUS_LABEL_MAP[status] || status}
+          {STATUS_LABEL_MAP[status] || '未知状态'}
         </Tag>
       ),
     },

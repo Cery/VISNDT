@@ -243,18 +243,19 @@ function ProductsPageContent() {
         {/* 受控技术网格 */}
         <div className="absolute inset-0 bg-grid-pattern bg-grid-md opacity-20" aria-hidden="true" />
         <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-primary/0 via-industrial-cyan/50 to-primary/0" aria-hidden="true" />
-        <PageContainer variant="content" paddingY={40}>
+        {/* 835 密度目标：压缩顶部引导带，让搜索/结果更快进入首屏（Result-first） */}
+        <PageContainer variant="content" paddingY={24}>
           <div className="max-w-4xl relative">
             <IndustrialBadge label="工业检测能力发现 · 能力中心" tone="cyan" />
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white mt-5 tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-extrabold text-white mt-4 tracking-tight">
             工业检测能力注册表
           </h1>
-          <p className="text-slate-400 mt-3 text-sm sm:text-base max-w-2xl leading-relaxed">
-            面向工业无损检测的能力发现平台。围绕检测场景、技术参数与能力状态，从注册能力中定位匹配的设备与方案。
+          <p className="text-slate-400 mt-2 text-sm sm:text-base max-w-2xl leading-relaxed">
+            围绕工业无损检测场景、技术参数与能力状态，从注册能力中定位匹配的设备与方案。
           </p>
           {/* mono 数据锚点：注册能力总数 */}
-          <div className="mt-5 inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5">
-            <span className="font-mono text-lg font-bold text-white tabular-nums">
+          <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-1.5">
+            <span className="font-mono text-base font-bold text-white tabular-nums">
               {productsData?.total ?? '—'}
             </span>
             <span className="text-xs text-slate-400">项已注册检测能力</span>
@@ -263,7 +264,7 @@ function ProductsPageContent() {
 
           {/* 分类能力铁轨 rail（保留既有 onCategoryChange 行为） */}
           {categories.length > 0 && (
-            <div className="mt-7 flex flex-wrap gap-2">
+            <div className="mt-5 flex flex-wrap gap-2">
               {categories.slice(0, 8).map((c, idx) => (
                 <button
                   key={c.id}
@@ -311,7 +312,13 @@ function ProductsPageContent() {
             <div className="flex flex-wrap gap-2 shrink-0">
               <button
                 type="button"
-                onClick={() => router.push('/products/compare')}
+                onClick={() =>
+                  router.push(
+                    compareIds.length > 0
+                      ? `/products/compare?ids=${compareIds.join(',')}`
+                      : '/products/compare',
+                  )
+                }
                 className="inline-flex items-center gap-1 rounded-lg border border-primary/30 text-primary text-sm font-medium px-3 py-1.5 hover:border-primary hover:bg-primary/5 transition-colors"
               >
                 评估对比<span aria-hidden="true">→</span>

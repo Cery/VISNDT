@@ -11,7 +11,7 @@ export default function KnowledgeResultCard({ content, highlight }: KnowledgeRes
   return (
     <Link
       href={`/knowledge/${content.slug}`}
-      className="block rounded-xl border border-slate-200/80 shadow-industrial-sm p-5 hover:shadow-industrial-md hover:-translate-y-1 transition-all duration-300 group"
+      className="group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-industrial-sm p-5 hover:shadow-industrial-md transition-all duration-300"
     >
       <div className="flex items-start gap-4">
         <div className="flex-1 min-w-0">
@@ -25,7 +25,7 @@ export default function KnowledgeResultCard({ content, highlight }: KnowledgeRes
                 : content.summary}
             </p>
           )}
-          <div className="flex items-center gap-3 text-xs text-slate-400">
+          <div className="mt-auto flex items-center gap-3 text-xs text-slate-400">
             <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full text-[11px] font-medium">
               知识
             </span>
@@ -35,7 +35,7 @@ export default function KnowledgeResultCard({ content, highlight }: KnowledgeRes
           </div>
         </div>
 
-        <div className="flex-shrink-0 text-slate-300 group-hover:text-primary transition-colors pt-1">
+        <div className="flex-shrink-0 self-center text-slate-300 group-hover:text-primary transition-colors">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M9 18l6-6-6-6" />
           </svg>

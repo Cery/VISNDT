@@ -1,15 +1,51 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Button, Spin, Alert, Typography, Input, Space, message, Modal, Card, Row, Col, Statistic } from 'antd';
+import { Table, Button, Spin, Alert, Typography, Input, Space, message, Modal, Card, Row, Col, Statistic, TreeSelect } from 'antd';
 import { PlusOutlined, ReloadOutlined, GroupOutlined, ToolOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { SorterResult } from 'antd/es/table/interface';
 import { parameterGroupService } from '../../api/parameter-group.service';
 import { parameterDefinitionService } from '../../api/parameter-definition.service';
+import { categoriesService } from '../../api';
 import type { ParameterGroup } from '../../types/parameter.types';
+import type { ProductCategory } from '../../types/category.types';
 import { BatchActionBar } from '../../components/operation';
 
 const { Title } = Typography;
+
+/** Build Ant Design TreeSelect treeData from ProductCategory list (parentId hierarchy) */
+function buildCategoryTreeData(catList: ProductCategory[]) {
+  const map = new Map<string, ProductCategory>();
+  for (const cat of catList) map.set(cat.id, { ...cat, children: cat.children ?? [] });
+  const roots: ProductCategory[] = [];
+  for (const node of map.values()) {
+    const parent = node.parentId ? map.get(node.parentId) : undefined;
+    if (parent) {
+      (parent.children = parent.children ?? []).push(node);
+    } else {
+      roots.push(node);
+    }
+  }
+  const toData = (node: ProductCategory): Record<string, unknown> => ({
+    title: node.name,
+    value: node.id,
+    children: (node.children ?? []).length > 0 ? (node.children as ProductCategory[]).map(toData) : undefined,
+  });
+  return roots.map(toData);
+}
+
+/** Return full category path label (e.g. 工业检测 / 内窥镜) from a category object */
+function resolveCategoryPath(cat: { id: string; name: string } | null | undefined, catList: ProductCategory[]): string {
+  if (!cat) return '-';
+  const map = new Map(catList.map((c) => [c.id, c]));
+  const chain: string[] = [];
+  let cur = map.get(cat.id);
+  while (cur) {
+    chain.unshift(cur.name);
+    cur = cur.parentId ? map.get(cur.parentId) : undefined;
+  }
+  return chain.join(' / ');
+}
 
 type PageState =
   | { status: 'loading' }
@@ -21,6 +57,7 @@ interface QueryParams {
   page: number;
   pageSize: number;
   keyword: string;
+  categoryId: string;
   sortBy: string;
   sortOrder: string;
 }
@@ -31,10 +68,12 @@ function ParameterGroupList() {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [batchLoading, setBatchLoading] = useState(false);
   const [paramStats, setParamStats] = useState({ groupCount: 0, defCount: 0 });
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [query, setQuery] = useState<QueryParams>({
     page: 1,
     pageSize: 20,
     keyword: '',
+    categoryId: '',
     sortBy: 'createdAt',
     sortOrder: 'desc',
   });
@@ -46,6 +85,7 @@ function ParameterGroupList() {
         page: query.page,
         pageSize: query.pageSize,
         keyword: query.keyword || undefined,
+        categoryId: query.categoryId || undefined,
       });
       if (result.data.length === 0) {
         setPageState({ status: 'empty' });
@@ -67,15 +107,17 @@ function ParameterGroupList() {
     fetchData();
   }, [fetchData]);
 
-  // Load parameter governance statistics
+  // Load parameter governance statistics and categories
   useEffect(() => {
     const loadStats = async () => {
       try {
-        const [groups, defs] = await Promise.all([
+        const [groups, defs, cats] = await Promise.all([
           parameterGroupService.getList({ page: 1, pageSize: 1 }),
           parameterDefinitionService.getList({ pageSize: 1 }),
+          categoriesService.getList(),
         ]);
         setParamStats({ groupCount: groups.total, defCount: defs.total });
+        setCategories(cats);
       } catch {
         // Stats load failure is non-critical
       }
@@ -105,9 +147,27 @@ function ParameterGroupList() {
     setQuery((prev) => ({ ...prev, keyword: value, page: 1 }));
   }, []);
 
-  const handleReset = useCallback(() => {
-    setQuery({ page: 1, pageSize: 20, keyword: '', sortBy: 'createdAt', sortOrder: 'desc' });
+  const handleCategoryChange = useCallback((value: string | undefined) => {
+    setQuery((prev) => ({ ...prev, categoryId: value || '', page: 1 }));
   }, []);
+
+  const handleReset = useCallback(() => {
+    setQuery({ page: 1, pageSize: 20, keyword: '', categoryId: '', sortBy: 'createdAt', sortOrder: 'desc' });
+  }, []);
+
+  const renderCategoryFilter = () => (
+    <TreeSelect
+      placeholder="按分类筛选"
+      allowClear
+      treeDefaultExpandAll
+      showSearch
+      treeNodeFilterProp="title"
+      style={{ width: 200 }}
+      value={query.categoryId || undefined}
+      onChange={handleCategoryChange}
+      treeData={buildCategoryTreeData(categories)}
+    />
+  );
 
   const handleDelete = useCallback((id: string) => {
     Modal.confirm({
@@ -194,6 +254,12 @@ function ParameterGroupList() {
       dataIndex: 'code',
       key: 'code',
       render: (code: string) => <code>{code}</code>,
+    },
+    {
+      title: '分类',
+      dataIndex: 'category',
+      key: 'category',
+      render: (cat: ParameterGroup['category']) => resolveCategoryPath(cat, categories),
     },
     {
       title: '描述',
@@ -286,6 +352,7 @@ function ParameterGroupList() {
       {pageState.status === 'empty' ? (
         <>
           <Space style={{ marginBottom: 16 }} wrap>
+            {renderCategoryFilter()}
             <Input.Search
               placeholder="搜索名称/编码..."
               allowClear
@@ -306,6 +373,7 @@ function ParameterGroupList() {
       ) : (
         <>
           <Space style={{ marginBottom: 16 }} wrap>
+            {renderCategoryFilter()}
             <Input.Search
               placeholder="搜索名称/编码..."
               allowClear

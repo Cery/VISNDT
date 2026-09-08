@@ -141,12 +141,12 @@ export default function CategoriesPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-start">
               {categories.map((cat, idx) => (
                 <Link
                   key={cat.id}
                   href={`/products?categoryId=${cat.id}`}
-                  className="group relative rounded-xl border border-slate-200/80 bg-surface-1 p-6 shadow-industrial-sm hover:shadow-industrial-md hover:border-primary/30 hover:-translate-y-0.5 transition-all duration-300"
+                  className="group relative rounded-xl border border-slate-200/80 bg-surface-1 p-6 shadow-industrial-sm hover:shadow-industrial-md hover:border-primary/30 transition-all duration-300"
                 >
                   {/* mono 序号 + 技术刻度 */}
                   <div className="flex items-center justify-between">

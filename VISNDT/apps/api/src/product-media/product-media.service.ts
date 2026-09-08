@@ -158,6 +158,58 @@ export class ProductMediaService {
     }
   }
 
+  /**
+   * Batch upload-create product media in one call.
+   * Reuses {@link createWithUpload} per file (atomic upload+create+entityId
+   * writeback with rollback). displayOrder increments from the product's
+   * current max. Per-file failures do not abort the batch.
+   */
+  async createWithUploadBatch(
+    productId: string,
+    files: Express.Multer.File[],
+    dto: CreateProductMediaDto,
+    userId: string,
+  ) {
+    await this.ensureProductExists(productId);
+
+    const last = await this.prisma.productMedia.findFirst({
+      where: { productId },
+      orderBy: { displayOrder: 'desc' },
+      select: { displayOrder: true },
+    });
+    const baseOrder = (last?.displayOrder ?? -1) + 1;
+
+    const created: Awaited<ReturnType<typeof this.createWithUpload>>[] = [];
+    const failed: { fileName: string; reason: string }[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (!file) {
+        failed.push({ fileName: 'unknown', reason: 'NO_FILE' });
+        continue;
+      }
+      try {
+        const media = await this.createWithUpload(
+          productId,
+          file,
+          { ...dto, displayOrder: baseOrder + i },
+          userId,
+        );
+        created.push(media);
+      } catch (err) {
+        this.logger.error(
+          `Batch media upload failed for ${file.originalname}: ${(err as Error).message}`,
+        );
+        failed.push({ fileName: file.originalname, reason: (err as Error).message });
+      }
+    }
+
+    this.logger.log(
+      `Batch product media upload: ${created.length} created, ${failed.length} failed`,
+    );
+    return { created, failed };
+  }
+
   async update(productId: string, id: string, dto: UpdateProductMediaDto) {
     const media = await this.findOne(productId, id);
 

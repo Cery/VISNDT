@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Form, Input, Select, Button, Space, Spin, Alert, message, Upload, Card, Divider, InputNumber, Image, Row, Col, Tag, Typography } from 'antd';
+import { Form, Input, Select, Button, Space, Spin, Alert, message, Upload, Card, Divider, InputNumber, Image, Row, Col, Tag, Typography, TreeSelect, Empty } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeftOutlined, UploadOutlined, PictureOutlined } from '@ant-design/icons';
 import { categoriesService, parameterDefinitionService, productParameterService, productMediaService } from '../../api';
@@ -16,6 +16,8 @@ interface ProductCategory {
   id: string;
   name: string;
   slug: string;
+  parentId?: string;
+  children?: ProductCategory[];
 }
 
 interface ProductFormProps {
@@ -29,7 +31,28 @@ interface ProductFormProps {
 type FormState =
   | { status: 'loading' }
   | { status: 'error'; message: string }
-  | { status: 'ready'; categories: ProductCategory[]; parameterDefinitions: ParameterDefinition[] };
+  | { status: 'ready'; categories: ProductCategory[] };
+
+/** Build Ant Design TreeSelect treeData from ProductCategory hierarchy */
+function buildTreeData(categories: ProductCategory[]) {
+  const map = new Map<string, ProductCategory>();
+  for (const c of categories) map.set(c.id, { ...c, children: [] });
+  const roots: ProductCategory[] = [];
+  for (const node of map.values()) {
+    const parent = node.parentId ? map.get(node.parentId) : undefined;
+    if (parent) {
+      (parent.children = parent.children ?? []).push(node);
+    } else {
+      roots.push(node);
+    }
+  }
+  const toData = (node: ProductCategory): Record<string, unknown> => ({
+    title: node.name,
+    value: node.id,
+    children: (node.children ?? []).length > 0 ? (node.children as ProductCategory[]).map(toData) : undefined,
+  });
+  return roots.map(toData);
+}
 
 export default function ProductForm({ initialValues, onSubmit, submitLabel, title, productId }: ProductFormProps) {
   const navigate = useNavigate();
@@ -39,24 +62,51 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [parameterValues, setParameterValues] = useState<Record<string, { value: string; valueNumber?: number }>>({});
   const [existingMedia, setExistingMedia] = useState<ProductMediaItem[]>([]);
+  // Cascading: parameter definitions are loaded only after a category is selected
+  const [categoryId, setCategoryId] = useState<string | undefined>(initialValues?.categoryId);
+  const [parameterDefinitions, setParameterDefinitions] = useState<ParameterDefinition[]>([]);
+  const [paramsLoading, setParamsLoading] = useState(false);
 
   const loadFormData = useCallback(async () => {
     setFormState({ status: 'loading' });
     try {
-      const [categories, paramDefs] = await Promise.all([
-        categoriesService.getList(),
-        parameterDefinitionService.getList({ pageSize: 100 }),
-      ]);
-      setFormState({ status: 'ready', categories, parameterDefinitions: paramDefs.data });
+      const categories = await categoriesService.getList();
+      setFormState({ status: 'ready', categories });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '加载表单数据失败';
       setFormState({ status: 'error', message: errorMessage });
     }
   }, []);
 
+  const loadParameterDefinitions = useCallback(async (catId: string | undefined) => {
+    if (!catId) {
+      setParameterDefinitions([]);
+      return;
+    }
+    setParamsLoading(true);
+    try {
+      const res = await parameterDefinitionService.getList({ categoryId: catId, pageSize: 100 });
+      setParameterDefinitions(res.data);
+    } catch {
+      setParameterDefinitions([]);
+    } finally {
+      setParamsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadFormData();
   }, [loadFormData]);
+
+  // Load cascade parameters once categories are ready (edit mode echo initial category)
+  useEffect(() => {
+    if (formState.status === 'ready' && formState.categories.length > 0 && initialValues?.categoryId) {
+      setCategoryId(initialValues.categoryId);
+      form.setFieldsValue({ categoryId: initialValues.categoryId });
+      loadParameterDefinitions(initialValues.categoryId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formState.status]);
 
   useEffect(() => {
     if (initialValues) {
@@ -108,6 +158,14 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
         // silently fail — upload remains available
       })
   }, [productId]);
+
+  const handleCategoryChange = (value: string | undefined) => {
+    setCategoryId(value);
+    form.setFieldsValue({ categoryId: value });
+    // Switching category invalidates previously chosen parameters → clear them
+    setParameterValues({});
+    loadParameterDefinitions(value);
+  };
 
   const handleParameterChange = (defId: string, value: string, dataType: string) => {
     const numValue = dataType === 'NUMBER' ? parseFloat(value) : undefined;
@@ -187,8 +245,8 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
     );
   }
 
-  // Group parameter definitions by their group name
-  const groupedParams = formState.parameterDefinitions.reduce<Record<string, ParameterDefinition[]>>(
+  // Group cascade-loaded parameter definitions by their group name
+  const groupedParams = parameterDefinitions.reduce<Record<string, ParameterDefinition[]>>(
     (acc, def) => {
       const groupName = def.group?.name || '其他参数';
       if (!acc[groupName]) acc[groupName] = [];
@@ -231,12 +289,13 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
             name="categoryId"
             rules={[{ required: true, message: '请选择分类' }]}
           >
-            <Select
-              placeholder="请选择分类"
-              options={formState.categories.map((c) => ({
-                value: c.id,
-                label: c.name,
-              }))}
+            <TreeSelect
+              showSearch
+              treeDefaultExpandAll
+              placeholder="请选择分类（可按层级展开）"
+              treeData={buildTreeData(formState.categories)}
+              onChange={handleCategoryChange}
+              treeNodeFilterProp="title"
             />
           </Form.Item>
 
@@ -255,7 +314,21 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
           </Form.Item>
         </Card>
 
-        {Object.entries(groupedParams).length > 0 && (
+        {paramsLoading ? (
+          <Card title="参数配置" style={{ marginBottom: 16 }}>
+            <div style={{ textAlign: 'center', padding: 24 }}>
+              <Spin size="small" />
+              <div style={{ color: '#999', marginTop: 8 }}>正在加载该分类下的参数定义...</div>
+            </div>
+          </Card>
+        ) : !categoryId ? (
+          <Card title="参数配置" style={{ marginBottom: 16 }}>
+            <Empty
+              description="请先选择分类，参数将按所选分类动态加载"
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+            />
+          </Card>
+        ) : Object.entries(groupedParams).length > 0 ? (
           <Card title="参数配置" style={{ marginBottom: 16 }}>
             {Object.entries(groupedParams).map(([groupName, defs]) => (
               <div key={groupName} style={{ marginBottom: 16 }}>
@@ -303,10 +376,13 @@ export default function ProductForm({ initialValues, onSubmit, submitLabel, titl
               </div>
             ))}
           </Card>
+        ) : (
+          <Card title="参数配置" style={{ marginBottom: 16 }}>
+            <Empty description="该分类下暂无可用的参数定义" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          </Card>
         )}
 
         <Card title="媒体资源" style={{ marginBottom: 16 }}>
-          {/* Existing Media Display (edit mode) */}
           {productId && existingMedia.length > 0 && (
             <div style={{ marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>

@@ -3,8 +3,17 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { OrganizationStatus, Prisma, SupplierProductStatus } from '@prisma/client';
+import {
+  FileEntityType,
+  FileType,
+  OrganizationStatus,
+  Prisma,
+  SupplierProductStatus,
+} from '@prisma/client';
+import { Express } from 'express';
 import { PrismaService } from '../prisma/prisma.service';
+import { FileAssetService } from '../file-asset/file-asset.service';
+import { StorageService } from '../storage/storage.service';
 
 /**
  * 816 — Supplier organization type recognition.
@@ -63,7 +72,11 @@ export interface CreateSupplierProductInput {
  */
 @Injectable()
 export class SupplierProductsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly fileAssetService: FileAssetService,
+    private readonly storage: StorageService,
+  ) {}
 
   /**
    * Create a SUPPLIER_PRODUCT DRAFT entity.
@@ -194,7 +207,11 @@ export class SupplierProductsService {
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
-        include: { platformProduct: true, organization: true },
+        include: {
+          platformProduct: true,
+          organization: true,
+          _count: { select: { media: true, parameterValues: true } },
+        },
       }),
       this.prisma.supplierProduct.count({ where }),
     ]);
@@ -486,6 +503,288 @@ export class SupplierProductsService {
     await this.validateForOrganization(id, organizationId);
     await this.update(id, dto);
     return this.findOne(id, organizationId);
+  }
+
+  // =============================================================
+  // WP-5A — SupplierProduct Media Write (R1), org-scoped self-service
+  // =============================================================
+
+  /**
+   * Atomic upload + create a SupplierProductMedia for an OWN SupplierProduct.
+   * Uploads the file to storage, creates the FileAsset, then binds it as a
+   * SupplierProductMedia. Mirrors the ProductMedia#createWithUpload pattern but
+   * scoped to the authenticated organization + editable life-cycle state.
+   */
+  async createMediaWithUpload(
+    supplierProductId: string,
+    organizationId: string,
+    file: Express.Multer.File,
+    dto: {
+      mediaType?: FileType;
+      title?: string;
+      altText?: string;
+      isPrimary?: boolean;
+      displayOrder?: number;
+    },
+    userId: string,
+  ) {
+    await this.requireOwnEditable(supplierProductId, organizationId);
+
+    const fileAsset = await this.fileAssetService.upload(
+      file,
+      userId,
+      FileEntityType.PRODUCT,
+      dto.mediaType ?? FileType.IMAGE,
+    );
+
+    try {
+      const media = await this.prisma.supplierProductMedia.create({
+        data: {
+          supplierProductId,
+          fileAssetId: fileAsset.id,
+          mediaType: dto.mediaType ?? FileType.IMAGE,
+          title: dto.title,
+          altText: dto.altText,
+          isPrimary: dto.isPrimary ?? false,
+          displayOrder:
+            dto.displayOrder ?? (await this.nextDisplayOrder(supplierProductId)),
+        },
+        include: { fileAsset: true },
+      });
+
+      await this.linkFileAsset(fileAsset.id, media.id);
+      if (media.isPrimary) {
+        await this.demoteOtherPrimary(supplierProductId, media.id);
+      }
+      return media;
+    } catch (err) {
+      try {
+        await this.fileAssetService.delete(fileAsset.id);
+      } catch {
+        // best-effort storage rollback on create failure
+      }
+      throw err;
+    }
+  }
+
+  /**
+   * Create a SupplierProductMedia bound to an already-uploaded FileAsset.
+   */
+  async createMedia(
+    supplierProductId: string,
+    organizationId: string,
+    dto: {
+      fileAssetId?: string;
+      mediaType?: FileType;
+      title?: string;
+      altText?: string;
+      isPrimary?: boolean;
+      displayOrder?: number;
+    },
+  ) {
+    await this.requireOwnEditable(supplierProductId, organizationId);
+    if (!dto.fileAssetId) {
+      throw new BadRequestException(
+        'fileAssetId is required to create media from an existing asset.',
+      );
+    }
+    const media = await this.prisma.supplierProductMedia.create({
+      data: {
+        supplierProductId,
+        fileAssetId: dto.fileAssetId,
+        mediaType: dto.mediaType ?? FileType.IMAGE,
+        title: dto.title,
+        altText: dto.altText,
+        isPrimary: dto.isPrimary ?? false,
+        displayOrder:
+          dto.displayOrder ?? (await this.nextDisplayOrder(supplierProductId)),
+      },
+      include: { fileAsset: true },
+    });
+    await this.linkFileAsset(dto.fileAssetId, media.id);
+    if (media.isPrimary) {
+      await this.demoteOtherPrimary(supplierProductId, media.id);
+    }
+    return media;
+  }
+
+  /**
+   * Update metadata / ordering / primary for one media of an OWN SupplierProduct.
+   */
+  async updateMedia(
+    supplierProductId: string,
+    organizationId: string,
+    mediaId: string,
+    dto: { title?: string; altText?: string; isPrimary?: boolean; displayOrder?: number },
+  ) {
+    await this.requireOwnEditable(supplierProductId, organizationId);
+    await this.findOwnMedia(supplierProductId, mediaId);
+
+    const data: Prisma.SupplierProductMediaUpdateInput = {};
+    if (dto.title !== undefined) data.title = dto.title;
+    if (dto.altText !== undefined) data.altText = dto.altText;
+    if (dto.displayOrder !== undefined) data.displayOrder = dto.displayOrder;
+    if (dto.isPrimary !== undefined) {
+      data.isPrimary = dto.isPrimary;
+      if (dto.isPrimary) {
+        await this.demoteOtherPrimary(supplierProductId, mediaId);
+      }
+    }
+
+    return this.prisma.supplierProductMedia.update({
+      where: { id: mediaId },
+      data,
+      include: { fileAsset: true },
+    });
+  }
+
+  /**
+   * Delete one media of an OWN SupplierProduct (persistence + storage cleanup).
+   */
+  async removeMedia(
+    supplierProductId: string,
+    organizationId: string,
+    mediaId: string,
+  ) {
+    await this.requireOwnEditable(supplierProductId, organizationId);
+    const media = await this.findOwnMedia(supplierProductId, mediaId);
+    const fileAssetId = media.fileAssetId ?? null;
+
+    await this.prisma.supplierProductMedia.delete({ where: { id: mediaId } });
+    if (fileAssetId) {
+      try {
+        await this.fileAssetService.delete(fileAssetId);
+      } catch {
+        // best-effort storage cleanup after DB consistency
+      }
+    }
+    return { id: mediaId };
+  }
+
+  // =============================================================
+  // WP-5A — SupplierProduct Parameter Write (R2), org-scoped self-service
+  // =============================================================
+
+  /**
+   * Full-set replace of SupplierProduct parameter overrides.
+   * Upserts every provided item (unique supplierProductId + parameterDefinitionId);
+   * removes any persisted override not present in the list. Parameter Definition
+   * authority stays untouched (Platform Product holds definitions).
+   */
+  async setParameterOverrides(
+    supplierProductId: string,
+    organizationId: string,
+    items: { parameterDefinitionId: string; value: string; valueNumber?: number }[],
+  ) {
+    await this.requireOwnEditable(supplierProductId, organizationId);
+
+    await this.prisma.$transaction(async (tx) => {
+      for (const it of items) {
+        await tx.supplierProductParameterValue.upsert({
+          where: {
+            supplierProductId_parameterDefinitionId: {
+              supplierProductId,
+              parameterDefinitionId: it.parameterDefinitionId,
+            },
+          },
+          create: {
+            supplierProductId,
+            parameterDefinitionId: it.parameterDefinitionId,
+            value: it.value,
+            valueNumber: it.valueNumber ?? null,
+          },
+          update: {
+            value: it.value,
+            valueNumber: it.valueNumber ?? null,
+          },
+        });
+      }
+      const wanted = new Set(items.map((i) => i.parameterDefinitionId));
+      await tx.supplierProductParameterValue.deleteMany({
+        where: {
+          supplierProductId,
+          parameterDefinitionId: { notIn: [...wanted] },
+        },
+      });
+    });
+
+    return this.findOne(supplierProductId, organizationId);
+  }
+
+  // ---- WP-5A media/parameter helper guards ----
+
+  private async requireOwnEditable(
+    supplierProductId: string,
+    organizationId: string,
+  ) {
+    const row = await this.prisma.supplierProduct.findFirst({
+      where: { id: supplierProductId, organizationId },
+      select: { id: true, status: true },
+    });
+    if (!row) {
+      throw new NotFoundException(
+        `SupplierProduct ${supplierProductId} not found in organization ${organizationId}`,
+      );
+    }
+    if (
+      row.status !== SupplierProductStatus.DRAFT &&
+      row.status !== SupplierProductStatus.APPROVED
+    ) {
+      throw new BadRequestException(
+        `SupplierProduct is in "${row.status}"; media/parameter editing is only allowed in DRAFT or APPROVED (unpublish published records first).`,
+      );
+    }
+    return row;
+  }
+
+  private async findOwnMedia(
+    supplierProductId: string,
+    mediaId: string,
+  ): Promise<{
+    id: string;
+    fileAssetId: string | null;
+    fileAsset?: unknown;
+  }> {
+    const media = await this.prisma.supplierProductMedia.findFirst({
+      where: { id: mediaId, supplierProductId },
+      include: { fileAsset: true },
+    });
+    if (!media) {
+      throw new NotFoundException(
+        `SupplierProductMedia ${mediaId} not found for SupplierProduct ${supplierProductId}`,
+      );
+    }
+    return media;
+  }
+
+  private async nextDisplayOrder(supplierProductId: string): Promise<number> {
+    const last = await this.prisma.supplierProductMedia.findFirst({
+      where: { supplierProductId },
+      orderBy: { displayOrder: 'desc' },
+      select: { displayOrder: true },
+    });
+    return (last?.displayOrder ?? -1) + 1;
+  }
+
+  private async demoteOtherPrimary(
+    supplierProductId: string,
+    keepMediaId: string,
+  ) {
+    await this.prisma.supplierProductMedia.updateMany({
+      where: { supplierProductId, id: { not: keepMediaId }, isPrimary: true },
+      data: { isPrimary: false },
+    });
+  }
+
+  private async linkFileAsset(fileAssetId: string, mediaId: string) {
+    try {
+      await this.prisma.fileAsset.update({
+        where: { id: fileAssetId },
+        data: { entityId: mediaId },
+      });
+    } catch {
+      // best-effort: non-fatal when the FileAsset row is unavailable
+    }
   }
 
   /**

@@ -91,7 +91,7 @@ export default function RfqDetailPage() {
     try {
       setUpdating(true);
       await rfqService.update(id, { status: newStatus as Rfq['status'] });
-      message.success(`询价单状态已更新为 ${RFQ_STATUS_LABEL_MAP[newStatus] || newStatus}`);
+      message.success(`询价单状态已更新为 ${RFQ_STATUS_LABEL_MAP[newStatus] || '未知状态'}`);
       fetchRfq();
     } catch (err) {
       const msg = err instanceof Error ? err.message : '更新状态失败';
@@ -251,7 +251,7 @@ export default function RfqDetailPage() {
             <BusinessIdentityBadge type="RFQ" id={rfq.id} createdAt={rfq.createdAt} />
           </Descriptions.Item>
           <Descriptions.Item label="状态">
-            <StatusTag status={rfq.status} label={RFQ_STATUS_LABEL_MAP[rfq.status] || rfq.status} />
+            <StatusTag status={rfq.status} label={RFQ_STATUS_LABEL_MAP[rfq.status] || '未知状态'} />
           </Descriptions.Item>
           <Descriptions.Item label="需求">
             {rfq.demand?.title || '-'}
@@ -259,7 +259,7 @@ export default function RfqDetailPage() {
           <Descriptions.Item label="买方组织">
             {rfq.demand?.organization?.name || '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="目标能力提供方">
+          <Descriptions.Item label="目标供应商">
             {rfq.targetOrganization?.name || '-'}
           </Descriptions.Item>
           <Descriptions.Item label="创建者">
@@ -285,7 +285,7 @@ export default function RfqDetailPage() {
               onChange={handleStatusChange}
               options={allowedTransitions.map((s) => ({
                 value: s,
-                label: RFQ_STATUS_LABEL_MAP[s] || s,
+                label: RFQ_STATUS_LABEL_MAP[s] || '未知状态',
               }))}
               style={{ minWidth: 160 }}
             />

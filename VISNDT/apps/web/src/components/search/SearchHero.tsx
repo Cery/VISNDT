@@ -7,10 +7,10 @@ import IndustrialBadge from '@/components/brand/IndustrialBadge';
  * Elevates search from an auxiliary header tool into the core entry point for
  * Industrial Inspection Capability Discovery. Reuses the existing
  * GlobalSearchBar (no new search logic, API, or data structure) and expresses
- * only the legal search domains (检测能力 / 能力型号 / 知识 / 方案).
+ * only the legal search domains (检测能力 / 产品型号 / 知识 / 方案).
  */
 
-const SEARCH_DOMAIN_HINTS = ['检测能力', '能力型号', '知识', '方案'];
+const SEARCH_DOMAIN_HINTS = ['检测能力', '产品型号', '知识', '方案'];
 
 export default function SearchHero() {
   return (
@@ -35,7 +35,7 @@ export default function SearchHero() {
 
         {/* Capability discovery description */}
         <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto mb-8 leading-relaxed">
-          按能力型号、检测参数或技术关键词，发现工业检测能力、能力型号、技术知识与解决方案。
+          按产品型号、检测参数或技术关键词，发现工业检测能力、产品型号、技术知识与解决方案。
         </p>
 
         {/* Large search box — reuses existing GlobalSearchBar search logic */}

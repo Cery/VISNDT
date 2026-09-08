@@ -63,7 +63,7 @@ function SupplierProductList() {
       }
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : '加载能力型号池失败';
+        err instanceof Error ? err.message : '加载产品型号池失败';
       setPageState({ status: 'error', message });
     }
   }, [query]);
@@ -92,10 +92,10 @@ function SupplierProductList() {
     <div style={{ marginBottom: 24 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-        <Title level={4} style={{ margin: 0 }}>能力型号管理</Title>
+        <Title level={4} style={{ margin: 0 }}>产品型号管理</Title>
       </div>
       <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-        能力型号审核池 — 平台级审核，跨组织
+        产品型号审核池 — 平台级审核，跨组织
       </Text>
     </div>
   );
@@ -118,7 +118,7 @@ function SupplierProductList() {
         icon={<PlusOutlined />}
         onClick={() => navigate('/supplier-products/create')}
       >
-        新建能力型号
+        新建产品型号
       </Button>
     </Space>
   );
@@ -135,7 +135,7 @@ function SupplierProductList() {
     return (
       <Alert
         type="error"
-        message="加载能力型号池失败"
+        message="加载产品型号池失败"
         description={pageState.message}
         showIcon
         action={
@@ -154,8 +154,8 @@ function SupplierProductList() {
         {renderToolbar()}
         <Alert
           type="info"
-          message="暂无能力型号"
-          description="当前没有可审核的能力型号。"
+          message="暂无产品型号"
+          description="当前没有可审核的产品型号。"
           showIcon
         />
       </div>
@@ -194,7 +194,7 @@ function SupplierProductList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || status} />
+        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || '未知状态'} />
       ),
     },
     {
@@ -228,7 +228,7 @@ function SupplierProductList() {
           type="info"
           showIcon
           style={{ marginBottom: 16 }}
-          message={`已选择 ${selectedRowKeys.length} 项能力型号`}
+          message={`已选择 ${selectedRowKeys.length} 项产品型号`}
           description={
             <Space direction="vertical" size={4}>
               <Text type="secondary" style={{ fontSize: 12 }}>

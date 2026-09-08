@@ -14,4 +14,9 @@ export class CreateParameterGroupDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @ApiPropertyOptional({ description: 'Associated product category ID' })
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
 }

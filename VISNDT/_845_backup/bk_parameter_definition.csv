@@ -1,0 +1,3 @@
+id,parameter_group_id,name,parameter_code,value_unit,required,created_at,updated_at,data_type
+a89a3ba0-98fe-413d-9081-514b9cfa85db,f93a2519-eede-4067-a8de-db2c2e9760c2,E2E测试参数,e2e_test_param,,f,2026-08-21 22:52:35.098,2026-08-21 22:52:35.098,STRING
+9aab3df1-6acf-4c18-ab0b-4cde1e804064,,TC715-1787693599528 枚举参数,enum-tc715-1787693599528,,f,2026-08-25 21:33:19.995,2026-08-25 21:33:19.995,ENUM

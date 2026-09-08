@@ -3,6 +3,7 @@ import { SupplierProductsService } from './supplier-products.service';
 import { SupplierProductsController } from './supplier-products.controller';
 import { SupplierProductsSelfServiceController } from './supplier-products-self-service.controller';
 import { SupplierSelfServiceGuard } from './supplier-self-service.guard';
+import { FileAssetModule } from '../file-asset/file-asset.module';
 
 /**
  * SupplierProductsModule — M28.0 Hybrid Model C Domain Service + API transport.
@@ -19,6 +20,7 @@ import { SupplierSelfServiceGuard } from './supplier-self-service.guard';
  *   gated by SupplierSelfServiceGuard (enabled supplier org, existing membership).
  */
 @Module({
+  imports: [FileAssetModule],
   controllers: [SupplierProductsController, SupplierProductsSelfServiceController],
   providers: [SupplierProductsService, SupplierSelfServiceGuard],
   exports: [SupplierProductsService],

@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
-import { ContentStatus, FileAssetStatus, FileEntityType, FileType, Prisma } from '@prisma/client';
+import { ContentStatus, FileAsset, FileAssetStatus, FileEntityType, FileType, Prisma } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { Express } from 'express';
 
@@ -202,8 +202,10 @@ export class FileAssetService {
   private static readonly PLACEHOLDER_ENTITY_ID = '00000000-0000-0000-0000-000000000000';
 
   /**
-   * Find orphan FileAssets — records with no associated ProductMedia
-   * and entityId still set to the placeholder.
+   * Find orphan FileAssets — records with no associated media reference,
+   * entityId still set to the placeholder, and no explicit ownership
+   * (organizationId must be null). Ownership-tagged batch uploads are NOT
+   * orphans and must not be swept by orphan cleanup.
    */
   async findOrphans() {
     this.logger.log('Querying orphan FileAssets');
@@ -211,7 +213,11 @@ export class FileAssetService {
     const orphans = await this.prisma.fileAsset.findMany({
       where: {
         entityId: FileAssetService.PLACEHOLDER_ENTITY_ID,
+        organizationId: null,
         media: { none: {} },
+        contentMedia: { none: {} },
+        contentCoverImages: { none: {} },
+        supplierProductMedia: { none: {} },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -240,11 +246,20 @@ export class FileAssetService {
 
     for (const id of ids) {
       try {
-        // Re-validate: must be a true orphan before deletion
+        // Re-validate: must be a true orphan before deletion.
+        // A file is only a safe orphan when it has no ownership, no media
+        // attachment, and references nothing across all media relations.
         const fileAsset = await this.prisma.fileAsset.findUnique({
           where: { id },
           include: {
-            _count: { select: { media: true } },
+            _count: {
+              select: {
+                media: true,
+                contentMedia: true,
+                contentCoverImages: true,
+                supplierProductMedia: true,
+              },
+            },
           },
         });
 
@@ -262,9 +277,29 @@ export class FileAssetService {
           continue;
         }
 
+        if (fileAsset.organizationId !== null) {
+          this.logger.warn(
+            `Skip orphan ${id}: owned by organization ${fileAsset.organizationId}`,
+          );
+          failed.push(id);
+          continue;
+        }
+
         if (fileAsset._count.media > 0) {
           this.logger.warn(
             `Skip orphan ${id}: still referenced by ${fileAsset._count.media} ProductMedia`,
+          );
+          failed.push(id);
+          continue;
+        }
+
+        if (
+          fileAsset._count.contentMedia > 0 ||
+          fileAsset._count.contentCoverImages > 0 ||
+          fileAsset._count.supplierProductMedia > 0
+        ) {
+          this.logger.warn(
+            `Skip orphan ${id}: still referenced by content/supplier media`,
           );
           failed.push(id);
           continue;
@@ -288,11 +323,149 @@ export class FileAssetService {
   }
 
   async batchDelete(ids: string[]) {
-    const result = await this.prisma.fileAsset.deleteMany({
-      where: { id: { in: ids } },
+    let deleted = 0;
+    const failed: { id: string; reason: string }[] = [];
+
+    for (const id of ids) {
+      const check = await this.canDeleteSafely(id);
+      if (!check.ok) {
+        failed.push({ id, reason: check.reason! });
+        continue;
+      }
+      try {
+        await this.delete(id);
+        deleted++;
+      } catch (err) {
+        this.logger.error(
+          `Batch delete ${id} failed: ${(err as Error).message}`,
+        );
+        failed.push({ id, reason: 'DELETE_FAILED' });
+      }
+    }
+
+    this.logger.log(
+      `Batch delete complete: ${deleted} deleted, ${failed.length} failed`,
+    );
+    return { deleted, failed };
+  }
+
+  /**
+   * Determine whether a FileAsset can be safely deleted:
+   * must exist and not be referenced by any media relation.
+   */
+  private async canDeleteSafely(
+    id: string,
+  ): Promise<{ ok: boolean; reason?: string }> {
+    const fileAsset = await this.prisma.fileAsset.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: {
+            media: true,
+            contentMedia: true,
+            contentCoverImages: true,
+            supplierProductMedia: true,
+          },
+        },
+      },
     });
-    this.logger.log(`Batch deleted ${result.count} FileAssets`);
-    return { deletedCount: result.count };
+
+    if (!fileAsset) return { ok: false, reason: 'NOT_FOUND' };
+    if (fileAsset._count.media > 0) {
+      return { ok: false, reason: 'REFERENCED_BY_PRODUCT_MEDIA' };
+    }
+    if (fileAsset._count.contentMedia > 0) {
+      return { ok: false, reason: 'REFERENCED_BY_CONTENT_MEDIA' };
+    }
+    if (fileAsset._count.contentCoverImages > 0) {
+      return { ok: false, reason: 'REFERENCED_BY_CONTENT_COVER' };
+    }
+    if (fileAsset._count.supplierProductMedia > 0) {
+      return { ok: false, reason: 'REFERENCED_BY_SUPPLIER_PRODUCT_MEDIA' };
+    }
+    return { ok: true };
+  }
+
+  /**
+   * Batch upload files with ownership tagging (ADMIN media center).
+   *
+   * Unlike {@link upload}, each file's organizationId is taken from the
+   * caller (not derived from the uploader) so the asset is ownership-tagged
+   * and can later be attached to an entity — never treated as a bare orphan.
+   * entityId stays at the placeholder until attached to a real entity.
+   *
+   * Per-file failures are collected and do not abort the whole batch.
+   */
+  async batchUploadWithOwnership(
+    files: Express.Multer.File[],
+    userId: string,
+    opts: {
+      fileType?: FileType;
+      organizationId?: string | null;
+      entityType?: FileEntityType;
+    },
+  ): Promise<{ created: FileAsset[]; failed: { fileName: string; reason: string }[] }> {
+    const created: FileAsset[] = [];
+    const failed: { fileName: string; reason: string }[] = [];
+
+    for (const file of files) {
+      if (!file) {
+        failed.push({ fileName: 'unknown', reason: 'NO_FILE' });
+        continue;
+      }
+
+      try {
+        this.validateFile(file);
+
+        const ext = file.originalname.split('.').pop() || 'bin';
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const storageKey = `uploads/${timestamp}-${randomUUID()}.${ext}`;
+
+        await this.storage.upload(file.buffer, storageKey, file.mimetype);
+
+        try {
+          const fileAsset = await this.prisma.fileAsset.create({
+            data: {
+              entityType: opts.entityType ?? FileEntityType.PRODUCT,
+              entityId: FileAssetService.PLACEHOLDER_ENTITY_ID,
+              fileType:
+                opts.fileType ?? this.mapMimeTypeToFileType(file.mimetype),
+              fileName: file.originalname,
+              storageKey,
+              mimeType: file.mimetype,
+              fileSize: file.size,
+              uploadedBy: userId,
+              organizationId: opts.organizationId ?? null,
+              status: FileAssetStatus.ACTIVE,
+            },
+          });
+          created.push(fileAsset);
+        } catch (err) {
+          this.logger.error(
+            `Batch upload DB create failed for ${file.originalname}: ${(err as Error).message}`,
+          );
+          // Rollback the just-uploaded object (best-effort)
+          try {
+            await this.storage.deleteObject(storageKey);
+          } catch (cleanupErr) {
+            this.logger.error(
+              `Failed to rollback object ${storageKey}: ${(cleanupErr as Error).message}`,
+            );
+          }
+          failed.push({ fileName: file.originalname, reason: 'DB_CREATE_FAILED' });
+        }
+      } catch (err) {
+        this.logger.error(
+          `Batch upload rejected ${file.originalname}: ${(err as Error).message}`,
+        );
+        failed.push({ fileName: file.originalname, reason: (err as Error).message });
+      }
+    }
+
+    this.logger.log(
+      `Batch upload with ownership: ${created.length} created, ${failed.length} failed`,
+    );
+    return { created, failed };
   }
 
   /**

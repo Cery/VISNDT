@@ -171,7 +171,7 @@ export default function KnowledgeEntryEdit() {
   const refColumns: ColumnsType<KnowledgeContentRef> = [
     { title: '内容', dataIndex: ['content', 'title'], key: 'content', ellipsis: true },
     { title: '类型', key: 'type', width: 100, render: (_, r) => (
-      <Tag>{knowledgeLabels.referenceType[r.referenceType] ?? r.referenceType}</Tag>
+      <Tag>{knowledgeLabels.referenceType[r.referenceType] ?? '未知类型'}</Tag>
     )},
     { title: '排序', dataIndex: 'sortOrder', key: 'sortOrder', width: 80 },
     { title: '操作', key: 'actions', width: 80, render: (_, r) => (
@@ -194,7 +194,7 @@ export default function KnowledgeEntryEdit() {
     }},
     { title: '类型', key: 'type', width: 100, render: (_, r: any) => {
       const type = r.relationType as string;
-      return <Tag>{(knowledgeLabels.relationType as Record<string, string>)[type] ?? type}</Tag>;
+      return <Tag>{(knowledgeLabels.relationType as Record<string, string>)[type] ?? '未知类型'}</Tag>;
     }},
     { title: '描述', dataIndex: 'description', key: 'description', width: 120, ellipsis: true },
     { title: '操作', key: 'actions', width: 80, render: (_, r: any) => (
@@ -275,7 +275,7 @@ export default function KnowledgeEntryEdit() {
         <Title level={4} className="!mb-0">
           编辑知识条目
           <Tag color={STATUS_COLORS[entry.status] ?? 'default'} className="ml-2">
-            {knowledgeLabels.status[entry.status as KnowledgeEntryStatus] ?? entry.status}
+            {knowledgeLabels.status[entry.status as KnowledgeEntryStatus] ?? '未知状态'}
           </Tag>
         </Title>
         <Button icon={<ReloadOutlined />} onClick={loadData}>刷新</Button>

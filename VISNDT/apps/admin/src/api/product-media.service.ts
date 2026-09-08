@@ -72,6 +72,39 @@ export const productMediaService = {
     return response.data;
   },
 
+  /**
+   * Batch upload-create product media in one request.
+   * Each file travels as a repeated `files` multipart field; all files share
+   * the provided metadata (mediaType required). displayOrder is auto-incremented
+   * by the backend.
+   * Calls POST /products/:productId/media/batch-upload (ADMIN only, max 10 files).
+   * @param productId - Product UUID
+   * @param files - Files to upload
+   * @param metadata - Shared media metadata (mediaType required)
+   * @returns Aggregated created items and per-file failures
+   */
+  async createWithUploadBatch(
+    productId: string,
+    files: File[],
+    metadata: Pick<CreateProductMediaDto, 'mediaType'> & Partial<CreateProductMediaDto>,
+  ): Promise<{ created: ProductMediaItem[]; failed: { fileName: string; reason: string }[] }> {
+    const formData = new FormData();
+    for (const f of files) formData.append('files', f);
+    formData.append('mediaType', metadata.mediaType);
+    if (metadata.title) formData.append('title', metadata.title);
+    if (metadata.description) formData.append('description', metadata.description);
+
+    const response = (await apiClient.post(
+      `/products/${productId}/media/batch-upload`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    )) as unknown as ApiResponseWrapper<{
+      created: ProductMediaItem[];
+      failed: { fileName: string; reason: string }[];
+    }>;
+    return response.data;
+  },
+
   async update(
     productId: string,
     id: string,

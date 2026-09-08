@@ -31,7 +31,7 @@ export default function SearchResultSection({
       </div>
 
       {loading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 items-start">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
@@ -58,7 +58,7 @@ export default function SearchResultSection({
       )}
 
       {!loading && !error && count > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 items-start">
           {children}
         </div>
       )}

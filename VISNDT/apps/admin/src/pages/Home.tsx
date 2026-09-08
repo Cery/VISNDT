@@ -497,7 +497,7 @@ function Home() {
             { title: '内容资产', value: stats.content.total, icon: <FileTextOutlined />, tone: 'success', hint: '已发布的知识 / 检测内容资产', onClick: () => navigate('/content') },
             { title: '注册用户', value: stats.users.total, icon: <TeamOutlined />, tone: 'violet', hint: '平台注册用户规模（含活跃口径）', meta: `${stats.users.active} 活跃`, metaTone: 'success', onClick: () => navigate('/users') },
             { title: '组织', value: stats.organizations.total, icon: <BankOutlined />, tone: 'info', hint: '参与能力撮合的供需机构', onClick: () => navigate('/organizations') },
-            { title: '能力分类', value: categoryCount, icon: <TagsOutlined />, tone: 'warning', hint: '能力分类目录节点（导向分类上下文）', onClick: () => navigate('/product-categories') },
+            { title: '产品分类', value: categoryCount, icon: <TagsOutlined />, tone: 'warning', hint: '产品分类目录节点（导向分类上下文）', onClick: () => navigate('/product-categories') },
             { title: '参数定义', value: parameterCount, icon: <SettingOutlined />, tone: 'neutral', hint: '可用筛选参数定义（能力匹配上下文）', onClick: () => navigate('/parameter-definitions') },
           ]}
         />

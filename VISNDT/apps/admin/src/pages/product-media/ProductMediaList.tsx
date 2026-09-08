@@ -16,6 +16,9 @@ import {
   Col,
   Card,
   Statistic,
+  Modal,
+  Upload,
+  Select,
 } from 'antd';
 import {
   PlusOutlined,
@@ -24,10 +27,12 @@ import {
   FileImageOutlined,
   FileTextOutlined,
   FileProtectOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { productMediaService } from '../../api/product-media.service';
 import { fileAssetService } from '../../api/file-asset.service';
+import { extractErrorMessage } from '../../api/client';
 import { VISNDT_COLORS } from '../../components/design-system/tokens';
 import type { ProductMediaItem, MediaType } from '../../types/product-media.types';
 import { getFileTypeIcon, formatFileSize } from '../../utils/file-utils';
@@ -59,6 +64,13 @@ const MEDIA_TYPE_LABEL_MAP: Record<string, string> = {
   OTHER: '其他',
 };
 
+const MEDIA_TYPE_OPTIONS = [
+  { value: 'IMAGE', label: '图片' },
+  { value: 'DOCUMENT', label: '文档' },
+  { value: 'CERTIFICATE', label: '证书' },
+  { value: 'OTHER', label: '其他' },
+];
+
 function ProductMediaList() {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
@@ -67,6 +79,11 @@ function ProductMediaList() {
   /** Cache of resolved signed URLs keyed by fileAssetId */
   const [signedUrlCache, setSignedUrlCache] = useState<Record<string, string | null>>({});
   const [mediaStats, setMediaStats] = useState({ total: 0, images: 0, documents: 0, certificates: 0 });
+  /** Batch-upload modal state. */
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+  const [uploadMediaType, setUploadMediaType] = useState<MediaType>('IMAGE');
+  const [uploading, setUploading] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!productId) return;
@@ -125,6 +142,47 @@ function ProductMediaList() {
       const errorMessage =
         err instanceof Error ? err.message : '删除媒体失败';
       message.error(errorMessage);
+    }
+  };
+
+  /** Collect dropped files without triggering default upload. */
+  const handleUploadFileSelect = (file: File) => {
+    setUploadFiles((prev) => [...prev, file]);
+    return false;
+  };
+
+  const handleUploadOk = async () => {
+    if (!productId) return;
+    if (uploadFiles.length === 0) {
+      message.warning('请先选择要上传的文件');
+      return;
+    }
+    setUploading(true);
+    try {
+      const result = await productMediaService.createWithUploadBatch(
+        productId,
+        uploadFiles,
+        { mediaType: uploadMediaType },
+      );
+      const failCount = result.failed?.length ?? 0;
+      if (result.created?.length > 0) {
+        message.success(`已上传 ${result.created.length} 个媒体`);
+      }
+      if (failCount > 0) {
+        message.warning(
+          `${failCount} 个文件上传失败：` +
+            result.failed.map((f) => `${f.fileName} (${f.reason})`).join('；'),
+        );
+      }
+      setUploadFiles([]);
+      setUploadOpen(false);
+      fetchData();
+    } catch (err) {
+      message.error(
+        extractErrorMessage(err, '批量上传失败'),
+      );
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -239,7 +297,7 @@ function ProductMediaList() {
       width: 120,
       render: (mediaType: MediaType) => (
         <Tag color={MEDIA_TYPE_COLOR_MAP[mediaType] || 'default'}>
-          {MEDIA_TYPE_LABEL_MAP[mediaType] || mediaType}
+          {MEDIA_TYPE_LABEL_MAP[mediaType] || '未知类型'}
         </Tag>
       ),
     },
@@ -330,13 +388,24 @@ function ProductMediaList() {
         <Title level={4} style={{ margin: 0 }}>
           产品媒体
         </Title>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => navigate(`/products/${productId}/media/create`)}
-        >
-          添加媒体
-        </Button>
+        <Space>
+          <Button
+            icon={<UploadOutlined />}
+            onClick={() => {
+              setUploadFiles([]);
+              setUploadOpen(true);
+            }}
+          >
+            批量上传
+          </Button>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => navigate(`/products/${productId}/media/create`)}
+          >
+            添加媒体
+          </Button>
+        </Space>
       </div>
 
       {/* Media Statistics */}
@@ -389,6 +458,59 @@ function ProductMediaList() {
           }}
         />
       )}
+
+      {/* 批量上传弹窗 */}
+      <Modal
+        title="批量上传媒体"
+        open={uploadOpen}
+        onOk={handleUploadOk}
+        onCancel={() => setUploadOpen(false)}
+        okText="上传"
+        cancelText="取消"
+        confirmLoading={uploading}
+        maskClosable={false}
+        width={560}
+      >
+        <Space direction="vertical" style={{ width: '100%' }} size={16}>
+          <Upload.Dragger
+            multiple
+            accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv"
+            showUploadList={false}
+            beforeUpload={handleUploadFileSelect}
+            fileList={uploadFiles.map((f, i) => ({
+              uid: `-${i}`,
+              name: f.name,
+              status: 'done',
+            }))}
+          >
+            <p className="ant-upload-drag-icon">
+              <UploadOutlined />
+            </p>
+            <p className="ant-upload-text">点击或拖拽文件到此处批量上传</p>
+            <p className="ant-upload-hint">
+              可一次选择多个文件（最多 10 个，单个 ≤ 10MB），所选文件将同时关联到该产品
+            </p>
+          </Upload.Dragger>
+
+          <Space wrap>
+            <span>媒体类型：</span>
+            <Select
+              value={uploadMediaType}
+              onChange={(v) => setUploadMediaType(v as MediaType)}
+              options={MEDIA_TYPE_OPTIONS}
+              style={{ width: 140 }}
+            />
+          </Space>
+
+          {uploadFiles.length > 0 && (
+            <ul style={{ maxHeight: 160, overflow: 'auto', paddingLeft: 18 }}>
+              {uploadFiles.map((f, i) => (
+                <li key={i}>{f.name}</li>
+              ))}
+            </ul>
+          )}
+        </Space>
+      </Modal>
     </div>
   );
 }

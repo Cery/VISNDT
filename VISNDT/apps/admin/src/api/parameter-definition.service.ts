@@ -14,7 +14,7 @@ interface ApiResponseWrapper<T> {
 }
 
 export const parameterDefinitionService = {
-  async getList(params?: { page?: number; pageSize?: number; keyword?: string }): Promise<ParameterDefinitionListResponse> {
+  async getList(params?: { page?: number; pageSize?: number; keyword?: string; categoryId?: string; parameterGroupId?: string }): Promise<ParameterDefinitionListResponse> {
     const response = (await apiClient.get('/parameter-definitions', {
       params,
     })) as unknown as ApiResponseWrapper<ParameterDefinitionListResponse>;

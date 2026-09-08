@@ -20,7 +20,7 @@ const OFFER_STATUS_LABELS: Record<string, string> = {
 };
 
 function OfferStatusBadge({ status }: { status: string }) {
-  const label = OFFER_STATUS_LABELS[status] ?? status;
+  const label = OFFER_STATUS_LABELS[status] ?? '未知状态';
   const colorMap: Record<string, string> = {
     DRAFT: 'bg-slate-100 text-slate-600',
     SUBMITTED: 'bg-blue-100 text-blue-700',
@@ -230,17 +230,17 @@ function OfferEditContent() {
                 </p>
               </div>
               <div className="rounded-lg bg-slate-50 p-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">能力型号</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">产品型号</p>
                 <p className="mt-1 text-sm font-medium text-slate-900">
                   {offer.supplierProduct
                     ? `${offer.supplierProduct.brand} ${offer.supplierProduct.modelNumber}${
                         offer.supplierProduct.series ? ` · ${offer.supplierProduct.series}` : ''
                       }`
-                    : '未绑定能力型号'}
+                    : '未绑定产品型号'}
                 </p>
               </div>
               <div className="rounded-lg bg-slate-50 p-3">
-                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">能力提供商</p>
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">供应商</p>
                 <p className="mt-1 text-sm font-medium text-slate-900">
                   {offer.supplierProduct?.organization?.name ||
                     offer.organization?.name ||

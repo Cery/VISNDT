@@ -14,7 +14,7 @@ import type { ParameterFacet } from '@/lib/api/search';
  * width → no horizontal overflow at 375/768/1024/1440.
  */
 interface RelevantParametersProps {
-  /** Common (intersection) technical parameters of the query */ 
+  /** Common (intersection) technical parameters of the query */
   params: ParameterFacet[];
   /** parameterId → selected values for the current query (active filters) */
   activeFilters?: Record<string, string[]>;
@@ -22,15 +22,18 @@ interface RelevantParametersProps {
   caption?: string;
   /** Max parameters to render (avoid clutter) */
   limit?: number;
+  /** Max values to show per parameter (compact cards default 2) */
+  valuesLimit?: number;
 }
 
-const MAX_VALUES_PER_PARAM = 2;
+const DEFAULT_MAX_VALUES_PER_PARAM = 2;
 
 export default function RelevantParameters({
   params,
   activeFilters,
   caption = '相关技术参数',
   limit = 4,
+  valuesLimit = DEFAULT_MAX_VALUES_PER_PARAM,
 }: RelevantParametersProps) {
   if (!params || params.length === 0) return null;
 
@@ -59,31 +62,33 @@ export default function RelevantParameters({
         {visible.map((param) => {
           const selectedValues = activeFilters?.[param.parameterId];
           const isFiltered = !!selectedValues && selectedValues.length > 0;
-          const values = param.availableValues.slice(0, MAX_VALUES_PER_PARAM);
+          const values = param.availableValues.slice(0, valuesLimit);
           const totalValues = param.availableValues.length;
+          const valueText = values
+            .map((v) => `${v.label}${param.unit ? ` ${param.unit}` : ''}`)
+            .join(' · ');
 
           return (
             <span
               key={param.parameterId}
-              className={`inline-flex items-center gap-1 text-[11px] rounded-md border px-2 py-1 whitespace-nowrap ${
+              className={`inline-flex items-center gap-1 max-w-full sm:max-w-[calc(50%-0.375rem)] min-w-0 overflow-hidden text-[11px] rounded-md border px-2 py-1 ${
                 isFiltered
                   ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
                   : 'border-slate-200 bg-slate-50 text-slate-500'
               }`}
             >
-              <span className="font-medium text-slate-600">{param.parameterName}</span>
+              <span className="font-medium text-slate-600 truncate shrink-0">
+                {param.parameterName}
+              </span>
               {values.length > 0 && (
-                <span className="flex items-center gap-1">
-                  {values.map((v) => (
-                    <span key={v.value} className={isFiltered ? 'font-semibold text-emerald-700' : ''}>
-                      {v.label}
-                      {param.unit ? ` ${param.unit}` : ''}
-                    </span>
-                  ))}
-                  {totalValues > MAX_VALUES_PER_PARAM && <span>等</span>}
+                <span className="flex items-center gap-1 min-w-0">
+                  <span className={`truncate ${isFiltered ? 'font-semibold text-emerald-700' : ''}`}>
+                    {valueText}
+                  </span>
+                  {totalValues > valuesLimit && <span className="shrink-0">等</span>}
                 </span>
               )}
-              {isFiltered && <span className="font-semibold">· 已匹配</span>}
+              {isFiltered && <span className="font-semibold shrink-0">· 已匹配</span>}
             </span>
           );
         })}

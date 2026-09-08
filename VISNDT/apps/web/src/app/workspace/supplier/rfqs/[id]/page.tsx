@@ -49,7 +49,7 @@ function formatOfferOption(offer: Offer) {
   const model = offer.supplierProduct?.modelNumber;
   const capability = offer.supplierProduct?.platformProduct?.name || offer.product?.name || '未命名能力';
   const price = offer.price ? `${offer.price}${offer.currency ? ` ${offer.currency}` : ''}` : '未定价';
-  const statusLabel = OFFER_STATUS_LABELS[offer.status] ?? offer.status;
+  const statusLabel = OFFER_STATUS_LABELS[offer.status] ?? '未知状态';
   const label = model ? `${capability} / ${model}（${statusLabel}）` : `${capability}（${statusLabel}）`;
   return { label, price, status: statusLabel, capability, model: model ?? '未指定型号' };
 }

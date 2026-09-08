@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Space, Spin, Alert, Button, message, Modal, Checkbox, Row, Col } from 'antd';
+import { Table, Space, Spin, Alert, Button, message, Modal, Checkbox, Row, Col, TreeSelect } from 'antd';
 import { AppstoreOutlined, CheckCircleOutlined, EditOutlined, StopOutlined, TagsOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { SorterResult } from 'antd/es/table/interface';
@@ -55,11 +55,44 @@ const STATUS_LABEL_MAP: Record<string, string> = {
   INACTIVE: '已下架',
 };
 
+/** Build Ant Design TreeSelect treeData from ProductCategory list (parentId hierarchy) */
+function buildCategoryTreeData(catList: ProductCategory[]) {
+  const map = new Map<string, ProductCategory>();
+  for (const cat of catList) map.set(cat.id, { ...cat, children: cat.children ?? [] });
+  const roots: ProductCategory[] = [];
+  for (const node of map.values()) {
+    const parent = node.parentId ? map.get(node.parentId) : undefined;
+    if (parent) {
+      (parent.children = parent.children ?? []).push(node);
+    } else {
+      roots.push(node);
+    }
+  }
+  const toData = (node: ProductCategory): Record<string, unknown> => ({
+    title: node.name,
+    value: node.id,
+    children: (node.children ?? []).length > 0 ? (node.children as ProductCategory[]).map(toData) : undefined,
+  });
+  return roots.map(toData);
+}
+
+/** Return full category path label (e.g. 工业检测 / 内窥镜) from a category id */
+function resolveCategoryPath(catList: ProductCategory[], id: string): string {
+  const map = new Map(catList.map((c) => [c.id, c]));
+  const chain: string[] = [];
+  let cur = map.get(id);
+  while (cur) {
+    chain.unshift(cur.name);
+    cur = cur.parentId ? map.get(cur.parentId) : undefined;
+  }
+  return chain.join(' / ');
+}
+
 const PRODUCT_EXPORT_COLUMNS: ExportColumn<Product>[] = [
   { key: 'name', title: '名称' },
   { key: 'model', title: '型号', render: (item) => item.model || '' },
   { key: 'category', title: '分类', render: (item) => item.category?.name || '' },
-  { key: 'status', title: '状态', render: (item) => STATUS_LABEL_MAP[item.status] || item.status },
+  { key: 'status', title: '状态', render: (item) => STATUS_LABEL_MAP[item.status] || '未知状态' },
   { key: 'createdAt', title: '创建时间', render: (item) => new Date(item.createdAt).toLocaleDateString() },
 ];
 
@@ -97,6 +130,7 @@ function ProductList() {
       }
       if (query.categoryId) {
         params.categoryId = query.categoryId;
+        params.includeSubcategories = true;
       }
 
       const result = await productService.getList(params);
@@ -302,7 +336,11 @@ function ProductList() {
       title: '分类',
       dataIndex: 'category',
       key: 'category',
-      render: (category: Product['category']) => category?.name || '-',
+      render: (_: unknown, record: Product) => {
+        const cat = record.category;
+        if (!cat) return '-';
+        return resolveCategoryPath(categories, cat.id) || cat.name;
+      },
     },
     {
       title: '组织',
@@ -324,7 +362,7 @@ function ProductList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || status} />
+        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || '未知状态'} />
       ),
     },
     {
@@ -414,13 +452,13 @@ function ProductList() {
                   color: VISNDT_COLORS.industrialCyan,
                 }}
               >
-                Capability / Governance · Registry
+                产品 / 治理 · 注册表
               </div>
               <h1 style={{ margin: '10px 0 6px', fontSize: '22px', lineHeight: 1.2, color: '#fff', fontWeight: 800 }}>
-                能力管理
+                产品管理
               </h1>
               <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.62)', maxWidth: 620, lineHeight: 1.6 }}>
-                管理工业检测能力、状态与分类 · 能力资产全生命周期治理
+                管理工业检测能力、状态与分类 · 产品资产全生命周期治理
               </p>
             </div>
             <Button type="primary" onClick={() => navigate('/products/create')}>
@@ -436,7 +474,7 @@ function ProductList() {
                 { label: '已上架', value: governanceStats.active, color: VISNDT_COLORS.success },
                 { label: '草稿', value: governanceStats.draft, color: VISNDT_COLORS.warning },
                 { label: '已下架', value: governanceStats.inactive, color: VISNDT_COLORS.error },
-                { label: '能力分类', value: governanceStats.categoryCount, color: VISNDT_COLORS.industrialCyan },
+                { label: '产品分类', value: governanceStats.categoryCount, color: VISNDT_COLORS.industrialCyan },
               ].map((it) => (
                 <span key={it.label} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
                   <span aria-hidden="true" style={{ width: 7, height: 7, borderRadius: '50%', background: it.color, flexShrink: 0 }} />
@@ -475,7 +513,7 @@ function ProductList() {
       {/* Governance Statistics — 728 KpiCard Executive Grid */}
       <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
         <Col xs={12} sm={8} lg={5}>
-          <KpiCard title="能力总数" value={governanceStats.total} icon={<AppstoreOutlined />} tone="primary" hint="平台能力资产总量" />
+          <KpiCard title="能力总数" value={governanceStats.total} icon={<AppstoreOutlined />} tone="primary" hint="平台产品资产总量" />
         </Col>
         <Col xs={12} sm={8} lg={5}>
           <KpiCard title="已上架" value={governanceStats.active} icon={<CheckCircleOutlined />} tone="success" hint="当前在售能力规格" />
@@ -487,7 +525,7 @@ function ProductList() {
           <KpiCard title="已下架" value={governanceStats.inactive} icon={<StopOutlined />} tone="error" hint="已停售能力条目" />
         </Col>
         <Col xs={12} sm={8} lg={4}>
-          <KpiCard title="能力分类" value={governanceStats.categoryCount} icon={<TagsOutlined />} tone="cyan" hint="分类目录节点数" />
+          <KpiCard title="产品分类" value={governanceStats.categoryCount} icon={<TagsOutlined />} tone="cyan" hint="分类目录节点数" />
         </Col>
       </Row>
 
@@ -507,7 +545,25 @@ function ProductList() {
         fields={[
           { key: 'keyword', label: '能力名称', type: 'keyword', placeholder: '按名称、型号或描述搜索', width: 320 },
           { key: 'status', label: '状态', type: 'select', options: STATUS_OPTIONS, width: 160 },
-          { key: 'categoryId', label: '分类', type: 'select', options: categories.map((c) => ({ value: c.id, label: c.name })), width: 200 },
+          {
+            key: 'categoryId',
+            label: '分类',
+            type: 'custom',
+            width: 240,
+            render: (value: unknown, onChange: (v: unknown) => void) => (
+              <TreeSelect
+                placeholder="选择分类（含其子分类）"
+                allowClear
+                treeDefaultExpandAll
+                showSearch
+                treeNodeFilterProp="title"
+                style={{ width: 240 }}
+                value={(value as string) || undefined}
+                onChange={(v) => onChange(v)}
+                treeData={buildCategoryTreeData(categories)}
+              />
+            ),
+          },
         ]}
         values={{ keyword: query.keyword, status: query.status, categoryId: query.categoryId }}
         onChange={(values) => {

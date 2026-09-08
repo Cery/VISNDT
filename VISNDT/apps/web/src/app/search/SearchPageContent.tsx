@@ -426,7 +426,7 @@ export default function SearchPageContent() {
         const pseudo: Product = {
           id: cap?.id || sp.platformProductId,
           categoryId: cap?.categoryId ?? '',
-          name: cap?.name || sp.modelNumber || '能力型号',
+          name: cap?.name || sp.modelNumber || '产品型号',
           model: null,
           description: null,
           status: 'ACTIVE',
@@ -541,6 +541,13 @@ export default function SearchPageContent() {
 
       {/* Search Content */}
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
+        {/* 842 WP-7 Discoverability — 页面级唯一 H1（P2-841-01 收口）：
+            统一检索 Authority 的机器可读页面标题。作为稳定页面意图标题，
+            始终渲染（query / loading / empty 状态共用一个 H1），不做重复关键词填充。 */}
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-4">
+          工业检测能力搜索
+        </h1>
+
         {/* Tabs + Filter Area */}
             <div className="space-y-3">
               <SearchTypeTabs
@@ -584,54 +591,22 @@ export default function SearchPageContent() {
               />
             )}
 
-            {/* 802 — Engineering Discovery Workbench intent band: query → facets → grouped
-                results → parameter/supplier context → next discovery */}
+            {/* 846 §20 Search Result Density — 移除装饰性大横幅，仅保留单行轻量工程连接入口
+                （评估对比 / 发起检测需求 / 能力分类 从黑色 WORKBENCH 横幅降级到此） */}
             {!loading && !error && results && hasAnyResults && (
-              <div className="mt-4 rounded-xl border border-slate-200/80 bg-white overflow-hidden">
-                <div className="flex items-center gap-3 px-4 py-3 bg-industrial-dark/95">
-                  <span className="h-3 w-1 rounded-sm bg-industrial-cyan" aria-hidden="true" />
-                  <span className="font-mono text-[11px] uppercase tracking-widest text-slate-300">
-                    ENGINEERING DISCOVERY WORKBENCH
-                  </span>
-                  <span className="hidden md:inline ml-auto font-mono text-[10px] uppercase tracking-widest text-slate-500">
-                    SCOPE · FACET · EVALUATE · CONNECT
-                  </span>
-                </div>
-                <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
-                    {[
-                      { mono: '01', label: '范围界定' },
-                      { mono: '02', label: '参数约束' },
-                      { mono: '03', label: '能力/方案/供应商' },
-                      { mono: '04', label: '工程连接' },
-                    ].map((s) => (
-                      <span key={s.mono} className="inline-flex items-center gap-1.5">
-                        <span className="font-mono text-[10px] uppercase tracking-widest text-industrial-cyan">{s.mono}</span>
-                        <span className="text-foreground">{s.label}</span>
-                      </span>
-                    ))}
-                  </div>
-                  <div className="flex flex-wrap gap-2 shrink-0">
-                    <Link
-                      href="/products/compare"
-                      className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80"
-                    >
-                      评估对比<span aria-hidden="true">→</span>
-                    </Link>
-                    <Link
-                      href="/workspace/demands/create"
-                      className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80"
-                    >
-                      发起检测需求<span aria-hidden="true">→</span>
-                    </Link>
-                    <Link
-                      href="/categories"
-                      className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80"
-                    >
-                      能力分类<span aria-hidden="true">→</span>
-                    </Link>
-                  </div>
-                </div>
+              <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-slate-500 px-0.5">
+                <span className="font-mono uppercase tracking-widest text-[10px] text-slate-400">
+                  NEXT →
+                </span>
+                <Link href="/products/compare" className="hover:text-primary transition-colors">
+                  评估对比
+                </Link>
+                <Link href="/workspace/demands/create" className="hover:text-primary transition-colors">
+                  发起检测需求
+                </Link>
+                <Link href="/categories" className="hover:text-primary transition-colors">
+                  能力分类
+                </Link>
               </div>
             )}
 
@@ -690,6 +665,7 @@ export default function SearchPageContent() {
                           highlight={query}
                           relevantParams={searchRelevantParams}
                           activeParamFilters={activeFacet.filters}
+                          supplierModelCount={entry.models.length}
                         />
                         <ProductSupplierContext models={entry.models} />
                       </div>

@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import MediaImage from '@/components/common/MediaImage';
 
 /**
  * 802_M39 — Whole-site Recommendation reframe.
@@ -8,15 +11,21 @@ import Link from 'next/link';
  * technical knowledge, solutions and suppliers are grouped under an
  * engineering-relevance frame, with explicit cross-surface Next Discovery.
  *
- * Server-safe (no client directive) — composes only existing public data
- * (already fetched by the parent server route) into a coherent discovery
- * layer. No recommendation entity / domain is introduced.
+ * Composes only existing public data (already fetched by the parent server
+ * route) into a coherent discovery layer. No recommendation entity / domain
+ * is introduced.
+ *
+ * 853/临时修复 — 卡片增强：
+ *  - 支持可选 `fileAssetId` 缩略图（有图渲染缩略图 + 标题，无图降级纯文字）。
+ *  - `narrow`：用于 280px 侧边栏等窄容器时强制单列，避免宽域网格把分组压成窄条。
  */
 
 export interface RelevantDiscoveryItem {
   href: string;
   title: string;
   sub?: string;
+  /** FileAsset 缩略图（相关产品/知识/方案封面）；缺省时降级为纯文字行 */
+  fileAssetId?: string | null;
 }
 
 export interface RelevantDiscoveryGroup {
@@ -34,12 +43,15 @@ interface RelevantEngineeringDiscoveryProps {
   capabilityAnchor: string;
   groups: RelevantDiscoveryGroup[];
   nextActions?: { href: string; label: string }[];
+  /** 窄容器（如 280px 侧边栏）：单列布局，避免分组被压成窄条；组内最多展示 4 项 */
+  narrow?: boolean;
 }
 
 export default function RelevantEngineeringDiscovery({
   capabilityAnchor,
   groups,
   nextActions = [],
+  narrow = false,
 }: RelevantEngineeringDiscoveryProps) {
   const hasGroups = groups.some((g) => g.items.length > 0);
 
@@ -69,7 +81,7 @@ export default function RelevantEngineeringDiscovery({
             暂无收录的相关工程信息。可通过统一检索继续定位检测能力、参数解读与方案语境。
           </p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className={`grid grid-cols-1 gap-4 items-start ${narrow ? '' : 'md:grid-cols-2'}`}>
             {groups.map(
               (g) =>
                 g.items.length > 0 && (
@@ -90,20 +102,30 @@ export default function RelevantEngineeringDiscovery({
                       )}
                     </div>
                     <ul className="divide-y divide-slate-100">
-                      {g.items.map((it) => (
+                      {(narrow ? g.items.slice(0, 4) : g.items).map((it) => (
                         <li key={it.href}>
                           <Link
                             href={it.href}
-                            className="group flex items-start justify-between gap-2 py-2"
+                            className="group flex items-center gap-2.5 py-2"
                           >
-                            <span className="text-sm text-foreground leading-snug group-hover:text-primary transition-colors">
-                              {it.title}
-                            </span>
-                            {it.sub && (
-                              <span className="shrink-0 text-xs text-slate-400 mt-0.5">
-                                {it.sub}
+                            {it.fileAssetId ? (
+                              <MediaImage
+                                fileAssetId={it.fileAssetId}
+                                alt={it.title}
+                                seed={it.href}
+                                className="w-12 h-9 md:w-14 md:h-10 shrink-0 rounded object-cover bg-surface-2"
+                              />
+                            ) : null}
+                            <span className="flex-1 min-w-0">
+                              <span className="block text-sm leading-snug text-foreground group-hover:text-primary transition-colors">
+                                {it.title}
                               </span>
-                            )}
+                              {it.sub && (
+                                <span className="block text-xs text-slate-400 mt-0.5">
+                                  {it.sub}
+                                </span>
+                              )}
+                            </span>
                           </Link>
                         </li>
                       ))}

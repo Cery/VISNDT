@@ -79,7 +79,7 @@ export default async function TagPage({ params }: TagPageProps) {
         ) : (
           <>
             <p className="text-sm text-slate-400 mb-6">共 {contents.length} 篇相关内容</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-start">
               {contents.map((item) => (
                 <ContentCard key={item.id} item={item} />
               ))}

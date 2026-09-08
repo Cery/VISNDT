@@ -13,14 +13,19 @@ export const metadata: Metadata = {
   title: '知识中心',
   description:
     '为工业检测专业人士提供的技术文章、检测指南、应用案例和设备选型指南。',
-  // 797: 补全 /knowledge 列表页 canonical（详情页已有，列表页缺失）
-  alternates: { canonical: `${SITE_URL}/knowledge` },
+  // 842 WP-7 Discoverability（P2-841-02 收口）：
+  //   /knowledge 为历史内容频道列表页，/knowledge-base 为已确立的知识中心 canonical 权威。
+  //   为避免两个"知识中心"列表页互为独立 canonical、造成搜索引擎重复内容竞争，
+  //   本列表页声明 noindex（不作独立索引面），canonical 指向权威 /knowledge-base，
+  //   由搜索/外部引用继续将读者导向权威 representation；不删除页面、不改路由语义。
+  robots: { index: false, follow: true },
+  alternates: { canonical: `${SITE_URL}/knowledge-base` },
   openGraph: {
     title: '知识中心 – 工业检测技术知识',
     description:
       '为工业检测专业人士提供的技术文章、检测指南、应用案例和设备选型指南。',
     type: 'website',
-    url: `${SITE_URL}/knowledge`,
+    url: `${SITE_URL}/knowledge-base`,
   },
 };
 
@@ -101,7 +106,6 @@ export default async function KnowledgePage() {
               { href: '/categories', label: '能力分类', mono: 'CAP' },
               { href: '/products', label: '检测产品', mono: 'PRD' },
               { href: '/solutions', label: '解决方案', mono: 'SOL' },
-              { href: '/search?type=supplier-product', label: '能力提供方', mono: 'SPL' },
               { href: '/search', label: '统一检索', mono: 'SRC' },
             ].map((t) => (
               <Link
@@ -138,7 +142,7 @@ export default async function KnowledgePage() {
                 共 {knowledgeCount} 篇技术知识
               </span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-start">
               {contents.map((item) => (
                 <ContentCard key={item.id} item={item} />
               ))}

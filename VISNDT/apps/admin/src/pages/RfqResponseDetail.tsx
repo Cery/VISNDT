@@ -73,7 +73,7 @@ export default function RfqResponseDetailPage() {
     try {
       setUpdating(true);
       await rfqResponseService.update(id, { status: newStatus });
-      message.success(`响应状态已更新为 ${RESPONSE_STATUS_LABEL_MAP[newStatus] || newStatus}`);
+      message.success(`响应状态已更新为 ${RESPONSE_STATUS_LABEL_MAP[newStatus] || '未知状态'}`);
       fetchResponse();
     } catch (err) {
       const msg = err instanceof Error ? err.message : '更新状态失败';
@@ -131,7 +131,7 @@ export default function RfqResponseDetailPage() {
           <Descriptions.Item label="业务编号"><BusinessIdentityBadge type="RFQ_RESPONSE" id={response.id} createdAt={response.createdAt} /></Descriptions.Item>
           <Descriptions.Item label="状态">
             <Tag color={STATUS_COLOR[response.status] || 'default'}>
-              {RESPONSE_STATUS_LABEL_MAP[response.status] || response.status}
+              {RESPONSE_STATUS_LABEL_MAP[response.status] || '未知状态'}
             </Tag>
           </Descriptions.Item>
           <Descriptions.Item label="组织">
@@ -168,7 +168,7 @@ export default function RfqResponseDetailPage() {
               onChange={handleStatusChange}
               options={allowedTransitions.map((s) => ({
                 value: s,
-                label: RESPONSE_STATUS_LABEL_MAP[s] || s,
+                label: RESPONSE_STATUS_LABEL_MAP[s] || '未知状态',
               }))}
               style={{ minWidth: 160 }}
             />

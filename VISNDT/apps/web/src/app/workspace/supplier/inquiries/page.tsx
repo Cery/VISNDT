@@ -19,7 +19,7 @@ const INQUIRY_STATUS_LABELS: Record<string, string> = {
 };
 
 function InquiryStatusBadge({ status }: { status: string }) {
-  const label = INQUIRY_STATUS_LABELS[status] ?? status;
+  const label = INQUIRY_STATUS_LABELS[status] ?? '未知状态';
   const colorMap: Record<string, string> = {
     NEW: 'bg-blue-100 text-blue-700',
     PROCESSING: 'bg-amber-100 text-amber-700',
@@ -77,7 +77,7 @@ function InquiryListContent() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900">收到的询价</h1>
           <p className="mt-1 text-sm text-slate-500">
-            来自采购方 / 访客的能力询价线索，含针对的能力、联系人与当前状态。
+            来自采购方 / 访客的询价线索，含针对的能力、联系人与当前状态。
           </p>
         </div>
 
@@ -115,7 +115,7 @@ function InquiryListContent() {
             />
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 items-start">
             {filtered.map((inq) => (
               <Link
                 key={inq.id}

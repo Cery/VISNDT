@@ -51,7 +51,7 @@ export default function RFQResponseList({
             </span>
           </div>
           <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
-            {STATUS_MAP[resp.status] || resp.status}
+            {STATUS_MAP[resp.status] || '未知状态'}
           </span>
         </div>
       ))}

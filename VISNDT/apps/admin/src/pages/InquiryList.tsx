@@ -196,7 +196,7 @@ function InquiryList() {
             <Title level={4} style={{ margin: 0 }}>询价管理</Title>
           </div>
           <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-            管理买方询价、能力提供商响应与状态
+            管理买方询价、供应商响应与状态
           </Text>
         </div>
         <Space style={{ marginBottom: 16 }} wrap>
@@ -259,7 +259,7 @@ function InquiryList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <StatusTag status={status} label={INQUIRY_STATUS_LABEL_MAP[status] || status} />
+        <StatusTag status={status} label={INQUIRY_STATUS_LABEL_MAP[status] || '未知状态'} />
       ),
     },
     {
@@ -301,7 +301,7 @@ function InquiryList() {
           <Title level={4} style={{ margin: 0 }}>询价管理</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          管理买方询价、能力提供商响应与状态
+          管理买方询价、供应商响应与状态
         </Text>
       </div>
 

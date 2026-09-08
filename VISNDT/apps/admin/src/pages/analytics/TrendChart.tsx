@@ -52,7 +52,7 @@ export default function TrendChart({ data }: Props) {
           <YAxis fontSize={12} />
           <Tooltip />
           <Legend
-            formatter={(value: string) => LABELS[value] ?? value}
+            formatter={(value: string) => LABELS[value] ?? '未知'}
           />
           {Object.keys(COLORS).map((key) => (
             <Line

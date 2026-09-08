@@ -117,7 +117,6 @@ export default async function KnowledgeBaseHomePage() {
               { href: '/categories', label: '能力分类', mono: 'CAP' },
               { href: '/products', label: '检测产品', mono: 'PRD' },
               { href: '/solutions', label: '解决方案', mono: 'SOL' },
-              { href: '/search?type=supplier-product', label: '能力提供方', mono: 'SPL' },
               { href: '/search', label: '统一检索', mono: 'SRC' },
             ].map((t) => (
               <Link
@@ -145,12 +144,12 @@ export default async function KnowledgeBaseHomePage() {
                 Technical Topic Index
               </span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 items-start">
               {domains.map((domain) => (
                 <Link
                   key={domain.id}
                   href={`/knowledge-base/domains/${domain.slug}`}
-                  className="group block p-4 sm:p-5 bg-white border border-slate-200 rounded-xl hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5 transition-all"
+                  className="group block p-4 sm:p-5 bg-white border border-slate-200 rounded-xl hover:border-primary/30 hover:shadow-md transition-all"
                 >
                   <h3 className="text-base sm:text-lg font-semibold text-foreground group-hover:text-primary transition-colors mb-1">
                     {domain.name}
@@ -193,12 +192,12 @@ export default async function KnowledgeBaseHomePage() {
               action={{ label: '前往统一检索', href: '/search' }}
             />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-start">
               {entries.map((entry) => (
                 <Link
                   key={entry.id}
                   href={`/knowledge-base/${entry.slug}`}
-                  className="group block bg-white border border-slate-200 rounded-xl p-4 sm:p-5 hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5 transition-all"
+                  className="group block bg-white border border-slate-200 rounded-xl p-4 sm:p-5 hover:border-primary/30 hover:shadow-md transition-all"
                 >
                   {entry.domain && (
                     <span className="inline-block text-xs font-medium text-primary bg-primary/5 px-2 py-0.5 rounded mb-2">

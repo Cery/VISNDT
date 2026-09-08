@@ -10,6 +10,7 @@ import ErrorState from '@/components/common/ErrorState';
 import Loading from '@/components/common/Loading';
 import StatCard from '@/components/workspace/StatCard';
 import WorkspaceLayout from '@/components/layout/WorkspaceLayout';
+import { MODEL_STATUS_LABEL } from '@/lib/display-labels';
 import { getSupplierRuntimeInquiryContext } from '@/services/workspace.service';
 
 /**
@@ -83,7 +84,7 @@ function SupplierInquiryContextContent() {
                   </h2>
                 </div>
                 <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-medium text-slate-600">
-                  {context.status}
+                  {MODEL_STATUS_LABEL[context.status] ?? '未知状态'}
                 </span>
               </div>
               <p className="mt-3 text-sm text-slate-500">
@@ -102,7 +103,7 @@ function SupplierInquiryContextContent() {
               </div>
 
               {context.inquiries.length === 0 ? (
-                <EmptyState message="该能力型号暂无买方兴趣。" />
+                <EmptyState message="该产品型号暂无买方兴趣。" />
               ) : (
                 <div className="space-y-3">
                   {context.inquiries.map((inquiry) => (

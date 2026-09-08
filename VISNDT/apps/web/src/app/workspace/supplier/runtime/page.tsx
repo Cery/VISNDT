@@ -44,7 +44,7 @@ const STATUS_OPTIONS = Object.entries(MODEL_STATUS_LABEL).map(([value, label]) =
 }));
 
 function statusLabel(status: string): string {
-  return MODEL_STATUS_LABEL[status] ?? status;
+  return MODEL_STATUS_LABEL[status] ?? '未知状态';
 }
 
 function statusTone(status: string): string {
@@ -141,12 +141,22 @@ function parseUrlState(): { page: number; q: string; status: string; series: str
 }
 
 function SupplierRuntimeContent() {
-  const initial = useMemo(parseUrlState, []);
-  const [q, setQ] = useState(initial.q);
-  const [status, setStatus] = useState(initial.status);
-  const [series, setSeries] = useState(initial.series);
-  const [page, setPage] = useState(initial.page);
-  const [searchInput, setSearchInput] = useState(initial.q);
+  // SSR 与首次客户端渲染保持一致（默认值），避免在渲染期读 window 引发 Hydration 不匹配。
+  // 挂载后一次性从 URL 恢复分页/检索/过滤状态（深链/刷新语义保留）。
+  const [q, setQ] = useState('');
+  const [status, setStatus] = useState('');
+  const [series, setSeries] = useState('');
+  const [page, setPage] = useState(1);
+  const [searchInput, setSearchInput] = useState('');
+
+  useEffect(() => {
+    const restored = parseUrlState();
+    setQ(restored.q);
+    setStatus(restored.status);
+    setSeries(restored.series);
+    setPage(restored.page);
+    setSearchInput(restored.q);
+  }, []);
 
   // 817 Supplier Attach — associate an existing Platform Product with this org.
   const [attachOpen, setAttachOpen] = useState(false);
@@ -302,7 +312,7 @@ function SupplierRuntimeContent() {
           <div>
             <h1 className="text-2xl font-bold text-slate-900">供应商运行时（Supplier Runtime）</h1>
             <p className="mt-1 text-sm text-slate-500">
-              供应商能力操作边界 — 查看自身 SupplierProduct、商用汇总、买方兴趣；并可把平台既有能力挂靠到自己组织。不是商城、不是卖家中心。
+              供应商操作边界 — 查看自身产品型号、商用汇总、买方兴趣；并可把平台既有产品挂靠到自己组织。不是商城、不是卖家中心。
             </p>
           </div>
           <button
@@ -318,7 +328,7 @@ function SupplierRuntimeContent() {
         <section className="space-y-4">
           <div className="flex items-center gap-2">
             <div className="w-1 h-5 bg-primary rounded-full" />
-            <h2 className="text-lg font-semibold text-slate-900">能力概览</h2>
+            <h2 className="text-lg font-semibold text-slate-900">产品概览</h2>
           </div>
 
           {overviewQuery.isLoading ? (
@@ -333,8 +343,8 @@ function SupplierRuntimeContent() {
               />
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <StatCard label="能力型号" value={overviewQuery.data.total} description="自身 SupplierProduct" icon="list" />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 items-start">
+              <StatCard label="产品型号" value={overviewQuery.data.total} description="我的产品型号" icon="list" />
               <StatCard label="已发布" value={publishedCount} description="可供公开发现" icon="dashboard" />
               <StatCard label="有效 Offer" value={totalOffers} description="商用层汇总" icon="link" />
               <StatCard label="审核中" value={reviewingCount} description="待治理确认" icon="clock" />
@@ -346,7 +356,7 @@ function SupplierRuntimeContent() {
         <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
             <div className="w-1 h-5 bg-emerald-400 rounded-full" />
-            <h2 className="text-lg font-semibold text-slate-900">能力型号状态</h2>
+            <h2 className="text-lg font-semibold text-slate-900">产品型号状态</h2>
           </div>
 
           {/* Toolbar: search / status filter / series filter / reset */}
@@ -418,11 +428,11 @@ function SupplierRuntimeContent() {
             <Loading />
           ) : productsQuery.isError ? (
             <ErrorState
-              message="加载能力型号失败，请稍后重试。"
+              message="加载产品型号失败，请稍后重试。"
               onRetry={() => void productsQuery.refetch()}
             />
           ) : products.length === 0 ? (
-            <EmptyState message="当前筛选条件下暂无可展示的 SupplierProduct。" />
+            <EmptyState message="当前筛选条件下暂无可展示的产品型号。" />
           ) : (
             <div className="space-y-4">
               {products.map((product) => (

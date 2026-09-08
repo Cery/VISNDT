@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
@@ -46,13 +47,8 @@ const MODEL_STATUS_LABEL: Record<string, string> = {
   REJECTED: '已拒绝',
 };
 
-const STATUS_OPTIONS = Object.entries(MODEL_STATUS_LABEL).map(([value, label]) => ({
-  value,
-  label,
-}));
-
 function statusLabel(status: string): string {
-  return MODEL_STATUS_LABEL[status] ?? status;
+  return MODEL_STATUS_LABEL[status] ?? '未知状态';
 }
 
 function statusTone(status: string): string {
@@ -66,6 +62,30 @@ function statusTone(status: string): string {
 function formatDateTime(value?: string | null): string {
   if (!value) return '暂无';
   return new Date(value).toLocaleString('zh-CN');
+}
+
+/** WP-5A — 完备度指示：媒体数量 + 参数覆盖数量，映射为工作台可读的进度状态。 */
+function completenessOf(p: MySupplierProduct): { media: number; params: number; pct: number; label: string } {
+  const media = p._count?.media ?? p.media?.length ?? 0;
+  const params = p._count?.parameterValues ?? p.parameterValues?.length ?? 0;
+  // 完备度 = 媒体(50%) + 参数(50%) 的简单加权；真实数量来自后端 _count。
+  const pct = Math.min(100, Math.round(media * 25 + params * 2));
+  const label = media === 0 && params === 0
+    ? '待完善'
+    : pct >= 100 ? '较完善' : '资料不足';
+  return { media, params, pct, label };
+}
+
+/** WP-5A — 工作台“下一步有效动作”判定。 */
+function nextActionOf(p: MySupplierProduct): { action: 'submit' | 'edit' | 'view' | 'none'; text: string } {
+  if (p.status === 'DRAFT') {
+    if (p.isPlaceholder) return { action: 'edit', text: '完善真实型号' };
+    return { action: 'submit', text: '提交审核' };
+  }
+  if (p.status === 'REJECTED') return { action: 'edit', text: '已拒绝 · 需重新编辑' };
+  if (p.status === 'APPROVED') return { action: 'view', text: '待发布' };
+  if (p.status === 'PUBLISHED') return { action: 'view', text: '已发布 · 查看' };
+  return { action: 'none', text: '审核中' };
 }
 
 type FormState = {
@@ -305,6 +325,7 @@ function ModelFormModal({
 
 /** Supplier product self-service content (list + create/edit + attach). */
 function SupplierProductsContent() {
+  const router = useRouter();
   const [q, setQ] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [status, setStatus] = useState('');
@@ -421,6 +442,32 @@ function SupplierProductsContent() {
         )}
 
         <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+          {/* WP-5A Workbench Overview — 以任务为组织单元的快速视图 */}
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            {[
+              { v: '', label: '全部' },
+              { v: 'DRAFT', label: '草稿' },
+              { v: 'SUBMITTED', label: '待审核' },
+              { v: 'REVIEWING', label: '审核中' },
+              { v: 'APPROVED', label: '已批准' },
+              { v: 'PUBLISHED', label: '已发布' },
+              { v: 'REJECTED', label: '已拒绝' },
+            ].map((c) => {
+              const active = status === c.v;
+              return (
+                <button
+                  key={c.v}
+                  type="button"
+                  onClick={() => { setStatus(c.v); setPage(1); }}
+                  className={`h-8 rounded-full px-3 text-xs font-medium transition-colors ${active ? 'bg-slate-900 text-white' : 'border border-slate-200 text-slate-600 hover:border-slate-400'}`}
+                  aria-pressed={active}
+                >
+                  {c.label}
+                </button>
+              );
+            })}
+          </div>
+
           <div className="mb-5 flex flex-wrap items-center gap-2">
             <input
               type="text"
@@ -433,17 +480,6 @@ function SupplierProductsContent() {
             <button type="button" onClick={searchList} className="h-9 rounded-md bg-slate-900 px-3 text-sm font-medium text-white hover:bg-slate-700">
               搜索
             </button>
-            <select
-              value={status}
-              onChange={(e) => { setStatus(e.target.value); setPage(1); }}
-              className="h-9 rounded-md border border-slate-300 bg-white px-2 text-sm text-slate-700 focus:border-slate-500 focus:outline-none"
-              aria-label="状态筛选"
-            >
-              <option value="">全部状态</option>
-              {STATUS_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
             {(q || status || page > 1) && (
               <button type="button" onClick={resetFilters} className="h-9 rounded-md border border-slate-300 px-3 text-sm text-slate-600 hover:bg-slate-50">
                 重置
@@ -459,59 +495,69 @@ function SupplierProductsContent() {
           ) : products.length === 0 ? (
             <EmptyState message="暂无 SupplierProduct。可点击「挂靠平台能力」或「新增型号」开始。" />
           ) : (
-            <div className="space-y-4">
-              {products.map((p) => (
-                <article key={p.id} className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="overflow-hidden rounded-lg border border-slate-200">
+              <div className="hidden grid-cols-[1.6fr_1fr_1fr_auto] gap-3 border-b border-slate-200 bg-slate-50 px-4 py-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500 md:grid">
+                <span>产品 / 型号</span>
+                <span>状态 · 完备度</span>
+                <span>能力锚点</span>
+                <span className="text-right">操作</span>
+              </div>
+              {products.map((p) => {
+                const comp = completenessOf(p);
+                const next = nextActionOf(p);
+                return (
+                  <div
+                    key={p.id}
+                    className="grid grid-cols-1 gap-3 border-b border-slate-100 px-4 py-3 transition-colors last:border-b-0 hover:bg-slate-50 md:grid-cols-[1.6fr_1fr_1fr_auto] md:items-center"
+                  >
                     <div className="min-w-0 space-y-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="break-words text-sm font-semibold text-slate-900">
+                        <Link href={`/workspace/supplier/products/${p.id}`} className="break-words text-sm font-semibold text-slate-900 hover:text-industrial-cyan">
                           {p.brand} {p.series ?? ''} {p.modelNumber}
-                        </span>
-                        <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${statusTone(p.status)}`}>
-                          {statusLabel(p.status)}
-                        </span>
+                        </Link>
                         {p.isPlaceholder && (
-                          <span className="rounded-full bg-orange-100 px-2 py-0.5 text-[11px] font-medium text-orange-700">
-                            平台占位 · 待完善真实型号
-                          </span>
+                          <span className="rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-medium text-orange-700">平台占位</span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-500">
-                        能力锚点：{p.platformProduct?.name ?? '—'}
-                      </p>
-                      <p className="text-xs text-slate-400">创建：{formatDateTime(p.createdAt)}</p>
+                      <p className="text-[11px] text-slate-400">更新：{formatDateTime(p.updatedAt)}</p>
                     </div>
-                    <div className="flex shrink-0 flex-wrap items-center gap-2">
+
+                    <div className="space-y-1.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${statusTone(p.status)}`}>{statusLabel(p.status)}</span>
+                        <span className={`text-[11px] font-medium ${comp.label === '待完善' ? 'text-slate-400' : comp.label === '较完善' ? 'text-emerald-600' : 'text-amber-600'}`}>{comp.label}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-[11px] text-slate-500">
+                        <span>媒体 {comp.media}</span>
+                        <span className="text-slate-300">·</span>
+                        <span>参数 {comp.params}</span>
+                      </div>
+                    </div>
+
+                    <div className="min-w-0 text-xs text-slate-500 md:truncate">
+                      {p.platformProduct?.name ?? '—'}
+                    </div>
+
+                    <div className="flex shrink-0 flex-wrap items-center gap-2 md:justify-end">
                       <Link
                         href={`/workspace/supplier/products/${p.id}`}
                         className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
                       >
-                        详情
+                        工作台
                       </Link>
-                      {(p.status === 'DRAFT' || p.status === 'APPROVED') && (
+                      {next.action !== 'none' && (
                         <button
                           type="button"
-                          onClick={() => openEdit(p.id)}
-                          className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700"
+                          onClick={() => { if (next.action === 'edit') openEdit(p.id); else if (next.action === 'submit') void submitProduct(p.id); else router.push(`/workspace/supplier/products/${p.id}`); }}
+                          className={`rounded-md px-3 py-1.5 text-xs font-medium text-white ${next.action === 'submit' ? 'bg-emerald-600 hover:bg-emerald-500' : next.action === 'edit' ? 'bg-amber-500 hover:bg-amber-400' : 'bg-slate-900 hover:bg-slate-700'}`}
                         >
-                          编辑
-                        </button>
-                      )}
-                      {p.status === 'DRAFT' && (
-                        <button
-                          type="button"
-                          onClick={() => void submitProduct(p.id)}
-                          className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-emerald-500"
-                        >
-                          提交审核
+                          {next.text}
                         </button>
                       )}
                     </div>
                   </div>
-                  {p.description ? <p className="mt-2 text-xs text-slate-600">{p.description}</p> : null}
-                </article>
-              ))}
+                );
+              })}
             </div>
           )}
 

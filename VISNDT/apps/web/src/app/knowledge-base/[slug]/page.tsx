@@ -308,13 +308,13 @@ export default async function KnowledgeEntryDetailPage({ params }: EntryDetailPa
       </article>
 
       {/* 802_M39 — Relevant Engineering Discovery：把“相关产品”重构为分组的“相关工程发现”——
-          把知识关联与相关检测能力产品折叠为单一发现面，提供工程相关性框架 + 跨面下一步发现。
+          把知识关联与相关检测产品折叠为单一发现面，提供工程相关性框架 + 跨面下一步发现。
           非购物推荐，未引入 recommendation domain。 */}
       <RelevantEngineeringDiscovery
         capabilityAnchor={entry.title}
         groups={[
           {
-            label: '相关检测能力产品',
+            label: '相关检测产品',
             mono: 'PRODUCT',
             items: relatedProducts.map((p) => ({
               href: `/products/${p.id}`,

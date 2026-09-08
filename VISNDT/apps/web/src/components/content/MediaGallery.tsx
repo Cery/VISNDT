@@ -36,7 +36,7 @@ export default function MediaGallery({ media }: { media?: ContentMedia[] }) {
       {images.length > 0 && (
         <section>
           <h2 className="text-xl font-bold text-foreground mb-4">媒体画廊</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
             {images.map((m) => {
               const src = fileUrl(m.fileAsset?.id);
               if (!src) return null;

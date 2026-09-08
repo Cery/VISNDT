@@ -41,7 +41,7 @@ export default function ApplicationScenario({
           <circle cx="12" cy="12" r="3" />
           <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1" />
         </svg>
-        <span className="leading-snug">{text}</span>
+        <span className="leading-snug line-clamp-2">{text}</span>
       </div>
     );
   }

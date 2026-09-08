@@ -9,16 +9,21 @@ import {
   Space,
   Select,
   Input,
+  Modal,
+  Upload,
   message,
 } from 'antd';
+import type { UploadFile } from 'antd';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import {
   SearchOutlined,
   ReloadOutlined,
   DownloadOutlined,
   DeleteOutlined,
+  UploadOutlined,
 } from '@ant-design/icons';
 import { fileAssetService } from '../api/file-asset.service';
+import { extractErrorMessage } from '../api/client';
 import { organizationService } from '../api/organization.service';
 import type { FileAssetListItem } from '../types/file-asset.types';
 import type { Organization } from '../types/organization.types';
@@ -68,7 +73,7 @@ const FILE_STATUS_COLOR: Record<string, string> = {
 
 const ENTITY_TYPE_LABEL: Record<string, string> = {
   PRODUCT: '能力',
-  SUPPLIER_PRODUCT: '能力型号',
+  SUPPLIER_PRODUCT: '产品型号',
   ORGANIZATION: '组织',
   DEMAND: '需求',
   RFQ: 'RFQ',
@@ -89,7 +94,7 @@ const FILE_TYPE_OPTIONS = [
 const ENTITY_TYPE_OPTIONS = [
   { value: '', label: '全部实体' },
   { value: 'PRODUCT', label: '能力' },
-  { value: 'SUPPLIER_PRODUCT', label: '能力型号' },
+  { value: 'SUPPLIER_PRODUCT', label: '产品型号' },
   { value: 'ORGANIZATION', label: '组织' },
   { value: 'DEMAND', label: '需求' },
   { value: 'RFQ', label: 'RFQ' },
@@ -135,6 +140,17 @@ function MediaList() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
+
+  /** Batch-delete selection keys. */
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  /** Batch-upload modal state. */
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+  const [uploadFileType, setUploadFileType] = useState<string>('IMAGE');
+  const [uploadOrgId, setUploadOrgId] = useState<string | undefined>(
+    undefined,
+  );
+  const [uploading, setUploading] = useState(false);
 
   /** 当前页治理状态汇总（页面级展示提示） */
   const governanceCounts = useMemo(() => {
@@ -262,6 +278,81 @@ function MediaList() {
     }
   };
 
+  /** Batch delete selected rows — backend skips referenced files safely. */
+  const handleBatchDelete = () => {
+    if (selectedRowKeys.length === 0) return;
+    const idList = selectedRowKeys as string[];
+    Modal.confirm({
+      title: `确定删除选中的 ${idList.length} 个文件？`,
+      content:
+        '仅删除未被任何产品/内容引用的文件；被引用的文件将被安全跳过。此操作无法撤销。',
+      okText: '删除',
+      okButtonProps: { danger: true },
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          const result = await fileAssetService.batchDelete(idList);
+          const failCount = result.failed?.length ?? 0;
+          if (result.deleted > 0) {
+            message.success(`已删除 ${result.deleted} 个文件`);
+          }
+          if (failCount > 0) {
+            message.warning(
+              `${failCount} 个文件被跳过（被引用或不存在）`,
+            );
+          }
+          setSelectedRowKeys([]);
+          fetchData();
+        } catch (err) {
+          message.error(extractErrorMessage(err, '批量删除失败'));
+        }
+      },
+    });
+  };
+
+  /** Collect dropped files without triggering default upload. */
+  const handleUploadFileSelect = (file: File) => {
+    setUploadFiles((prev) => [...prev, file]);
+    return false;
+  };
+
+  const handleUploadOk = async () => {
+    if (uploadFiles.length === 0) {
+      message.warning('请先选择要上传的文件');
+      return;
+    }
+    setUploading(true);
+    try {
+      const result = await fileAssetService.batchUpload(uploadFiles, {
+        fileType: uploadFileType,
+        organizationId: uploadOrgId || undefined,
+      });
+      const failCount = result.failed?.length ?? 0;
+      if (result.created?.length > 0) {
+        message.success(`已上传 ${result.created.length} 个文件`);
+      }
+      if (failCount > 0) {
+        message.warning(
+          `${failCount} 个文件上传失败：` +
+            result.failed.map((f) => `${f.fileName} (${f.reason})`).join('；'),
+        );
+      }
+      setUploadFiles([]);
+      setUploadOpen(false);
+      fetchData();
+    } catch (err) {
+      message.error(extractErrorMessage(err, '批量上传失败'));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const uploadFileList: UploadFile[] = uploadFiles.map((f, i) => ({
+    uid: `-${i}`,
+    name: f.name,
+    status: 'done',
+  }));
+
   const columns: ColumnsType<FileAssetListItem> = [
     {
       title: '文件',
@@ -283,7 +374,7 @@ function MediaList() {
       width: 110,
       render: (type: string) => (
         <Tag color={FILE_TYPE_COLOR[type] || 'default'}>
-          {FILE_TYPE_LABEL[type] || type}
+          {FILE_TYPE_LABEL[type] || '未知类型'}
         </Tag>
       ),
     },
@@ -294,7 +385,7 @@ function MediaList() {
       width: 100,
       render: (status: string) => (
         <Tag color={FILE_STATUS_COLOR[status] || 'default'}>
-          {FILE_STATUS_LABEL[status] || status}
+          {FILE_STATUS_LABEL[status] || '未知状态'}
         </Tag>
       ),
     },
@@ -311,7 +402,7 @@ function MediaList() {
       dataIndex: 'entityType',
       key: 'entityType',
       width: 110,
-      render: (type: string) => ENTITY_TYPE_LABEL[type] || type,
+      render: (type: string) => ENTITY_TYPE_LABEL[type] || '未知类型',
     },
     {
       title: '所属组织',
@@ -444,9 +535,28 @@ function MediaList() {
             统一管理平台所有上传的文件资产，按类型 / 实体 / 组织分开浏览
           </Text>
         </div>
-        <Button icon={<DeleteOutlined />} onClick={() => navigate('/files/orphans')}>
-          孤立文件清理
-        </Button>
+        <Space>
+          <Button
+            icon={<UploadOutlined />}
+            onClick={() => {
+              setUploadFiles([]);
+              setUploadOpen(true);
+            }}
+          >
+            批量上传
+          </Button>
+          <Button
+            danger
+            icon={<DeleteOutlined />}
+            disabled={selectedRowKeys.length === 0}
+            onClick={handleBatchDelete}
+          >
+            批量删除{selectedRowKeys.length > 0 ? ` (${selectedRowKeys.length})` : ''}
+          </Button>
+          <Button icon={<DeleteOutlined />} onClick={() => navigate('/files/orphans')}>
+            孤立文件清理
+          </Button>
+        </Space>
       </div>
 
       <Space
@@ -580,6 +690,16 @@ function MediaList() {
         columns={columns}
         dataSource={items}
         loading={loading}
+        rowSelection={{
+          selectedRowKeys,
+          onChange: setSelectedRowKeys,
+          getCheckboxProps: (record) => ({
+            disabled:
+              (record.productMediaCount ?? 0) > 0 ||
+              (record.contentMediaCount ?? 0) > 0,
+            title: '文件被引用，无法删除',
+          }),
+        }}
         onChange={handleTableChange}
         expandable={{ expandedRowRender, rowExpandable: () => true }}
         pagination={{
@@ -592,6 +712,65 @@ function MediaList() {
         scroll={{ x: 'max-content' }}
         locale={{ emptyText: '暂无媒体文件' }}
       />
+
+      <Modal
+        title="批量上传"
+        open={uploadOpen}
+        onOk={handleUploadOk}
+        onCancel={() => setUploadOpen(false)}
+        okText="上传"
+        cancelText="取消"
+        confirmLoading={uploading}
+        maskClosable={false}
+        width={560}
+      >
+        <Space direction="vertical" style={{ width: '100%' }} size={16}>
+          <Upload.Dragger
+            multiple
+            accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv"
+            showUploadList={false}
+            beforeUpload={handleUploadFileSelect}
+            fileList={uploadFileList}
+          >
+            <p className="ant-upload-drag-icon">
+              <UploadOutlined />
+            </p>
+            <p className="ant-upload-text">点击或拖拽文件到此处批量上传</p>
+            <p className="ant-upload-hint">
+              可一次选择多个文件（最多 10 个，单个 ≤ 10MB）
+            </p>
+          </Upload.Dragger>
+
+          <Space wrap>
+            <span>类型：</span>
+            <Select
+              value={uploadFileType}
+              onChange={setUploadFileType}
+              options={FILE_TYPE_OPTIONS.filter((o) => o.value)}
+              style={{ width: 140 }}
+            />
+            <span>归属组织：</span>
+            <Select
+              allowClear
+              showSearch
+              optionFilterProp="label"
+              placeholder="选择归属组织"
+              value={uploadOrgId}
+              onChange={(v) => setUploadOrgId(v)}
+              options={orgOptions.filter((o) => o.value)}
+              style={{ width: 220 }}
+            />
+          </Space>
+
+          {uploadFiles.length > 0 && (
+            <ul style={{ maxHeight: 160, overflow: 'auto', paddingLeft: 18 }}>
+              {uploadFiles.map((f, i) => (
+                <li key={i}>{f.name}</li>
+              ))}
+            </ul>
+          )}
+        </Space>
+      </Modal>
     </div>
   );
 }

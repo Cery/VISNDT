@@ -28,7 +28,7 @@ function formatDateTime(value?: string | null) {
 }
 
 function RfqStatusBadge({ status }: { status: string }) {
-  const label = RFQ_STATUS_LABELS[status] ?? status;
+  const label = RFQ_STATUS_LABELS[status] ?? '未知状态';
   const colorMap: Record<string, string> = {
     OPEN: 'bg-emerald-100 text-emerald-700',
     RESPONDING: 'bg-blue-100 text-blue-700',
@@ -108,7 +108,7 @@ function OpportunityContent() {
         {overviewQuery.isLoading ? (
           <div className="rounded-xl border border-slate-200 bg-white"><Loading /></div>
         ) : overviewQuery.data ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 items-start">
             <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
               <p className="text-xs font-medium uppercase tracking-wide text-slate-500">公开 RFQ</p>
               <p className="mt-1 text-2xl font-bold text-slate-900">{availableTotal}</p>

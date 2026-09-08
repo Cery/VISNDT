@@ -35,34 +35,34 @@ const { Header, Sider, Content } = Layout;
 // ============================================
 // Sectioned Menu Configuration — Operational IA
 // ============================================
-// 目标结构（773 IA Decision Gate AUTHORIZED）：
-// 工作台 / 业务中心 / 能力主数据 / 合作方管理 / 内容与知识库 / 数据与监控 / 系统管理
-// 运营中心并入首页工作台（/home）；媒体管理并入内容与知识库；AI 数据准备并入数据与监控。
+// 目标结构（839 WP-5B Governance IA AUTHORIZED）：
+// 治理工作台 / 业务队列 / 产品治理 / 组织与用户治理 / 内容治理 / 监控与审计 / 系统管理
+// 首页 = Platform Governance Workbench（队列优先）；既有运营中心并入 /home，不再作为独立侧边栏菜单项。
 type MenuGroup = 'workbench' | 'business' | 'product' | 'permission' | 'content' | 'data' | 'system';
 
-// 推荐优化 IA（773 Decision Gate AUTHORIZED）：按【工作台 → 业务 → 主数据 → 合作方 → 内容媒体 → 数据监控 → 系统】排序。
-// 运营中心并入首页工作台（/home），不再作为独立侧边栏菜单项。
+// 839 WP-5B Governance IA：按【治理工作台 → 业务队列 → 产品治理 → 组织与用户治理 → 内容治理 → 监控与审计 → 系统】排序。
+// 所有菜单项均映射真实路由；仅重定义组织/标签，不引入后端能力。运营中心并入首页工作台（/home）。
 const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }> = {
   workbench: {
-    label: '工作台',
-    items: [{ key: '/home', icon: <DashboardOutlined />, label: '首页' }],
+    label: '治理工作台',
+    items: [{ key: '/home', icon: <DashboardOutlined />, label: '治理工作台' }],
   },
   business: {
-    label: '业务中心',
+    label: '业务队列',
     items: [
       { key: '/demands', icon: <FileTextOutlined />, label: '需求管理' },
       { key: '/rfqs', icon: <SnippetsOutlined />, label: 'RFQ 管理' },
-      { key: '/inquiries', icon: <MailOutlined />, label: '能力询价' },
+      { key: '/inquiries', icon: <MailOutlined />, label: '询价' },
       { key: '/offers', icon: <TagsOutlined />, label: '报价管理' },
       { key: '/matching', icon: <NodeIndexOutlined />, label: '匹配管理' },
     ],
   },
   product: {
-    label: '能力主数据',
+    label: '产品治理',
     items: [
-      { key: '/products', icon: <AppstoreOutlined />, label: '能力管理' },
-      { key: '/supplier-products', icon: <ExperimentOutlined />, label: '能力型号审核' },
-      { key: '/product-categories', icon: <TagsOutlined />, label: '能力分类' },
+      { key: '/products', icon: <AppstoreOutlined />, label: '产品治理' },
+      { key: '/supplier-products', icon: <ExperimentOutlined />, label: '产品型号审核' },
+      { key: '/product-categories', icon: <TagsOutlined />, label: '产品分类' },
       {
         key: 'parameters',
         icon: <SettingOutlined />,
@@ -75,14 +75,14 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
     ],
   },
   permission: {
-    label: '合作方管理',
+    label: '组织与用户治理',
     items: [
-      { key: '/users', icon: <TeamOutlined />, label: '用户管理' },
-      { key: '/organizations', icon: <BankOutlined />, label: '企业管理' },
+      { key: '/users', icon: <TeamOutlined />, label: '用户治理' },
+      { key: '/organizations', icon: <BankOutlined />, label: '组织治理' },
     ],
   },
   content: {
-    label: '内容与知识库',
+    label: '内容治理',
     items: [
       { key: '/content', icon: <ReadOutlined />, label: '内容管理' },
       {
@@ -101,7 +101,7 @@ const menuGroups: Record<MenuGroup, { label: string; items: MenuProps['items'] }
     ],
   },
   data: {
-    label: '数据与监控',
+    label: '监控与审计',
     items: [
       { key: '/analytics', icon: <DatabaseOutlined />, label: '数据分析' },
       { key: '/business-analytics', icon: <FundOutlined />, label: '业务分析' },
@@ -143,20 +143,20 @@ const menuKeys: string[] = [
 
 // Breadcrumb route mapping
 const breadcrumbMap: Record<string, string> = {
-  '/home': '首页',
+  '/home': '平台治理工作台',
   '/analytics': '数据分析',
   '/business-analytics': '业务分析',
   '/monitoring': '运营监控',
   '/audit-intelligence': '审计智能',
-  '/products': '能力管理',
-  '/product-categories': '能力分类',
+  '/products': '产品管理',
+  '/product-categories': '产品分类',
   '/content': '内容管理',
   '/content/tags': '标签管理',
-  '/inquiries': '能力询价',
+  '/inquiries': '询价',
   '/demands': '需求管理',
   '/rfqs': 'RFQ 管理',
   '/offers': '报价管理',
-  '/supplier-products': '能力型号审核',
+  '/supplier-products': '产品型号审核',
   '/matching': '匹配管理',
   '/users': '用户管理',
   '/organizations': '企业管理',
@@ -349,7 +349,7 @@ function AdminLayout() {
             </span>
             {!collapsed && (
               <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>
-                工业运营中心
+                平台治理工作台
               </span>
             )}
           </div>
@@ -410,7 +410,7 @@ function AdminLayout() {
               />
             )}
             <span className="admin-header-title" style={{ fontSize: 16, fontWeight: 600, whiteSpace: 'nowrap' }}>
-              VISNDT 工业运营中心
+              VISNDT 平台治理工作台
             </span>
             <span className="admin-header-title" style={{ fontSize: 12, color: '#999', marginLeft: 8, borderLeft: '1px solid #e8e8e8', paddingLeft: 8 }}>
               工业检测能力发现平台

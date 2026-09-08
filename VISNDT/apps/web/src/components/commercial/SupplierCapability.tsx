@@ -3,16 +3,20 @@ import type { Organization } from '@/types/organization';
 import type { Offer } from '@/types/product';
 import EmptyState from '@/components/common/EmptyState';
 import DemandCTA from '@/components/conversion/DemandCTA';
+import { stripGovernanceLabels } from '@/lib/display-text';
 
-/** Supplier type Chinese mapping (mirrors SupplierPublicProfile) */
+/** Supplier type Chinese mapping (mirrors SupplierPublicProfile)
+ * 统一供应商语义：「供应商」不下钻猜测制造商/贸易商（organization.type 仅有 ADMIN/SUPPLIER）。 */
 const typeLabels: Record<string, string> = {
-  manufacturer: '制造商',
-  distributor: '经销商',
-  agent: '代理商',
-  'service-provider': '服务商',
-  integrator: '集成商',
-  'testing-organization': '检测机构',
-  other: '其他',
+  SUPPLIER: '供应商',
+  ADMIN: '管理方',
+  manufacturer: '供应商',
+  distributor: '供应商',
+  agent: '供应商',
+  'service-provider': '供应商',
+  integrator: '供应商',
+  'testing-organization': '供应商',
+  other: '供应商',
 };
 
 interface SupplierCapabilityProps {
@@ -44,7 +48,7 @@ export default function SupplierCapability({
   organization,
   offers,
 }: SupplierCapabilityProps) {
-  const typeLabel = typeLabels[organization.type] ?? organization.type;
+  const typeLabel = typeLabels[organization.type] ?? '供应商';
   const activeOffers = offers.filter(
     (o) => o.status === 'ACTIVE' || o.status === 'SUBMITTED',
   );
@@ -94,7 +98,7 @@ export default function SupplierCapability({
                 description="该供应商暂未发布已关联的产品能力。"
               />
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
                 {relatedCaps.map((offer) => (
                   <Link
                     key={offer.id}
@@ -102,11 +106,12 @@ export default function SupplierCapability({
                     className="group flex items-center justify-between gap-3 rounded-lg border border-slate-200/80 bg-slate-50/60 px-4 py-3 hover:border-primary/40 hover:bg-primary/5 transition-colors"
                   >
                     <div className="min-w-0">
+                      {/* 846 §60：剥离治理前缀，禁止测试治理标签进普通视图 */}
                       <p className="text-sm font-medium text-slate-700 group-hover:text-primary transition-colors truncate">
-                        {offer.title}
+                        {stripGovernanceLabels(offer.title)}
                       </p>
                       <p className="text-xs text-slate-400">
-                        {offerStatusLabels[offer.status] ?? offer.status}
+                        {offerStatusLabels[offer.status] ?? '未知状态'}
                       </p>
                     </div>
                     <span className="text-xs text-slate-400 shrink-0">&rarr;</span>

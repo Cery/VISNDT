@@ -56,7 +56,7 @@ function CompareContextHeader({
           <p className="text-slate-400 mt-3 text-sm sm:text-base max-w-2xl leading-relaxed">
             以技术参数、能力异同与工程适用性维度开展评估对比——面向工程师的确定性评估工作台，
             {mode === 'product'
-              ? `当前选择 ${count} 个检测能力产品进行横向评估。`
+              ? `当前选择 ${count} 个检测产品进行横向评估。`
               : `在同一检测能力锚点下对 ${count} 个供应商型号逐一核验。`}
           </p>
           <div className="mt-5">
@@ -202,7 +202,7 @@ function ComparePageContent() {
               在产品详情页的「供应商型号」中勾选 2–7 个型号进行对比。
             </p>
             <Link
-              href="/search?type=supplier-product"
+              href="/products"
               className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
             >
               前往供应商型号搜索
@@ -224,7 +224,7 @@ function ComparePageContent() {
               缺少能力锚点（capability 参数），无法完成同能力下比较。请重新选择型号。
             </p>
             <Link
-              href="/search?type=supplier-product"
+              href="/products"
               className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
             >
               前往供应商型号搜索
@@ -273,11 +273,11 @@ function ComparePageContent() {
                   : '在产品详情页的「供应商型号」中勾选 2–7 个型号进行对比。'}
               </p>
               <Link
-                href="/search?type=supplier-product"
+                href="/products"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
               >
-                返回供应商型号搜索
-              </Link>
+                返回产品注册表选型
+            </Link>
             </div>
           )}
 

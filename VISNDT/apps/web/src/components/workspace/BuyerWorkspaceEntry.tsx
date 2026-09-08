@@ -75,7 +75,7 @@ export default function BuyerWorkspaceEntry() {
             />
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 items-start">
             <StatCard
               label="需求"
               value={overviewQuery.data.demandSummary.total}
@@ -162,7 +162,7 @@ export default function BuyerWorkspaceEntry() {
           <span className="w-1 h-5 bg-industrial-cyan rounded-full" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-foreground">快捷入口</h2>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4 items-start">
           {BUYER_QUICK_ITEMS.map((item) => (
             <Link
               key={item.href}

@@ -50,7 +50,7 @@ function getTypeLabel(type: string): string {
     RESPONSE_UPDATE: '响应更新',
   };
 
-  return labels[type] || type;
+  return labels[type] || '未知类型';
 }
 
 function NotificationsContent() {

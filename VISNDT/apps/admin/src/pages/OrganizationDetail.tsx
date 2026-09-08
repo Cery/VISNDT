@@ -57,7 +57,7 @@ const MEMBER_COLUMNS: ColumnsType<OrganizationMember> = [
     key: 'role',
     width: 120,
     render: (role: string) => (
-      <Tag color={role === 'ADMIN' ? 'blue' : 'default'}>{ROLE_LABEL_MAP[role] || role}</Tag>
+      <Tag color={role === 'ADMIN' ? 'blue' : 'default'}>{ROLE_LABEL_MAP[role] || '未知角色'}</Tag>
     ),
   },
   {
@@ -156,7 +156,7 @@ export default function OrganizationDetailPage() {
           <Descriptions.Item label="名称">{org.name}</Descriptions.Item>
           <Descriptions.Item label="类型">{org.type || '-'}</Descriptions.Item>
           <Descriptions.Item label="状态">
-            <StatusTag status={org.status} label={STATUS_LABEL_MAP[org.status] || org.status} />
+            <StatusTag status={org.status} label={STATUS_LABEL_MAP[org.status] || '未知状态'} />
           </Descriptions.Item>
         </Descriptions>
       </Card>

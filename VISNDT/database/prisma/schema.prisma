@@ -372,6 +372,7 @@ model ProductCategory {
   products          Product[]
   demands           Demand[]
   knowledgeMappings ProductCategoryKnowledgeMapping[]
+  parameterGroups   ParameterGroup[]
 
   @@index([parentId])
   @@map("product_category")
@@ -436,13 +437,16 @@ model ParameterGroup {
   name        String
   code        String  @unique
   description String?
+  categoryId  String? @map("category_id") @db.Uuid
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   definitions ParameterDefinition[]
+  category    ProductCategory?      @relation(fields: [categoryId], references: [id])
 
   @@index([code])
+  @@index([categoryId])
   @@map("parameter_group")
 }
 

@@ -18,7 +18,7 @@
 | Notification | `DONE` | `85%` | 列表、未读数、已读、批量已读、Workspace 页面已落地 | 主要剩余运行态验证和一致性治理 |
 | Workflow | `DONE` | `90%` | WorkflowEvent 已覆盖全部主链生命周期；**Content 生命周期 WorkflowEvent 可靠性已修复（M18.4.1：CONTENT 豁免组织约束，emitEvent 不再静默吞错）** | Match/RFQ/Response 事件已补齐，主体语义已统一；Content 事件可靠性已由 M18.4.1 修复 |
 | Inquiry | `MOSTLY_DONE` | `85%` | Inquiry 模型、API、Admin 页面已存在，公开产品详情页已接入完整 `offerId + organizationId` 询价数据链 | 后续可增强询价状态流转与运营视图 |
-| Admin | `DONE` | `97%` | Dashboard、Users、Organizations、Products、Demands、RFQs、Offers、Inquiries、AuditLog、FileAsset 全覆盖；**Content 管理基础已落地（M17.3：列表/编辑器/生命周期操作）**；**Content 正文升级为 Markdown 编辑+预览（M18.1：MarkdownEditor 组件）**；**Content 类型与筛选支持 INSIGHT 参数百科（M18.1）**；**Content 媒体管理已实现（M18.2：ContentMediaManager 组件，上传/图片附件判别/编辑/排序/级联删除）**；**Admin Operation Center 升级已完成（M20.4.1：分组菜单 + 面包屑 + 用户头像/通知 + 移动端抽屉 + Dashboard 运营驾驶舱 recharts 图表 + 16 页面 Table 体验升级 + 响应式三端适配 + 6 个 operation 基础组件）** | 更偏运营效率升级，不是能力空白；SEO 深化（M18.3）已由 Web 展示层完成；M20.4.1 已完成 Admin 专业运营中心基础 |
+| Admin | `DONE` | `97%` | Dashboard、Users、Organizations、Products、Demands、RFQs、Offers、Inquiries、AuditLog、FileAsset 全覆盖；**Content 管理基础已落地（M17.3：列表/编辑器/生命周期操作）**；**Content 正文升级为 Markdown 编辑+预览（M18.1：MarkdownEditor 组件）**；**Content 类型与筛选支持 INSIGHT 参数百科（M18.1）**；**Content 媒体管理已实现（M18.2：ContentMediaManager 组件，上传/图片附件判别/编辑/排序/级联删除）**；**Admin Operation Center 升级已完成（M20.4.1：分组菜单 + 面包屑 + 用户头像/通知 + 移动端抽屉 + Dashboard 运营驾驶舱 recharts 图表 + 16 页面 Table 体验升级 + 响应式三端适配 + 6 个 operation 基础组件）** | 更偏运营效率升级，不是能力空白；SEO 深化（M18.3）已由 Web 展示层完成；M20.4.1 已完成 Admin 专业运营中心基础；**WP-5B（839）Admin Core Operations：传统 Dashboard+Statistics+CRUD Menu → Platform Governance Workbench（AdminLayout 治理工作台 IA + OperationCenter 治理优先首页：对象→状态→队列→证据→治理动作→结果），队列/审核/发布真实 API，P0=0/P1=0，839 = PASS / CLOSED** |
 | Embedding | `DONE` | `80%` | **AI Data Preparation Foundation（M21.3.5：pgvector VECTOR(1536) + Content/Product Embedding + ContentChunk + EmbeddingService + 8 ADMIN-only API + Admin Management UI）** | 当前仅数据准备层，Semantic Search / RAG / AI Chat 待 M21.4+ |
 | Semantic | `DONE` | `95%` | **M21.4.0 Audit（CONDITIONAL PASS）。M21.4.1 Vector Index（527：Migration 011——3 IVFFlat indexes + cosine_similarity，P0 GAP-01/GAP-02 RESOLVED）。M21.4.2 Data Population（528：OpenRouter——8 Content + 5 Product + 8 Chunk，100% Coverage，21/21 1536-dim，P1 GAP-04 RESOLVED）。M21.4.3 Semantic Module Foundation（529：SemanticModule + RetrievalService + EmbeddingCacheService + SemanticController，P0 GAP-03 RESOLVED）。M21.4.4 Semantic Search API Foundation（530：SemanticQueryService + SemanticQueryController + DTO + Query Contract Frozen，Internal API）。M21.4.5 Retrieval Enhancement（531：threshold filtering + diagnostics + unified retrieve() + metadata + query normalization，P1 GAP-05 RESOLVED）。M21.4.6 Ranking Foundation（532：RankingService + RankingStrategy + Contract Frozen，semanticScore + rankingScore，P1 GAP-06 RESOLVED）。M21.4.7 Unified Search Ranking Foundation（533：UnifiedSearchService + UnifiedSearchContract + UnifiedSearchDto，Retrieval→Ranking→Unified Response orchestration，P1 GAP-07 RESOLVED）。M21.4 CLOSED——3/3 P0 GAPs + 4/4 P1 GAPs 全部解决** | Semantic Intelligence Layer 基础完成，未来 Search/Agent/RAG 可基于此扩展 |
 | AI Gateway | `FOUNDATION` | `30%` | **M21.7.1 AI Agent Gateway Foundation（545：AIModule + AIController + AIService + AICapabilityGuard + AIRequestDto + AICapability Interface + 3 API endpoints（GET /ai/status /ai/capabilities /ai/boundaries，JWT protected），AI Capability Boundary + AI Request Audit（复用 AuditLog）+ Capability Registry + Boundary Rules，apps/api build exit 0，零 Schema/Migration 变更）** | AI 入口边界建立，Agent Runtime / Tool Layer / LLM Client 待 M21.7.2+ |
@@ -40,7 +40,7 @@
 | --- | --- | --- | --- | --- |
 | Public Website | `MOSTLY_DONE` | `97%` | 首页、产品列表/详情、分类、关于、商务、知识中心、解决方案已存在，公开询价链路已接入真实数据，页面与组件层 API 调用均已统一至 service 层（M16.2/M16.5），SEO 元数据基础（metadataBase/Open Graph/动态产品元数据）已建立；**知识中心与解决方案已动态化（M17.4：Content API 数据源 + 详情页 + 动态内容 SEO）**；**内容详情 Markdown 安全渲染已完成（M18.1：react-markdown + remark-gfm + skipHtml + 协议白名单，服务端渲染，SEO 保留）**；**内容排版依赖已启用（M18.1：@tailwindcss/typography prose 插件）**；**Content Media 展示已实现（M18.2：MediaGallery 组件，媒体画廊 + 附件列表 + 预签名下载）**；**SEO Enhancement 已完成（M18.3：OpenGraph images / JSON-LD（Article/TechArticle）/ Sitemap.xml / Canonical / keywords）** | 剩余偏运营内容质量与生产域名配置，非能力空白；SEO 展示层能力已由 M18.3 落地 |
 | Buyer Workspace | `MOSTLY_DONE` | `90%` | Demand / RFQ / Match / Notification / Dashboard / Edit Flow 已落地，页面 API 调用已统一至 service 层 | 组件层仍存在 5 处 `import type` 类型引用（非运行时数据访问），可后续清理 |
-| Supplier Workspace | `MOSTLY_DONE` | `82%` | Supplier Dashboard、RFQ 列表/详情、响应跟踪已落地 | 兼容入口与状态表达仍需继续收口 |
+| Supplier Workspace | `MOSTLY_DONE` | `90%` | Supplier Dashboard、RFQ 列表/详情、响应跟踪已落地；**WP-5A（837/838）**：Supplier Workbench 产品化（My SupplierProducts dense 列表 + Model Workbench 详情：Identity/Media R1/Parameter R2/Review/Public Context）+ R1 媒体写（上传/预览/主图/重排/删除）+ R2 参数覆盖写（全量 replace）+ DRAFT→SUBMITTED 生命周期门控，继承 834/835 平台 UI 基线，375-1440 无溢出；**838 Closeout**：Rich-State（媒体 5 型号/参数覆盖 8 条）证据 + Touch Target 精修（44/48px）+ Build/Regression 复验，837/WP-5A = PASS / CLOSED | WP-5B（Admin Core Operations）= PASS / CLOSED（839）；WP-5C = READY / NEXT（不自动启动）；剩余为受控测试数据稀缺（P2，非缺陷） |
 | Dashboard | `MOSTLY_DONE` | `85%` | Buyer / Supplier Dashboard 已形成业务状态聚合页 | 与 Workspace 的职责边界仍有历史兼容痕迹 |
 | Mobile Experience | `COMPLETED` | `100%` | **M21.5.0 Pre-Dev Audit（534 Completed）**：PASS——API/Auth Ready，Semantic Protected，BFF Deferred；**M21.5.1 Responsive Web Foundation（535 Completed）**：2 new + 18 modified files，Responsive Layout + Mobile Navigation + WorkspaceLayout + Responsive Hooks + 三端适配（Mobile/Tablet/Desktop），apps/web build exit 0，零 API/Schema/Migration 变更；**M21.5.2 Progressive Web App Foundation（536 Completed）**：6 new + 1 modified files，PWA Manifest + Service Worker（Cache-First Static / Network-First Pages / Offline Fallback）+ PWA Icons + Offline Page + Root Layout PWA Integration，apps/web build compiled successfully，零 API/Schema/Migration 变更；**M21.5.3 Mobile Experience Optimization（537 Completed）**：12 modified files，Workspace Mobile UX（Sidebar close button + 44px touch targets + responsive padding）+ Product Experience（ProductCard + Specifications responsive）+ Form Experience（Demand/RFQ Create 44px buttons）+ Touch Optimization + PWA Offline Page ESLint fix，apps/web build exit 0，零 API/Schema/Migration 变更 | M21.5 Mobile Experience — CLOSED（534-537 全部完成，Responsive Web + PWA + Mobile UX Optimization） |
 | Admin Intelligence | `IN_PROGRESS` | `70%` | **M21.6.0 Pre-Dev Audit（538 Completed）**：Audit PASS——Admin UI 19 pages（B+ maturity），Admin API 11 endpoints（ADMIN-only），Analytics 8 event types（dashboard + statistics + events），Monitoring（Matching + System status），Audit（full trail + filter + export），Embedding（coverage status + manual trigger），Semantic Boundary PROTECTED，13 data sources READY，8 Gaps（0 P0 / 3 P1 / 5 P2），Overall Readiness B+；**M21.6.1 Admin Operational Dashboard Enhancement（539 Completed）**：8 modified files（4 backend + 4 frontend），1 new API endpoint（GET /admin/dashboard/trend）+ 2 enhanced API responses（stats + pending），Dashboard Enhancement：Platform KPIs（6 cards）+ Business KPIs（6 cards）+ Matching Intelligence（4 cards）+ Pending Items（5 cards）+ Real Trend（7-day ConversionEvent）+ Business Funnel（7-stage real data）+ Entity Comparison（10 entities），apps/admin + apps/api build exit 0，零 Schema/Migration 变更；**M21.6.2 Admin Business Analytics Enhancement（540 Completed）**：11 files（2 new backend + 3 new frontend + 6 modified），4 new API endpoints（GET /admin/analytics/business/{funnel,lifecycle,conversion,matching}，ADMIN-only），Business Analytics Page（4 tabs：Demand Funnel 6-stage + RFQ Lifecycle 5-stage + Business Conversion 9-stage pipeline + Matching Analysis 6-stage），apps/admin + apps/api build exit 0，零 Schema/Migration 变更；**M21.6.3 Admin Monitoring Enhancement（541 Completed）**：9 files（2 new backend + 3 new frontend + 4 modified），1 new API endpoint（GET /admin/monitoring/overview，ADMIN-only），Monitoring Page（5 sections：System Health + Business Risk + Matching Health + Embedding Coverage + Analytics Pipeline），10 code-level thresholds（NORMAL/WARNING/CRITICAL），apps/admin + apps/api build exit 0，零 Schema/Migration 变更；**M21.6.4 Admin Audit Intelligence Enhancement（542 Completed）**：9 files（2 new backend + 3 new frontend + 4 modified），1 new API endpoint（GET /admin/audit-intelligence/overview?days=7，ADMIN-only），Audit Intelligence Page（5 sections：Audit Overview + Audit Trend + Entity Distribution + Actor Activity + Risk Indicators），6 code-level risk indicators（DELETE/STATUS_CHANGE/Event Rate/Login Rate/Actor Activity/Actor Concentration），apps/admin + apps/api build exit 0，零 Schema/Migration 变更 | Next: M21.6 Closure / Admin Intelligence Final Audit |
@@ -737,6 +737,35 @@ M20.4 CLOSED
 - **Docs** ✅：新建 `docs/_review/833_WP-4_SupplierProduct_Media_Parameter_Report.md`；STATUS/ROADMAP/MATRIX 追加 833。
 - **Next** ⏸️：**STOP——833 WP-4 COMPLETE（CONDITIONAL PASS）。WP-5A 待独立授权后启动**。
 
+### 834_Platform_UIUX_Redefinition_Gate（POST-M39 · V3.3.12 · 平台 UI/UX 目标态定义门 · PASS · CLOSED）
+- **WP 状态** ✅：**834（833 → 834）Platform UI/UX Redefinition Gate COMPLETE = PASS / CLOSED**。
+- **版本化** ✅：833 → **834 = PASS / CLOSED**（平台 UI/UX 诊断 + IA/Navigation/Visual/Interaction 目标态 + 边界决策；Zero 生产代码）。
+- **边界决策** ✅：**833 R1 Media Write / R2 Parameter Write = WP-5A Implementation（Supplier Workspace）一部分，非 WP-4 Closeout**；WP-4（833）= RESUME / REBASELINE REQUIRED；WP-5A=NOT AUTO-STARTED。
+- **Docs** ✅：新建 `docs/_review/834_Platform_UIUX_Redefinition_Gate_Report.md`；STATUS/ROADMAP/MATRIX 追加 834。
+- **Next** ⏸️：**STOP——834 COMPLETE（PASS / CLOSED）。WP-4 = RESUME / REBASELINE REQUIRED；WP-5A = NOT AUTO-STARTED**，待独立授权后启动。
+
+### 835_Platform_UIUX_Redefinition_Implementation（POST-M39 · V3.3.13 · 平台 UI/UX 重定义实施 · Public Core · CONDITIONAL PASS）
+- **WP 状态** ✅：**835（834 → 835）Platform UI/UX Redefinition Implementation COMPLETE = CONDITIONAL PASS**。
+- **版本化** ✅：834 → **835 = CONDITIONAL PASS**（Public Core Frontend 实施；Frontend Source=YES；Backend/API/Schema/Migration=NO；无新 Domain/Authority/Search Domain/Public Content Domain；未动 833 R1/R2）。
+- **Homepage** ✅ HostDiscoveryLedge（Search-first）→ 能力/分类 → 注册表台账 → 知识索引 → 方案索引 → 连续发现+单一需求行动；移除品牌 Hero/平台流程/icon 卡营销。
+- **Nav & Mobile** ✅ 用户语言层（发现/产品/方案/连接）+ 48px 触控 + 抽屉；修复 `/search?type=supplier-product` 死点与 `/supplier-models` redirect。
+- **Product/Knowledge/Solution** ✅ Result-first 列表 + 工程评估详情 + 数据驱动方案索引 + 紧凑知识 rail。
+- **A11y/Runtime/Security/Regression** ✅ 单 H1、4 视口溢出=0、无 5xx/新增 console error、敏感字段扫描=0 leak、build EXIT=0。
+- **P0=0/P1=0**；**P2** 双 knowledge 套件冗余、compare 深链忽略 type 参（均非阻塞，顺延）；**数据稀缺**（2 方案等）。
+- **Docs** ✅：新建 `docs/_review/835_Platform_UIUX_Redefinition_Implementation_Report.md`；STATUS/ROADMAP/MATRIX 追加 835。
+- **Final** ✅：835=CONDITIONAL PASS；WP-4=REBASELINE REQUIRED；WP-5A=NOT AUTO-STARTED。
+- **Next** ⏸️：**STOP——835 COMPLETE（CONDITIONAL PASS）。不自动启动 WP-4/WP-5A/WP-5B/WP-5C/WP-6/WP-7/WP-8**。
+
+### 836_WP-4_Rebaseline_Closeout（POST-M39 · V3.3.14 · WP-4 Rebaseline + Closeout Gate · PASS · CLOSED）
+- **性质** ✅：**WP-4 Rebaseline / Closeout（严格收口 Gate）**。非新开发、非重建。基于 833/834/835 确认 833 核心只读交付 + 835 新 UI 兼容 + R1/R2 归属 WP-5A + 关闭 WP-4 Conditional。**Business/Schema/Migration/API/Frontend=NO**；仅报告 + 文档同步。
+- **只读确认** ✅：Media/Parameter Read 仅收口验证（真实 API `media`/`parameterValues` 字段 + 浏览器详情页只读区渲染），未改代码；媒体/参数值 seed 0 条为受控数据稀缺（P2）。
+- **边界** ✅：Ownership（Own=200/Cross-org=403 服务端作用域）；Publication（仅 PUBLISHED 公共可见，APPROVED 隐藏，后端强制）；Security（敏感字段不泄漏，非前端隐藏）。
+- **Runtime/Build** ✅：Supplier 登录→我的产品→详情只读链路 + 公共产品供应商型号上下文 PASS；console error=0/exception=0/load failure=0/5xx=0；375/1440（必测）+768/1024（抽查）溢出=0；Web/API tsc+next/nest build 全过；Home/Search/Products/Detail/Knowledge/Solution/Buyer/SupplierRead 回归正常。
+- **版本化** ✅：833（CONDITIONAL）→ 834（PASS/CLOSED）→ 835（CONDITIONAL）→ **836 WP-4 REBASELINE/CLOSEOUT = PASS / CLOSED**。R1/R2 写能力已正式确认归属 WP-5A，不再循环阻塞 WP-4。
+- **Readiness** ✅：**WP-5A（Supplier Workspace）R1 Media Write / R2 Parameter Write = READY / NEXT**，但**不自动启动**，须独立授权。
+- **Docs** ✅：新建 `docs/_review/836_WP-4_Rebaseline_Closeout_Report.md`；STATUS/ROADMAP/MATRIX 追加 836。
+- **Next** **⏸️：STOP——836/WP-4 COMPLETE（PASS / CLOSED）。WP-5A（Supplier Workspace）= READY / NEXT 但**不自动启动**，须独立授权**。
+
 ### 832_WP-3B_Buyer_Workspace（POST-M39 · WP-3B 采购方工作空间重构 · PASS · CLOSED）
 - **WP 状态** ✅：**832（831 → 832）WP-3B Buyer Workspace COMPLETE = PASS / CLOSED**。
 - **采购旅程 IA** ✅：新增 `BuyerJourneySteps`，工作台由统计卡片重构为 **DEMAND → MATCH → RFQ → DECISION** 采购旅程；计数全部来自 `GET /workspace/buyer/overview` 真实聚合，不伪造数据。
@@ -794,3 +823,87 @@ M20.4 CLOSED
 - **Readiness** ✅：**READY FOR WP-3A.3（Product Detail + Related Discovery）**，但**不自动启动**。
 - **Docs** ✅：新建 `docs/_review/828_POST_M39_WP3A2_SEARCH_CATEGORIES_PRODUCT_LIST_RECONSTRUCTION_REPORT.md`；STATUS/ROADMAP/MATRIX 追加 828/829。
 - **Next** ⏸️：**STOP——828 WP-3A.2 CLOSED（经 829）。WP-3A.3 待独立授权后启动**。
+
+### 839_WP-5B_Admin_Core_Operations（POST-M39 · V3.3.17 · WP-5B Admin Core Operations · Platform Governance Workbench · PASS · CLOSED）
+
+- **WP 状态** ✅：**839（838 = PASS/CLOSED → 839 WP-5B COMPLETE = PASS / CLOSED）**。Admin Core Operations 从传统 Dashboard+Statistics+CRUD Menu 重构为 **Platform Governance Workbench**（对象→状态→队列→证据→治理动作→结果），同时保持 Database/Domain/Authority/API Contract/Route Semantics/Permission/Lifecycle/Business Logic 全冻结。
+- **Admin IA** ✅：AdminLayout 导航重构为治理工作台 IA（治理工作台 / 业务队列 / 产品治理·能力产品·能力型号·能力分类·参数体系 / 组织与用户治理·用户治理·组织治理 / 内容治理·内容管理·知识库·标签管理·媒体管理 / 监控与审计·数据分析·业务分析·运营监控·审计智能·AI数据准备 / 系统管理·通知管理·审计日志），未凭空创建无后端能力的菜单。
+- **Workbench（首页）** ✅：OperationCenter 重构为治理优先首页（待处理业务/能力产品/组织/内容/匹配计数 + 治理队列待审核/审核中/待发布/已拒绝/已发布 + 能力型号 dense 审核表），数字来自真实 Admin API，无 Fake KPI；队列优先而非装饰性大盘。
+- **治理** ✅：Product/SupplierProduct/Organization/User/Content/Parameter-Taxonomy/Monitoring 界面沿用既有治理能力（真实 API 与生命周期），仅重构表层；SupplierProduct 审核页支持 SUBMITTED/REVIEWING/APPROVED/发布/下架真实生命周期（服务端强制）。
+- **RBAC/Security** ✅：真实 API 探针——Guest→Admin 401 DENIED；Buyer→/admin/supplier-products·/users 403 DENIED；Supplier→同 403 DENIED；Admin→/admin/supplier-products 200 ALLOWED；Admin 治理 API 敏感字段扫描（password/passwordHash/salt/credential/secret/accessToken/refreshToken/privateContact/internalNote）= NONE。
+- **Runtime/Browser** ✅：真实 headed Chrome/CDP——Admin 登录→Workbench→治理队列→产品/组织/用户/内容/监控（375/1024/1440 无横向溢出，console/page error=0）；治理生命周期（DRAFT→SUBMITTED→REVIEWING→APPROVED→PUBLISHED→UNPUBLISHED）全链验证 + 测试数据清理。
+- **Mobile/A11y** ✅：核心 Admin 页（/home、/supplier-products、/products、/organizations、/users、/content、/monitoring）375 无溢出；移动端起 header 抽屉 + dense 表格 + 审核过滤完整呈现；touch target 44/48px 既有门禁继承。
+- **Build** ✅：Web tsc + next build、API tsc + nest build、Admin tsc 全部 exit 0。
+- **Regression** ✅：公开面（Home/Search/Products/Compare/Solutions/Knowledge/Supplier-models）1440+375 无溢出；Admin 前端变更（apps/admin）与 Public/Buyer/Supplier（apps/web）隔离，无回归。
+- **版本化** ✅：**838 = PASS / CLOSED → 839 WP-5B = PASS / CLOSED**；**WP-5B = PASS / CLOSED；WP-5C（Admin Master Data / Content / Monitoring）= READY / NEXT（不自动启动）**。
+
+- **Change Control** ✅：Frontend Source=YES（仅 `apps/admin/src/layouts/AdminLayout.tsx` + `apps/admin/src/pages/OperationCenter.tsx`）；Backend=NO；API Contract=NO；Schema=NO；Migration=NO；Domain=NO；无新生命周期/权限语义。
+- **Docs** ✅：新建 `docs/_review/839_WP-5B_Admin_Core_Operations_Report.md`；STATUS/ROADMAP/MATRIX 追加 839。
+- **Next** ⏸️：**STOP——839 WP-5B COMPLETE（PASS / CLOSED）。不自动启动 WP-5C / WP-6 / WP-7 / WP-8**。
+
+### 840_WP-5C_Admin_Governance_Depth（POST-M39 · V3.4.0 · WP-5C Admin Governance Depth · PASS · CLOSED）
+
+- **WP 状态** ✅：**840（839 = PASS/CLOSED → 840 WP-5C COMPLETE = PASS / CLOSED）**。Admin Governance Depth——基于 839 Governance Workbench 基础，验证并补齐 Master Data/Content/Monitoring/Audit Governance 的实际操作深度 + Operational Evidence/Empty-State Semantics + Cross-object Governance Visibility。**严格不重叠 839**（不重做 Admin Header/Layout/视觉大改/Workbench/Product/SupplierProduct）；**Frozen**：Database/Schema/Migration/Domain/Authority/API Contract/Route Semantics/Permission/Lifecycle/Business Logic 全冻结；**Frontend/Backend Source = NO CHANGES（纯验证，未改任何源码）**。
+- **Master Data** ✅：Taxonomy/Parameter = 权威数据基础设施（`/product-categories` 树形 + 依赖守卫删除 CATEGORY_HAS_PRODUCTS/CHILDREN + 批量删除；`/parameter-groups`·`/parameter-definitions` CRUD + 批量/排序；能力详情 Product↔Parameter 8 条真实值）。
+- **Content** ✅：Content DRAFT→REVIEW→PUBLISHED→ARCHIVED 真实生命周期（submit/review/publish/archive 真实 API）+ SEO 完整度/健康度/标签/修订历史/审批时间线；真实数据已发布 8（真实零，非伪造）。
+- **Monitoring / Audit** ✅：Monitoring 真实平台状态 + 诚实空态（非伪造 healthy）；Audit 完整 Who→What→Which→When→From→To→Result 治理证据（恒 tokenHash 非令牌明文）。
+- **RBAC/Security** ✅：Guest→Admin 401、Buyer/Supplier→`/admin/monitoring/overview`·`/admin/audit-logs`·`/content` 403、Admin→200（真实 API 探针）；Admin 治理 API 敏感字段扫描 = NONE。
+- **Runtime/Responsive** ✅：headed Chrome/CDP 逐页逐视口 375/768/1024/1440 overflow=0、error=0（独立证据）；Build（Admin/Web/API）exit 0。
+- **版本化** ✅：**839 = PASS / CLOSED → 840 WP-5C = PASS / CLOSED**；**WP-5C = PASS / CLOSED；WP-6 = READY / NEXT（不自动启动）**；P0=0/P1=0/P2=0/P3=1（监控平均匹配度单位显示，转结后修复）。
+- **Change Control** ✅：Frontend Source=NO CHANGES（840 纯验证）；Backend Source=NO；API Contract=NO；Schema=NO；Migration=NO；Domain=NO；Lifecycle=NO；Permission 语义=NO；Documentation=YES。
+- **Docs** ✅：新建 `docs/_review/840_WP-5C_Admin_Governance_Depth_Report.md`；STATUS/ROADMAP/MATRIX 追加 840。
+- **Next** ⏸️：**STOP——840 WP-5C COMPLETE（PASS / CLOSED）。不自动启动 WP-6 / WP-7 / WP-8 / WP-9**。
+
+### 841_WP-6_Platform-wide_Integration_and_Closure（POST-M39 · V3.4.0 · WP-6 Platform-wide Integration / Closure · CONDITIONAL）
+- **WP 状态** ✅：**841（840 = PASS/CLOSED → 841 WP-6 COMPLETE = CONDITIONAL PASS / CLOSED）**。Platform-wide Integration / Closure——验证 Public/Buyer/Supplier/Admin 四面围绕同一套对象/状态/权限/工作流形成完整平台闭环；**不按页面拆分**、仅最小必要修复、禁重开已关闭工作包。**Frozen**：Database/Schema/Migration/Domain/Authority/API Contract/Route Semantics/Permission/Lifecycle/Business Logic 全冻结；仅 Open Experience Layer 评估；**Frontend/Backend Source = NO CHANGES（纯验证）**。
+- **Capability Inventory** ✅：Product/SupplierProduct/Organization/Knowledge/Solution/Demand/Match/RFQ/Offer/Content/Taxonomy/Audit 12 对象跨四面 `EXISTS/VISIBLE/LINKED/ACTIONABLE/PERSISTED/GOVERNED/REDISCOVERABLE` 运行时验证；**零新增 Domain/Authority/API/Schema**。
+- **Core End-to-End Loop** ✅：真实数据链 RFQ→Response→Offer→Published SP→Public `/search`；受控闭环 14/14 PASS（Demand→Match→RFQ Identity 连续）；Supplier→Admin→Public→Rediscovery 发布边界 PUBLISHED visible / UNPUBLISHED absent。
+- **Object / RBAC / Org Boundary** ✅：Platform Product `ebb1c034` 跨四角色 Identity/Meaning/Authority/State/Ownership 连续；Guest≠Buyer≠Supplier≠Admin；Supplier A→B=404、Admin cross-org=ALLOWED、Published SP→Public visible / Unpublished→absent。
+- **Security / Persistence / Audit** ✅：跨 surface 敏感扫描 clean、P0=0；Action→API→Persistence→Reload 一致；audit-logs 含 SupplierProduct 实体证据。
+- **Runtime/Responsive/Build** ✅：headed Chrome/CDP 375/768/1024/1440 overflow=false；Admin/Web/API build exit 0（Web 仅 lint warning）。
+- **Capability Gap（诚实记录）** ✅：Matching 依赖「ACTIVE 产品 + ACTIVE Offer」，真实数据当前无产品挂 ACTIVE Offer，纯真实数据下 Demand→Match 返回 0；链路接通并运行，缺环在数据供给，本任务内 DO NOT FAKE。
+- **版本化** ✅：**840 = PASS / CLOSED → 841 WP-6 = CONDITIONAL PASS / CLOSED**；**WP-6 = CLOSED；WP-7（Discoverability）= READY / NEXT（不自动启动）**；P0=0/P1=0/Blocking=0；P2=2（Search H1、legacy alias `/knowledge`）、P3（lint/chunk/`/supplier-models`）+ 受控测试数据治理项，转结 WP-7。
+- **Change Control** ✅：Frontend Source=NO；Backend Source=NO；API Contract=NO；Schema=NO；Migration=NO；Domain=NO；Lifecycle=NO；Permission 语义=NO；Documentation=YES；仅新增 untracked 运行时探测脚本 `VISNDT\database\_841_*.mjs`。
+- **Docs** ✅：新建 `docs/_review/841_WP-6_Platform-wide_Integration_and_Closure_Report.md`；STATUS/ROADMAP/MATRIX 追加 841。
+- **Next** ⏸️：**STOP——841 WP-6 COMPLETE（CONDITIONAL PASS / CLOSED）。不自动启动 WP-7 / WP-8 / WP-9**。
+
+### 842_WP-7_Discoverability_and_Searchability（POST-M39 · V3.4.0 · WP-7 Discoverability and Searchability · CONDITIONAL PASS）
+
+- **WP 状态** ✅：**842（841 = CONDITIONAL PASS/CLOSED → 842 WP-7 COMPLETE = CONDITIONAL PASS / CLOSED）**。**Discoverability = Internal Search + External Search + LLM/AI Discoverability**——验证核心对象能否被 Users/Search Engines/LLMs 发现、理解、推荐。处理 841 → WP-7 Discoverability 项（P2-841-01 / P2-841-02 / P3-841-03），**不吸收** Monitoring/Bundle/Lint（P3-841-01/P3-841-02/P3-840-01）。**Frozen**：Database/Schema/Migration/Domain/Authority/API Contract/Route Semantic/Permission/Lifecycle/Matching/AI Foundation；仅 Open Experience Layer。
+- **Minimal Repair（收口 3 项）** ✅：Search 结果页唯一 H1「工业检测能力搜索」（`SearchPageContent.tsx`）；`/knowledge` 列表页 `noindex + canonical→/knowledge-base` 且整棵 legacy 详情树 `/knowledge/[slug]` 一并 `noindex`（Content vs KnowledgeEntry 为独立对象体系，不 redirect 到非等价对象；`/knowledge-base`=Canonical）；`/supplier-models`=Redirect(`/search`)+Noindex；`robots.ts` 加固 Disallow（`/api/ /search /login /register /dashboard /workspace`）；`sitemap.ts` 移除 `/knowledge` noindex 列表条目 + legacy KNOWLEDGE 详情类型（知识索引入口统一 `getEntries → /knowledge-base/{slug}`）。
+- **Internal Search / Semantics / Continuity** ✅：`q=ZB-K60`→products=1+2 supplier-model（Product 语境）+`/products/zb-k60` 详情连续；`q=探头`→产品+型号+知识，对象类型语义正确（WHAT / WHICH MODEL / WHY-HOW / SCENARIO）。召回局限（同义词/规格/场景短语召回 0，精确/子串匹配）源于冻结检索层→STOP→Document→DEFER（P2-842-01），未用假数据补齐。
+- **Canonical / H1 / Legacy** ✅：`/knowledge-base`=Canonical；`/knowledge`(列表)+`/knowledge/[slug]`(详情树)=Legacy(noindex，详情树亦 noindex)；`/supplier-models`=Redirect+Noindex；全站核心公开页 H1 恰 1（375/768/1440 复核）。
+- **LLM Semantic / JSON-LD** ✅：产品 `Product`+`BreadcrumbList`、首页 `Organization`+`WebSite`；**无虚构 Offer/Price/Rating**；语义聚焦事实/对象/规格/关系/场景/来源。
+- **Sitemap / Robots** ✅：`/sitemap.xml` 14 url 仅公开 PUBLISHED 对象（知识面仅 `/knowledge-base/*`，已移除 legacy `/knowledge/{slug}`）；`/robots.txt` Public=Crawlable、Admin/Buyer/Supplier/Auth=Disallow；Public/Private Index Boundary 正确。
+- **Security** ✅：公开面（API+HTML+JSON-LD+sitemap）敏感扫描 clean；**P0=0**。
+- **Runtime / Responsive / Build / Regression** ✅：真实 Chrome+CDP 375/768/1440 overflow=0、h1=1；核心页 200 无 5xx/断链/console fatal；Web build exit 0、API tsc exit 0、Admin=N/A；边界 `/login /register /workspace /dashboard` 200、Admin 3001 200。
+- **版本化** ✅：**841 = CONDITIONAL PASS/CLOSED → 842 WP-7 = CONDITIONAL PASS / CLOSED**；**WP-7 = FINAL RESULT / CLOSED；WP-8（Final Platform Audit）= READY / NEXT（不自动启动）**；P0=0/P1=0/Blocking=0；P2=1（Search recall，DEFERRED，转结 WP-8/Future）、P3=2（`/about` canonical、canonical 占位域）。
+- **Change Control** ✅：Frontend Source=YES（Search H1/robots/knowledge metadata/sitemap）；Backend Source=NO；API Contract=NO；Schema=NO；Migration=NO；Domain=NO；Lifecycle=NO；Permission 语义=NO；Matching=NO；AI Foundation=NO；Documentation=YES；仅新增 untracked 运行时探测脚本（`_842_*`，验证用）。
+- **Docs** ✅：新建 `docs/_review/842_WP-7_Discoverability_and_Searchability_Report.md`；STATUS/ROADMAP/MATRIX 追加 842。
+- **Next** ⏸️：**STOP——842 WP-7 COMPLETE（CONDITIONAL PASS / CLOSED）。不自动启动 WP-8 / WP-9**。
+
+### 843_WP-8_Final_Platform_Audit（POST-M39 · V3.4.0 · WP-8 Final Platform Audit + Productization Closure Gate · PASS / CLOSED · Round Closure = YES）
+
+- **WP 状态** ✅：**843（842 = CONDITIONAL PASS/CLOSED → 843 WP-8 COMPLETE = PASS / CLOSED，Round Closure = YES）**。最终跨层/跨角色/跨工作流总验收；所有不阻止封版问题划入 WP-9。
+- **Architecture / Domain Authority** ✅：冻结契约未变；仅公开 Product 面发布边界强制 ACTIVE（Category A，未改 API Contract/Schema）；Product=WHAT / SupplierProduct=WHICH MODEL / Offer=COMMERCIAL RESPONSE 语义无漂移；无 SupplierStore/Marketplace/集中供应商目录漂移。
+- **Surface / Core Flow** ✅：Public/Buyer/Supplier/Admin 四面全维度 PASS；Public→Product→Demand→Match→RFQ→SupplierProduct→Admin→Publication→Rediscovery 全链 PASS。
+- **Publication / Security / RBAC** ✅：Product 公开=仅 ACTIVE（运行实测）、SupplierProduct 公开面=仅 PUBLISHED、APPROVED 不自动公开；公开敏感投影 clean（P0=0）；org 级隔离 + roles 守卫；AuditLog 可审计。
+- **Discoverability / Route / Mobile / A11y** ✅：Unified `/search`、sitemap=Platform Product 权威、robots Disallow 私有、JSON-LD 无虚构；`/knowledge-base` canonical、`/knowledge` noindex、`/supplier-models` redirect→`/search`；375/768/1024/1440 响应式、H1=1、搜索 aria-label、focus-visible。
+- **Build / Runtime** ✅：API/Web/Admin `tsc --noEmit` 全 exit 0；API health ok、Web 3000/Admin 3001 200。
+- **版本化** ✅：**842 = CONDITIONAL PASS/CLOSED → 843 WP-8 = PASS / CLOSED**；**Current Round Closure = YES；WP-9 = FINAL POST-PRODUCTIZATION**；P0=0/Critical P1=0/Blocking=0；P2=1（Search recall→Future）、P3=2（`/about` canonical、canonical 占位域）。
+- **Change Control** ✅：本轮最小源码改动=仅 `products.controller.ts` 公开边界 ACTIVE（Category A）；API Contract=NO；Schema=NO；Migration=NO；Domain=NO；Lifecycle=NO；Permission 语义=NO；Matching=NO；AI Foundation=NO；Documentation=YES。
+- **Docs** ✅：新建 `docs/_review/843_WP-8_Final_Platform_Audit_Report.md`；STATUS/ROADMAP/MATRIX 追加 843。
+- **Next** ⏸️：**STOP——843 WP-8 COMPLETE（PASS / CLOSED，Round Closure = YES）。不自动启动 WP-9**。
+
+### 845_Production_Data_Sanitization_and_Test_Data_Purge（POST-PRODUCTIZATION · V3.4.0 · 生产数据清洗 + 测试数据清除 + 受保护数据核验 · DONE）
+
+- **WP 状态** ✅：**845（Post-Productization Cycle 第一步 = DONE / Production Data Baseline 就绪）**。Current Productization Round = CLOSED；Post-Productization Cycle = STARTING；845 = CURRENT/DONE；846 = NEXT。**Code / Schema / Migration / API / Business Logic 全 Frozen / UNCHANGED**。
+- **PRESERVE（保护集）** ✅：admin@visndt.com + 组织微视（`697c99b2`）+ 知象（`be7e5cd7`）+ 关联用户与真实数据；AuditLog = RETAIN（保留 1573 条生产审计）。
+- **DELETE（删除集）** ✅：6 个测试/演示组织 + 6 个测试/演示用户 + 删除范围内全部测试业务数据（含 844/841/840/835 登记的受控测试数据与测试参数）+ 微视组织下自标记 `[CONTROLLED TEST DATA]` 测试 Inquiry 1 条。
+- **AMBIGUOUS 授权** ✅：`SZ Wise Supplier`+`vsndt@sz-wise.cn` 归类测试删除（真实微视=697c99b2 已保留）；`audit_log.operator_id` 2789 条强 FK（RESTRICT，NOT NULL）→ 用户授权删除（测试/DEMO 用户审计，已 CSV 备份）。
+- **删除统计** ✅：demand_parameter 13 / buyer_evaluation 1 / rfq_response 4 / offer 1 / rfq 5 / workflow_event 63 / demand_match 5 / supplier_product 6 / inquiry 3 / demand 10 / notification 20 / organization_member 6 / file_asset 6 / audit_log 2789 / user 6 / parameter_definition 2 / organization 6（`PURGE_COMMITTED` 单事务）。
+- **Integrity / Protected / Runtime** ✅：所有 RESTRICT 强外键按序解决，全局孤儿扫描=0；admin=1、微视=1、知象=1、保留真实用户 8、待删组织与用户残留 0；API health 200（DB connected）、Web 200、公共产品目录 total=4 无测试外泄。
+- **最终基线** ✅：组织 4 / 真实用户 8 / Product 4 / SupplierProduct 6 / Demand 1 / RFQ 1 / Offer 1 / Inquiry 0 / AuditLog 1573 保留。
+- **Change Control** ✅：Frontend Source=NO；Backend Source=NO；API Contract=NO；Schema=NO；Migration=NO；Domain=NO；Lifecycle=NO；Permission 语义=NO；Data Only=YES（受控清理）。
+- **Docs** ✅：新建 `docs/_review/845_Production_Data_Sanitization_and_Test_Data_Purge_Report.md`；STATUS/ROADMAP/MATRIX 追加 845；备份 `VISNDT\_845_backup\`。
+- **Next** ⏸️：**STOP——845 COMPLETE（DONE）。后续进入 846 Real Product Value Density（NEXT），本任务不自动启动**。

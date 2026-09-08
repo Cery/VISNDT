@@ -587,12 +587,12 @@ export default function DemandEdit() {
           </Form.Item>
 
           <Form.Item
-            label="能力分类"
+            label="产品分类"
             name="categoryId"
             extra={categoryError || undefined}
           >
             <Select
-              placeholder="请选择需求所属能力分类"
+              placeholder="请选择需求所属产品分类"
               allowClear
               options={categories.map((c) => ({
                 value: c.id,
@@ -652,7 +652,7 @@ export default function DemandEdit() {
             label="联系人信息可见性"
             name="contactVisible"
             valuePropName="checked"
-            extra="开启后，联系人信息将对能力提供商公开可见"
+            extra="开启后，联系人信息将对供应商公开可见"
           >
             <Switch />
           </Form.Item>

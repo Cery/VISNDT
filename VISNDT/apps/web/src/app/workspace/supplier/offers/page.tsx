@@ -30,7 +30,7 @@ const OFFER_STATUS_FILTERS = [
 ] as const;
 
 function OfferStatusBadge({ status }: { status: string }) {
-  const label = OFFER_STATUS_LABELS[status] ?? status;
+  const label = OFFER_STATUS_LABELS[status] ?? '未知状态';
   const colorMap: Record<string, string> = {
     DRAFT: 'bg-slate-100 text-slate-600',
     SUBMITTED: 'bg-blue-100 text-blue-700',
@@ -145,7 +145,7 @@ function OfferListContent() {
             />
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 items-start">
             {offers.map((offer) => (
               <Link
                 key={offer.id}
@@ -164,7 +164,7 @@ function OfferListContent() {
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-400">
                   {offer.supplierProduct && (
                     <span className="rounded bg-slate-50 px-2 py-0.5 font-medium text-slate-600">
-                      能力型号 · {offer.supplierProduct.brand} {offer.supplierProduct.modelNumber}
+                      产品型号 · {offer.supplierProduct.brand} {offer.supplierProduct.modelNumber}
                     </span>
                   )}
                   {offer.price && (

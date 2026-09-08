@@ -26,12 +26,12 @@ export default function RelatedKnowledge({ items }: RelatedKnowledgeProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
       {items.map((item) => (
         <Link
           key={item.id}
           href={`/knowledge-base/${item.slug}`}
-          className="group rounded-xl border border-slate-200/80 shadow-industrial-sm hover:shadow-industrial-md hover:-translate-y-1 transition-all duration-300 bg-white p-4 flex flex-col gap-2"
+          className="group overflow-hidden rounded-xl border border-slate-200/80 shadow-industrial-sm hover:shadow-industrial-md transition-all duration-300 bg-white p-4 flex flex-col gap-2"
         >
           <div className="flex items-center gap-2 flex-wrap">
             {item.domain && (

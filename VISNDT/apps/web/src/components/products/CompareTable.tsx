@@ -86,10 +86,14 @@ export default function CompareTable({ products, parameterGroups }: CompareTable
               参数
             </th>
             {products.map((p) => (
-              <th key={p.id} className="py-2 px-3 border-b border-slate-200 text-left min-w-[180px]">
+              <th key={p.id} className="py-2 px-3 border-b border-slate-200 text-left min-w-[180px] align-top">
+                {/* 846 §XY — 三元标识：Product / Model / Category */}
                 <p className="font-semibold text-slate-800 line-clamp-2">{p.name}</p>
                 {p.model && (
                   <p className="text-xs text-slate-400 font-mono mt-0.5">{p.model}</p>
+                )}
+                {p.category && (
+                  <p className="text-[11px] text-slate-400 mt-0.5">{p.category.name}</p>
                 )}
               </th>
             ))}
@@ -113,7 +117,7 @@ export default function CompareTable({ products, parameterGroups }: CompareTable
                 </tr>
                 {/* Parameter rows */}
                 {params.map(([key, entry]) => {
-                  const values = products.map((p) => entry.values.get(p.id) ?? '-');
+                  const values = products.map((p) => entry.values.get(p.id) ?? '未提供');
                   const diff = isDifferent(values);
                   const numValues = products.map((p) => {
                     const pv = products.flatMap((pp) => pp.parameterValues).find(
@@ -128,7 +132,7 @@ export default function CompareTable({ products, parameterGroups }: CompareTable
                       key={key}
                       className={diff ? 'bg-amber-50/60' : 'hover:bg-slate-50'}
                     >
-                      <td className="py-2 px-3 border-b border-slate-100 text-slate-600">
+                      <td className={`sticky left-0 z-10 py-2 px-3 border-b border-slate-100 text-slate-600 ${diff ? 'bg-amber-50' : 'bg-white'}`}>
                         {entry.definition.name}
                         {entry.definition.unit && (
                           <span className="text-slate-400 ml-1">({entry.definition.unit})</span>

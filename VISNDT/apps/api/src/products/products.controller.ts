@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseGuards, NotFoundException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -21,6 +21,11 @@ export class ProductsController {
   @Get()
   @ApiOperation({ summary: 'Search products (public). Supports keyword, categoryId, status, parameterFilters (exact match or numeric range), sortBy, sortOrder, page, pageSize' })
   async findAll(@Query() query: SearchProductDto) {
+    // 843 WP-8 Publication Boundary（Category A）：
+    //   公开产品面 = Lifecycle-aware —— 仅暴露 ACTIVE（上架）平台产品。
+    //   强制覆盖客户端传入的任何 status，确保 DRAFT(草稿)/INACTIVE(已下架) 绝不进入公开列表。
+    //   不改 API 响应契约；返回字段形状不变，仅限定记录集合。
+    query.status = 'ACTIVE';
     return ApiResponse.ok(await this.service.findAll(query));
   }
 
@@ -60,7 +65,15 @@ export class ProductsController {
   @ApiOperation({ summary: 'Get product by ID or slug (public)' })
   @ApiParam({ name: 'id', description: 'Product UUID or slug' })
   async findOne(@Param('id') id: string) {
-    return ApiResponse.ok(await this.service.findOne(id));
+    // 843 WP-8 Publication Boundary（Category A）：
+    //   公开产品详情 = Lifecycle-aware —— 仅暴露 ACTIVE（上架）平台产品；
+    //   DRAFT(草稿)/INACTIVE(已下架) 在公开面视为不存在（404），不泄露未发布对象。
+    //   不改 API 响应契约；服务端内部 findOne 使用（更新前校验等）不受影响。
+    const product = await this.service.findOne(id);
+    if (product.status !== 'ACTIVE') {
+      throw new NotFoundException(`产品 ${id} 未找到`);
+    }
+    return ApiResponse.ok(product);
   }
 
   @Post()

@@ -30,9 +30,13 @@ export class ProductsService {
       });
     }
 
-    // Category filter
+    // Category filter (optionally include all descendant subcategories)
     if (categoryId) {
-      where.categoryId = categoryId;
+      if (query.includeSubcategories) {
+        where.categoryId = { in: await this.collectCategoryWithDescendants(categoryId) };
+      } else {
+        where.categoryId = categoryId;
+      }
     }
 
     // Status filter
@@ -116,6 +120,28 @@ export class ProductsService {
     const enriched = await this.enrichWithCardFields(data);
 
     return { data: enriched, total, page, pageSize, totalPages: Math.ceil(total / pageSize) };
+  }
+
+  /**
+   * Collect the given category id plus all descendant category ids (recursive tree walk).
+   * Used by findAll(includeSubcategories) so selecting a parent category shows products
+   * of the entire subcategory tree.
+   */
+  private async collectCategoryWithDescendants(categoryId: string): Promise<string[]> {
+    const included: string[] = [];
+    const stack: string[] = [categoryId];
+    while (stack.length > 0) {
+      const current = stack.pop() as string;
+      included.push(current);
+      const children = await this.prisma.productCategory.findMany({
+        where: { parentId: current },
+        select: { id: true },
+      });
+      for (const child of children) {
+        stack.push(child.id);
+      }
+    }
+    return included;
   }
 
   /**

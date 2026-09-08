@@ -197,7 +197,7 @@ function OfferList() {
           <Title level={4} style={{ margin: 0 }}>报价管理</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          管理能力提供商报价与状态
+          管理供应商报价与状态
         </Text>
       </div>
         <Space style={{ marginBottom: 16 }} wrap>
@@ -247,7 +247,7 @@ function OfferList() {
       },
     },
     {
-      title: '能力提供商',
+      title: '供应商',
       dataIndex: 'organization',
       key: 'supplier',
       render: (org: Offer['organization']) => org?.name || '-',
@@ -277,7 +277,7 @@ function OfferList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || status} />
+        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || '未知状态'} />
       ),
     },
     {
@@ -319,7 +319,7 @@ function OfferList() {
           <Title level={4} style={{ margin: 0 }}>报价管理</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          管理能力提供商报价与状态
+          管理供应商报价与状态
         </Text>
       </div>
 

@@ -125,7 +125,7 @@ export default function InquiryDetailPage() {
           <Title level={4} style={{ margin: 0 }}>询价详情</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          查看询价详情、能力提供商响应与状态
+          查看询价详情、供应商响应与状态
         </Text>
       </div>
 

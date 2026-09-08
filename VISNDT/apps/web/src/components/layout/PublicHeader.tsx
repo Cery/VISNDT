@@ -7,77 +7,75 @@ import { useAuth } from '@/auth/AuthProvider';
 import GlobalSearchBar from '@/components/search/GlobalSearchBar';
 import { Drawer } from '@/components/ui/Drawer';
 
-// 800_M39 Whole-site frontend platformization — Global Navigation reconstruction.
-// 目标：VISNDT = Industrial Inspection Capability Discovery Platform（工业检测能力发现平台），
-// 而非 Manufacturer Corporate Website（厂商企业官网）。
-// 导航从扁平企业菜单重构为「平台层（Platform Layer）」分组 mega-navigation：
-//   发现(Discover) / 评估(Evaluate) / 技术内容(Technical Content) / 连接(Connect)
-// 路由语义、API、RBAC、断点（797:xinline nav / lg search / md auth / 底部抽屉）全保持。
-interface LayerItem {
+// 800_M39 / 835 Platform UIUX — Global Navigation in user language.
+// 设计决策（专业复核）：原为「发现/产品/方案/连接」四层巨型下拉，但每层仅 2 个子项，
+// 对仅两个目的地下拉属过度设计（点击两步 + hover 面板复杂度）。扁平化为单级平铺导航：
+// 直接可达、减少步数、更可扫读，符合 B2B 工业选型站主导航惯例。
+// 同时移除冗余「统一检索」项——顶部栏已有常驻搜索框，导航内再放搜索入口属重复。
+// 角色化「采购需求 / 供应能力」保持按登录态诚实路由（guestHref/authHref）。
+
+interface NavEntry {
+  label: string;
+  /** 静态公开页路由 */
   href: string;
-  label: string;
-  desc: string;
+  /** 任务类入口描述（移动端展示）；需要登录的入口经 guestHref/authHref 按角色路由。 */
+  desc?: string;
+  authHref?: string;
+  guestHref?: string;
 }
 
-interface PlatformLayer {
-  key: string;
-  label: string;
-  items: LayerItem[];
-}
-
-const PLATFORM_LAYERS: PlatformLayer[] = [
+const NAV_ENTRIES: NavEntry[] = [
+  { label: '能力分类', href: '/categories' },
+  { label: '检测产品', href: '/products' },
+  { label: '产品对比', href: '/products/compare' },
+  { label: '解决方案', href: '/solutions' },
+  { label: '知识中心', href: '/knowledge-base' },
   {
-    key: 'discover',
-    label: '发现',
-    items: [
-      { href: '/search', label: '统一检索', desc: '一条路径检索能力、产品、知识、方案' },
-      { href: '/categories', label: '能力分类', desc: '按检测对象与应用场景浏览能力' },
-      { href: '/search?type=supplier-product', label: '能力型号 / 供应商', desc: '浏览能力提供商与供应型号' },
-    ],
+    label: '采购需求',
+    href: '/register?role=BUYER',
+    guestHref: '/register?role=BUYER',
+    authHref: '/workspace/demands',
+    desc: '提出结构化需求，获得确定性匹配',
   },
   {
-    key: 'evaluate',
-    label: '评估',
-    items: [
-      { href: '/products', label: '检测产品', desc: '产品注册表：能力、技术参数、检测对象' },
-      { href: '/products/compare', label: '产品对比', desc: '参数级工程评估与横向对比' },
-    ],
-  },
-  {
-    key: 'content',
-    label: '技术内容',
-    items: [
-      { href: '/solutions', label: '解决方案', desc: '检测问题 → 所需能力 → 落地产品' },
-      { href: '/knowledge-base', label: '知识中心', desc: '工程信息资产、参数解读、应用语境' },
-    ],
-  },
-  {
-    key: 'connect',
-    label: '连接',
-    items: [
-      { href: '/register?role=BUYER', label: '发布检测需求', desc: '提出结构化需求，获得确定性匹配' },
-      { href: '/business', label: '商务合作', desc: '连接采购方、能力提供商与平台' },
-    ],
+    label: '供应能力',
+    href: '/register?role=SUPPLIER',
+    guestHref: '/register?role=SUPPLIER',
+    authHref: '/workspace/supplier/offers',
+    desc: '发布您的检测能力与服务',
   },
 ];
 
-function isLayerActive(layer: PlatformLayer, pathname: string, searchParams: string): boolean {
-  return layer.items.some((it) => {
-    const [p] = it.href.split('?');
-    const q = it.href.split('?')[1] || '';
-    if (q && !searchParams.includes(q.split('=')[1])) return false;
-    if (p === '/') return pathname === '/';
-    return p && pathname.startsWith(p);
-  });
+/** 解析导航项 href：任务类入口按登录态路由，其余走静态公开页。 */
+function resolveEntryHref(it: NavEntry, isAuthenticated: boolean): string {
+  if (it.guestHref || it.authHref) {
+    return (isAuthenticated && it.authHref ? it.authHref : it.guestHref) ?? it.href;
+  }
+  return it.href;
+}
+
+/** 任务类入口的描述随登录态自述，保持「注册 xxx」与跳转工作区文案一致。 */
+function resolveEntryDesc(it: NavEntry, isAuthenticated: boolean): string {
+  if (it.guestHref || it.authHref) {
+    return isAuthenticated ? (it.desc ?? '') : `${it.desc ?? ''}（新用户将引导注册对应角色账号）`;
+  }
+  return '';
+}
+
+/** 单级导航高亮：按条目实际可达路径前缀匹配当前路由。 */
+function isEntryActive(it: NavEntry, pathname: string): boolean {
+  const path = it.guestHref || it.authHref ? (it.authHref || it.guestHref || it.href) : it.href;
+  const p = path.split('?')[0];
+  if (p === '/') return pathname === '/';
+  return !!p && pathname.startsWith(p);
 }
 
 export default function PublicHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [openLayer, setOpenLayer] = useState<string | null>(null);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [isStrictMobile, setIsStrictMobile] = useState(false);
   const pathname = usePathname();
-  const searchParams = typeof window !== 'undefined' ? window.location.search : '';
   const router = useRouter();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
 
@@ -107,182 +105,179 @@ export default function PublicHeader() {
     router.refresh();
   };
 
+  // 顶部登录/注册（或已登录用户态）块，供桌面与移动端内联复用
+  const authBlock = isLoading ? (
+    <div className="flex items-center gap-3 flex-shrink-0">
+      <div className="w-20 h-8 bg-slate-100 rounded-lg animate-pulse" />
+    </div>
+  ) : isAuthenticated && user ? (
+    <div className="flex items-center gap-2 flex-shrink-0">
+      <Link
+        href="/dashboard"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-primary to-industrial-cyan px-4 py-2 text-sm font-semibold text-white shadow-industrial-sm hover:opacity-90 transition-opacity"
+      >
+        工作台
+        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        </svg>
+      </Link>
+      <div className="relative">
+        <button
+          onClick={() => setUserMenuOpen(!userMenuOpen)}
+          className="flex items-center gap-2 px-2 py-2 text-sm font-medium text-slate-700 hover:text-foreground hover:bg-slate-50 rounded-lg transition-colors"
+          aria-label="用户菜单"
+        >
+          <span className="w-7 h-7 bg-gradient-to-r from-primary to-industrial-cyan rounded-full flex items-center justify-center text-white text-xs font-bold">
+            {user.name?.charAt(0) || user.email?.charAt(0) || '?'}
+          </span>
+          <span className="max-w-[110px] truncate hidden lg:inline">{user.name || user.email}</span>
+          <svg
+            className={`w-4 h-4 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        {userMenuOpen && (
+          <>
+            <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
+            <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-industrial-lg py-1 z-20">
+              <div className="px-4 py-2 text-xs text-slate-400 truncate border-b border-slate-100">
+                {user.email}
+              </div>
+              <button
+                onClick={() => {
+                  setUserMenuOpen(false);
+                  handleLogout();
+                }}
+                className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+              >
+                退出登录
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  ) : (
+    <div className="flex items-center gap-3 flex-shrink-0">
+      <Link
+        href="/login"
+        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2"
+      >
+        登录
+      </Link>
+      <Link
+        href="/register"
+        className="text-sm font-medium bg-gradient-to-r from-primary to-industrial-cyan text-white px-5 py-2.5 rounded-lg hover:opacity-90 transition-opacity shadow-industrial-sm"
+      >
+        注册
+      </Link>
+    </div>
+  );
+
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-industrial-sm border-b border-slate-100">
       <div className="w-full">
-        <div className="max-w-[1200px] mx-auto flex h-[4.5rem] items-center justify-between px-6 gap-4">
-          {/* Logo — platform identity */}
-          <Link href="/" className="flex items-center gap-2 flex-shrink-0 group">
-            <span className="text-xl font-bold font-mono tracking-tight">
-              <span className="text-foreground">VIS</span>
-              <span className="bg-gradient-to-r from-primary to-industrial-cyan bg-clip-text text-transparent">NDT</span>
-            </span>
-            <span className="hidden lg:inline-flex flex-col leading-none">
-              <span className="text-xs text-slate-800 font-semibold tracking-wide">工业检测能力发现平台</span>
-              <span className="text-[10px] text-slate-400 tracking-widest mt-0.5">CAPABILITY DISCOVERY</span>
-            </span>
-          </Link>
+        {/* ===== TOP BAR（上层，粘性）：Logo · 搜索 · 登录/注册 · 汉堡 ===== */}
+        <div className="border-b border-slate-100">
+          <div className="max-w-[1200px] mx-auto flex h-16 items-center justify-between gap-2 px-4 sm:px-6">
+            {/* Logo — platform identity */}
+            <Link href="/" className="flex items-center gap-2 flex-shrink-0 group">
+              <span className="text-xl font-bold font-mono tracking-tight">
+                <span className="text-foreground">VIS</span>
+                <span className="bg-gradient-to-r from-primary to-industrial-cyan bg-clip-text text-transparent">NDT</span>
+              </span>
+              <span className="hidden lg:inline-flex flex-col leading-none">
+                <span className="text-xs text-slate-800 font-semibold tracking-wide">工业检测能力发现平台</span>
+                <span className="text-[10px] text-slate-400 tracking-widest mt-0.5">能力发现平台</span>
+              </span>
+            </Link>
 
-          {/* Desktop Platform-Layer Nav (xl+, per 797 breakpoint) */}
-          <nav className="hidden xl:flex items-center gap-1" aria-label="平台导航">
-            {PLATFORM_LAYERS.map((layer) => {
-              const active = isLayerActive(layer, pathname, searchParams);
-              return (
-                <div
-                  key={layer.key}
-                  className="relative"
-                  onMouseEnter={() => setOpenLayer(layer.key)}
-                  onMouseLeave={() => setOpenLayer(null)}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setOpenLayer(openLayer === layer.key ? null : layer.key)}
-                    className={`relative flex items-center gap-1 whitespace-nowrap px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                      active
-                        ? 'text-primary bg-primary/5'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-slate-50'
-                    }`}
-                    aria-expanded={openLayer === layer.key}
-                  >
-                    {layer.label}
-                    <svg className={`w-3.5 h-3.5 transition-transform ${openLayer === layer.key ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                    {active && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-primary rounded-full" />}
-                  </button>
+            {/* 桌面/平板内联搜索（lg+） — 812 Batch B: 纯关键字入口 */}
+            <div className="hidden lg:flex flex-1 min-w-0 max-w-xl mx-2 justify-center">
+              <div className="w-full max-w-lg">
+                <GlobalSearchBar showTypeSelector={false} />
+              </div>
+            </div>
 
-                  {/* Mega panel */}
-                  {openLayer === layer.key && (
-                    <>
-                      <div className="fixed inset-0 -z-10" onClick={() => setOpenLayer(null)} />
-                      <div className="absolute left-0 top-full mt-1 w-80 bg-white border border-slate-200 rounded-xl shadow-industrial-lg p-2 z-20">
-                        <div className="px-3 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-widest text-slate-400">
-                          {layer.label}
-                        </div>
-                        {layer.items.map((it) => {
-                          const [p] = it.href.split('?');
-                          const itemActive = p === '/' ? pathname === '/' : p && pathname.startsWith(p);
-                          return (
-                            <Link
-                              key={it.href}
-                              href={it.href}
-                              onClick={() => setOpenLayer(null)}
-                              className={`flex flex-col gap-0.5 rounded-lg px-3 py-2 transition-colors ${
-                                itemActive ? 'bg-primary/5' : 'hover:bg-slate-50'
-                              }`}
-                            >
-                              <span className={`text-sm font-medium ${itemActive ? 'text-primary' : 'text-foreground'}`}>
-                                {it.label}
-                              </span>
-                              <span className="text-xs text-slate-500 leading-snug">{it.desc}</span>
-                            </Link>
-                          );
-                        })}
-                      </div>
-                    </>
-                  )}
-                </div>
-              );
-            })}
-          </nav>
+            {/* 移动端搜索切换（<lg）：两种可访问语义（打开时为关闭） */}
+            <button
+              onClick={() => setMobileSearchOpen((v) => !v)}
+              className="lg:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label={mobileSearchOpen ? '关闭搜索' : '打开搜索'}
+              aria-expanded={mobileSearchOpen}
+            >
+              {mobileSearchOpen ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="M21 21l-4.3-4.3" />
+                </svg>
+              )}
+            </button>
 
-          {/* Desktop Search Bar — 812 Batch B: header is a pure entry point; remove redundant
-              type selector so it always emits /search?q=... and /search stays the sole authority. */}
-          <div className="hidden lg:flex flex-1 min-w-[220px] max-w-xl mx-2">
+            {/* 登录/注册（sm+ 内联置顶；<sm 收进抽屉，保持同步结构） */}
+            <div className="hidden sm:flex items-center">
+              {authBlock}
+            </div>
+
+            {/* 导航汉堡（xl:hidden，导航行仅在 xl+ 内联展示） */}
+            <button
+              onClick={() => setMobileOpen((prev) => !prev)}
+              className="xl:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="切换菜单"
+              aria-expanded={mobileOpen}
+            >
+              {mobileOpen ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* ===== 移动端展开的搜索行（<lg 且打开时，仍随 sticky 头部显示） ===== */}
+        {mobileSearchOpen && (
+          <div className="lg:hidden border-b border-slate-100 px-4 sm:px-6 py-2.5">
             <GlobalSearchBar showTypeSelector={false} />
           </div>
+        )}
 
-          {/* Desktop Auth Section */}
-          <div className="hidden md:flex items-center gap-3 flex-shrink-0">
-            {isLoading ? (
-              <div className="w-20 h-8 bg-slate-100 rounded-lg animate-pulse" />
-            ) : isAuthenticated && user ? (
-              <div className="flex items-center gap-2">
+        {/* ===== NAV BAR（专门导航栏，粘性；深色独立条带，单级平铺，xl+ 内联，其余进抽屉） ===== */}
+        <nav className="hidden xl:block bg-slate-900 text-slate-200" aria-label="平台导航">
+          <div className="max-w-[1200px] mx-auto flex items-center gap-1 px-6 py-1.5">
+            {NAV_ENTRIES.map((it) => {
+              const href = resolveEntryHref(it, isAuthenticated);
+              const active = isEntryActive(it, pathname);
+              return (
                 <Link
-                  href="/dashboard"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-primary to-industrial-cyan px-4 py-2 text-sm font-semibold text-white shadow-industrial-sm hover:opacity-90 transition-opacity"
+                  key={it.label}
+                  href={href}
+                  className={`relative flex items-center whitespace-nowrap px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    active ? 'text-white' : 'text-slate-300 hover:text-white hover:bg-white/10'
+                  }`}
+                  aria-current={active ? 'page' : undefined}
                 >
-                  工作台
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
-                <div className="relative">
-                  <button
-                    onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center gap-2 px-2 py-2 text-sm font-medium text-slate-700 hover:text-foreground hover:bg-slate-50 rounded-lg transition-colors"
-                    aria-label="用户菜单"
-                  >
-                    <span className="w-7 h-7 bg-gradient-to-r from-primary to-industrial-cyan rounded-full flex items-center justify-center text-white text-xs font-bold">
-                      {user.name?.charAt(0) || user.email?.charAt(0) || '?'}
-                    </span>
-                    <span className="max-w-[120px] truncate hidden lg:inline">{user.name || user.email}</span>
-                    <svg
-                      className={`w-4 h-4 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </button>
-                  {userMenuOpen && (
-                    <>
-                      <div className="fixed inset-0 z-10" onClick={() => setUserMenuOpen(false)} />
-                      <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-lg shadow-industrial-lg py-1 z-20">
-                        <div className="px-4 py-2 text-xs text-slate-400 truncate border-b border-slate-100">
-                          {user.email}
-                        </div>
-                        <button
-                          onClick={() => {
-                            setUserMenuOpen(false);
-                            handleLogout();
-                          }}
-                          className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                        >
-                          退出登录
-                        </button>
-                      </div>
-                    </>
+                  {it.label}
+                  {active && (
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-industrial-cyan rounded-full" />
                   )}
-                </div>
-              </div>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2"
-                >
-                  登录
                 </Link>
-                <Link
-                  href="/register"
-                  className="text-sm font-medium bg-gradient-to-r from-primary to-industrial-cyan text-white px-5 py-2.5 rounded-lg hover:opacity-90 transition-opacity shadow-industrial-sm"
-                >
-                  注册
-                </Link>
-              </>
-            )}
+              );
+            })}
           </div>
-
-          {/* Mobile Hamburger (xl lint, complements 797 breakpoint) */}
-          <button
-            onClick={() => setMobileOpen((prev) => !prev)}
-            className="xl:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="切换菜单"
-            aria-expanded={mobileOpen}
-          >
-            {mobileOpen ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
-          </button>
-        </div>
+        </nav>
       </div>
 
       {/* Mobile / Tablet Nav — WP-3A.1 复用 Foundation Drawer（§9.2 §17）：
@@ -299,34 +294,32 @@ export default function PublicHeader() {
           <GlobalSearchBar showTypeSelector={false} />
         </div>
         <nav aria-label="平台导航（移动）">
-          {PLATFORM_LAYERS.map((layer) => (
-            <div key={layer.key} className="mb-4">
-              <div className="px-1 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-1">
-                {layer.label}
-              </div>
-              <div className="space-y-0.5">
-                {layer.items.map((it) => {
-                  const [p] = it.href.split('?');
-                  const active = p === '/' ? pathname === '/' : p && pathname.startsWith(p);
-                  return (
-                    <Link
-                      key={it.href}
-                      href={it.href}
-                      onClick={() => setMobileOpen(false)}
-                      aria-current={active ? 'page' : undefined}
-                      className={`block rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                        active
-                          ? 'bg-primary/5 text-primary'
-                          : 'text-slate-700 hover:bg-slate-50'
-                      }`}
-                    >
-                      {it.label}
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+          <div className="space-y-0.5">
+            {NAV_ENTRIES.map((it) => {
+              const href = resolveEntryHref(it, isAuthenticated);
+              const active = isEntryActive(it, pathname);
+              return (
+                <Link
+                  key={it.label}
+                  href={href}
+                  onClick={() => setMobileOpen(false)}
+                  aria-current={active ? 'page' : undefined}
+                  className={`block rounded-md px-3 py-3 text-sm font-medium transition-colors ${
+                    active
+                      ? 'bg-primary/5 text-primary'
+                      : 'text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  {it.label}
+                  {it.guestHref || it.authHref ? (
+                    <span className="block text-xs font-normal text-slate-400 mt-0.5">
+                      {resolveEntryDesc(it, isAuthenticated)}
+                    </span>
+                  ) : null}
+                </Link>
+              );
+            })}
+          </div>
         </nav>
         <div className="border-t border-border pt-4 mt-3 flex gap-3">
           {isLoading ? (

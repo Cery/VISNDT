@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { CapabilitySupplierProduct } from '@/types/capability';
+import { stripGovernanceLabels } from '@/lib/display-text';
 import CapabilitySection from '@/components/capability/CapabilitySection';
 import EmptyState from '@/components/common/EmptyState';
 import SupplierCompareBar from './SupplierCompareBar';
@@ -9,7 +10,7 @@ import SupplierCompareBar from './SupplierCompareBar';
 /**
  * SupplierModelsSection — M28.0 Public Discovery View.
  *
- * Renders the published Supplier Models (SupplierProduct) for a Platform Product
+ * Renders the published 供应商产品型号 (SupplierProduct) for a Platform Product
  * as model identity + compare entry. Only PUBLISHED models are exposed
  * (backend-enforced). This is a NON-COMMERCIAL public view (P2 frozen):
  *   - no price / currency / offer-count / commercial summary
@@ -54,14 +55,14 @@ export default function SupplierModelsSection({
     return (
       <section id="supplier-models">
         <CapabilitySection
-          eyebrow="Supplier Models"
-          title="能力型号"
-          subtitle="已上架并通过审核的能力型号"
+          eyebrow="供应商产品型号"
+          title="产品型号"
+          subtitle="已上架并通过审核的产品型号"
         >
           <EmptyState
             icon="document"
-            message="暂无已上架能力型号"
-            description="该平台产品尚未有已发布的能力型号公开上架。"
+            message="暂无已上架产品型号"
+            description="该平台产品尚未有已发布的产品型号公开上架。"
           />
         </CapabilitySection>
       </section>
@@ -71,9 +72,9 @@ export default function SupplierModelsSection({
   return (
     <section id="supplier-models">
       <CapabilitySection
-        eyebrow="Supplier Models"
-        title="能力型号"
-        subtitle="已上架并通过审核（Approved Supplier Model）的公开能力型号"
+        eyebrow="产品型号"
+        title="产品型号"
+        subtitle="已上架并通过审核的公开产品型号"
       >
         <div className="divide-y divide-slate-100 rounded-xl border border-slate-200/80 shadow-industrial-sm bg-white">
           {models.map((supplierProduct) => {
@@ -148,7 +149,7 @@ export default function SupplierModelsSection({
         </div>
 
         <p className="mt-3 text-xs text-slate-400">
-          勾选 2–7 个能力型号，比较技术参数与规格（同一检测能力下）。
+          勾选 2–7 个产品型号，比较技术参数与规格（同一平台产品下）。
         </p>
       </CapabilitySection>
 

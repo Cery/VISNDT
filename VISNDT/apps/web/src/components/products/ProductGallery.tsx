@@ -21,14 +21,14 @@ export default function ProductGallery({ media, productName }: ProductGalleryPro
     return a.displayOrder - b.displayOrder;
   });
 
-  // No image asset: render media fallback (dev placeholder / prod empty state).
+  // No image asset: render stable-ratio neutral fallback (846 §28: large, stable ratio).
   if (sortedImages.length === 0) {
     return (
       <MediaImage
         fileAssetId={null}
         alt={productName}
         seed={productName}
-        className="aspect-square w-full object-cover rounded-lg bg-muted"
+        className="aspect-[4/3] w-full object-contain rounded-lg border border-slate-200/80 bg-white"
       />
     );
   }
@@ -37,13 +37,13 @@ export default function ProductGallery({ media, productName }: ProductGalleryPro
 
   return (
     <div className="space-y-3">
-      {/* Main Image */}
-      <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+      {/* Main Image — 846 §28: aspect-ratio ≈ 4:3, object contain */}
+      <div className="aspect-[4/3] rounded-lg overflow-hidden border border-slate-200/80 bg-white">
         <MediaImage
           fileAssetId={currentImage.fileAssetId}
           alt={currentImage.title || productName}
           seed={currentImage.id}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
         />
       </div>
 

@@ -2,6 +2,7 @@
 
 import type { Offer } from '@/types/product';
 import Link from 'next/link';
+import { ORG_TYPE_LABEL } from '@/lib/display-labels';
 
 interface SupplierCapabilityListProps {
   offers: Offer[];
@@ -95,7 +96,7 @@ export default function SupplierCapabilityList({
                       {org.name}
                     </p>
                     <span className="inline-block px-1.5 py-0.5 text-xs rounded bg-slate-100 text-slate-500 font-medium flex-shrink-0">
-                      {org.type}
+                      {ORG_TYPE_LABEL[org.type] ?? '未知类型'}
                     </span>
                   </div>
 

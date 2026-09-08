@@ -1,0 +1,4 @@
+id,product_id,organization_id,created_by_id,contact_name,contact_email,contact_phone,message,status,created_at,updated_at
+03c51edc-44c0-4665-aec6-68d68d92a6d3,38a711ff-9352-40ea-978b-90ecd566b826,926d5a96-e1be-455c-8d58-8f4a79b6735d,,张检测,demo.buyer.01@visndt.local,13800138000,TEST/E2E/807 贵司提供的高精度三维扫描仪，希望建立联系获取更多技术资料。,NEW,2026-09-02 15:59:42.762,2026-09-02 15:59:42.762
+4c21af99-9ccb-4825-8e6c-f3062e56f425,38a711ff-9352-40ea-978b-90ecd566b826,926d5a96-e1be-455c-8d58-8f4a79b6735d,,张检测,demo.buyer.01@visndt.local,,probe,NEW,2026-09-02 16:03:40.645,2026-09-02 16:03:40.645
+f866c67c-7850-4efa-80d2-5c3ee5e91eab,38a711ff-9352-40ea-978b-90ecd566b826,926d5a96-e1be-455c-8d58-8f4a79b6735d,,张检测,demo.buyer.01@visndt.local,13800138000,TEST/E2E/807 贵司提供的高精度三维扫描仪，希望建立联系获取更多技术资料。,NEW,2026-09-02 16:10:11.761,2026-09-02 16:10:11.761

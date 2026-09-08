@@ -66,7 +66,7 @@ export class ContentMediaController {
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Upload file and create media in one step (ADMIN only)' })
   @ApiParam({ name: 'contentId', description: 'Content UUID' })
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024 } }))
   async createWithUpload(
     @Param('contentId') contentId: string,
     @UploadedFile() file: Express.Multer.File,

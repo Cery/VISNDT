@@ -1,4 +1,6 @@
 import { apiClient } from '../api-client';
+import { getCsrfToken } from '../csrf';
+import { API_BASE_URL } from '../constants';
 import type { ApiResponse } from '@/types/api';
 
 /**
@@ -61,6 +63,8 @@ export interface MySupplierProduct {
   media?: MySupplierProductMedia[] | null;
   /** 型号级技术参数覆盖（parameterDefinition 联动平台参数定义）。 */
   parameterValues?: MySupplierProductParameterValue[] | null;
+  /** WP-5A — list 视口计数（media 数量 / parameterValues 数量），用于完备度指示。 */
+  _count?: { media: number; parameterValues: number } | null;
 }
 
 export interface MySupplierProducts {
@@ -147,6 +151,112 @@ export async function submitMySupplierProduct(id: string): Promise<MySupplierPro
   const res = await apiClient<ApiResponse<MySupplierProduct>>(
     `/supplier-products/my/${id}/submit`,
     { method: 'POST' },
+  );
+  return res.data;
+}
+
+// =============================================================
+// WP-5A — Media Write (R1) + Parameter Write (R2), org-scoped
+// =============================================================
+
+export interface CreateMyMediaPayload {
+  mediaType?: string;
+  title?: string;
+  altText?: string;
+  isPrimary?: boolean;
+  displayOrder?: number;
+}
+
+export interface UpdateMyMediaPayload {
+  title?: string;
+  altText?: string;
+  isPrimary?: boolean;
+  displayOrder?: number;
+}
+
+export interface MyParameterOverrideItem {
+  parameterDefinitionId: string;
+  value: string;
+  valueNumber?: number;
+}
+
+/**
+ * Upload a file and bind it as SupplierProductMedia for an OWN SupplierProduct
+ * (multipart). Organization + life-cycle (DRAFT/APPROVED) scoped server-side.
+ * Uses FormData so the browser sets the multipart boundary (no forced JSON header).
+ */
+export async function uploadMySupplierProductMedia(
+  id: string,
+  file: File,
+  payload?: CreateMyMediaPayload,
+): Promise<MySupplierProductMedia> {
+  const form = new FormData();
+  form.append('file', file);
+  if (payload?.mediaType) form.append('mediaType', payload.mediaType);
+  if (payload?.title) form.append('title', payload.title);
+  if (payload?.altText) form.append('altText', payload.altText);
+  if (payload?.isPrimary !== undefined) form.append('isPrimary', String(payload.isPrimary));
+  if (payload?.displayOrder !== undefined) form.append('displayOrder', String(payload.displayOrder));
+
+  const headers: Record<string, string> = {};
+  try {
+    headers['X-CSRF-Token'] = await getCsrfToken();
+  } catch {
+    // best-effort; backend rejects with 403 if CSRF is strictly required
+  }
+  const res = await fetch(`${API_BASE_URL}/supplier-products/my/${id}/media/upload`, {
+    method: 'POST',
+    headers,
+    credentials: 'include',
+    body: form,
+  });
+  if (!res.ok) {
+    let msg = `Upload failed with status ${res.status}`;
+    try {
+      const b = await res.json();
+      msg = b?.message ?? b?.data?.message ?? msg;
+    } catch {
+      // ignore
+    }
+    throw new Error(msg);
+  }
+  const json = (await res.json()) as ApiResponse<MySupplierProductMedia>;
+  return json.data;
+}
+
+/** Update one media (title / altText / isPrimary / displayOrder). */
+export async function updateMySupplierProductMedia(
+  id: string,
+  mediaId: string,
+  payload: UpdateMyMediaPayload,
+): Promise<MySupplierProductMedia> {
+  const res = await apiClient<ApiResponse<MySupplierProductMedia>>(
+    `/supplier-products/my/${id}/media/${mediaId}`,
+    { method: 'PATCH', body: JSON.stringify(payload) },
+  );
+  return res.data;
+}
+
+/** Delete one media (persistence + storage cleanup, org-scoped). */
+export async function deleteMySupplierProductMedia(
+  id: string,
+  mediaId: string,
+): Promise<{ id: string }> {
+  const res = await apiClient<ApiResponse<{ id: string }>>(
+    `/supplier-products/my/${id}/media/${mediaId}`,
+    { method: 'DELETE' },
+  );
+  return res.data;
+}
+
+/** Full-set replace supplier product parameter overrides (upsert + remove missing). */
+export async function setMySupplierProductParameters(
+  id: string,
+  items: MyParameterOverrideItem[],
+): Promise<MySupplierProduct> {
+  const res = await apiClient<ApiResponse<MySupplierProduct>>(
+    `/supplier-products/my/${id}/parameters`,
+    { method: 'PUT', body: JSON.stringify({ items }) },
   );
   return res.data;
 }

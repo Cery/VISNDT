@@ -10,15 +10,17 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  UploadedFiles,
   Res,
   HttpStatus,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiParam, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { Response } from 'express';
 import { FileType } from '@prisma/client';
 import { FileAssetService } from './file-asset.service';
 import type { ListFilesQuery } from './file-asset.service';
+import { BatchUploadDto } from './dto/batch-upload.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -27,6 +29,9 @@ import { ApiResponse } from '../common/dto/api-response.dto';
 import { AuthRequest } from '../auth/interfaces/auth-request.interface';
 import { CleanupOrphansDto } from './dto/cleanup-orphans.dto';
 import { BatchDeleteDto } from '../common/dto/batch-delete.dto';
+
+/** Per-file upload limit — must match FileAssetService MAX_FILE_SIZE (10MB). */
+const FILE_SIZE_LIMIT = 10 * 1024 * 1024;
 
 @ApiTags('Files')
 @Controller('files')
@@ -62,7 +67,7 @@ export class FileAssetController {
     summary:
       'Upload a file (ADMIN only, max 10MB). Optional fileType: IMAGE/DOCUMENT/CERTIFICATE/SPEC_SHEET/ILLUSTRATION/OTHER',
   })
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: FILE_SIZE_LIMIT } }))
   async upload(
     @UploadedFile() file: Express.Multer.File,
     @Req() req: AuthRequest,
@@ -135,6 +140,40 @@ export class FileAssetController {
   async batchDelete(@Body() dto: BatchDeleteDto) {
     const result = await this.service.batchDelete(dto.ids);
     return ApiResponse.ok(result, 'Files deleted');
+  }
+
+  /**
+   * Batch upload files with ownership tags (ADMIN only).
+   * Max 10 files per request, 10MB per file. Multipart fields:
+   * `files` (repeated), plus optional `fileType` / `organizationId` / `entityType`.
+   */
+  @Post('batch-upload')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({
+    summary:
+      'Batch upload files with ownership tags (ADMIN only, max 10 files, 10MB each).',
+  })
+  @UseInterceptors(
+    FilesInterceptor('files', 10, { limits: { fileSize: FILE_SIZE_LIMIT } }),
+  )
+  async batchUpload(
+    @UploadedFiles() files: Express.Multer.File[],
+    @Req() req: AuthRequest,
+    @Body() dto: BatchUploadDto,
+  ) {
+    const result = await this.service.batchUploadWithOwnership(
+      files,
+      req.user.id,
+      {
+        fileType: dto.fileType,
+        organizationId: dto.organizationId,
+        entityType: dto.entityType,
+      },
+    );
+    return ApiResponse.ok(result, 'Batch upload completed');
   }
 
   /**

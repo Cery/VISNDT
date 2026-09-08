@@ -87,7 +87,7 @@ export default function ProductSupplierContext({
       )}
 
       <p className="mt-2.5 border-t border-slate-100 pt-2 text-[11px] text-slate-400">
-        该能力下已发布 {uniqModels.length} 个能力型号 · {orgs.length} 家提供商
+        该能力下已发布 {uniqModels.length} 个产品型号 · {orgs.length} 家供应商
       </p>
     </div>
   );

@@ -216,11 +216,11 @@ export default function ContentEdit() {
           <Descriptions.Item label="标题">{content.title}</Descriptions.Item>
           <Descriptions.Item label="状态">
             <Tag color={STATUS_COLOR_MAP[status] || 'default'}>
-              {STATUS_LABEL_MAP[status] || status}
+              {STATUS_LABEL_MAP[status] || '未知状态'}
             </Tag>
           </Descriptions.Item>
           <Descriptions.Item label="类型">
-            {TYPE_LABEL_MAP[content.type] || content.type}
+            {TYPE_LABEL_MAP[content.type] || '未知类型'}
           </Descriptions.Item>
           <Descriptions.Item label="Slug">{content.slug}</Descriptions.Item>
           <Descriptions.Item label="作者">

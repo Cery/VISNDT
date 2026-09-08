@@ -79,7 +79,7 @@ export default function RegisterPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             disabled={status === 'submitting'}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[16px] sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
             placeholder="您的姓名"
           />
         </div>
@@ -99,7 +99,7 @@ export default function RegisterPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
             disabled={status === 'submitting'}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[16px] sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
             placeholder="请输入邮箱"
           />
         </div>
@@ -120,7 +120,7 @@ export default function RegisterPage() {
             required
             minLength={8}
             disabled={status === 'submitting'}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[16px] sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
             placeholder="至少8个字符"
           />
         </div>
@@ -140,7 +140,7 @@ export default function RegisterPage() {
             onChange={(e) => setInviteToken(e.target.value)}
             required
             disabled={status === 'submitting'}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-[16px] sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:bg-slate-50 disabled:text-slate-400 transition-colors"
             placeholder="请输入管理员提供的邀请码"
           />
         </div>

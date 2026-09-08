@@ -43,10 +43,17 @@ const STATUS_LABEL_MAP: Record<string, string> = {
   SUSPENDED: '已停用',
 };
 
+const ORG_TYPE_LABEL_MAP: Record<string, string> = {
+  SUPPLIER: '供应商',
+  BUYER: '采购方',
+  ADMIN: '管理员',
+  MEMBER: '成员',
+};
+
 const ORG_EXPORT_COLUMNS: ExportColumn<Organization>[] = [
   { key: 'name', title: '名称' },
   { key: 'type', title: '类型', render: (item) => item.type || '' },
-  { key: 'status', title: '状态', render: (item) => STATUS_LABEL_MAP[item.status] || item.status },
+  { key: 'status', title: '状态', render: (item) => STATUS_LABEL_MAP[item.status] || '未知状态' },
   { key: 'createdAt', title: '创建时间', render: (item) => new Date(item.createdAt).toLocaleDateString() },
 ];
 
@@ -172,7 +179,7 @@ function OrganizationList() {
     setToggleIds((prev) => [...prev, id]);
     try {
       await organizationService.setSupplierProductEnablement(id, checked);
-      message.success(checked ? '已开放 SupplierProduct 自助管理' : '已关闭 SupplierProduct 自助管理');
+      message.success(checked ? '已开放产品型号自助管理' : '已关闭产品型号自助管理');
       setPageState((prev) =>
         prev.status === 'success'
           ? {
@@ -227,7 +234,7 @@ function OrganizationList() {
       title: '类型',
       dataIndex: 'type',
       key: 'type',
-      render: (type: string) => type || '-',
+      render: (type: string) => ORG_TYPE_LABEL_MAP[type] || '未知类型',
     },
     {
       title: '状态',
@@ -235,11 +242,11 @@ function OrganizationList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || status} />
+        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || '未知状态'} />
       ),
     },
     {
-      title: 'SupplierProduct 自助管理',
+      title: '产品型号自助管理',
       key: 'spEnable',
       width: 170,
       render: (_: unknown, record: Organization) =>

@@ -18,7 +18,7 @@ const INQUIRY_STATUS_LABELS: Record<string, string> = {
 };
 
 function InquiryStatusBadge({ status }: { status: string }) {
-  const label = INQUIRY_STATUS_LABELS[status] ?? status;
+  const label = INQUIRY_STATUS_LABELS[status] ?? '未知状态';
   const colorMap: Record<string, string> = {
     NEW: 'bg-blue-100 text-blue-700',
     PROCESSING: 'bg-amber-100 text-amber-700',

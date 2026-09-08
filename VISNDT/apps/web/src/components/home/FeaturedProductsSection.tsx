@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getProducts } from '@/services/product.service';
 import ProductCard from '@/components/products/ProductCard';
 import SectionHeader from '@/components/brand/SectionHeader';
+import PageContainer from '@/components/common/PageContainer';
 
 export default function FeaturedProductsSection() {
   const { data, isLoading, isError } = useQuery({
@@ -22,7 +23,7 @@ export default function FeaturedProductsSection() {
 
   return (
     <section className="py-20 bg-industrial-slate">
-      <div className="max-w-[1200px] mx-auto px-6">
+      <PageContainer variant="content">
         <div className="flex items-end justify-between mb-10">
           <SectionHeader
             title="推荐产品"
@@ -39,7 +40,7 @@ export default function FeaturedProductsSection() {
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
             {Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={i}
@@ -60,7 +61,7 @@ export default function FeaturedProductsSection() {
             <p>暂无产品</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -75,7 +76,7 @@ export default function FeaturedProductsSection() {
             查看全部产品 →
           </Link>
         </div>
-      </div>
+      </PageContainer>
     </section>
   );
 }

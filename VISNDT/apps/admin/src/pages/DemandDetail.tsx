@@ -301,7 +301,7 @@ export default function DemandDetailPage() {
           </Descriptions.Item>
           <Descriptions.Item label="标题">{demand.title}</Descriptions.Item>
           <Descriptions.Item label="状态">
-            <StatusTag status={demand.status} label={STATUS_LABEL_MAP[demand.status] || demand.status} />
+            <StatusTag status={demand.status} label={STATUS_LABEL_MAP[demand.status] || '未知状态'} />
           </Descriptions.Item>
           <Descriptions.Item label="分类">
             {demand.category?.name || '-'}
@@ -397,7 +397,7 @@ export default function DemandDetailPage() {
         {demand.rfq ? (
           <Descriptions bordered column={{ xs: 1, sm: 2 }}>
             <Descriptions.Item label="RFQ状态">
-              <StatusTag status={demand.rfq.status} label={RFQ_STATUS_LABEL_MAP[demand.rfq.status] || demand.rfq.status} />
+              <StatusTag status={demand.rfq.status} label={RFQ_STATUS_LABEL_MAP[demand.rfq.status] || '未知状态'} />
             </Descriptions.Item>
             <Descriptions.Item label="创建时间">
               {formatDate(demand.rfq.createdAt)}

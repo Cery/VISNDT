@@ -172,7 +172,7 @@ export default function OfferDetailPage() {
           <Title level={4} style={{ margin: 0 }}>报价详情</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          查看能力提供商报价详情
+          查看供应商报价详情
         </Text>
       </div>
 
@@ -248,9 +248,9 @@ export default function OfferDetailPage() {
 
       {/* Capability Model Binding (Offer ↔ SupplierProduct ↔ Provider) */}
       {offer.supplierProduct && (
-        <Card title="能力型号绑定" style={{ marginBottom: 16 }}>
+        <Card title="产品型号绑定" style={{ marginBottom: 16 }}>
           <Descriptions bordered column={{ xs: 1, sm: 2 }}>
-            <Descriptions.Item label="能力型号">
+            <Descriptions.Item label="产品型号">
               {offer.supplierProduct.brand} {offer.supplierProduct.modelNumber}
               {offer.supplierProduct.series ? ` · ${offer.supplierProduct.series}` : ''}
             </Descriptions.Item>
@@ -260,7 +260,7 @@ export default function OfferDetailPage() {
             <Descriptions.Item label="平台能力">
               {offer.supplierProduct.platformProduct?.name || '-'}
             </Descriptions.Item>
-            <Descriptions.Item label="能力提供商">
+            <Descriptions.Item label="供应商">
               {offer.supplierProduct.organization?.name || offer.organization?.name || '-'}
             </Descriptions.Item>
           </Descriptions>

@@ -7,6 +7,7 @@ import AuthGuard from '@/auth/AuthGuard';
 import RoleGuard from '@/auth/RoleGuard';
 import WorkspaceSidebar from '@/components/workspace/WorkspaceSidebar';
 import WorkspaceHeader from '@/components/workspace/WorkspaceHeader';
+import { DEMAND_STATUS_LABEL } from '@/lib/display-labels';
 import DemandParameterEditor, {
   type DemandParameterDraft,
 } from '@/components/demand/DemandParameterEditor';
@@ -282,7 +283,7 @@ function DemandEditContent({ id }: { id: string }) {
                   当前状态不可编辑
                 </h3>
                 <p className="text-sm text-amber-800">
-                  需求进入发布后流程后，不再开放基础信息编辑。当前状态：{demand.status}
+                  需求进入发布后流程后，不再开放基础信息编辑。当前状态：{DEMAND_STATUS_LABEL[demand.status] ?? '未知状态'}
                 </p>
                 <div className="flex items-center gap-3">
                   <button

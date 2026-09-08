@@ -14,7 +14,7 @@ export const SITE_URL =
 
 /** 站点默认描述 */
 export const SITE_DESCRIPTION =
-  'VISNDT是一个专业的工业检测能力发现平台——发现检测能力、能力型号、技术知识与解决方案，支持需求发布、平台撮合与询价协作。';
+  'VISNDT是一个专业的工业检测能力发现平台——发现检测能力、产品型号、技术知识与解决方案，支持需求发布、平台撮合与询价协作。';
 
 /** 站点全局关键词 */
 export const SITE_KEYWORDS = [
@@ -24,7 +24,7 @@ export const SITE_KEYWORDS = [
   'NDT',
   '工业检测',
   '检测能力',
-  '能力型号',
+  '产品型号',
   '技术知识',
   '检测方案',
   'VISNDT',

@@ -5,6 +5,8 @@ interface ProductCategory {
   name: string;
   slug: string;
   description?: string;
+  parentId?: string;
+  children?: ProductCategory[];
   createdAt: string;
   updatedAt: string;
 }

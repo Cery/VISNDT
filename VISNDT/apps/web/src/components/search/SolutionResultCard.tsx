@@ -27,7 +27,7 @@ export default function SolutionResultCard({ content, highlight }: SolutionResul
   return (
     <Link
       href={`/solutions/${content.slug}`}
-      className="group block rounded-xl border border-slate-200/80 bg-white shadow-industrial-sm p-5 hover:shadow-industrial-md hover:-translate-y-1 transition-all duration-300"
+      className="group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-industrial-sm p-5 hover:shadow-industrial-md transition-all duration-300"
     >
       <div className="flex items-start gap-4">
         <div className="flex-1 min-w-0">
@@ -53,7 +53,7 @@ export default function SolutionResultCard({ content, highlight }: SolutionResul
             </p>
           )}
 
-          <div className="flex items-center justify-between gap-3">
+          <div className="mt-auto flex items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400 min-w-0">
               {contextTags.length > 0 && (
                 <>

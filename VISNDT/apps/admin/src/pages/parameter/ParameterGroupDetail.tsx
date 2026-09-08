@@ -129,7 +129,7 @@ export default function ParameterGroupDetail() {
       width: 120,
       render: (dataType: string) => (
         <Tag color={DATA_TYPE_COLOR[dataType] || 'default'}>
-          {DATA_TYPE_LABEL[dataType] || dataType}
+          {DATA_TYPE_LABEL[dataType] || '未知类型'}
         </Tag>
       ),
     },

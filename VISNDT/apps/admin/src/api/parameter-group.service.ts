@@ -14,7 +14,7 @@ interface ApiResponseWrapper<T> {
 }
 
 export const parameterGroupService = {
-  async getList(params?: { page?: number; pageSize?: number; keyword?: string }): Promise<ParameterGroupListResponse> {
+  async getList(params?: { page?: number; pageSize?: number; keyword?: string; categoryId?: string }): Promise<ParameterGroupListResponse> {
     const response = (await apiClient.get('/parameter-groups', {
       params,
     })) as unknown as ApiResponseWrapper<ParameterGroupListResponse>;

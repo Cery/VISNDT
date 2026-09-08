@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VISNDT – 工业检测能力发现平台（重构版）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --graphite:#1B1F24;
+    --graphite-2:#262C33;
+    --steel:#3D4A56;
+    --paper:#ECE8DE;
+    --paper-2:#E1DCCE;
+    --ink:#20242A;
+    --ink-soft:#565F68;
+    --line:#C9C2B0;
+    --line-dark:#3A4149;
+    --amber:#CE8A2E;
+    --amber-deep:#A96F1F;
+    --verdigris:#4F7A6E;
+    --verdigris-soft:#DDE6E1;
+    --radius: 2px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Noto Sans SC', sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  img,svg{display:block; max-width:100%;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 28px;}
+
+  /* ---------- corner registration marks ---------- */
+  .reg{position:relative;}
+  .reg::before,.reg::after{
+    content:""; position:absolute; width:9px; height:9px;
+    border:1.5px solid currentColor; opacity:.55;
+  }
+  .reg::before{top:-1px; left:-1px; border-right:none; border-bottom:none;}
+  .reg::after{bottom:-1px; right:-1px; border-left:none; border-top:none;}
+
+  /* ---------- header ---------- */
+  header{
+    background:var(--paper); border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:50;
+  }
+  .header-row{
+    display:flex; align-items:center; justify-content:space-between;
+    height:68px; gap:24px;
+  }
+  .logo{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+  .logo-mark{width:30px; height:30px; flex-shrink:0;}
+  .logo-text{font-weight:700; font-size:19px; letter-spacing:.01em; color:var(--ink);}
+  .logo-text span{color:var(--amber-deep);}
+  nav.primary-nav{display:flex; gap:2px; flex:1; justify-content:center;}
+  nav.primary-nav a{
+    font-size:14px; font-weight:500; color:var(--ink-soft);
+    padding:8px 14px; border-radius:1px; transition:color .15s;
+  }
+  nav.primary-nav a:hover{color:var(--ink);}
+  .header-actions{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+  .btn{
+    font-size:13.5px; font-weight:600; padding:9px 18px;
+    border:1px solid var(--line-dark); cursor:pointer; white-space:nowrap;
+  }
+  .btn-ghost{background:transparent; color:var(--ink); border-color:var(--line);}
+  .btn-ghost:hover{border-color:var(--ink);}
+  .btn-solid{background:var(--graphite); color:var(--paper); border-color:var(--graphite);}
+  .btn-solid:hover{background:var(--ink);}
+  .btn-amber{background:var(--amber); color:var(--graphite); border-color:var(--amber);}
+  .btn-amber:hover{background:var(--amber-deep); border-color:var(--amber-deep); color:#fff;}
+
+  /* ---------- hero ---------- */
+  .hero{background:var(--graphite); color:var(--paper); overflow:hidden;}
+  .hero-grid{
+    display:grid; grid-template-columns:1.05fr 0.95fr; gap:40px;
+    padding:76px 0 0; align-items:center;
+  }
+  .hero h1{
+    font-size:40px; font-weight:900; line-height:1.28; letter-spacing:-0.01em;
+    color:#fff; max-width:11.5em;
+  }
+  .hero p.lede{
+    margin-top:18px; font-size:15.5px; color:#B9BEC3; max-width:34em; line-height:1.8;
+  }
+  .hero-search{
+    margin-top:32px; display:flex; max-width:520px; border:1px solid #4B535B;
+    background:#20262D;
+  }
+  .hero-search input{
+    flex:1; background:transparent; border:none; outline:none; color:#fff;
+    font-size:14.5px; padding:14px 16px; font-family:inherit;
+  }
+  .hero-search input::placeholder{color:#7C848C;}
+  .hero-search button{
+    background:var(--amber); color:var(--graphite); border:none; font-weight:700;
+    padding:0 22px; font-size:14px; cursor:pointer;
+  }
+  .hero-search button:hover{background:#DFA24E;}
+
+  .spec-strip{display:flex; gap:0; margin-top:44px; border-top:1px solid #3B424A;}
+  .spec-item{
+    flex:1; padding:18px 20px 18px 0; border-right:1px solid #3B424A;
+  }
+  .spec-item:last-child{border-right:none;}
+  .spec-item .num{font-family:'JetBrains Mono',monospace; font-size:24px; font-weight:600; color:var(--amber);}
+  .spec-item .label{font-size:12px; color:#9BA2A9; margin-top:4px;}
+
+  /* hero diagram */
+  .hero-diagram{
+    align-self:stretch; display:flex; align-items:center; justify-content:center;
+    padding:20px 0 0 0; height:100%;
+  }
+  .diagram-card{
+    border:1px solid #454D55; background:#20262D; padding:26px 26px 20px;
+    width:100%; max-width:440px;
+  }
+  .diagram-card .cap-row{
+    display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace;
+    font-size:10.5px; color:#7C848C; letter-spacing:.03em; margin-bottom:16px;
+  }
+  .diagram-card svg{width:100%; height:auto;}
+  .diagram-legend{display:flex; flex-wrap:wrap; gap:14px 22px; margin-top:16px; padding-top:14px; border-top:1px solid #3B424A;}
+  .diagram-legend div{font-size:11.5px; color:#B9BEC3; display:flex; align-items:baseline; gap:6px;}
+  .diagram-legend .lv{font-family:'JetBrains Mono',monospace; color:var(--amber); font-weight:600;}
+
+  /* ---------- section shell ---------- */
+  section{padding:76px 0;}
+  section.on-paper-2{background:var(--paper-2);}
+  .section-head{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    gap:24px; margin-bottom:42px; flex-wrap:wrap;
+  }
+  .section-head h2{font-size:27px; font-weight:700; letter-spacing:-0.005em; max-width:16em;}
+  .section-head p{font-size:14px; color:var(--ink-soft); max-width:30em; margin-top:8px;}
+  .section-head .see-all{font-size:13.5px; font-weight:600; color:var(--ink); flex-shrink:0; padding-bottom:4px; border-bottom:1px solid var(--ink);}
+
+  /* ---------- capability register (table, not cards) ---------- */
+  .register{border-top:1px solid var(--line-dark);}
+  .register-row{
+    display:grid; grid-template-columns:88px 1.1fr 1.6fr 30px;
+    align-items:center; gap:20px; padding:18px 4px;
+    border-bottom:1px solid var(--line); transition:background .15s;
+  }
+  .register-row:hover{background:#E4DFD1;}
+  .register-row .code{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--verdigris); font-weight:600;}
+  .register-row .name{font-size:16px; font-weight:600;}
+  .register-row .desc{font-size:13.5px; color:var(--ink-soft);}
+  .register-row .arrow{font-size:16px; color:var(--ink-soft); text-align:right; transition:transform .15s;}
+  .register-row:hover .arrow{transform:translateX(3px); color:var(--ink);}
+
+  /* ---------- product datasheet cards ---------- */
+  .product-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line);}
+  .product-card{background:var(--paper); display:flex; flex-direction:column;}
+  .product-visual{
+    aspect-ratio:16/10; background:var(--graphite); display:flex; align-items:center; justify-content:center;
+    position:relative;
+  }
+  .product-visual svg{width:56%; opacity:.92;}
+  .product-visual .tag{
+    position:absolute; top:12px; left:12px; font-family:'JetBrains Mono',monospace;
+    font-size:10px; color:#DFA24E; border:1px solid #4B535B; padding:3px 7px; letter-spacing:.02em;
+  }
+  .product-body{padding:20px 22px 22px; flex:1; display:flex; flex-direction:column;}
+  .product-body h3{font-size:16.5px; font-weight:700; margin-bottom:4px;}
+  .product-body .maker{font-size:12.5px; color:var(--ink-soft); margin-bottom:14px;}
+  .spec-table{border-top:1px solid var(--line); font-size:12.5px;}
+  .spec-table div{
+    display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid var(--line);
+    color:var(--ink-soft);
+  }
+  .spec-table div b{font-family:'JetBrains Mono',monospace; color:var(--ink); font-weight:600;}
+  .product-footer{
+    margin-top:16px; display:flex; justify-content:space-between; align-items:center;
+  }
+  .product-footer .status{font-size:12px; color:var(--verdigris); font-weight:600;}
+  .product-footer a{font-size:13px; font-weight:600; border-bottom:1px solid var(--ink);}
+
+  /* ---------- solution flow ---------- */
+  .flow{display:flex; align-items:stretch; gap:0; margin-bottom:52px; overflow-x:auto;}
+  .flow-step{
+    flex:1; min-width:190px; border:1px solid var(--line-dark); padding:20px 18px;
+    background:var(--paper); position:relative;
+  }
+  .flow-step + .flow-step{margin-left:-1px;}
+  .flow-step .idx{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--amber-deep); font-weight:700;}
+  .flow-step h4{font-size:15px; font-weight:700; margin-top:8px;}
+  .flow-step p{font-size:12.5px; color:var(--ink-soft); margin-top:6px;}
+  .flow-arrow{
+    display:flex; align-items:center; justify-content:center; width:26px; flex-shrink:0;
+    color:var(--ink-soft); font-size:16px; z-index:1;
+  }
+
+  .scenario-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px;}
+  .scenario-card{border:1px solid var(--line); background:var(--paper); padding:24px;}
+  .scenario-card .field{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--verdigris); margin-bottom:10px;
+  }
+  .scenario-card h4{font-size:16px; font-weight:700; margin-bottom:10px;}
+  .scenario-card p{font-size:13px; color:var(--ink-soft); margin-bottom:16px;}
+  .scenario-card .params{display:flex; flex-wrap:wrap; gap:6px;}
+  .scenario-card .params span{
+    font-family:'JetBrains Mono',monospace; font-size:11px; background:var(--verdigris-soft); color:#345048;
+    padding:3px 8px; border-radius:1px;
+  }
+
+  /* ---------- knowledge index ---------- */
+  .knowledge-list{border-top:1px solid var(--line);}
+  .knowledge-item{
+    display:grid; grid-template-columns:170px 1fr 26px; gap:24px; align-items:baseline;
+    padding:20px 0; border-bottom:1px solid var(--line);
+  }
+  .knowledge-item .tag{font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--ink-soft); align-self:start; padding-top:2px;}
+  .knowledge-item h4{font-size:16px; font-weight:700; margin-bottom:5px;}
+  .knowledge-item p{font-size:13px; color:var(--ink-soft);}
+  .knowledge-item .arrow{text-align:right; color:var(--ink-soft); align-self:start;}
+
+  /* ---------- CTA ---------- */
+  .cta{background:var(--graphite); color:var(--paper); padding:80px 0;}
+  .cta-grid{display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center;}
+  .cta h2{font-size:29px; font-weight:800; color:#fff; line-height:1.35; max-width:12em;}
+  .cta p{margin-top:16px; font-size:14.5px; color:#B9BEC3; max-width:32em; line-height:1.8;}
+  .cta .btn-row{margin-top:28px; display:flex; gap:12px;}
+  .mini-form{border:1px solid #454D55; background:#20262D; padding:26px;}
+  .mini-form .row-label{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#7C848C; margin-bottom:6px; letter-spacing:.02em;}
+  .mini-form input, .mini-form select{
+    width:100%; background:#171C21; border:1px solid #3B424A; color:#fff; padding:11px 12px;
+    font-size:13.5px; font-family:inherit; margin-bottom:16px; outline:none;
+  }
+  .mini-form input:focus, .mini-form select:focus{border-color:var(--amber);}
+
+  /* ---------- footer ---------- */
+  footer{background:#161A1E; color:#8B9198; padding:52px 0 26px;}
+  .foot-grid{display:grid; grid-template-columns:1.4fr repeat(4,1fr); gap:32px; padding-bottom:36px; border-bottom:1px solid #2A3037;}
+  .foot-grid h5{color:#D8D3C6; font-size:13px; font-weight:600; margin-bottom:14px;}
+  .foot-grid a{display:block; font-size:13px; padding:5px 0; color:#8B9198;}
+  .foot-grid a:hover{color:#D8D3C6;}
+  .foot-bottom{display:flex; justify-content:space-between; padding-top:22px; font-size:12.5px; flex-wrap:wrap; gap:8px;}
+
+  @media (max-width: 860px){
+    .hero-grid{grid-template-columns:1fr; padding-top:48px;}
+    .hero-diagram{order:-1; padding-top:0; padding-bottom:24px;}
+    nav.primary-nav{display:none;}
+    .product-grid{grid-template-columns:1fr;}
+    .scenario-grid{grid-template-columns:1fr;}
+    .cta-grid{grid-template-columns:1fr;}
+    .foot-grid{grid-template-columns:1fr 1fr;}
+    .spec-strip{flex-wrap:wrap;}
+    .spec-item{flex:1 1 45%;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap header-row">
+    <a href="#" class="logo">
+      <svg class="logo-mark" viewBox="0 0 30 30" fill="none">
+        <rect x="1" y="1" width="28" height="28" stroke="#20242A" stroke-width="1.4"/>
+        <circle cx="15" cy="15" r="6" stroke="#CE8A2E" stroke-width="1.4"/>
+        <line x1="15" y1="1" x2="15" y2="7" stroke="#20242A" stroke-width="1.2"/>
+        <line x1="15" y1="23" x2="15" y2="29" stroke="#20242A" stroke-width="1.2"/>
+        <line x1="1" y1="15" x2="7" y2="15" stroke="#20242A" stroke-width="1.2"/>
+        <line x1="23" y1="15" x2="29" y2="15" stroke="#20242A" stroke-width="1.2"/>
+      </svg>
+      <span class="logo-text">VIS<span>NDT</span></span>
+    </a>
+    <nav class="primary-nav">
+      <a href="#">能力分类</a>
+      <a href="#">检测产品</a>
+      <a href="#">解决方案</a>
+      <a href="#">知识中心</a>
+    </nav>
+    <div class="header-actions">
+      <a href="#" class="btn btn-ghost">供应能力入驻</a>
+      <a href="#" class="btn btn-solid">发布检测需求</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <h1>把检测需求，<br>翻译成可比对的参数</h1>
+        <p class="lede">按探头直径、工作长度、分辨率等标准化参数检索检测能力与设备型号，让工程需求与供应商报价可以直接对齐比对。</p>
+        <div class="hero-search">
+          <input type="text" placeholder="例如：φ4.0mm 工业内窥镜，长度 1000mm">
+          <button>检索</button>
+        </div>
+        <div class="spec-strip">
+          <div class="spec-item"><div class="num">1,240+</div><div class="label">已收录检测产品型号</div></div>
+          <div class="spec-item"><div class="num">86</div><div class="label">入驻检测能力供应商</div></div>
+          <div class="spec-item"><div class="num">＜4h</div><div class="label">平均询价响应时长</div></div>
+        </div>
+      </div>
+
+      <div class="hero-diagram">
+        <div class="diagram-card">
+          <div class="cap-row"><span>FIG. 01 — 工业内窥镜工作原理</span><span>SCALE N.T.S.</span></div>
+          <svg viewBox="0 0 400 210" fill="none">
+            <!-- pipe cross-section -->
+            <rect x="20" y="70" width="360" height="70" rx="2" stroke="#4B535B" stroke-width="1.4"/>
+            <line x1="20" y1="80" x2="380" y2="80" stroke="#3A414A" stroke-width="1"/>
+            <line x1="20" y1="130" x2="380" y2="130" stroke="#3A414A" stroke-width="1"/>
+            <!-- flaw -->
+            <path d="M240 80 L252 96 L238 108 L250 130" stroke="#CE8A2E" stroke-width="2" fill="none"/>
+            <!-- probe -->
+            <line x1="20" y1="105" x2="250" y2="105" stroke="#DDD7C7" stroke-width="3"/>
+            <circle cx="255" cy="105" r="7" stroke="#DDD7C7" stroke-width="2" fill="#20262D"/>
+            <!-- field of view cone -->
+            <path d="M262 105 L300 88 L300 122 Z" fill="#4F7A6E" fill-opacity="0.28" stroke="#4F7A6E" stroke-width="1"/>
+            <!-- dimension lines -->
+            <line x1="20" y1="150" x2="255" y2="150" stroke="#7C848C" stroke-width="1"/>
+            <line x1="20" y1="145" x2="20" y2="155" stroke="#7C848C" stroke-width="1"/>
+            <line x1="255" y1="145" x2="255" y2="155" stroke="#7C848C" stroke-width="1"/>
+            <text x="120" y="168" fill="#9BA2A9" font-size="10" font-family="JetBrains Mono, monospace">L = 1000mm</text>
+
+            <line x1="248" y1="98" x2="248" y2="112" stroke="#7C848C" stroke-width="1"/>
+            <text x="200" y="30" fill="#9BA2A9" font-size="10" font-family="JetBrains Mono, monospace">φ4.0mm PROBE HEAD</text>
+            <line x1="255" y1="98" x2="255" y2="55" stroke="#5A626A" stroke-width="1" stroke-dasharray="2 2"/>
+            <line x1="196" y1="35" x2="255" y2="55" stroke="#5A626A" stroke-width="1" stroke-dasharray="2 2"/>
+
+            <text x="304" y="80" fill="#7FA294" font-size="10" font-family="JetBrains Mono, monospace">FOV 90°</text>
+          </svg>
+          <div class="diagram-legend">
+            <div><span class="lv">φ4.0mm</span> 探头直径</div>
+            <div><span class="lv">1000mm</span> 工作长度</div>
+            <div><span class="lv">90°</span> 视场角</div>
+            <div><span class="lv">1080p</span> 成像分辨率</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>按检测对象与工况找能力</h2>
+        <p>六类检测能力索引，覆盖从设备选型到应用场景的检索路径。</p>
+      </div>
+      <a href="#" class="see-all">查看完整分类 →</a>
+    </div>
+    <div class="register">
+      <div class="register-row">
+        <div class="code">CAT.01</div>
+        <div class="name">工业内窥镜检测</div>
+        <div class="desc">发动机、管道、腔体内部目视检测，覆盖硬管镜、软管镜、可变焦机型</div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="register-row">
+        <div class="code">CAT.02</div>
+        <div class="name">超声波检测</div>
+        <div class="desc">壁厚测量、焊缝内部缺陷探伤，适用于压力容器与管道系统</div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="register-row">
+        <div class="code">CAT.03</div>
+        <div class="name">涡流检测</div>
+        <div class="desc">导电材料表面及近表面裂纹检测，常用于航空结构件维护</div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="register-row">
+        <div class="code">CAT.04</div>
+        <div class="name">工业内窥摄像系统</div>
+        <div class="desc">高分辨率成像与录制回放，用于检测存档与远程会诊</div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="register-row">
+        <div class="code">CAT.05</div>
+        <div class="name">精密测量附件</div>
+        <div class="desc">3D立体测量探头、比对测量探头，配合内窥镜实现缺陷量化</div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="register-row">
+        <div class="code">CAT.06</div>
+        <div class="name">检测服务与外协</div>
+        <div class="desc">按检测任务提供持证检测人员与现场服务，不涉及设备采购</div>
+        <div class="arrow">→</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="on-paper-2">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>近期上架的检测设备</h2>
+        <p>关键参数直接列出，便于与您的检测工况比对。</p>
+      </div>
+      <a href="#" class="see-all">浏览全部产品 →</a>
+    </div>
+    <div class="product-grid">
+      <div class="product-card">
+        <div class="product-visual">
+          <span class="tag">现货</span>
+          <svg viewBox="0 0 120 80" fill="none">
+            <rect x="10" y="34" width="70" height="10" rx="2" fill="#3D4A56"/>
+            <circle cx="86" cy="39" r="9" stroke="#DDD7C7" stroke-width="2" fill="#1B1F24"/>
+            <rect x="88" y="18" width="26" height="42" rx="2" stroke="#7C848C" stroke-width="1.4"/>
+            <circle cx="101" cy="39" r="4" stroke="#CE8A2E" stroke-width="1.4"/>
+          </svg>
+        </div>
+        <div class="product-body">
+          <h3>YT-4000E 工业视频内窥镜</h3>
+          <div class="maker">供应商：远瞳精密仪器</div>
+          <div class="spec-table">
+            <div><span>探头直径</span><b>4.0mm</b></div>
+            <div><span>工作长度</span><b>1.0 / 1.5 / 2.0m</b></div>
+            <div><span>视场角</span><b>90°</b></div>
+            <div><span>分辨率</span><b>1920×1080</b></div>
+          </div>
+          <div class="product-footer">
+            <span class="status">● 支持在线询价</span>
+            <a href="#">查看详情</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-visual">
+          <span class="tag">定制</span>
+          <svg viewBox="0 0 120 80" fill="none">
+            <rect x="6" y="35" width="80" height="8" rx="2" fill="#3D4A56"/>
+            <circle cx="92" cy="39" r="10" stroke="#DDD7C7" stroke-width="2" fill="#1B1F24"/>
+            <path d="M100 39 L118 30 L118 48 Z" fill="#4F7A6E" fill-opacity=".4" stroke="#4F7A6E"/>
+          </svg>
+        </div>
+        <div class="product-body">
+          <h3>PX-620S 可变焦硬管内窥镜</h3>
+          <div class="maker">供应商：普锐视觉检测</div>
+          <div class="spec-table">
+            <div><span>探头直径</span><b>6.2mm</b></div>
+            <div><span>工作长度</span><b>350mm</b></div>
+            <div><span>视场角</span><b>0°/30°/70°</b></div>
+            <div><span>光源</span><b>LED 可调</b></div>
+          </div>
+          <div class="product-footer">
+            <span class="status">● 支持在线询价</span>
+            <a href="#">查看详情</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-visual">
+          <span class="tag">热门</span>
+          <svg viewBox="0 0 120 80" fill="none">
+            <rect x="14" y="20" width="10" height="46" rx="2" stroke="#DDD7C7" stroke-width="1.6"/>
+            <rect x="30" y="30" width="60" height="26" rx="2" stroke="#7C848C" stroke-width="1.4"/>
+            <line x1="40" y1="38" x2="80" y2="38" stroke="#CE8A2E" stroke-width="1.4"/>
+            <line x1="40" y1="46" x2="70" y2="46" stroke="#CE8A2E" stroke-width="1.4"/>
+          </svg>
+        </div>
+        <div class="product-body">
+          <h3>EC-200 便携式涡流探伤仪</h3>
+          <div class="maker">供应商：中检智控</div>
+          <div class="spec-table">
+            <div><span>检测频率</span><b>10Hz–10MHz</b></div>
+            <div><span>探头类型</span><b>表面 / 螺孔</b></div>
+            <div><span>显示屏</span><b>7英寸触控</b></div>
+            <div><span>续航</span><b>约8小时</b></div>
+          </div>
+          <div class="product-footer">
+            <span class="status">● 支持在线询价</span>
+            <a href="#">查看详情</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>从检测问题到落地方案</h2>
+        <p>四步流程把您的现场问题转化为可执行的采购动作。</p>
+      </div>
+    </div>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="idx">STEP 01</div>
+        <h4>描述检测场景</h4>
+        <p>说明检测对象、工况环境与限制条件</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="idx">STEP 02</div>
+        <h4>转化为标准参数</h4>
+        <p>系统归纳出探头直径、工作长度等关键参数</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="idx">STEP 03</div>
+        <h4>匹配检测能力</h4>
+        <p>按参数比对入驻供应商的设备与服务能力</p>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <div class="idx">STEP 04</div>
+        <h4>提交询价</h4>
+        <p>直接向匹配到的供应商发起报价请求</p>
+      </div>
+    </div>
+
+    <div class="scenario-grid">
+      <div class="scenario-card">
+        <div class="field">场景 / 航空发动机</div>
+        <h4>涡轮叶片裂纹排查</h4>
+        <p>孔径受限、耐高温部件的内部目视检测，需细径探头与高分辨率成像</p>
+        <div class="params"><span>φ2.8mm</span><span>耐温≥150°C</span><span>3D测量选配</span></div>
+      </div>
+      <div class="scenario-card">
+        <div class="field">场景 / 汽车制造</div>
+        <h4>焊缝内部缺陷检测</h4>
+        <p>批量焊点抽检，要求检测节拍快、可导出报告存档</p>
+        <div class="params"><span>超声测厚</span><span>数据存档</span><span>产线节拍适配</span></div>
+      </div>
+      <div class="scenario-card">
+        <div class="field">场景 / 市政管网</div>
+        <h4>管道内壁腐蚀普查</h4>
+        <p>长距离管道巡检，需要长工作长度与防水探头</p>
+        <div class="params"><span>工作长度≥30m</span><span>IP67</span><span>实时录像</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="on-paper-2">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>工程信息与选型参考</h2>
+        <p>面向工程人员的参数解读与应用说明，帮助判断设备是否适配工况。</p>
+      </div>
+      <a href="#" class="see-all">进入知识中心 →</a>
+    </div>
+    <div class="knowledge-list">
+      <div class="knowledge-item">
+        <div class="tag">技术原理</div>
+        <div>
+          <h4>内窥镜、超声、涡流检测方法对比</h4>
+          <p>三种主流无损检测技术的适用材料、缺陷类型与选型判断依据</p>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="knowledge-item">
+        <div class="tag">应用场景</div>
+        <div>
+          <h4>航空航天、汽车、管道检测方案拆解</h4>
+          <p>典型行业场景下的检测流程、设备组合与常见问题</p>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="knowledge-item">
+        <div class="tag">设备应用</div>
+        <div>
+          <h4>检测相机与测量系统的现场使用要点</h4>
+          <p>探头保护、光源调节、成像清晰度优化的实操建议</p>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="knowledge-item">
+        <div class="tag">标准合规</div>
+        <div>
+          <h4>不同工业领域的无损检测标准解读</h4>
+          <p>行业检测规范、验收标准与常见认证要求</p>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+      <div class="knowledge-item">
+        <div class="tag">参数指导</div>
+        <div>
+          <h4>如何根据孔径与工作距离选择探头</h4>
+          <p>分辨率、直径、焦距等关键参数的选型对照方法</p>
+        </div>
+        <div class="arrow">→</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <div class="cta-grid">
+      <div>
+        <h2>找不到匹配的检测能力？</h2>
+        <p>提交您的检测需求，系统会转化为标准参数并推送给匹配的供应商，供应商的报价会附带参数核对结果。</p>
+        <div class="btn-row">
+          <a href="#" class="btn btn-amber">提交检测需求</a>
+          <a href="#" class="btn btn-ghost" style="border-color:#4B535B; color:#fff;">浏览全部产品</a>
+        </div>
+      </div>
+      <div class="mini-form">
+        <div class="row-label">检测对象</div>
+        <input type="text" placeholder="例如：航空发动机涡轮叶片">
+        <div class="row-label">关键限制（孔径 / 工作距离 / 环境）</div>
+        <input type="text" placeholder="例如：入口孔径 φ8mm，工作距离 1.2m">
+        <div class="row-label">期望响应时间</div>
+        <select><option>24小时内</option><option>3个工作日内</option><option>不限</option></select>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="logo-text" style="color:#D8D3C6; margin-bottom:12px;">VIS<span style="color:#CE8A2E;">NDT</span></div>
+        <p style="font-size:13px; line-height:1.8; max-width:26em;">工业检测能力发现平台，以标准化参数连接检测需求与供应能力。</p>
+      </div>
+      <div>
+        <h5>发现</h5>
+        <a href="#">统一检索</a>
+        <a href="#">能力分类</a>
+        <a href="#">检测产品</a>
+      </div>
+      <div>
+        <h5>产品</h5>
+        <a href="#">检测产品</a>
+        <a href="#">产品对比</a>
+        <a href="#">供应型号</a>
+      </div>
+      <div>
+        <h5>方案</h5>
+        <a href="#">解决方案</a>
+        <a href="#">知识中心</a>
+      </div>
+      <div>
+        <h5>连接</h5>
+        <a href="#">发布检测需求</a>
+        <a href="#">供应能力入驻</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 VISNDT. 版权所有</span>
+      <span>工业无损检测产品与技术方案平台</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

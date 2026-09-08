@@ -1,6 +1,7 @@
 import type { Organization } from '@/types/organization';
 import type { Offer } from '@/types/product';
 import Link from 'next/link';
+import { ORG_TYPE_LABEL, ORG_STATUS_LABEL } from '@/lib/display-labels';
 
 interface SupplierInfoProps {
   /** 可选：直接传入 organization */
@@ -47,12 +48,12 @@ export default function SupplierInfo({
         </div>
         <div className="flex justify-between">
           <span className="text-slate-500">类型</span>
-          <span className="font-medium text-slate-700">{derivedOrg.type}</span>
+          <span className="font-medium text-slate-700">{ORG_TYPE_LABEL[derivedOrg.type] ?? '未知类型'}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-slate-500">状态</span>
           <span className="inline-block px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-700">
-            {derivedOrg.status === 'ACTIVE' ? '活跃' : derivedOrg.status}
+            {ORG_STATUS_LABEL[derivedOrg.status] ?? '未知状态'}
           </span>
         </div>
       </div>

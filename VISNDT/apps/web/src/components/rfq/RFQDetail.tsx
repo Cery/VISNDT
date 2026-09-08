@@ -1,5 +1,6 @@
 import type { RfqDetailItem } from '@/lib/api/rfqs';
 import { BusinessIdentityBadge, WorkflowTimeline, NextActionHint, buildRfqTimeline, RFQ_STATUS_PRESENTATION, presentStatus } from '@visndt/design-system';
+import { ORG_TYPE_LABEL } from '@/lib/display-labels';
 import RFQStatusBadge from './RFQStatusBadge';
 import DemandParameters from '@/components/demand/DemandParameters';
 
@@ -110,7 +111,7 @@ export default function RFQDetail({ rfq, responseCount }: RFQDetailProps) {
               {targetOrg.name || '未命名组织'}
             </p>
             {targetOrg.type && (
-              <p className="text-xs text-slate-400 mt-1">类型：{targetOrg.type}</p>
+              <p className="text-xs text-slate-400 mt-1">类型：{ORG_TYPE_LABEL[targetOrg.type] ?? '未知类型'}</p>
             )}
           </div>
         </section>

@@ -29,11 +29,13 @@ export default function RoleCapabilityCard() {
           <Text code>{currentRole}</Text>
         </Descriptions.Item>
         <Descriptions.Item label="能力范围">
-          {capabilities.map((cap) => (
-            <Tag key={cap} color="green" style={{ marginBottom: 4 }}>
-              {cap}
-            </Tag>
-          ))}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+            {capabilities.map((cap) => (
+              <Tag key={cap} color="green" style={{ margin: 0 }}>
+                {cap}
+              </Tag>
+            ))}
+          </div>
         </Descriptions.Item>
       </Descriptions>
     </Card>

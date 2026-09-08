@@ -53,7 +53,7 @@ function formatStatusCounts(statusCounts?: Record<string, number>) {
 
   return entries
     .slice(0, 3)
-    .map(([status, count]) => `${STATUS_LABEL_MAP[status] || status} ${count}`)
+    .map(([status, count]) => `${STATUS_LABEL_MAP[status] || '未知状态'} ${count}`)
     .join(' / ');
 }
 
@@ -208,7 +208,7 @@ function BuyerDashboardContent() {
                           <div>
                             <p className="text-xs text-slate-500">当前状态</p>
                             <p className="mt-1 text-sm font-medium text-slate-900">
-                            {STATUS_LABEL_MAP[decision.status] || decision.status}
+                            {STATUS_LABEL_MAP[decision.status] || '未知状态'}
                           </p>
                         </div>
                         <Link

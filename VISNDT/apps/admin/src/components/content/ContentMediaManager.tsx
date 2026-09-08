@@ -183,7 +183,7 @@ export default function ContentMediaManager({ contentId }: ContentMediaManagerPr
       width: 100,
       render: (type: ContentMediaType) => (
         <Tag color={type === 'IMAGE' ? 'blue' : 'green'}>
-          {MEDIA_TYPE_LABEL_MAP[type] || type}
+          {MEDIA_TYPE_LABEL_MAP[type] || '未知类型'}
         </Tag>
       ),
     },

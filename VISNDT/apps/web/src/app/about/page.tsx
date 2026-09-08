@@ -125,7 +125,7 @@ export default async function AboutPage() {
                 </p>
               )}
               {section.cards && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                   {section.cards.map((card) => (
                     <div
                       key={card.title}

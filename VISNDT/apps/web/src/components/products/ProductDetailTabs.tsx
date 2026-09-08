@@ -14,9 +14,9 @@ interface TabDefinition {
 const TABS: TabDefinition[] = [
   { id: 'overview', label: '能力概览', anchor: '#overview' },
   { id: 'specifications', label: '技术参数', anchor: '#specifications' },
-  { id: 'supplier-models', label: '能力型号', anchor: '#supplier-models' },
-  { id: 'suppliers', label: '能力提供商', anchor: '#suppliers' },
-  { id: 'documents', label: '文档证书', anchor: '#documents' },
+  { id: 'supplier-models', label: '产品型号', anchor: '#supplier-models' },
+  { id: 'suppliers', label: '供应商', anchor: '#suppliers' },
+  { id: 'documents', label: '文档资料', anchor: '#documents' },
   { id: 'knowledge', label: '相关知识', anchor: '#knowledge' },
   { id: 'related', label: '相关能力', anchor: '#related' },
 ];

@@ -255,7 +255,7 @@ function DemandList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || status} />
+        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || '未知状态'} />
       ),
     },
     {

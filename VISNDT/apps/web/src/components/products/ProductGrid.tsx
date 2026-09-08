@@ -39,7 +39,7 @@ export default function ProductGrid({
         <div className="mb-4 flex items-center gap-2">
           <div className="h-4 bg-muted rounded w-32 animate-pulse" />
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6 items-start">
           {Array.from({ length: 9 }).map((_, i) => (
             <div
               key={i}
@@ -100,8 +100,8 @@ export default function ProductGrid({
         </div>
       )}
 
-      {/* 响应式 Column Strategy（5.3）：375=1 / 768=2 / 1024=3 / 1440=3；统一 gap rhythm + 等高策略 */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6">
+      {/* 响应式 Column Strategy（5.3）：375=1 / 768=2 / 1024=3 / 1440=3；统一 gap rhythm + 顶部对齐避免拉伸成异常长条 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6 items-start">
         {products.map((product, idx) => (
           <div
             key={product.id}

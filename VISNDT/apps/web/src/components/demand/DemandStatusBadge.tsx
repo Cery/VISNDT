@@ -16,7 +16,7 @@ export default function DemandStatusBadge({
   className = '',
 }: DemandStatusBadgeProps) {
   const config = STATUS_MAP[status] || {
-    label: status,
+    label: '未知状态',
     className: 'bg-slate-100 text-slate-600',
   };
 

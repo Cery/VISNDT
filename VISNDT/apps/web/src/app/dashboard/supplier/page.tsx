@@ -55,7 +55,7 @@ function formatStatusCounts(statusCounts?: Record<string, number>) {
 
   return entries
     .slice(0, 3)
-    .map(([status, count]) => `${STATUS_LABEL_MAP[status] || status} ${count}`)
+    .map(([status, count]) => `${STATUS_LABEL_MAP[status] || '未知状态'} ${count}`)
     .join(' / ');
 }
 
@@ -216,7 +216,7 @@ function SupplierDashboardContent() {
               />
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-6 items-start">
               <StatCard
                 label="待处理 RFQ"
                 value={overviewQuery.data.rfqSummary.total}
@@ -431,7 +431,7 @@ function SupplierDashboardContent() {
             />
           ) : (
             <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 items-start">
                 <StatCard
                   label="已提交"
                   value={submittedResponseCount}

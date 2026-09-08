@@ -86,7 +86,7 @@ export default function ContentApprovalTimeline({ contentId }: { contentId: stri
             children: (
               <div>
                 <Typography.Text strong>
-                  {ACTION_LABEL[item.action] || item.action}
+                  {ACTION_LABEL[item.action] || '未知操作'}
                 </Typography.Text>
                 {renderStatusTransition(item)}
                 <Typography.Paragraph

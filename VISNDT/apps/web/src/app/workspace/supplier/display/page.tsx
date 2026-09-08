@@ -20,15 +20,17 @@ import { getSupplierWorkspaceOverview } from '@/services/workspace.service';
 import type { Organization } from '@/types/organization';
 import type { Offer } from '@/types/product';
 
-/** 供应商类型中文映射 */
+/** 供应商类型中文映射（统一「供应商」，不下钻猜测制造商/贸易商） */
 const typeLabels: Record<string, string> = {
-  manufacturer: '制造商',
-  distributor: '经销商',
-  agent: '代理商',
-  'service-provider': '服务商',
-  integrator: '集成商',
-  'testing-organization': '检测机构',
-  other: '其他',
+  SUPPLIER: '供应商',
+  ADMIN: '管理方',
+  manufacturer: '供应商',
+  distributor: '供应商',
+  agent: '供应商',
+  'service-provider': '供应商',
+  integrator: '供应商',
+  'testing-organization': '供应商',
+  other: '供应商',
 };
 
 /** 供应商状态中文映射 */
@@ -185,7 +187,7 @@ function DisplayPageContent() {
                   供应商公开展示能力概览，包括活跃报价数量、产品覆盖和展示完整度。
                 </p>
               </div>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 items-start">
                 <StatCard
                   label="活跃报价"
                   value={activeOffers.length}
@@ -257,7 +259,7 @@ function DisplayPageContent() {
                   <div className="rounded-lg bg-slate-50 p-4">
                     <p className="text-xs text-slate-500">企业类型</p>
                     <p className="mt-1 text-base font-semibold text-slate-900">
-                      {typeLabels[org.type] ?? org.type}
+                      {typeLabels[org.type] ?? '供应商'}
                     </p>
                   </div>
                   <div className="rounded-lg bg-slate-50 p-4">
@@ -272,7 +274,7 @@ function DisplayPageContent() {
                               : 'bg-amber-50 text-amber-600'
                         }`}
                       >
-                        {statusLabels[org.status] ?? org.status}
+                        {statusLabels[org.status] ?? '未知状态'}
                       </span>
                     </p>
                   </div>
@@ -337,7 +339,7 @@ function DisplayPageContent() {
                                       : 'bg-slate-100 text-slate-500'
                                 }`}
                               >
-                                {offerStatusLabels[offer.status] ?? offer.status}
+                                {offerStatusLabels[offer.status] ?? '未知状态'}
                               </span>
                             </div>
                             <h3 className="text-base font-semibold text-slate-900 truncate">
@@ -429,7 +431,7 @@ function DisplayPageContent() {
                                       : 'bg-slate-100 text-slate-500'
                                 }`}
                               >
-                                {offerStatusLabels[offer.status] ?? offer.status}
+                                {offerStatusLabels[offer.status] ?? '未知状态'}
                               </span>
                             </td>
                             <td className="py-3 pr-4 text-slate-600 hidden md:table-cell">

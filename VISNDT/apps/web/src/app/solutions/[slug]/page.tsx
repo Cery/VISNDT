@@ -15,7 +15,9 @@ import {
 import MarkdownRenderer from '@/components/markdown/MarkdownRenderer';
 import ContentProductCTA from '@/components/common/ContentProductCTA';
 import DemandCTA from '@/components/conversion/DemandCTA';
+import PageContainer from '@/components/common/PageContainer';
 import RelevantEngineeringDiscovery from '@/components/engineering/RelevantEngineeringDiscovery';
+import { stripGovernanceLabels } from '@/lib/display-text';
 import type { Content } from '@/types/content';
 import type { Product } from '@/types/product';
 
@@ -30,6 +32,12 @@ function formatDate(value?: string | null): string {
     month: 'long',
     day: 'numeric',
   });
+}
+
+/** 文章/方案封面缩略图 FileAsset id：优先封面，其次媒体首图；无则 null（卡片降级纯文字） */
+function contentCover(content: Content): string | null {
+  if (content.coverImage?.id) return content.coverImage.id;
+  return content.media?.find((m) => m.type === 'IMAGE')?.fileAsset?.id ?? null;
 }
 
 /** 解决方案详情页动态 SEO Metadata（来源：seoTitle / seoDescription / title / summary / coverImage） */
@@ -133,7 +141,7 @@ export default async function SolutionDetailPage({
   });
 
   return (
-    <div className="max-w-[820px] mx-auto px-6 py-10">
+    <PageContainer variant="content" paddingY={32}>
       <TrackOnMount
         event="content_view"
         targetId={solution.id}
@@ -146,114 +154,127 @@ export default async function SolutionDetailPage({
         { name: '解决方案', url: absoluteUrl('/solutions') },
         { name: solution.title, url: absoluteUrl(`/solutions/${slug}`) },
       ])} />
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-        <Link href="/" className="hover:text-primary transition-colors">
+      {/* Breadcrumb — 846 §53: Home → Domain → Object */}
+      <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6 overflow-x-auto">
+        <Link href="/" className="hover:text-primary transition-colors whitespace-nowrap">
           首页
         </Link>
         <span className="text-slate-300">/</span>
-        <Link href="/solutions" className="hover:text-primary transition-colors">
+        <Link href="/solutions" className="hover:text-primary transition-colors whitespace-nowrap">
           解决方案
         </Link>
         <span className="text-slate-300">/</span>
         <span className="text-foreground truncate max-w-[240px]">{solution.title}</span>
       </nav>
 
-      <article>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-4">
-          {solution.title}
-        </h1>
+      {/* 846 §49 — content 容器 + 双栏：主文 720–800 / 侧栏 CTA */}
+      <div className="lg:flex lg:gap-8">
+        {/* Main reading column */}
+        <article className="flex-1 min-w-0 lg:max-w-[780px]">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-4">
+            {solution.title}
+          </h1>
 
-        <div className="flex items-center gap-3 text-sm text-slate-400 mb-8">
-          {solution.author?.name && <span>{solution.author.name}</span>}
-          {solution.publishedAt && <span>发布于 {formatDate(solution.publishedAt)}</span>}
-        </div>
-
-        {solution.summary && (
-          <p className="text-base text-slate-600 leading-relaxed mb-8 border-l-4 border-primary/30 pl-4">
-            {solution.summary}
-          </p>
-        )}
-
-        {/* Tag Chips */}
-        {solution.tags && solution.tags.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mb-8">
-            <span className="text-xs text-slate-400 mr-1">标签：</span>
-            {solution.tags.map(({ tag }) => (
-              <Link
-                key={tag.id}
-                href={`/tags/${tag.slug}`}
-                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
-              >
-                {tag.name}
-              </Link>
-            ))}
+          <div className="flex items-center gap-3 text-sm text-slate-400 mb-8">
+            {solution.author?.name && <span>{solution.author.name}</span>}
+            {solution.publishedAt && <span>发布于 {formatDate(solution.publishedAt)}</span>}
           </div>
-        )}
 
-        <div className="mb-8">
-          <MarkdownRenderer content={solution.content} />
-        </div>
-      </article>
+          {solution.summary && (
+            <p className="text-base text-slate-600 leading-relaxed mb-8 border-l-4 border-primary/30 pl-4">
+              {stripGovernanceLabels(solution.summary)}
+            </p>
+          )}
 
-      {/* 802_M39 — Relevant Engineering Discovery：把“相关推荐”重构为分组的“相关工程发现”——
-          related capability products / technical knowledge / solutions 折叠为单一发现面，
-          提供工程相关性框架 + 跨面下一步发现。非购物推荐，未引入 recommendation domain。 */}
-      <RelevantEngineeringDiscovery
-        capabilityAnchor={solution.title}
-        groups={[
-          {
-            label: '相关检测能力产品',
-            mono: 'PRODUCT',
-            items: relatedProducts.map((p) => ({
-              href: `/products/${p.id}`,
-              title: p.name,
-              sub: p.status === 'ACTIVE' ? '可用' : undefined,
-            })),
-            seeAllHref: '/products',
-          },
-          {
-            label: '相关技术知识',
-            mono: 'KNOWLEDGE',
-            items: relatedKnowledge.map((k) => ({
-              href: `/knowledge/${k.slug}`,
-              title: k.title,
-            })),
-            seeAllHref: '/knowledge',
-          },
-          {
-            label: '相关解决方案',
-            mono: 'SOLUTION',
-            items: otherSolutions.map((s) => ({
-              href: `/solutions/${s.slug}`,
-              title: s.title,
-            })),
-            seeAllHref: '/solutions',
-          },
-        ]}
-        nextActions={[
-          { href: '/search', label: '统一检索相关参数' },
-          { href: '/products/compare', label: '评估对比检测能力' },
-          { href: '/categories', label: '回到能力分类' },
-        ]}
-      />
+          {/* Tag Chips */}
+          {solution.tags && solution.tags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 mb-8">
+              <span className="text-xs text-slate-400 mr-1">标签：</span>
+              {solution.tags.map(({ tag }) => (
+                <Link
+                  key={tag.id}
+                  href={`/tags/${tag.slug}`}
+                  className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+                >
+                  {tag.name}
+                </Link>
+              ))}
+            </div>
+          )}
 
-      {/* Commercial conversion */}
-      <div className="mt-12 mb-8 space-y-4">
-        <ContentProductCTA contextType="solution" />
-        <DemandCTA contextType="solution" targetLabel={solution.title} />
+          <div className="mb-8">
+            <MarkdownRenderer content={stripGovernanceLabels(solution.content)} />
+          </div>
+
+          {/* Commercial conversion — 主文底部 */}
+          <div className="mt-10 space-y-4">
+            <ContentProductCTA contextType="solution" />
+            <DemandCTA contextType="solution" targetLabel={solution.title} />
+          </div>
+
+          <div className="mt-10 pt-8 border-t border-slate-200">
+            <Link
+              href="/solutions"
+              className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors"
+            >
+              <span>更多行业方案</span>
+              <span className="text-xs">&rarr;</span>
+            </Link>
+          </div>
+        </article>
+
+        {/* Sidebar column 280–320px */}
+        <aside className="lg:w-[280px] lg:shrink-0 mt-10 lg:mt-0 space-y-6">
+          <RelevantEngineeringDiscovery
+            capabilityAnchor={solution.title}
+            narrow
+            groups={[
+              {
+                label: '相关检测产品',
+                mono: 'PRODUCT',
+                items: relatedProducts.map((p) => ({
+                  href: `/products/${p.id}`,
+                  title: p.name,
+                  sub: p.status === 'ACTIVE' ? '可用' : undefined,
+                  fileAssetId: p.primaryMedia?.fileAssetId ?? null,
+                })),
+                seeAllHref: '/products',
+              },
+              {
+                label: '相关技术知识',
+                mono: 'KNOWLEDGE',
+                items: relatedKnowledge.map((k) => ({
+                  href: `/knowledge/${k.slug}`,
+                  title: k.title,
+                  fileAssetId: contentCover(k),
+                })),
+                seeAllHref: '/knowledge',
+              },
+              {
+                label: '相关解决方案',
+                mono: 'SOLUTION',
+                items: otherSolutions.map((s) => ({
+                  href: `/solutions/${s.slug}`,
+                  title: s.title,
+                  fileAssetId: contentCover(s),
+                })),
+                seeAllHref: '/solutions',
+              },
+            ]}
+            nextActions={[
+              { href: '/search', label: '统一检索相关参数' },
+              { href: '/products/compare', label: '评估对比检测能力' },
+              { href: '/categories', label: '回到能力分类' },
+            ]}
+          />
+
+          {/* Mobile-only CTA fallback */}
+          <div className="lg:hidden space-y-4">
+            <ContentProductCTA contextType="solution" />
+            <DemandCTA contextType="solution" targetLabel={solution.title} />
+          </div>
+        </aside>
       </div>
-
-      {/* More from this type */}
-      <div className="mt-12 pt-8 border-t border-slate-200">
-        <Link
-          href="/solutions"
-          className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors"
-        >
-          <span>更多行业方案</span>
-          <span className="text-xs">&rarr;</span>
-        </Link>
-      </div>
-    </div>
+    </PageContainer>
   );
 }

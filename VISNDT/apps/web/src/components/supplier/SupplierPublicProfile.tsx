@@ -4,15 +4,17 @@ interface SupplierPublicProfileProps {
   organization: Organization;
 }
 
-/** 供应商类型中文映射 */
+/** 供应商类型中文映射（统一「供应商」，不下钻猜测制造商/贸易商） */
 const typeLabels: Record<string, string> = {
-  manufacturer: '制造商',
-  distributor: '经销商',
-  agent: '代理商',
-  'service-provider': '服务商',
-  integrator: '集成商',
-  'testing-organization': '检测机构',
-  other: '其他',
+  SUPPLIER: '供应商',
+  ADMIN: '管理方',
+  manufacturer: '供应商',
+  distributor: '供应商',
+  agent: '供应商',
+  'service-provider': '供应商',
+  integrator: '供应商',
+  'testing-organization': '供应商',
+  other: '供应商',
 };
 
 /** 供应商状态中文映射 */
@@ -25,8 +27,8 @@ const statusLabels: Record<string, string> = {
 export default function SupplierPublicProfile({
   organization,
 }: SupplierPublicProfileProps) {
-  const typeLabel = typeLabels[organization.type] ?? organization.type;
-  const statusLabel = statusLabels[organization.status] ?? organization.status;
+  const typeLabel = typeLabels[organization.type] ?? '供应商';
+  const statusLabel = statusLabels[organization.status] ?? '未知状态';
 
   return (
     <div className="rounded-xl border border-slate-200/80 shadow-industrial-sm bg-white p-6">

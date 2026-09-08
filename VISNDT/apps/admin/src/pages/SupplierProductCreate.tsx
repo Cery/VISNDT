@@ -80,7 +80,7 @@ export default function SupplierProductCreate() {
     () =>
       orgs.map((o) => ({
         value: o.id,
-        label: `${o.name}（${SUPPLIER_ORG_LABEL[o.type.toUpperCase()] ?? o.type}${o.status === 'ACTIVE' ? '' : ' · 非ACTIVE'}）`,
+        label: `${o.name}（${SUPPLIER_ORG_LABEL[o.type.toUpperCase()] ?? '供应商'}${o.status === 'ACTIVE' ? '' : ' · 未启用'}）`,
         disabled: o.status !== 'ACTIVE',
       })),
     [orgs],
@@ -119,7 +119,7 @@ export default function SupplierProductCreate() {
         technicalDescription: values.technicalDescription?.trim() || null,
         applicationInfo: values.applicationInfo?.trim() || null,
       });
-      message.success('能力型号已创建（草稿）');
+      message.success('产品型号已创建（草稿）');
       navigate(`/supplier-products/${created.id}`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : '创建失败';
@@ -166,20 +166,20 @@ export default function SupplierProductCreate() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>新建能力型号（Supplier Product）</Title>
+          <Title level={4} style={{ margin: 0 }}>新建产品型号</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          平台治理 — 选择供应商组织（WHO）与平台能力（WHAT），创建归属该组织的型号草稿
+          平台治理 — 选择供应商组织（WHO）与平台产品（WHAT），创建归属该组织的产品型号草稿
         </Text>
       </div>
 
-      <Card title="所有权分配（Ownership Assignment）" style={{ marginBottom: 16 }}>
+      <Card title="所有权分配" style={{ marginBottom: 16 }}>
         <Form form={form} layout="vertical" onFinish={handleSubmit} requiredMark>
           <Form.Item
             name="organizationId"
-            label="供应商组织（Supplier Organization）"
+            label="供应商组织"
             rules={[{ required: true, message: '请选择供应商组织' }]}
-            extra="仅显示运行语义上的供应商组织（SUPPLIER/MANUFACTURER/DISTRIBUTOR 及中文等价）；非 ACTIVE 组织不可选。"
+            extra="仅显示运行语义上的供应商组织（供应商/制造商/分销商 等）；未启用组织不可选。"
           >
             <Select
               showSearch
@@ -193,7 +193,7 @@ export default function SupplierProductCreate() {
             name="platformProductId"
             label="平台能力 / 平台产品（Platform Product）"
             rules={[{ required: true, message: '请选择平台能力' }]}
-            extra="仅绑定已存在的平台能力节点；创建不会修改平台产品。"
+            extra="仅绑定已存在的平台产品；创建不会修改平台产品。"
           >
             <Select
               showSearch

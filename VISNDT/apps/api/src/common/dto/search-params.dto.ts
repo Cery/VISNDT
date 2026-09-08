@@ -18,6 +18,21 @@ export class SearchParamsDto {
   @IsString()
   status?: string;
 
+  @ApiPropertyOptional({ description: 'Filter by product category ID', example: 'uuid' })
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
+
+  @ApiPropertyOptional({ description: 'Filter by parameter group ID', example: 'uuid' })
+  @IsOptional()
+  @IsString()
+  parameterGroupId?: string;
+
+  @ApiPropertyOptional({ description: 'Include items from all descendant subcategories when categoryId is set', example: 'true' })
+  @IsOptional()
+  @Type(() => Boolean)
+  includeSubcategories?: boolean;
+
   @ApiPropertyOptional({ description: 'Page number', default: 1, minimum: 1 })
   @IsOptional()
   @Type(() => Number)

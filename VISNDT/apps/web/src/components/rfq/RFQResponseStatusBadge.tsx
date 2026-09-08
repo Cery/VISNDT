@@ -15,7 +15,7 @@ export default function RFQResponseStatusBadge({
   className = '',
 }: RFQResponseStatusBadgeProps) {
   const config = STATUS_MAP[status] || {
-    label: status,
+    label: '未知状态',
     className: 'bg-slate-100 text-slate-600',
   };
 

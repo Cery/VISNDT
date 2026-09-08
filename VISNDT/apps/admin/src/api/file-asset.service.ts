@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { UploadResponse, FileAsset, OrphanListResponse, CleanupOrphansResponse, FileAssetListParams, FileAssetListResponse } from '../types/file-asset.types';
+import type { UploadResponse, FileAsset, OrphanListResponse, CleanupOrphansResponse, FileAssetListParams, FileAssetListResponse, BatchDeleteResult, BatchUploadResult } from '../types/file-asset.types';
 
 interface ApiResponseWrapper<T> {
   data: T;
@@ -85,8 +85,41 @@ export const fileAssetService = {
     return response.data;
   },
 
-  async batchDelete(ids: string[]): Promise<{ count: number }> {
-    const response = (await apiClient.post(`${FILES_BASE}/batch-delete`, { ids })) as unknown as ApiResponseWrapper<{ count: number }>;
+  /**
+   * Batch delete FileAssets with backend per-ID safety checks.
+   * Returns deleted count plus per-ID failure reasons (referenced files are skipped).
+   * Calls POST /files/batch-delete (ADMIN only).
+   * @param ids - Array of FileAsset IDs to delete
+   */
+  async batchDelete(ids: string[]): Promise<BatchDeleteResult> {
+    const response = (await apiClient.post(
+      `${FILES_BASE}/batch-delete`,
+      { ids },
+    )) as unknown as ApiResponseWrapper<BatchDeleteResult>;
+    return response.data;
+  },
+
+  /**
+   * Batch upload files with ownership tags (media center).
+   * Each file travels as a repeated `files` multipart field; ownership metadata
+   * (fileType / organizationId / entityType) is sent as sibling form fields.
+   * Calls POST /files/batch-upload (ADMIN only, max 10 files, 10MB each).
+   * @param files - Files to upload
+   * @param opts - Ownership metadata; organizationId omitted when unowned
+   */
+  async batchUpload(
+    files: File[],
+    opts: { fileType?: string; organizationId?: string; entityType?: string } = {},
+  ): Promise<BatchUploadResult> {
+    const formData = new FormData();
+    for (const f of files) formData.append('files', f);
+    if (opts.fileType) formData.append('fileType', opts.fileType);
+    if (opts.organizationId) formData.append('organizationId', opts.organizationId);
+    if (opts.entityType) formData.append('entityType', opts.entityType);
+
+    const response = (await apiClient.post(`${FILES_BASE}/batch-upload`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })) as unknown as ApiResponseWrapper<BatchUploadResult>;
     return response.data;
   },
 };

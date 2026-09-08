@@ -1,0 +1,5 @@
+id,name,model,status,description
+ebb1c034-4280-480b-89ce-29753660e126,ZB-K60 工业检测内窥镜,ZB-K60,ACTIVE,[M34.6 CONTROLLED TEST DATA][PUBLIC SOURCE DATA] 便携式工业检测内窥镜，360° 全方位摆头，IP67 防护，软性插入管。
+98fe9224-12b1-4b2e-ba5d-f17f23f7e9e2,ZB-TJ095 光纤检测内窥镜,ZB-TJ095,ACTIVE,[M34.6 CONTROLLED TEST DATA][PUBLIC SOURCE DATA] 细径光纤检测内窥镜，φ3.9mm 探头，360° 摆头，适用于窄小空间检测。
+a5a26d69-320f-4c95-a480-3d15f2faea2a,POP 4 便携式三维扫描仪,POP 4,ACTIVE,[M34.6 CONTROLLED TEST DATA][PUBLIC SOURCE DATA] 知象光电 Revopoint POP 4，AI 驱动、多光源、全场景便携式三维扫描仪。
+38a711ff-9352-40ea-978b-90ecd566b826,MetroY Ultra 高精度三维扫描仪,MetroY Ultra,ACTIVE,[M34.6 CONTROLLED TEST DATA][PUBLIC SOURCE DATA] 知象光电 Revopoint MetroY Ultra，多线激光及全场蓝光结构光，高精度三维扫描。

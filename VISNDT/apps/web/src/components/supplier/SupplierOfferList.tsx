@@ -1,6 +1,7 @@
 import type { Offer } from '@/types/product';
 import EmptyState from '@/components/common/EmptyState';
 import Link from 'next/link';
+import { stripGovernanceLabels } from '@/lib/display-text';
 
 interface SupplierOfferListProps {
   offers: Offer[];
@@ -29,10 +30,10 @@ export default function SupplierOfferList({ offers }: SupplierOfferListProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
       {offers.map((offer) => {
         const statusLabel =
-          offerStatusLabels[offer.status] ?? offer.status;
+          offerStatusLabels[offer.status] ?? '未知状态';
         const isActive =
           offer.status === 'ACTIVE' || offer.status === 'SUBMITTED';
 
@@ -40,17 +41,17 @@ export default function SupplierOfferList({ offers }: SupplierOfferListProps) {
           <Link
             key={offer.id}
             href={`/products/${offer.productId}`}
-            className="rounded-xl border border-slate-200/80 shadow-industrial-sm hover:shadow-industrial-md hover:-translate-y-1 transition-all duration-300 bg-white p-5 block group"
+            className="rounded-xl border border-slate-200/80 shadow-industrial-sm hover:shadow-industrial-md transition-all duration-300 bg-white p-5 block group"
           >
-            {/* Product Name */}
+            {/* Product Name — 846 §60：剥离治理前缀，禁止测试治理标签进普通视图 */}
             <h3 className="font-semibold text-slate-800 group-hover:text-primary transition-colors truncate">
-              {offer.title}
+              {stripGovernanceLabels(offer.title)}
             </h3>
 
             {/* Offer Description */}
             {offer.description && (
               <p className="text-sm text-slate-500 mt-2 line-clamp-2">
-                {offer.description}
+                {stripGovernanceLabels(offer.description)}
               </p>
             )}
 

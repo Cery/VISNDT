@@ -1,14 +1,50 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Button, Spin, Alert, Tag, Typography, Input, Space, message, Modal } from 'antd';
+import { Table, Button, Spin, Alert, Tag, Typography, Input, Space, message, Modal, TreeSelect } from 'antd';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { SorterResult } from 'antd/es/table/interface';
 import { parameterDefinitionService } from '../../api/parameter-definition.service';
+import { categoriesService } from '../../api';
 import type { ParameterDefinition } from '../../types/parameter-definition.types';
+import type { ProductCategory } from '../../types/category.types';
 import { BatchActionBar } from '../../components/operation';
 
 const { Title } = Typography;
+
+/** Build Ant Design TreeSelect treeData from ProductCategory list (parentId hierarchy) */
+function buildCategoryTreeData(catList: ProductCategory[]) {
+  const map = new Map<string, ProductCategory>();
+  for (const cat of catList) map.set(cat.id, { ...cat, children: cat.children ?? [] });
+  const roots: ProductCategory[] = [];
+  for (const node of map.values()) {
+    const parent = node.parentId ? map.get(node.parentId) : undefined;
+    if (parent) {
+      (parent.children = parent.children ?? []).push(node);
+    } else {
+      roots.push(node);
+    }
+  }
+  const toData = (node: ProductCategory): Record<string, unknown> => ({
+    title: node.name,
+    value: node.id,
+    children: (node.children ?? []).length > 0 ? (node.children as ProductCategory[]).map(toData) : undefined,
+  });
+  return roots.map(toData);
+}
+
+/** Return full category path label (e.g. 工业检测 / 内窥镜) from a category object */
+function resolveCategoryPath(cat: { id: string; name: string } | null | undefined, catList: ProductCategory[]): string {
+  if (!cat) return '-';
+  const map = new Map(catList.map((c) => [c.id, c]));
+  const chain: string[] = [];
+  let cur = map.get(cat.id);
+  while (cur) {
+    chain.unshift(cur.name);
+    cur = cur.parentId ? map.get(cur.parentId) : undefined;
+  }
+  return chain.join(' / ');
+}
 
 type PageState =
   | { status: 'loading' }
@@ -20,6 +56,7 @@ interface QueryParams {
   page: number;
   pageSize: number;
   keyword: string;
+  categoryId: string;
   sortBy: string;
   sortOrder: string;
 }
@@ -43,10 +80,12 @@ function ParameterDefinitionList() {
   const [pageState, setPageState] = useState<PageState>({ status: 'loading' });
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [batchLoading, setBatchLoading] = useState(false);
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [query, setQuery] = useState<QueryParams>({
     page: 1,
     pageSize: 20,
     keyword: '',
+    categoryId: '',
     sortBy: 'createdAt',
     sortOrder: 'desc',
   });
@@ -58,6 +97,7 @@ function ParameterDefinitionList() {
         page: query.page,
         pageSize: query.pageSize,
         keyword: query.keyword || undefined,
+        categoryId: query.categoryId || undefined,
       });
       if (result.data.length === 0) {
         setPageState({ status: 'empty' });
@@ -78,6 +118,16 @@ function ParameterDefinitionList() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Load product categories for the hierarchical category filter
+  useEffect(() => {
+    categoriesService
+      .getList()
+      .then(setCategories)
+      .catch(() => {
+        // Category loading failure is non-critical
+      });
+  }, []);
 
   const handleTableChange = useCallback(
     (
@@ -101,9 +151,27 @@ function ParameterDefinitionList() {
     setQuery((prev) => ({ ...prev, keyword: value, page: 1 }));
   }, []);
 
-  const handleReset = useCallback(() => {
-    setQuery({ page: 1, pageSize: 20, keyword: '', sortBy: 'createdAt', sortOrder: 'desc' });
+  const handleCategoryChange = useCallback((value: string | undefined) => {
+    setQuery((prev) => ({ ...prev, categoryId: value || '', page: 1 }));
   }, []);
+
+  const handleReset = useCallback(() => {
+    setQuery({ page: 1, pageSize: 20, keyword: '', categoryId: '', sortBy: 'createdAt', sortOrder: 'desc' });
+  }, []);
+
+  const renderCategoryFilter = () => (
+    <TreeSelect
+      placeholder="按分类筛选"
+      allowClear
+      treeDefaultExpandAll
+      showSearch
+      treeNodeFilterProp="title"
+      style={{ width: 200 }}
+      value={query.categoryId || undefined}
+      onChange={handleCategoryChange}
+      treeData={buildCategoryTreeData(categories)}
+    />
+  );
 
   const handleDelete = useCallback((id: string) => {
     Modal.confirm({
@@ -176,7 +244,21 @@ function ParameterDefinitionList() {
 
   const columns: ColumnsType<ParameterDefinition> = [
     {
-      title: '名称',
+      title: '分类',
+      dataIndex: 'group',
+      key: 'category',
+      width: 180,
+      render: (group: ParameterDefinition['group']) => resolveCategoryPath(group?.category, categories),
+    },
+    {
+      title: '分组',
+      dataIndex: 'group',
+      key: 'group',
+      width: 160,
+      render: (group: ParameterDefinition['group']) => group?.name || '-',
+    },
+    {
+      title: '参数',
       dataIndex: 'name',
       key: 'name',
       render: (name: string, record: ParameterDefinition) => (
@@ -197,7 +279,7 @@ function ParameterDefinitionList() {
       key: 'dataType',
       width: 100,
       render: (dataType: string) => (
-        <Tag color={DATA_TYPE_COLOR_MAP[dataType] || 'default'}>{DATA_TYPE_LABEL_MAP[dataType] || dataType}</Tag>
+        <Tag color={DATA_TYPE_COLOR_MAP[dataType] || 'default'}>{DATA_TYPE_LABEL_MAP[dataType] || '未知类型'}</Tag>
       ),
     },
     {
@@ -284,6 +366,7 @@ function ParameterDefinitionList() {
       {pageState.status === 'empty' ? (
         <>
           <Space style={{ marginBottom: 16 }} wrap>
+            {renderCategoryFilter()}
             <Input.Search
               placeholder="搜索名称/编码..."
               allowClear
@@ -304,6 +387,7 @@ function ParameterDefinitionList() {
       ) : (
         <>
           <Space style={{ marginBottom: 16 }} wrap>
+            {renderCategoryFilter()}
             <Input.Search
               placeholder="搜索名称/编码..."
               allowClear

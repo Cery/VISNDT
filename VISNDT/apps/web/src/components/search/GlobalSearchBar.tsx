@@ -41,7 +41,9 @@ export default function GlobalSearchBar({
   const router = useRouter();
   const isHero = variant === 'hero';
   const controlHeight = isHero ? 'h-14 sm:h-16' : 'h-11';
-  const controlText = isHero ? 'text-base' : 'text-sm';
+  // 846 §58 移动端触摸控件：iOS Safari 会对字号 <16px 的输入框自动缩放页面。
+  // 移动端输入/按钮使用 16px，桌面端恢复 14px。
+  const controlText = isHero ? 'text-base' : 'text-[16px] sm:text-sm';
   const [keyword, setKeyword] = useState(initialKeyword);
   const [searchType, setSearchType] = useState<SearchDomain>(initialType);
   const [typeMenuOpen, setTypeMenuOpen] = useState(false);
@@ -153,7 +155,7 @@ export default function GlobalSearchBar({
                       setSearchType(domain.value);
                       setTypeMenuOpen(false);
                     }}
-                    className={`w-full text-left px-3 py-1.5 text-xs transition-colors ${
+                    className={`w-full text-left px-3 py-2 text-xs sm:text-sm transition-colors ${
                       searchType === domain.value
                         ? 'text-primary bg-primary/5 font-medium'
                         : 'text-slate-600 hover:bg-slate-50'
@@ -190,12 +192,12 @@ export default function GlobalSearchBar({
             onClose={() => setShowSuggestions(false)}
           />
 
-          {/* Clear Button */}
+          {/* Clear Button — 加大热区便于移动端点按 */}
           {hasValue && (
             <button
               type="button"
               onClick={handleClear}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+              className="absolute right-1 top-1/2 -translate-y-1/2 p-2 text-slate-400 hover:text-slate-600 transition-colors"
               aria-label="清除搜索"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">

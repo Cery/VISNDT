@@ -5,7 +5,9 @@
  * 不引入页面级 ad-hoc 颜色。
  */
 export const inputBase = [
-  'w-full rounded-md border border-input bg-background px-3 py-2 text-sm',
+  // 846 §58 移动端触摸控件：iOS Safari 对 <16px 输入框聚焦自动缩放页面。
+  // 统一移动端 16px、桌面端 14px，避免 iOS 自动 zoom。
+  'w-full rounded-md border border-input bg-background px-3 py-2 text-[16px] sm:text-[14px]',
   'placeholder:text-muted-foreground',
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-ring',
   'disabled:cursor-not-allowed disabled:bg-muted disabled:opacity-60',

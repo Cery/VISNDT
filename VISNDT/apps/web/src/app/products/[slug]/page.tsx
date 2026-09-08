@@ -3,7 +3,7 @@ import { getCapabilityDetail } from '@/services/capability.service';
 import { getContentList } from '@/services/content.service';
 import { getParameterGroups } from '@/services/parameter-group.service';
 import ProductDetailContent from '@/components/products/ProductDetailContent';
-import ProductDetailNav from '@/components/products/ProductDetailNav';
+import PageContainer from '@/components/common/PageContainer';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -144,7 +144,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
   const breadcrumbItems = [
     { name: '首页', url: absoluteUrl('/') },
-    { name: '能力列表', url: absoluteUrl('/products') },
+    { name: '检测产品', url: absoluteUrl('/products') },
   ];
   if (product.category) {
     breadcrumbItems.push({
@@ -155,7 +155,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   breadcrumbItems.push({ name: product.name, url: productUrl });
 
   return (
-    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-6 sm:py-8 lg:py-10">
+    <PageContainer variant="content" paddingY={24}>
       <TrackOnMount
         event="product_view"
         targetId={product.id}
@@ -167,14 +167,14 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       />
       <JsonLdScript data={productJsonLd} />
       <JsonLdScript data={buildBreadcrumbListJsonLd(breadcrumbItems)} />
-      {/* Breadcrumb */}
+      {/* Breadcrumb — 846 §53: Home → Domain → Object */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-4 sm:mb-6 overflow-x-auto">
         <Link href="/" className="hover:text-primary transition-colors whitespace-nowrap">
           首页
         </Link>
         <span className="text-slate-300">/</span>
         <Link href="/products" className="hover:text-primary transition-colors whitespace-nowrap">
-          能力列表
+          检测产品
         </Link>
         {product.category && (
           <>
@@ -191,22 +191,16 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         <span className="text-foreground truncate max-w-[120px] sm:max-w-[200px]">{product.name}</span>
       </nav>
 
-      {/* Two-column layout: Nav sidebar + Main content */}
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-        <ProductDetailNav />
-
-        <div className="flex-1 min-w-0">
-          <ProductDetailContent
-            product={product}
-            parameterGroups={parameterGroups}
-            relatedKnowledge={relatedKnowledge}
-            relatedProducts={relatedProducts}
-            relatedSolutions={relatedSolutions}
-            supplierModels={supplierModels}
-            parameterAnnotations={parameterAnnotations}
-          />
-        </div>
-      </div>
-    </div>
+      {/* 846 §30 — 唯一 Primary Navigation = 顶部 Tabs；左侧锚点导航已移除 */}
+      <ProductDetailContent
+        product={product}
+        parameterGroups={parameterGroups}
+        relatedKnowledge={relatedKnowledge}
+        relatedProducts={relatedProducts}
+        relatedSolutions={relatedSolutions}
+        supplierModels={supplierModels}
+        parameterAnnotations={parameterAnnotations}
+      />
+    </PageContainer>
   );
 }

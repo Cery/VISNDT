@@ -40,7 +40,7 @@ const STATUS_LABEL_MAP: Record<string, string> = {
 
 function formatStatus(status: string | undefined | null): string {
   if (!status) return '暂无';
-  return STATUS_LABEL_MAP[status] || status;
+  return STATUS_LABEL_MAP[status] || '未知状态';
 }
 
 function formatDateTime(value?: string | null) {

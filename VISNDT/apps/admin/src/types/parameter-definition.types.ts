@@ -14,6 +14,10 @@ export interface ParameterDefinition {
     id: string;
     name: string;
     code: string;
+    category?: {
+      id: string;
+      name: string;
+    } | null;
   };
   options?: ParameterOption[];
 }

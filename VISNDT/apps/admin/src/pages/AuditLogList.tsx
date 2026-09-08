@@ -49,7 +49,7 @@ const ENTITY_TYPE_OPTIONS = [
 
 const AUDIT_EXPORT_COLUMNS: ExportColumn<AuditLog>[] = [
   { key: 'createdAt', title: '时间', render: (item) => new Date(item.createdAt).toLocaleString() },
-  { key: 'action', title: '操作类型', render: (item) => ACTION_LABEL_MAP[item.action] || item.action },
+  { key: 'action', title: '操作类型', render: (item) => ACTION_LABEL_MAP[item.action] || '未知操作' },
   { key: 'entityType', title: '实体类型' },
   { key: 'entityId', title: '实体编号' },
   { key: 'operator', title: '操作者', render: (item) => item.operator?.name || item.operator?.email || '' },
@@ -176,7 +176,7 @@ function AuditLogList() {
       key: 'action',
       width: 120,
       render: (action: AuditAction) => (
-        <Tag color={ACTION_COLOR[action] || 'default'}>{ACTION_LABEL_MAP[action] || action}</Tag>
+        <Tag color={ACTION_COLOR[action] || 'default'}>{ACTION_LABEL_MAP[action] || '未知操作'}</Tag>
       ),
     },
     {

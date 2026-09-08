@@ -11,7 +11,7 @@ export class ParameterDefinitionsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(params: SearchParamsDto) {
-    const { page = 1, pageSize = 20, keyword } = params;
+    const { page = 1, pageSize = 20, keyword, categoryId, parameterGroupId } = params;
     const skip = (page - 1) * pageSize;
 
     const where: Prisma.ParameterDefinitionWhereInput = {};
@@ -21,6 +21,12 @@ export class ParameterDefinitionsService {
         { code: { contains: keyword } },
       ];
     }
+    if (parameterGroupId) {
+      where.parameterGroupId = parameterGroupId;
+    }
+    if (categoryId) {
+      where.group = { categoryId };
+    }
 
     const [data, total] = await Promise.all([
       this.prisma.parameterDefinition.findMany({
@@ -28,7 +34,7 @@ export class ParameterDefinitionsService {
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
-        include: { group: true },
+        include: { group: { include: { category: true } }, options: { orderBy: { sortOrder: 'asc' } } },
       }),
       this.prisma.parameterDefinition.count({ where }),
     ]);

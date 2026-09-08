@@ -1,0 +1,2 @@
+id,organization_id,product_id,title,description,status,created_at,updated_at,price,currency,created_by,supplier_product_id
+ba16e230-9abf-4397-bd64-f3b018b4c281,926d5a96-e1be-455c-8d58-8f4a79b6735d,38a711ff-9352-40ea-978b-90ecd566b826,TEST/E2E/807 三维扫描仪商用报价,,ACTIVE,2026-09-02 15:59:19.027,2026-09-03 17:45:48.284,88000.00,CNY,ea3c8ae9-500e-451a-59a3-000dcacee90c,

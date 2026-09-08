@@ -192,7 +192,7 @@ export default function ProductDetailPage() {
           <a onClick={() => navigate('/')}><HomeOutlined /> 首页</a>
         </Breadcrumb.Item>
         <Breadcrumb.Item>
-          <a onClick={() => navigate('/products')}>能力管理</a>
+          <a onClick={() => navigate('/products')}>产品管理</a>
         </Breadcrumb.Item>
         {product.category && (
           <Breadcrumb.Item>{product.category.name}</Breadcrumb.Item>
@@ -204,7 +204,7 @@ export default function ProductDetailPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
           <Title level={4} style={{ margin: 0 }}>能力详情</Title>
-          <StatusTag status={product.status} label={STATUS_LABEL_MAP[product.status] || product.status} />
+          <StatusTag status={product.status} label={STATUS_LABEL_MAP[product.status] || '未知状态'} />
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
           查看能力详情、参数与媒体
@@ -249,8 +249,8 @@ export default function ProductDetailPage() {
         </Col>
         <Col xs={12} sm={6}>
           <Card size="small">
-            <Tooltip title="能力治理状态">
-              <Statistic title="治理状态" value={STATUS_LABEL_MAP[product.status] || product.status} prefix={<AppstoreOutlined />} valueStyle={{ color: TONE_TO_HEX[resolveStatusTone(product.status)] }} />
+            <Tooltip title="产品治理状态">
+              <Statistic title="治理状态" value={STATUS_LABEL_MAP[product.status] || '未知状态'} prefix={<AppstoreOutlined />} valueStyle={{ color: TONE_TO_HEX[resolveStatusTone(product.status)] }} />
             </Tooltip>
           </Card>
         </Col>
@@ -267,7 +267,7 @@ export default function ProductDetailPage() {
             {product.category?.name || '-'}
           </Descriptions.Item>
           <Descriptions.Item label="状态">
-            <StatusTag status={product.status} label={STATUS_LABEL_MAP[product.status] || product.status} />
+            <StatusTag status={product.status} label={STATUS_LABEL_MAP[product.status] || '未知状态'} />
           </Descriptions.Item>
           <Descriptions.Item label="创建时间">
             {new Date(product.createdAt).toLocaleString()}

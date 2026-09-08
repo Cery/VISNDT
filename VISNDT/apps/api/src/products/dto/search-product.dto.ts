@@ -37,6 +37,11 @@ export class SearchProductDto extends PaginationDto {
   @IsString()
   categoryId?: string;
 
+  @ApiPropertyOptional({ description: 'Include products from descendant subcategories when categoryId is set', example: 'true' })
+  @IsOptional()
+  @Type(() => Boolean)
+  includeSubcategories?: boolean;
+
   @ApiPropertyOptional({ description: 'Filter by product status', example: 'ACTIVE' })
   @IsOptional()
   @IsString()

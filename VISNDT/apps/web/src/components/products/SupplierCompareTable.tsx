@@ -175,7 +175,7 @@ export default function SupplierCompareTable({
                   </tr>
                   {params.map(({ key, entry }) => {
                     const values = items.map(
-                      (it) => entry.values.get(it.id) ?? '-',
+                      (it) => entry.values.get(it.id) ?? '未提供',
                     );
                     const diff = isDifferent(values);
                     const numValues = items.map((it) => {

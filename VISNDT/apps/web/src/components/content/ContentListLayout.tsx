@@ -78,7 +78,7 @@ export default function ContentListLayout({
                   {String(contents.length).padStart(2, '0')}
                 </div>
                 <div className="mt-1 font-mono text-[10px] sm:text-[11px] uppercase tracking-widest text-slate-500">
-                  Total
+                  总数
                 </div>
               </div>
               <div className="px-3 py-3 sm:px-6 sm:py-4 text-center">
@@ -107,9 +107,9 @@ export default function ContentListLayout({
         <div className="flex items-center gap-3 mb-6 sm:mb-8">
           <span className="h-5 w-1 rounded-sm bg-industrial-cyan shrink-0" aria-hidden="true" />
           <span className="font-mono text-[11px] uppercase tracking-widest text-slate-400">
-            <span className="text-industrial-cyan">INDX</span>
+            <span className="text-industrial-cyan">内容库</span>
             <span className="mx-2 text-slate-300">/</span>
-            Published Items
+            已发布内容
           </span>
           {countLabel && (
             <span className="ml-auto font-mono text-xs text-slate-500 tabular-nums">
@@ -153,7 +153,7 @@ export default function ContentListLayout({
             description={empty.description}
           />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-start">
             {contents.map((item) => (
               <ContentCard key={item.id} item={item} />
             ))}

@@ -105,7 +105,7 @@ export default function UserDetailPage() {
           <Descriptions.Item label="邮箱">{user.email}</Descriptions.Item>
           <Descriptions.Item label="姓名">{user.name || '-'}</Descriptions.Item>
           <Descriptions.Item label="状态">
-            <StatusTag status={user.status} label={STATUS_LABEL_MAP[user.status] || user.status} />
+            <StatusTag status={user.status} label={STATUS_LABEL_MAP[user.status] || '未知状态'} />
           </Descriptions.Item>
         </Descriptions>
       </Card>

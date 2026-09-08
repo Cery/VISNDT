@@ -33,7 +33,7 @@ export default function SupplierResultCard({
         </div>
 
         <span className="inline-flex items-center flex-shrink-0 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-medium text-emerald-700">
-          {item.publishedSupplyProductCount} 个已发布能力型号
+          {item.publishedSupplyProductCount} 个已发布产品型号
         </span>
       </div>
 

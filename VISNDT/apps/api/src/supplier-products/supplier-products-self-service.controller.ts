@@ -3,26 +3,36 @@ import {
   Get,
   Post,
   Patch,
+  Put,
+  Delete,
   Param,
   Body,
   Query,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
   ApiParam,
   ApiBearerAuth,
   ApiBody,
+  ApiConsumes,
 } from '@nestjs/swagger';
 import { SupplierProductsService } from './supplier-products.service';
 import { SupplierSelfServiceGuard } from './supplier-self-service.guard';
 import { CreateMySupplierProductDto } from './dto/create-my-supplier-product.dto';
 import { UpdateMySupplierProductDto } from './dto/update-my-supplier-product.dto';
+import { CreateMySupplierProductMediaDto } from './dto/create-my-supplier-product-media.dto';
+import { UpdateMySupplierProductMediaDto } from './dto/update-my-supplier-product-media.dto';
+import { SetMySupplierProductParametersDto } from './dto/set-my-supplier-product-parameters.dto';
 import { ApiResponse } from '../common/dto/api-response.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthRequest } from '../auth/interfaces/auth-request.interface';
+import { Express } from 'express';
 
 /**
  * 819/820 Permission Foundation + Self-Service Foundation — SupplierProduct
@@ -125,6 +135,108 @@ export class SupplierProductsSelfServiceController {
     return ApiResponse.ok(
       await this.service.submitOwn(id, user.organizationId!, user.id),
       'SupplierProduct submitted',
+    );
+  }
+
+  /**
+   * WP-5A — Media Write (R1): upload + bind a media to an OWN SupplierProduct
+   * atomically. Multipart (file + optional mediaType/title/altText/isPrimary/
+   * displayOrder form fields). Organization + life-cycle scoped server-side.
+   */
+  @Post('my/:id/media/upload')
+  @ApiOperation({
+    summary:
+      'WP-5A — upload a file and bind it as SupplierProductMedia (SUPPLIER self-service, organization-scoped, DRAFT/APPROVED only).',
+  })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024 } }))
+  async uploadMyMedia(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: CreateMySupplierProductMediaDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(
+      await this.service.createMediaWithUpload(
+        id,
+        user.organizationId!,
+        file,
+        dto,
+        user.id,
+      ),
+      'SupplierProduct media uploaded',
+    );
+  }
+
+  /**
+   * WP-5A — Media Write (R1): bind an already-uploaded FileAsset as media.
+   */
+  @Post('my/:id/media')
+  @ApiBody({ type: CreateMySupplierProductMediaDto })
+  async createMyMedia(
+    @Param('id') id: string,
+    @Body() dto: CreateMySupplierProductMediaDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(
+      await this.service.createMedia(id, user.organizationId!, dto),
+      'SupplierProduct media created',
+    );
+  }
+
+  /**
+   * WP-5A — Media Write (R1): update media metadata / ordering / primary.
+   */
+  @Patch('my/:id/media/:mediaId')
+  @ApiParam({ name: 'mediaId', description: 'SupplierProductMedia UUID' })
+  @ApiBody({ type: UpdateMySupplierProductMediaDto })
+  async updateMyMedia(
+    @Param('id') id: string,
+    @Param('mediaId') mediaId: string,
+    @Body() dto: UpdateMySupplierProductMediaDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(
+      await this.service.updateMedia(id, user.organizationId!, mediaId, dto),
+      'SupplierProduct media updated',
+    );
+  }
+
+  /**
+   * WP-5A — Media Write (R1): delete media (persistence + storage cleanup).
+   */
+  @Delete('my/:id/media/:mediaId')
+  @ApiParam({ name: 'mediaId', description: 'SupplierProductMedia UUID' })
+  async removeMyMedia(
+    @Param('id') id: string,
+    @Param('mediaId') mediaId: string,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(
+      await this.service.removeMedia(id, user.organizationId!, mediaId),
+      'SupplierProduct media removed',
+    );
+  }
+
+  /**
+   * WP-5A — Parameter Write (R2): full-set replace of SupplierProduct parameter
+   * overrides (upsert + remove missing).
+   */
+  @Put('my/:id/parameters')
+  @ApiParam({ name: 'id', description: 'SupplierProduct UUID' })
+  @ApiBody({ type: SetMySupplierProductParametersDto })
+  async setMyParameters(
+    @Param('id') id: string,
+    @Body() dto: SetMySupplierProductParametersDto,
+    @CurrentUser() user: AuthRequest['user'],
+  ) {
+    return ApiResponse.ok(
+      await this.service.setParameterOverrides(
+        id,
+        user.organizationId!,
+        dto.items,
+      ),
+      'SupplierProduct parameters updated',
     );
   }
 }

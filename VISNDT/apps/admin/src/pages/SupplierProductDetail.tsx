@@ -53,7 +53,7 @@ export default function SupplierProductDetailPage() {
       setPageState({ status: 'success', data });
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : '加载能力型号失败';
+        err instanceof Error ? err.message : '加载产品型号失败';
       setPageState({ status: 'error', message });
     }
   }, [id]);
@@ -82,10 +82,10 @@ export default function SupplierProductDetailPage() {
 
   const handleSubmit = () => {
     Modal.confirm({
-      title: '提交能力型号',
+      title: '提交产品型号',
       content: '确认提交（DRAFT → SUBMITTED）？',
       okText: '提交',
-      onOk: () => runAction(() => supplierProductService.submit(id!), '能力型号已提交'),
+      onOk: () => runAction(() => supplierProductService.submit(id!), '产品型号已提交'),
     });
   };
 
@@ -103,16 +103,16 @@ export default function SupplierProductDetailPage() {
       title: '通过审核',
       content: '确认通过（REVIEWING → APPROVED）？',
       okText: '通过',
-      onOk: () => runAction(() => supplierProductService.approve(id!), '能力型号已通过'),
+      onOk: () => runAction(() => supplierProductService.approve(id!), '产品型号已通过'),
     });
   };
 
   const handlePublish = () => {
     Modal.confirm({
-      title: '发布能力型号',
+      title: '发布产品型号',
       content: '确认发布（APPROVED → PUBLISHED）？',
       okText: '发布',
-      onOk: () => runAction(() => supplierProductService.publish(id!), '能力型号已发布'),
+      onOk: () => runAction(() => supplierProductService.publish(id!), '产品型号已发布'),
     });
   };
 
@@ -121,7 +121,7 @@ export default function SupplierProductDetailPage() {
       message.warning('请填写拒绝原因（reviewedNote）');
       return;
     }
-    runAction(() => supplierProductService.reject(id!, rejectNote.trim()), '能力型号已拒绝')
+    runAction(() => supplierProductService.reject(id!, rejectNote.trim()), '产品型号已拒绝')
       .then(() => setRejectOpen(false))
       .catch(() => undefined);
   };
@@ -141,7 +141,7 @@ export default function SupplierProductDetailPage() {
           applicationInfo: (values.applicationInfo as string) || null,
         })
         .then(() => {
-          message.success('能力型号已更新');
+          message.success('产品型号已更新');
           setEditOpen(false);
           fetchData();
         })
@@ -155,18 +155,18 @@ export default function SupplierProductDetailPage() {
 
   const handleUnpublish = () => {
     Modal.confirm({
-      title: '下架能力型号',
+      title: '下架产品型号',
       content: '确认下架（PUBLISHED → APPROVED）？下架后将从公开发现中移除。',
       okText: '下架',
       okType: 'danger',
-      onOk: () => runAction(() => supplierProductService.unpublish(id!), '能力型号已下架'),
+      onOk: () => runAction(() => supplierProductService.unpublish(id!), '产品型号已下架'),
     });
   };
 
   const handleDelete = () => {
     Modal.confirm({
-      title: '删除能力型号',
-      content: '确认删除该能力型号？若存在关联 Offer，删除将被依赖保护阻止。',
+      title: '删除产品型号',
+      content: '确认删除该产品型号？若存在关联 Offer，删除将被依赖保护阻止。',
       okText: '删除',
       okType: 'danger',
       okButtonProps: { id: `delete-${id}` },
@@ -175,7 +175,7 @@ export default function SupplierProductDetailPage() {
         setActionLoading(true);
         try {
           await supplierProductService.remove(id);
-          message.success('能力型号已删除');
+          message.success('产品型号已删除');
           navigate('/supplier-products');
         } catch (err) {
           const msg = err instanceof Error ? err.message : '删除失败';
@@ -199,7 +199,7 @@ export default function SupplierProductDetailPage() {
     return (
       <Alert
         type="error"
-        message="加载能力型号失败"
+        message="加载产品型号失败"
         description={pageState.message}
         showIcon
         action={
@@ -231,15 +231,15 @@ export default function SupplierProductDetailPage() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>能力型号详情</Title>
+          <Title level={4} style={{ margin: 0 }}>产品型号详情</Title>
         </div>
         <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          能力型号审核详情 — 审核 / 通过 / 发布 / 治理
+          产品型号审核详情 — 审核 / 通过 / 发布 / 治理
         </Text>
       </div>
 
       {/* Card: SupplierProduct Identity */}
-      <Card title="能力型号身份（Capability Model）" style={{ marginBottom: 16 }}>
+      <Card title="产品型号身份" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>
           <Descriptions.Item label="品牌">{sp.brand}</Descriptions.Item>
           <Descriptions.Item label="系列">{sp.series || '-'}</Descriptions.Item>
@@ -249,7 +249,7 @@ export default function SupplierProductDetailPage() {
             {sp.organization?.name || sp.organizationId}
           </Descriptions.Item>
           <Descriptions.Item label="状态">
-            <StatusTag status={status} label={STATUS_LABEL_MAP[status] || status} />
+            <StatusTag status={status} label={STATUS_LABEL_MAP[status] || '未知状态'} />
           </Descriptions.Item>
         </Descriptions>
         {sp.description && (
@@ -274,7 +274,7 @@ export default function SupplierProductDetailPage() {
 
       {/* Card: Platform Capability Binding */}
       {sp.platformProduct && (
-        <Card title="平台能力绑定（Platform Capability Binding）" style={{ marginBottom: 16 }}>
+        <Card title="平台产品绑定" style={{ marginBottom: 16 }}>
           <Descriptions bordered column={{ xs: 1, sm: 2 }}>
             <Descriptions.Item label="能力节点">
               {sp.platformProduct.name}
@@ -411,7 +411,7 @@ export default function SupplierProductDetailPage() {
       </Card>
 
       <Modal
-        title="编辑能力型号"
+        title="编辑产品型号"
         open={editOpen}
         okText="保存"
         cancelText="取消"
@@ -451,7 +451,7 @@ export default function SupplierProductDetailPage() {
       </Modal>
 
       <Modal
-        title="拒绝能力型号"
+        title="拒绝产品型号"
         open={rejectOpen}
         okText="拒绝"
         okType="danger"

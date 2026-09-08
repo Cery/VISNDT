@@ -1,0 +1,473 @@
+﻿import fs from 'fs';
+const file = 'f:/Desktop/VISNDT/VISNDT/apps/admin/src/components/product/ProductForm.tsx';
+const content = `import { useEffect, useState, useCallback } from 'react';
+import { Form, Input, Select, Button, Space, Spin, Alert, message, Upload, Card, Divider, InputNumber, Image, Row, Col, Tag, Typography, TreeSelect, Empty } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeftOutlined, UploadOutlined, PictureOutlined } from '@ant-design/icons';
+import { categoriesService, parameterDefinitionService, productParameterService, productMediaService } from '../../api';
+import type { ProductFormData } from '../../types';
+import type { ParameterDefinition } from '../../types/parameter-definition.types';
+import type { ProductMediaItem } from '../../types/product-media.types';
+import type { UploadFile } from 'antd/es/upload/interface';
+
+const { TextArea } = Input;
+const { Text } = Typography;
+const { Dragger } = Upload;
+
+interface ProductCategory {
+  id: string;
+  name: string;
+  slug: string;
+  parentId?: string;
+  children?: ProductCategory[];
+}
+
+interface ProductFormProps {
+  initialValues?: Partial<ProductFormData>;
+  onSubmit: (data: ProductFormData) => Promise<{ id: string } | void>;
+  submitLabel: string;
+  title: string;
+  productId?: string;
+}
+
+type FormState =
+  | { status: 'loading' }
+  | { status: 'error'; message: string }
+  | { status: 'ready'; categories: ProductCategory[] };
+
+/** Build Ant Design TreeSelect treeData from ProductCategory hierarchy */
+function buildTreeData(categories: ProductCategory[]) {
+  const map = new Map<string, ProductCategory>();
+  for (const c of categories) map.set(c.id, { ...c, children: [] });
+  const roots: ProductCategory[] = [];
+  for (const node of map.values()) {
+    const parent = node.parentId ? map.get(node.parentId) : undefined;
+    if (parent) {
+      (parent.children = parent.children ?? []).push(node);
+    } else {
+      roots.push(node);
+    }
+  }
+  const toData = (node: ProductCategory): Record<string, unknown> => ({
+    title: node.name,
+    value: node.id,
+    children: (node.children ?? []).length > 0 ? (node.children as ProductCategory[]).map(toData) : undefined,
+  });
+  return roots.map(toData);
+}
+
+export default function ProductForm({ initialValues, onSubmit, submitLabel, title, productId }: ProductFormProps) {
+  const navigate = useNavigate();
+  const [form] = Form.useForm<ProductFormData>();
+  const [formState, setFormState] = useState<FormState>({ status: 'loading' });
+  const [submitting, setSubmitting] = useState(false);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [parameterValues, setParameterValues] = useState<Record<string, { value: string; valueNumber?: number }>>({});
+  const [existingMedia, setExistingMedia] = useState<ProductMediaItem[]>([]);
+  // Cascading: parameter definitions are loaded only after a category is selected
+  const [categoryId, setCategoryId] = useState<string | undefined>(initialValues?.categoryId);
+  const [parameterDefinitions, setParameterDefinitions] = useState<ParameterDefinition[]>([]);
+  const [paramsLoading, setParamsLoading] = useState(false);
+
+  const loadFormData = useCallback(async () => {
+    setFormState({ status: 'loading' });
+    try {
+      const categories = await categoriesService.getList();
+      setFormState({ status: 'ready', categories });
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : '加载表单数据失败';
+      setFormState({ status: 'error', message: errorMessage });
+    }
+  }, []);
+
+  const loadParameterDefinitions = useCallback(async (catId: string | undefined) => {
+    if (!catId) {
+      setParameterDefinitions([]);
+      return;
+    }
+    setParamsLoading(true);
+    try {
+      const res = await parameterDefinitionService.getList({ categoryId: catId, pageSize: 100 });
+      setParameterDefinitions(res.data);
+    } catch {
+      setParameterDefinitions([]);
+    } finally {
+      setParamsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadFormData();
+  }, [loadFormData]);
+
+  // Load cascade parameters once categories are ready (edit mode echo initial category)
+  useEffect(() => {
+    if (formState.status === 'ready' && formState.categories.length > 0 && initialValues?.categoryId) {
+      setCategoryId(initialValues.categoryId);
+      form.setFieldsValue({ categoryId: initialValues.categoryId });
+      loadParameterDefinitions(initialValues.categoryId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formState.status]);
+
+  useEffect(() => {
+    if (initialValues) {
+      form.setFieldsValue(initialValues);
+    }
+  }, [initialValues, form]);
+
+  // Hydrate existing parameter values in edit mode so they echo back in the form
+  useEffect(() => {
+    if (!productId) return;
+    let cancelled = false;
+    productParameterService
+      .list(productId)
+      .then((values) => {
+        if (cancelled) return;
+        const initial: Record<string, { value: string; valueNumber?: number }> = {};
+        const fields: Record<string, string | number> = {};
+        values.forEach((v) => {
+          const display =
+            v.valueNumber !== undefined && v.valueNumber !== null
+              ? v.valueNumber
+              : v.value || '';
+          initial[v.parameterDefinitionId] = {
+            value: String(display),
+            valueNumber: v.valueNumber,
+          };
+          fields[v.parameterDefinitionId] = display;
+        });
+        setParameterValues(initial);
+        form.setFieldsValue(fields);
+      })
+      .catch(() => {
+        // silently fail — parameter editing remains available
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [productId, form]);
+
+  // Load existing media in edit mode so they are visible alongside the upload area
+  useEffect(() => {
+    if (!productId) return;
+    productMediaService
+      .list(productId)
+      .then((media) => {
+        setExistingMedia(media ?? []);
+      })
+      .catch(() => {
+        // silently fail — upload remains available
+      })
+  }, [productId]);
+
+  const handleCategoryChange = (value: string | undefined) => {
+    setCategoryId(value);
+    form.setFieldsValue({ categoryId: value });
+    // Switching category invalidates previously chosen parameters → clear them
+    setParameterValues({});
+    loadParameterDefinitions(value);
+  };
+
+  const handleParameterChange = (defId: string, value: string, dataType: string) => {
+    const numValue = dataType === 'NUMBER' ? parseFloat(value) : undefined;
+    setParameterValues((prev) => ({
+      ...prev,
+      [defId]: { value, valueNumber: isNaN(numValue as number) ? undefined : numValue },
+    }));
+  };
+
+  const handleSubmit = async (values: ProductFormData) => {
+    setSubmitting(true);
+    try {
+      const createdProduct = await onSubmit(values);
+
+      // If there are parameter values and we have a product (created or edit), save them
+      const targetProductId = productId || (createdProduct as any)?.id;
+      if (targetProductId) {
+        const paramEntries = Object.entries(parameterValues).filter(([_, v]) => v.value.trim());
+        await Promise.all(
+          paramEntries.map(([defId, v]) =>
+            productParameterService.set(targetProductId, {
+              parameterDefinitionId: defId,
+              value: v.value,
+              valueNumber: v.valueNumber,
+            }),
+          ),
+        );
+      }
+
+      // Upload media files
+      if (targetProductId && fileList.length > 0) {
+        const uploadPromises = fileList
+          .filter((f) => f.originFileObj)
+          .map((f) =>
+            productMediaService.createWithUpload(targetProductId, f.originFileObj as File, {
+              mediaType: 'IMAGE' as any,
+              title: f.name,
+            }),
+          );
+        await Promise.all(uploadPromises);
+      }
+
+      message.success(submitLabel === '创建能力' ? '能力创建成功' : '能力更新成功');
+      navigate('/products');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : '保存能力失败';
+      message.error(errorMessage);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (formState.status === 'loading') {
+    return (
+      <div style={{ textAlign: 'center', padding: 80 }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (formState.status === 'error') {
+    return (
+      <Alert
+        type="error"
+        message="加载表单数据失败"
+        description={formState.message}
+        showIcon
+        action={
+          <Space>
+            <Button onClick={loadFormData}>重试</Button>
+            <Button onClick={() => navigate('/products')} icon={<ArrowLeftOutlined />}>
+              返回列表
+            </Button>
+          </Space>
+        }
+      />
+    );
+  }
+
+  // Group cascade-loaded parameter definitions by their group name
+  const groupedParams = parameterDefinitions.reduce<Record<string, ParameterDefinition[]>>(
+    (acc, def) => {
+      const groupName = def.group?.name || '其他参数';
+      if (!acc[groupName]) acc[groupName] = [];
+      acc[groupName].push(def);
+      return acc;
+    },
+    {},
+  );
+
+  return (
+    <div>
+      <Space style={{ marginBottom: 16 }}>
+        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/products')}>
+          返回列表
+        </Button>
+      </Space>
+      <h2>{title}</h2>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        initialValues={{ status: 'DRAFT' }}
+        style={{ maxWidth: 800 }}
+      >
+        <Card title="基本信息" style={{ marginBottom: 16 }}>
+          <Form.Item
+            label="名称"
+            name="name"
+            rules={[{ required: true, message: '请输入能力名称' }]}
+          >
+            <Input placeholder="请输入能力名称" />
+          </Form.Item>
+
+          <Form.Item label="型号" name="model">
+            <Input placeholder="请输入型号" />
+          </Form.Item>
+
+          <Form.Item
+            label="分类"
+            name="categoryId"
+            rules={[{ required: true, message: '请选择分类' }]}
+          >
+            <TreeSelect
+              showSearch
+              treeDefaultExpandAll
+              placeholder="请选择分类（可按层级展开）"
+              treeData={buildTreeData(formState.categories)}
+              onChange={handleCategoryChange}
+              treeNodeFilterProp="title"
+            />
+          </Form.Item>
+
+          <Form.Item label="状态" name="status">
+            <Select
+              options={[
+                { value: 'DRAFT', label: '草稿' },
+                { value: 'ACTIVE', label: '已上架' },
+                { value: 'INACTIVE', label: '已下架' },
+              ]}
+            />
+          </Form.Item>
+
+          <Form.Item label="描述" name="description">
+            <TextArea rows={4} placeholder="请输入能力描述" />
+          </Form.Item>
+        </Card>
+
+        {paramsLoading ? (
+          <Card title="参数配置" style={{ marginBottom: 16 }}>
+            <div style={{ textAlign: 'center', padding: 24 }}>
+              <Spin size="small" />
+              <div style={{ color: '#999', marginTop: 8 }}>正在加载该分类下的参数定义...</div>
+            </div>
+          </Card>
+        ) : !categoryId ? (
+          <Card title="参数配置" style={{ marginBottom: 16 }}>
+            <Empty
+              description="请先选择分类，参数将按所选分类动态加载"
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+            />
+          </Card>
+        ) : Object.entries(groupedParams).length > 0 ? (
+          <Card title="参数配置" style={{ marginBottom: 16 }}>
+            {Object.entries(groupedParams).map(([groupName, defs]) => (
+              <div key={groupName} style={{ marginBottom: 16 }}>
+                <Divider orientation="left" style={{ fontSize: 13 }}>{groupName}</Divider>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
+                  {defs.map((def) => (
+                    <div key={def.id} style={{ flex: '1 1 200px', minWidth: 200 }}>
+                      <Form.Item
+                        label={\`\${def.name}\${def.unit ? \` (\${def.unit})\` : ''}\${def.required ? ' *' : ''}\`}
+                        name={def.id}
+                      >
+                        {def.dataType === 'BOOLEAN' ? (
+                          <Select
+                            placeholder="请选择"
+                            allowClear
+                            onChange={(val) => handleParameterChange(def.id, val || '', def.dataType)}
+                            options={[
+                              { value: 'true', label: '是' },
+                              { value: 'false', label: '否' },
+                            ]}
+                          />
+                        ) : def.dataType === 'ENUM' && def.options && def.options.length > 0 ? (
+                          <Select
+                            placeholder="请选择"
+                            allowClear
+                            onChange={(val) => handleParameterChange(def.id, val || '', def.dataType)}
+                            options={def.options.map((o) => ({ value: o.value, label: o.label }))}
+                          />
+                        ) : def.dataType === 'NUMBER' ? (
+                          <InputNumber
+                            style={{ width: '100%' }}
+                            placeholder="请输入数值"
+                            onChange={(val) => handleParameterChange(def.id, val?.toString() || '', def.dataType)}
+                          />
+                        ) : (
+                          <Input
+                            placeholder="请输入"
+                            onChange={(e) => handleParameterChange(def.id, e.target.value, def.dataType)}
+                          />
+                        )}
+                      </Form.Item>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </Card>
+        ) : (
+          <Card title="参数配置" style={{ marginBottom: 16 }}>
+            <Empty description="该分类下暂无可用的参数定义" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          </Card>
+        )}
+
+        <Card title="媒体资源" style={{ marginBottom: 16 }}>
+          {productId && existingMedia.length > 0 && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <Text strong style={{ fontSize: 13 }}>现有媒体资源</Text>
+                <Button
+                  size="small"
+                  icon={<PictureOutlined />}
+                  onClick={() => navigate(\`/products/\${productId}/media\`)}
+                >
+                  管理媒体
+                </Button>
+              </div>
+              <Row gutter={[12, 12]}>
+                {existingMedia.map((item) => (
+                  <Col xs={12} sm={8} md={6} key={item.id}>
+                    <Card
+                      size="small"
+                      hoverable
+                      cover={
+                        item.fileAssetId ? (
+                          <Image
+                            alt={item.title || '媒体'}
+                            src={\`/api/v1/files/\${item.fileAssetId}/download\`}
+                            height={120}
+                            style={{ objectFit: 'cover' }}
+                            fallback="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iI2Y1ZjVmNSIvPjx0ZXh0IHg9IjEwMCIgeT0iNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIiBmaWxsPSIjOTk5IiBmb250LXNpemU9IjEyIj5JbWFnZTwvdGV4dD48L3N2Zz4="
+                          />
+                        ) : (
+                          <div style={{ height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fafafa' }}>
+                            <PictureOutlined style={{ fontSize: 24, color: '#bbb' }} />
+                          </div>
+                        )
+                      }
+                    >
+                      <Card.Meta
+                        title={item.title || '未命名'}
+                        description={
+                          <Space size={4} wrap>
+                            <Tag>{item.mediaType}</Tag>
+                            {item.isPrimary && <Tag color="gold">主图</Tag>}
+                          </Space>
+                        }
+                      />
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+              <Divider style={{ margin: '12px 0' }} />
+              <Text type="secondary" style={{ fontSize: 12 }}>新增上传</Text>
+            </div>
+          )}
+          <Dragger
+            multiple
+            fileList={fileList}
+            beforeUpload={(file) => {
+              setFileList((prev) => [...prev, file]);
+              return false;
+            }}
+            onRemove={(file) => {
+              setFileList((prev) => prev.filter((f) => f.uid !== file.uid));
+            }}
+            accept="image/*"
+          >
+            <p className="ant-upload-drag-icon">
+              <UploadOutlined />
+            </p>
+            <p className="ant-upload-text">点击或拖拽文件到此区域上传</p>
+            <p className="ant-upload-hint">支持 PNG、JPG、JPEG 等图片格式</p>
+          </Dragger>
+        </Card>
+
+        <Form.Item>
+          <Space>
+            <Button type="primary" htmlType="submit" loading={submitting}>
+              {submitLabel}
+            </Button>
+            <Button onClick={() => navigate('/products')}>取消</Button>
+          </Space>
+        </Form.Item>
+      </Form>
+    </div>
+  );
+}
+`;
+fs.writeFileSync(file, content, 'utf8');
+console.log('ProductForm.tsx rewritten (len=' + content.length + ')');

@@ -94,7 +94,6 @@ export default async function SolutionsPage() {
               { href: '/categories', label: '能力分类', mono: 'CAP' },
               { href: '/products', label: '检测产品', mono: 'PRD' },
               { href: '/knowledge-base', label: '工程知识', mono: 'KNW' },
-              { href: '/search?type=supplier-product', label: '能力提供方', mono: 'SPL' },
               { href: '/search', label: '统一检索', mono: 'SRC' },
             ].map((t) => (
               <Link
@@ -131,7 +130,7 @@ export default async function SolutionsPage() {
                 共 {solutionCount} 个解决方案
               </span>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 items-start">
               {contents.map((item) => (
                 <ContentCard key={item.id} item={item} />
               ))}

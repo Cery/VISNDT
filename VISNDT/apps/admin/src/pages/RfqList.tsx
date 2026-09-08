@@ -256,7 +256,7 @@ function RfqList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <StatusTag status={status} label={RFQ_STATUS_LABEL_MAP[status] || status} />
+        <StatusTag status={status} label={RFQ_STATUS_LABEL_MAP[status] || '未知状态'} />
       ),
     },
     {
@@ -279,7 +279,7 @@ function RfqList() {
       },
     },
     {
-      title: '目标能力提供商',
+      title: '目标供应商',
       key: 'targetOrganization',
       width: 160,
       render: (_: unknown, record: Rfq) => {

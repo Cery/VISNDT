@@ -35,14 +35,14 @@ export default function CategoryGrid({ categories, isLoading }: CategoryGridProp
     <section className="py-20 bg-industrial-slate">
       <div className="max-w-[1200px] mx-auto px-6">
         <h2 className="text-3xl font-extrabold mb-8">产品分类</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 items-start">
           {categories.map((cat) => (
             <Link
               key={cat.id}
               href={`/products?categoryId=${cat.id}`}
-              className="group rounded-xl border border-slate-200/80 shadow-industrial-sm hover:shadow-industrial-md hover:-translate-y-1 transition-all duration-300 bg-white"
+              className="group rounded-xl border border-slate-200/80 shadow-industrial-sm hover:shadow-industrial-md transition-all duration-300 bg-white p-4"
             >
-              <h3 className="font-semibold text-sm group-hover:text-primary transition-colors">
+              <h3 className="font-semibold text-sm group-hover:text-primary transition-colors line-clamp-1">
                 {translateCategoryName(cat.name)}
               </h3>
               {cat.children && cat.children.length > 0 && (

@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import type { Product, ProductDetail, ParameterGroup } from '@/types/product';
 import type { RelatedKnowledgeItem } from '@/types/knowledge-base';
@@ -8,10 +7,9 @@ import type { Content } from '@/types/content';
 import type { CapabilitySupplierProduct } from '@/types/capability';
 import type { EngineeringAnnotation } from '@/lib/engineering-insight/annotation';
 import { buildCapabilityContext } from '@/lib/capability-context';
-import { buildSupplierRelationshipContext } from '@/lib/supplier-context';
+import { stripGovernanceLabels } from '@/lib/display-text';
 import ProductGallery from './ProductGallery';
 import ProductParameters from './ProductParameters';
-import SupplierInfo from './SupplierInfo';
 import SupplierInquirySection from '@/components/inquiry/SupplierInquirySection';
 import SupplierModelsSection from './SupplierModelsSection';
 import ProductDetailTabs from './ProductDetailTabs';
@@ -50,12 +48,8 @@ export default function ProductDetailContent({
   supplierModels = [],
   parameterAnnotations,
 }: ProductDetailContentProps) {
-  const [descExpanded, setDescExpanded] = useState(false);
-  const descShouldTruncate = (product.description?.length ?? 0) > 200;
-  const displayDescription =
-    descShouldTruncate && !descExpanded
-      ? product.description?.slice(0, 200) + '...'
-      : product.description;
+  // 846 §60 — 治理标签退出公开买方视图（纯显示层剥离，数据本身不变）
+  const description = stripGovernanceLabels(product.description);
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -67,8 +61,8 @@ export default function ProductDetailContent({
   };
 
   const statusLabel: Record<string, string> = {
-    ACTIVE: '在售',
-    INACTIVE: '下架',
+    ACTIVE: '已发布',
+    INACTIVE: '已下架',
     DRAFT: '草稿',
     REVIEW: '审核中',
     ARCHIVED: '已归档',
@@ -82,13 +76,11 @@ export default function ProductDetailContent({
     ARCHIVED: 'bg-slate-100 text-slate-400',
   };
 
-  // M34.1 — Capability = Product 语义角色：从现有 Product/Category/Parameter/SupplierProduct/Organization
-  // 确定性派生 Capability Context（视图模型，非独立实体；不新增 Schema / 持久化）。
+  // M34.1 — Capability = Product 语义角色（视图模型，非独立实体；不新增 Schema / 持久化）
   const capability = buildCapabilityContext(product, supplierModels);
 
-  // M34.2 — Supply Relationship Foundation：Product(Capability Authority) → Published SupplyProducts → Supplier(Organization)
-  // 统一 Supplier Context 可见性。仅 PUBLISHED SupplierProduct + Organization（后端已强制过滤），零 Offer / 交易依赖。
-  const supplierRel = buildSupplierRelationshipContext(product.id, supplierModels);
+  const providerCount = capability.supplier.providerCount;
+  const modelCount = capability.supplier.publishedModelCount;
 
   // 技术规格台账单元格（展示性 mono 计量元数据，来源均为既有真实数据）
   const SpecCell = ({ label, value }: { label: string; value: string }) => (
@@ -98,7 +90,7 @@ export default function ProductDetailContent({
     </div>
   );
 
-  // 工业技术章节标题：mono 索引 + 眉标 + 受控 accent 竖条 + 副题（信息层级 / 技术信息模块化）
+  // 工业技术章节标题：mono 索引 + 眉标 + 受控 accent 竖条 + 副题
   const SectionTitle = ({
     index,
     eyebrow,
@@ -131,21 +123,22 @@ export default function ProductDetailContent({
     <ProductDetailTabs>
       {(activeTab) => (
         <>
-          {/* Overview Tab */}
+          {/* Overview Tab — 846 §27 Hero/Identity + §29 单一能力概览 */}
           {activeTab === 'overview' && (
             <section id="overview">
+              {/* §27 Hero / Identity */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <section id="media">
                   <ProductGallery media={product.media} productName={product.name} />
                 </section>
 
-                <div className="space-y-6">
+                <div className="space-y-5">
                   <div>
                     <div className="flex items-center gap-2 flex-wrap mb-2">
                       <span className="font-mono text-[11px] uppercase tracking-widest text-slate-400 mb-1 w-full">
-                        <span className="text-industrial-cyan">CAPABILITY</span>
+                        <span className="text-industrial-cyan">产品</span>
                         <span className="mx-2 text-slate-300">/</span>
-                        PRODUCT PROFILE
+                        明细
                       </span>
                       <h1 className="text-3xl font-extrabold text-foreground">
                         {product.name}
@@ -154,7 +147,7 @@ export default function ProductDetailContent({
                         <span
                           className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium ${statusColor[product.status] || 'bg-slate-100 text-slate-500'}`}
                         >
-                          {statusLabel[product.status] || product.status}
+                          {statusLabel[product.status] || '未知状态'}
                         </span>
                       )}
                     </div>
@@ -166,15 +159,15 @@ export default function ProductDetailContent({
                       />
                     )}
 
-                    {/* Technical Spec Header — industrial capability/parameter metadata ledger (existing real data) */}
+                    {/* Core Specs ledger — §27: Category / Core Specs */}
                     <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-px rounded-lg overflow-hidden border border-slate-200/80 bg-slate-200/80">
-                      <SpecCell label="MODEL" value={product.model || '—'} />
+                      <SpecCell label="MODEL" value={product.model || '未提供'} />
                       <SpecCell
                         label="CATEGORY"
                         value={
                           product.category
                             ? (translateCategoryName(product.category.name) || '').toUpperCase()
-                            : '—'
+                            : '未提供'
                         }
                       />
                       <SpecCell
@@ -183,44 +176,56 @@ export default function ProductDetailContent({
                       />
                       <SpecCell
                         label="REV"
-                        value={product.updatedAt ? formatDate(product.updatedAt) : '—'}
+                        value={product.updatedAt ? formatDate(product.updatedAt) : '未提供'}
                       />
                     </div>
+
+                    {/* §27: Supplier Model Count */}
+                    <p className="mt-3 text-sm text-slate-600">
+                      {modelCount > 0 ? (
+                        <>
+                          <span className="font-semibold text-foreground">{modelCount}</span> 个供应型号
+                          <span className="mx-1.5 text-slate-300">·</span>
+                          <span className="font-semibold text-foreground">{providerCount}</span> 家供应商
+                          <Link
+                            href="#supplier-models"
+                            className="ml-2 text-primary hover:text-primary/80 font-medium"
+                          >
+                            查看型号 →
+                          </Link>
+                        </>
+                      ) : (
+                        <span className="text-slate-400">暂无已发布供应型号</span>
+                      )}
+                    </p>
                   </div>
 
-                  {product.description && (
-                    <div>
-                      <h2 className="font-semibold text-sm text-slate-700 mb-2">
-                        能力描述
-                      </h2>
-                      <p className="text-sm text-slate-500 whitespace-pre-wrap leading-relaxed">
-                        {displayDescription}
-                      </p>
-                      {descShouldTruncate && (
-                        <button
-                          type="button"
-                          onClick={() => setDescExpanded(!descExpanded)}
-                          className="text-sm text-primary hover:text-primary/80 mt-1 font-medium"
-                        >
-                          {descExpanded ? '收起' : '展开全部'}
-                        </button>
-                      )}
-                    </div>
-                  )}
-
-                  <SupplierInfo
-                    offers={product.offers}
-                    productName={product.name}
-                  />
+                  {/* §27/§36: CTA — 任务语言：1 Primary + 1 Secondary */}
+                  <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                    <Link
+                      href={`/workspace/demands/create?productId=${encodeURIComponent(product.id)}`}
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm"
+                    >
+                      提交采购需求
+                      <span className="text-xs">&rarr;</span>
+                    </Link>
+                    <Link
+                      href={`/products/compare?ids=${encodeURIComponent(product.id)}`}
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:border-primary/40 hover:text-primary transition-colors"
+                    >
+                      加入对比
+                    </Link>
+                  </div>
                 </div>
               </div>
 
-              {/* Capability Profile — deterministic capability interpretation */}
+              {/* §29 — 唯一「能力概览」：检测对象 / 应用场景 / 能力说明 / 关键参数
+                  （原「能力描述」+「能力档案」双区已合并） */}
               <CapabilitySection
-                eyebrow="Capability Profile"
-                title="能力档案"
-                subtitle="基于检测分类与核心技术参数的确定性能力解读"
-                className="mt-8"
+                eyebrow="Capability Overview"
+                title="能力概览"
+                subtitle="检测对象、应用场景、能力说明与关键参数"
+                className="mt-10"
               >
                 <div className="space-y-4">
                   <ApplicationScenario categoryName={product.category?.name} />
@@ -228,75 +233,12 @@ export default function ProductDetailContent({
                     application={capability.engineeringContext.application}
                     detectionObject={capability.engineeringContext.detectionObject}
                   />
+                  {description && (
+                    <p className="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed">
+                      {description}
+                    </p>
+                  )}
                   <CapabilitySummary parameters={product.parameterValues} />
-
-                  {/* M34.1 — 能力提供商上下文：基于已发布 SupplierProduct / Organization，非 Offer / 交易 */}
-                    <div className="rounded-xl border border-slate-200/80 shadow-industrial-sm bg-white p-5">
-                      <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rotate-45 bg-industrial-cyan" aria-hidden="true" />
-                        能力提供商与供应关系
-                      </h3>
-                      {supplierRel.totalPublishedModels > 0 ? (
-                        <div className="space-y-3 text-sm text-slate-600">
-                          <p className="font-mono text-[11px] uppercase tracking-widest text-slate-400">
-                            <span className="text-industrial-cyan">{supplierRel.totalPublishedModels}</span>{' '}
-                            已发布能力型号 · {supplierRel.supplierCount} 家提供商
-                          </p>
-
-                          {/* M34.2 — Product → Published SupplyProducts → Supplier (Organization) 关系 */}
-                          <div className="divide-y divide-slate-100">
-                            {supplierRel.suppliers.map((supplier) => (
-                              <div key={supplier.organizationId} className="py-3 first:pt-1 last:pb-1">
-                                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                                  <Link
-                                    href={`/suppliers/${supplier.organizationId}`}
-                                    className="font-medium text-slate-800 hover:text-primary transition-colors"
-                                  >
-                                    {supplier.name}
-                                  </Link>
-                                  <span className="text-xs text-slate-400">
-                                    {supplier.publishedSupplyProductCount} 个供应型号
-                                  </span>
-                                  <span className="inline-flex items-center text-[11px] px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-medium">
-                                    已发布
-                                  </span>
-                                </div>
-                                <ul className="mt-2 space-y-1.5">
-                                  {supplier.models.map((model) => (
-                                    <li
-                                      key={model.id}
-                                      className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md bg-slate-50 px-2.5 py-1.5"
-                                    >
-                                      <span className="font-mono text-xs text-slate-700">{model.model}</span>
-                                      <span className="text-[11px] text-slate-400">
-                                        {model.specifications.length} 项规格
-                                      </span>
-                                      {model.hasMedia && (
-                                        <span className="text-[11px] text-slate-400">含媒体</span>
-                                      )}
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            ))}
-                          </div>
-
-                          {capability.category.categoryId && (
-                            <Link
-                              href={capability.category.categoryPath}
-                              className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80 font-medium"
-                            >
-                              在「{capability.category.categoryName}」中查看更多存量能力 →
-                            </Link>
-                          )}
-                        </div>
-                      ) : (
-                        <p className="text-sm text-slate-500">该能力暂未关联已发布的能力型号。</p>
-                      )}
-                      <p className="mt-3 text-xs text-slate-400 border-t border-slate-100 pt-3">
-                        平台能力/产品对象由供应商以其自有型号实际提供；供应关系按已发布能力型号+供应商归并，不依赖报价或交易记录。
-                      </p>
-                    </div>
                 </div>
               </CapabilitySection>
             </section>
@@ -335,7 +277,7 @@ export default function ProductDetailContent({
               <SectionTitle
                 index="03"
                 eyebrow="Capability Providers"
-                title="能力提供商"
+                title="供应商"
                 subtitle="提供该工业检测能力的合格服务方"
               />
               <SupplierInquirySection
@@ -369,13 +311,13 @@ export default function ProductDetailContent({
                 subtitle="规格书、证书与工程文档"
               />
               {product.media.filter((m) => m.mediaType !== 'IMAGE').length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
                   {product.media
                     .filter((m) => m.mediaType !== 'IMAGE')
                     .map((doc) => (
                       <div
                         key={doc.id}
-                        className="rounded-xl border border-slate-200/80 shadow-industrial-sm hover:shadow-industrial-md hover:-translate-y-1 transition-all duration-300 bg-white p-4 flex items-center gap-3"
+                        className="rounded-xl border border-slate-200/80 shadow-industrial-sm hover:shadow-industrial-md transition-all duration-300 bg-white p-4 flex items-center gap-3"
                       >
                         <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
                           <span className="text-xs text-primary font-medium">
@@ -471,6 +413,7 @@ export default function ProductDetailContent({
                   href: `/products/${p.id}`,
                   title: p.name,
                   sub: p.status === 'ACTIVE' ? '可用' : undefined,
+                  fileAssetId: p.primaryMedia?.fileAssetId ?? null,
                 })),
                 seeAllHref: `/products${
                   product.category ? `?categoryId=${product.category.id}` : ''
@@ -491,16 +434,19 @@ export default function ProductDetailContent({
                 items: relatedSolutions.map((s) => ({
                   href: `/solutions/${s.slug}`,
                   title: s.title,
+                  fileAssetId:
+                    s.coverImage?.id ??
+                    s.media?.find((m) => m.type === 'IMAGE')?.fileAsset?.id ??
+                    null,
                 })),
                 seeAllHref: '/solutions',
               },
               {
-                label: '能力提供方',
-                mono: 'SUPPLIER',
-                items: supplierRel.suppliers.map((sup) => ({
-                  href: `/suppliers/${sup.organizationId}`,
+                label: '供应商',
+                mono: '供应商',
+                items: capability.supplier.providers.map((sup) => ({
+                  href: `/suppliers/${sup.id}`,
                   title: sup.name,
-                  sub: `${sup.publishedSupplyProductCount} 个供应型号`,
                 })),
                 seeAllHref: `/search?q=${encodeURIComponent(product.name ?? '')}`,
               },

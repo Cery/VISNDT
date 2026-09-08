@@ -41,6 +41,10 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   keywords: SITE_KEYWORDS,
   manifest: '/manifest.json',
+  icons: {
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    apple: [{ url: '/icons/icon-192.jpg' }],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',

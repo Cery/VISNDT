@@ -34,7 +34,7 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 function roleLabel(role: string): string {
-  return ROLE_LABEL[role] ?? role;
+  return ROLE_LABEL[role] ?? '未知角色';
 }
 
 function roleTone(role: string): string {

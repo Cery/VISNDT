@@ -94,3 +94,25 @@ export interface FileAssetListResponse {
   pageSize: number;
   totalPages: number;
 }
+
+/** Result from POST /files/batch-delete — per-ID safety check outcomes. */
+export interface BatchDeleteFailed {
+  id: string;
+  reason: string;
+}
+
+export interface BatchDeleteResult {
+  deleted: number;
+  failed: BatchDeleteFailed[];
+}
+
+/** One failed file in a batch upload — carries a human-readable reason. */
+export interface BatchUploadFailed {
+  fileName: string;
+  reason: string;
+}
+
+export interface BatchUploadResult {
+  created: FileAsset[];
+  failed: BatchUploadFailed[];
+}

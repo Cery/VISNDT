@@ -16,7 +16,9 @@ import MarkdownRenderer from '@/components/markdown/MarkdownRenderer';
 import MediaGallery from '@/components/content/MediaGallery';
 import ContentProductCTA from '@/components/common/ContentProductCTA';
 import DemandCTA from '@/components/conversion/DemandCTA';
+import PageContainer from '@/components/common/PageContainer';
 import RelevantEngineeringDiscovery from '@/components/engineering/RelevantEngineeringDiscovery';
+import { stripGovernanceLabels } from '@/lib/display-text';
 import type { Content } from '@/types/content';
 import type { Product } from '@/types/product';
 
@@ -33,6 +35,12 @@ function formatDate(value?: string | null): string {
   });
 }
 
+/** 文章/方案封面缩略图 FileAsset id：优先封面，其次媒体首图；无则 null（卡片降级纯文字） */
+function contentCover(content: Content): string | null {
+  if (content.coverImage?.id) return content.coverImage.id;
+  return content.media?.find((m) => m.type === 'IMAGE')?.fileAsset?.id ?? null;
+}
+
 /** 知识详情页动态 SEO Metadata（来源：seoTitle / seoDescription / title / summary / coverImage） */
 export async function generateMetadata({
   params,
@@ -46,6 +54,12 @@ export async function generateMetadata({
       content.summary?.slice(0, 160) ||
       SITE_DESCRIPTION;
     const canonical = absoluteUrl(`/knowledge/${slug}`);
+    // 842 WP-7 Discoverability（P2-841-02 详情树收口）：
+    //   /knowledge/[slug] 为 ContentType.KNOWLEDGE 的 legacy 内容详情树；
+    //   /knowledge-base/[slug]（Knowledge Base 条目）为已确立的知识中心 canonical 权威。
+    //   两套为独立数据源（内容文章 vs 结构化知识条目），不能安全 redirect 到非等价对象，
+    //   故本 legacy 详情树与 /knowledge 列表保持一致声明 noindex（不独立争索引入口，
+    //   仅供内部引用继续可达），由 /knowledge-base/* 作为唯一公开知识索引面。
     // OG image：优先封面，其次媒体首图
     const image =
       contentImageUrl(content.coverImage?.id) ??
@@ -58,6 +72,8 @@ export async function generateMetadata({
       description,
       keywords,
       alternates: { canonical },
+      // 842 WP-7：legacy 详情树声明 noindex（配合上方注释，/knowledge-base/* 为唯一知识索引入口）
+      robots: { index: false, follow: true },
       openGraph: {
         title,
         description,
@@ -135,7 +151,7 @@ export default async function KnowledgeDetailPage({
   });
 
   return (
-    <div className="max-w-[820px] mx-auto px-4 sm:px-6 py-6 sm:py-10">
+    <PageContainer variant="content" paddingY={32}>
       <TrackOnMount
         event="content_view"
         targetId={content.id}
@@ -148,7 +164,7 @@ export default async function KnowledgeDetailPage({
         { name: '知识中心', url: absoluteUrl('/knowledge') },
         { name: content.title, url: absoluteUrl(`/knowledge/${slug}`) },
       ])} />
-      {/* Breadcrumb */}
+      {/* Breadcrumb — 846 §53: Home → Domain → Object */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-4 sm:mb-6 overflow-x-auto">
         <Link href="/" className="hover:text-primary transition-colors whitespace-nowrap">
           首页
@@ -161,114 +177,123 @@ export default async function KnowledgeDetailPage({
         <span className="text-foreground truncate max-w-[160px] sm:max-w-[240px]">{content.title}</span>
       </nav>
 
-      <article>
-        {/* Cover Image */}
-        {content.coverImage && (
-          <div className="mb-6 sm:mb-8 rounded-xl overflow-hidden">
-            <img
-              src={`/api/assets/${content.coverImage.id}/file`}
-              alt={content.coverImage.fileName ?? content.title}
-              className="w-full object-cover max-h-[400px]"
-            />
+      {/* 846 §49 — 1280 外层 + 主文 720–800 阅读栏 + 侧栏 */}
+      <div className="lg:flex lg:gap-8">
+        {/* Main reading column */}
+        <article className="flex-1 min-w-0 lg:max-w-[780px]">
+          {/* Cover Image */}
+          {content.coverImage && (
+            <div className="mb-6 sm:mb-8 rounded-xl overflow-hidden">
+              <img
+                src={`/api/assets/${content.coverImage.id}/file`}
+                alt={content.coverImage.fileName ?? content.title}
+                className="w-full object-cover max-h-[400px]"
+              />
+            </div>
+          )}
+
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground mb-4">
+            {content.title}
+          </h1>
+
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm text-slate-400 mb-6 sm:mb-8">
+            {content.author?.name && <span>{content.author.name}</span>}
+            {content.publishedAt && <span>发布于 {formatDate(content.publishedAt)}</span>}
+            {content.estimatedReadTime && <span>{content.estimatedReadTime} 分钟阅读</span>}
           </div>
-        )}
 
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-foreground mb-4">
-          {content.title}
-        </h1>
+          {content.summary && (
+            <p className="text-base text-slate-600 leading-relaxed mb-8 border-l-4 border-primary/30 pl-4">
+              {stripGovernanceLabels(content.summary)}
+            </p>
+          )}
 
-        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-sm text-slate-400 mb-6 sm:mb-8">
-          {content.author?.name && <span>{content.author.name}</span>}
-          {content.publishedAt && <span>发布于 {formatDate(content.publishedAt)}</span>}
-          {content.estimatedReadTime && <span>{content.estimatedReadTime} 分钟阅读</span>}
-        </div>
+          {/* Tag Chips */}
+          {content.tags && content.tags.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 mb-8">
+              <span className="text-xs text-slate-400 mr-1">标签：</span>
+              {content.tags.map(({ tag }) => (
+                <Link
+                  key={tag.id}
+                  href={`/tags/${tag.slug}`}
+                  className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+                >
+                  {tag.name}
+                </Link>
+              ))}
+            </div>
+          )}
 
-        {content.summary && (
-          <p className="text-base text-slate-600 leading-relaxed mb-8 border-l-4 border-primary/30 pl-4">
-            {content.summary}
-          </p>
-        )}
-
-        {/* Tag Chips */}
-        {content.tags && content.tags.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mb-8">
-            <span className="text-xs text-slate-400 mr-1">标签：</span>
-            {content.tags.map(({ tag }) => (
-              <Link
-                key={tag.id}
-                href={`/tags/${tag.slug}`}
-                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
-              >
-                {tag.name}
-              </Link>
-            ))}
+          {/* 正文 — 846：字号 16–18 / 行高 1.7–1.9 阅读优化（由 MarkdownRenderer class 承载） */}
+          <div className="mb-8">
+            <MarkdownRenderer content={stripGovernanceLabels(content.content)} />
           </div>
-        )}
 
-        <div className="mb-8">
-          <MarkdownRenderer content={content.content} />
-        </div>
+          <MediaGallery media={content.media} />
 
-        <MediaGallery media={content.media} />
-      </article>
+          {/* Commercial conversion — 主文底部 */}
+          <div className="mt-10 space-y-4">
+            <ContentProductCTA contextType="knowledge" />
+            <DemandCTA contextType="knowledge" targetLabel={content.title} />
+          </div>
 
-      {/* Engineering Discovery — unify Knowledge into the cross-surface discovery ecosystem
-          (related capability products / technical knowledge / solutions folded into one frame). */}
-      <RelevantEngineeringDiscovery
-        capabilityAnchor={content.title}
-        groups={[
-          {
-            label: '相关检测能力产品',
-            mono: 'PRODUCT',
-            items: relatedProducts.map((p) => ({
-              href: `/products/${p.id}`,
-              title: p.name,
-              sub: p.status === 'ACTIVE' ? '可用' : undefined,
-            })),
-            seeAllHref: '/products',
-          },
-          {
-            label: '相关技术知识',
-            mono: 'KNOWLEDGE',
-            items: otherKnowledge.map((k) => ({
-              href: `/knowledge/${k.slug}`,
-              title: k.title,
-            })),
-            seeAllHref: '/knowledge',
-          },
-          {
-            label: '相关解决方案',
-            mono: 'SOLUTION',
-            items: relatedSolutions.map((s) => ({
-              href: `/solutions/${s.slug}`,
-              title: s.title,
-            })),
-            seeAllHref: '/solutions',
-          },
-        ]}
-        nextActions={[
-          { href: '/search', label: '统一检索相关参数' },
-          { href: '/products/compare', label: '评估对比检测能力' },
-          { href: '/solutions', label: '继续查看解决方案' },
-        ]}
-      />
+          <div className="mt-10 pt-8 border-t border-slate-200">
+            <Link
+              href="/knowledge"
+              className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors"
+            >
+              <span>更多技术知识</span>
+              <span className="text-xs">&rarr;</span>
+            </Link>
+          </div>
+        </article>
 
-      {/* Commercial conversion — application / demand entry */}
-      <div className="mt-12 mb-8 space-y-4">
-        <ContentProductCTA contextType="knowledge" />
-        <DemandCTA contextType="knowledge" targetLabel={content.title} />
+        {/* Sidebar column 280–320px */}
+        <aside className="lg:w-[280px] lg:shrink-0 mt-10 lg:mt-0">
+          <RelevantEngineeringDiscovery
+            capabilityAnchor={content.title}
+            narrow
+            groups={[
+              {
+                label: '相关检测产品',
+                mono: 'PRODUCT',
+                items: relatedProducts.map((p) => ({
+                  href: `/products/${p.id}`,
+                  title: p.name,
+                  sub: p.status === 'ACTIVE' ? '可用' : undefined,
+                  fileAssetId: p.primaryMedia?.fileAssetId ?? null,
+                })),
+                seeAllHref: '/products',
+              },
+              {
+                label: '相关技术知识',
+                mono: 'KNOWLEDGE',
+                items: otherKnowledge.map((k) => ({
+                  href: `/knowledge/${k.slug}`,
+                  title: k.title,
+                  fileAssetId: contentCover(k),
+                })),
+                seeAllHref: '/knowledge',
+              },
+              {
+                label: '相关解决方案',
+                mono: 'SOLUTION',
+                items: relatedSolutions.map((s) => ({
+                  href: `/solutions/${s.slug}`,
+                  title: s.title,
+                  fileAssetId: contentCover(s),
+                })),
+                seeAllHref: '/solutions',
+              },
+            ]}
+            nextActions={[
+              { href: '/search', label: '统一检索相关参数' },
+              { href: '/products/compare', label: '评估对比检测能力' },
+              { href: '/solutions', label: '继续查看解决方案' },
+            ]}
+          />
+        </aside>
       </div>
-
-      {/* More from this type */}
-      <div className="mt-12 pt-8 border-t border-slate-200">
-        <Link
-          href="/knowledge"
-          className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors"
-        >
-          <span>更多技术知识</span>
-          <span className="text-xs">&rarr;</span>
-        </Link>
-      </div>
-    </div>
+    </PageContainer>
   );
 }

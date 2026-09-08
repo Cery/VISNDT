@@ -89,7 +89,7 @@ export default function KnowledgeEntryList() {
       width: 100,
       render: (status: string) => (
         <Tag color={STATUS_COLORS[status] ?? 'default'}>
-          {knowledgeLabels.status[status as keyof typeof knowledgeLabels.status] ?? status}
+          {knowledgeLabels.status[status as keyof typeof knowledgeLabels.status] ?? '未知状态'}
         </Tag>
       ),
     },

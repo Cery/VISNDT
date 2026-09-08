@@ -58,7 +58,7 @@ const STATUS_LABEL_MAP: Record<string, string> = {
 const USER_EXPORT_COLUMNS: ExportColumn<User>[] = [
   { key: 'email', title: '邮箱' },
   { key: 'name', title: '姓名', render: (item) => item.name || '' },
-  { key: 'status', title: '状态', render: (item) => STATUS_LABEL_MAP[item.status] || item.status },
+  { key: 'status', title: '状态', render: (item) => STATUS_LABEL_MAP[item.status] || '未知状态' },
   { key: 'createdAt', title: '创建时间', render: (item) => new Date(item.createdAt).toLocaleDateString() },
 ];
 
@@ -258,7 +258,7 @@ function UserList() {
       key: 'status',
       width: 120,
       render: (status: string) => (
-        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || status} />
+        <StatusTag status={status} label={STATUS_LABEL_MAP[status] || '未知状态'} />
       ),
     },
     {
