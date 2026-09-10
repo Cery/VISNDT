@@ -46,23 +46,23 @@ const FOOTER_SECTIONS = [
 
 export default function PublicFooter() {
   return (
-    <footer className="bg-industrial-dark mt-auto">
-      <div className="max-w-[1280px] mx-auto px-6 py-12">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-8">
+    <footer className="bg-[#161A1E] mt-auto">
+      <div className="max-w-[1180px] mx-auto px-7 py-12">
+        <div className="grid grid-cols-2 sm:grid-cols-3 xm:grid-cols-[1.4fr_repeat(4,1fr)] gap-8">
           {/* Brand Area — 仅品牌标识，减少公司宣传文案 */}
-          <div className="col-span-2 sm:col-span-3 lg:col-span-1">
+          <div className="col-span-2 sm:col-span-3 xm:col-span-1">
             <Link href="/" className="inline-block">
-              <span className="text-xl font-bold font-mono tracking-tight">
-                <span className="text-white">VIS</span>
-                <span className="bg-gradient-to-r from-primary to-industrial-cyan bg-clip-text text-transparent">NDT</span>
+              <span className="text-[19px] font-bold tracking-tight">
+                <span className="text-[#D8D3C6]">VIS</span>
+                <span className="text-blueprint-amber">NDT</span>
               </span>
             </Link>
-            <p className="text-sm text-slate-400 leading-relaxed mt-3">工业无损检测</p>
+            <p className="text-[13px] text-[#8B9198] leading-relaxed mt-3 max-w-[26em]">工业无损检测</p>
           </div>
 
           {FOOTER_SECTIONS.map((section) => (
             <div key={section.title}>
-              <h3 className="font-semibold text-sm mb-3 text-white">
+              <h3 className="font-semibold text-[13px] mb-3 text-[#D8D3C6]">
                 {section.title}
               </h3>
               <ul className="space-y-2">
@@ -70,7 +70,7 @@ export default function PublicFooter() {
                   <li key={`${section.title}-${link.href}-${link.label}`}>
                     <Link
                       href={link.href}
-                      className="text-sm text-slate-400 hover:text-white transition-colors"
+                      className="text-[13px] text-[#8B9198] hover:text-[#D8D3C6] transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -83,8 +83,8 @@ export default function PublicFooter() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-white/10">
-        <div className="max-w-[1280px] mx-auto px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-slate-400">
+      <div className="border-t border-[#2A3037]">
+        <div className="max-w-[1180px] mx-auto px-7 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-[12.5px] text-[#8B9198]">
           <p>&copy; {new Date().getFullYear()} VISNDT. 版权所有</p>
           <p>工业无损检测产品与技术方案平台</p>
         </div>

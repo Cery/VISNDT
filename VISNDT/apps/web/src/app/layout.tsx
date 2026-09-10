@@ -8,7 +8,7 @@ import ServiceWorkerRegistration from "@/components/pwa/ServiceWorkerRegistratio
 import { ToastViewport } from "@/components/common/Toast";
 import BackToTop from "@/components/common/BackToTop";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, SITE_KEYWORDS } from "@/lib/seo";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Noto_Sans_SC } from "next/font/google";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -21,6 +21,14 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   variable: "--font-jetbrains-mono",
+  display: "swap",
+});
+
+// 工业蓝图设计语言中文字体（align visndt_home_redesign.html：Noto Sans SC）
+const notoSansSC = Noto_Sans_SC({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "900"],
+  variable: "--font-noto-sans-sc",
   display: "swap",
 });
 
@@ -73,7 +81,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="zh-CN" className={`${inter.variable} ${jetbrainsMono.variable} font-sans`}>
+    <html lang="zh-CN" className={`${inter.variable} ${jetbrainsMono.variable} ${notoSansSC.variable} font-sans`}>
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
         <link rel="apple-touch-icon" href="/icons/icon-192.jpg" />

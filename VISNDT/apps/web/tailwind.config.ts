@@ -51,9 +51,29 @@ const config: Config = {
           dark: "hsl(var(--industrial-dark))",
           "dark-foreground": "hsl(var(--industrial-dark-foreground))",
         },
+        // 工业蓝图设计语言（首页 + 全局 Header/Footer），与 industrial 体系并存
+        blueprint: {
+          paper: "#ECE8DE",
+          "paper-2": "#E1DCCE",
+          graphite: "#1B1F24",
+          "graphite-2": "#262C33",
+          steel: "#3D4A56",
+          ink: "#20242A",
+          "ink-soft": "#565F68",
+          line: "#C9C2B0",
+          "line-dark": "#3A4149",
+          amber: "#CE8A2E",
+          "amber-deep": "#A96F1F",
+          verdigris: "#4F7A6E",
+          "verdigris-soft": "#DDE6E1",
+        },
+      },
+      screens: {
+        // 对齐设计稿断点（visndt_home_redesign.html）
+        xm: "860px",
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-noto-sans-sc)', 'var(--font-inter)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-jetbrains-mono)', 'monospace'],
       },
       boxShadow: {
@@ -75,6 +95,7 @@ const config: Config = {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        blueprint: "2px",
       },
     },
   },

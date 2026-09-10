@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
-import HomeDiscoveryLedge from '@/components/home/HomeDiscoveryLedge';
-import FeaturedProductsSection from '@/components/home/FeaturedProductsSection';
-import SolutionsSection from '@/components/home/SolutionsSection';
-import KnowledgeCenterSection from '@/components/home/KnowledgeCenterSection';
-import InquiryCTA from '@/components/home/InquiryCTA';
+import HomeHero from '@/components/home/HomeHero';
+import CategoryRegisterSection from '@/components/home/CategoryRegisterSection';
+import RecentProductsSection from '@/components/home/RecentProductsSection';
+import SolutionFlowSection from '@/components/home/SolutionFlowSection';
+import KnowledgeIndexSection from '@/components/home/KnowledgeIndexSection';
+import CTASection from '@/components/home/CTASection';
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, buildOrganizationJsonLd, buildWebSiteJsonLd, JsonLdScript } from '@/lib/seo';
 
 export const metadata: Metadata = {
@@ -27,13 +28,14 @@ export default function HomePage() {
     <>
       <JsonLdScript data={buildOrganizationJsonLd()} />
       <JsonLdScript data={buildWebSiteJsonLd()} />
-      {/* 846 §6.2 Final Section Order: Discovery → Featured Products → Solutions → Knowledge → Demand → Footer。
-          §71 CategorySection（完整分类墙）已从 Home 移除，完整分类收敛到 /categories。 */}
-      <HomeDiscoveryLedge />
-      <FeaturedProductsSection />
-      <SolutionsSection />
-      <KnowledgeCenterSection />
-      <InquiryCTA />
+      {/* 工业蓝图设计语言首页（1:1 复刻 visndt_home_redesign.html，真实数据驱动）：
+          Hero → 能力分类注册表 → 近期产品 → 方案流程/场景 → 知识索引 → CTA/Footer。 */}
+      <HomeHero />
+      <CategoryRegisterSection />
+      <RecentProductsSection />
+      <SolutionFlowSection />
+      <KnowledgeIndexSection />
+      <CTASection />
     </>
   );
 }

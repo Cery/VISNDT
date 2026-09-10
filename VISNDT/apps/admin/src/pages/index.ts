@@ -8,7 +8,6 @@ export { default as BusinessAnalytics } from './BusinessAnalytics';
 export { default as Login } from './Login';
 export { default as MatchingMonitor } from './MatchingMonitor';
 export { default as NotFound } from './NotFound';
-export { default as Placeholder } from './Placeholder';
 export { default as FoundationShowcase } from './FoundationShowcase';
 export { default as ProductCreate } from './ProductCreate';
 export { default as ProductDetail } from './ProductDetail';

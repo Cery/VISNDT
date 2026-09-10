@@ -111,10 +111,10 @@ export default function PublicHeader() {
       <div className="w-20 h-8 bg-slate-100 rounded-lg animate-pulse" />
     </div>
   ) : isAuthenticated && user ? (
-    <div className="flex items-center gap-2 flex-shrink-0">
+    <div className="flex items-center gap-3 flex-shrink-0">
       <Link
         href="/dashboard"
-        className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-primary to-industrial-cyan px-4 py-2 text-sm font-semibold text-white shadow-industrial-sm hover:opacity-90 transition-opacity"
+        className="inline-flex items-center gap-1.5 rounded-blueprint bg-blueprint-graphite px-4 py-2 text-sm font-semibold text-blueprint-paper border border-blueprint-line-dark hover:bg-blueprint-ink transition-colors"
       >
         工作台
         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -124,10 +124,10 @@ export default function PublicHeader() {
       <div className="relative">
         <button
           onClick={() => setUserMenuOpen(!userMenuOpen)}
-          className="flex items-center gap-2 px-2 py-2 text-sm font-medium text-slate-700 hover:text-foreground hover:bg-slate-50 rounded-lg transition-colors"
+          className="flex items-center gap-2 px-2 py-2 text-sm font-medium text-blueprint-ink hover:text-foreground hover:bg-blueprint-line/40 rounded-blueprint transition-colors"
           aria-label="用户菜单"
         >
-          <span className="w-7 h-7 bg-gradient-to-r from-primary to-industrial-cyan rounded-full flex items-center justify-center text-white text-xs font-bold">
+          <span className="w-7 h-7 bg-blueprint-amber text-blueprint-graphite rounded-full flex items-center justify-center text-xs font-bold">
             {user.name?.charAt(0) || user.email?.charAt(0) || '?'}
           </span>
           <span className="max-w-[110px] truncate hidden lg:inline">{user.name || user.email}</span>
@@ -165,13 +165,13 @@ export default function PublicHeader() {
     <div className="flex items-center gap-3 flex-shrink-0">
       <Link
         href="/login"
-        className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2"
+        className="text-sm font-medium text-blueprint-ink-soft hover:text-blueprint-ink transition-colors px-3 py-2"
       >
         登录
       </Link>
       <Link
         href="/register"
-        className="text-sm font-medium bg-gradient-to-r from-primary to-industrial-cyan text-white px-5 py-2.5 rounded-lg hover:opacity-90 transition-opacity shadow-industrial-sm"
+        className="text-sm font-semibold rounded-blueprint bg-blueprint-graphite text-blueprint-paper px-5 py-2.5 border border-blueprint-line-dark hover:bg-blueprint-ink transition-colors"
       >
         注册
       </Link>
@@ -179,20 +179,27 @@ export default function PublicHeader() {
   );
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-industrial-sm border-b border-slate-100">
+    <header className="sticky top-0 z-50 bg-blueprint-paper/95 backdrop-blur-sm border-b border-blueprint-line">
       <div className="w-full">
         {/* ===== TOP BAR（上层，粘性）：Logo · 搜索 · 登录/注册 · 汉堡 ===== */}
-        <div className="border-b border-slate-100">
+        <div className="border-b border-blueprint-line">
           <div className="max-w-[1200px] mx-auto flex h-16 items-center justify-between gap-2 px-4 sm:px-6">
-            {/* Logo — platform identity */}
-            <Link href="/" className="flex items-center gap-2 flex-shrink-0 group">
-              <span className="text-xl font-bold font-mono tracking-tight">
-                <span className="text-foreground">VIS</span>
-                <span className="bg-gradient-to-r from-primary to-industrial-cyan bg-clip-text text-transparent">NDT</span>
+            {/* Logo — platform identity（工业蓝图 mark，照搬设计稿） */}
+            <Link href="/" className="flex items-center gap-2.5 flex-shrink-0 group">
+              <svg className="w-[30px] h-[30px] shrink-0" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+                <rect x="1" y="1" width="28" height="28" stroke="#20242A" strokeWidth="1.4" />
+                <circle cx="15" cy="15" r="6" stroke="#CE8A2E" strokeWidth="1.4" />
+                <line x1="15" y1="1" x2="15" y2="7" stroke="#20242A" strokeWidth="1.2" />
+                <line x1="15" y1="23" x2="15" y2="29" stroke="#20242A" strokeWidth="1.2" />
+                <line x1="1" y1="15" x2="7" y2="15" stroke="#20242A" strokeWidth="1.2" />
+                <line x1="23" y1="15" x2="29" y2="15" stroke="#20242A" strokeWidth="1.2" />
+              </svg>
+              <span className="text-[19px] font-bold tracking-tight text-blueprint-ink">
+                VIS<span className="text-blueprint-amber-deep">NDT</span>
               </span>
               <span className="hidden lg:inline-flex flex-col leading-none">
-                <span className="text-xs text-slate-800 font-semibold tracking-wide">工业检测能力发现平台</span>
-                <span className="text-[10px] text-slate-400 tracking-widest mt-0.5">能力发现平台</span>
+                <span className="text-xs text-blueprint-ink font-semibold tracking-wide">工业检测能力发现平台</span>
+                <span className="text-[10px] text-blueprint-ink-soft tracking-widest mt-0.5">能力发现平台</span>
               </span>
             </Link>
 
@@ -249,13 +256,13 @@ export default function PublicHeader() {
 
         {/* ===== 移动端展开的搜索行（<lg 且打开时，仍随 sticky 头部显示） ===== */}
         {mobileSearchOpen && (
-          <div className="lg:hidden border-b border-slate-100 px-4 sm:px-6 py-2.5">
+          <div className="lg:hidden border-b border-blueprint-line px-4 sm:px-6 py-2.5">
             <GlobalSearchBar showTypeSelector={false} />
           </div>
         )}
 
-        {/* ===== NAV BAR（专门导航栏，粘性；深色独立条带，单级平铺，xl+ 内联，其余进抽屉） ===== */}
-        <nav className="hidden xl:block bg-slate-900 text-slate-200" aria-label="平台导航">
+        {/* ===== NAV BAR（专门导航栏，粘性；蓝图深色独立条带，单级平铺，xl+ 内联，其余进抽屉） ===== */}
+        <nav className="hidden xl:block bg-blueprint-graphite text-blueprint-paper" aria-label="平台导航">
           <div className="max-w-[1200px] mx-auto flex items-center gap-1 px-6 py-1.5">
             {NAV_ENTRIES.map((it) => {
               const href = resolveEntryHref(it, isAuthenticated);
@@ -264,14 +271,14 @@ export default function PublicHeader() {
                 <Link
                   key={it.label}
                   href={href}
-                  className={`relative flex items-center whitespace-nowrap px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                    active ? 'text-white' : 'text-slate-300 hover:text-white hover:bg-white/10'
+                  className={`relative flex items-center whitespace-nowrap px-3 py-2 text-sm font-medium rounded-blueprint transition-colors ${
+                    active ? 'text-white' : 'text-blueprint-paper/80 hover:text-white hover:bg-white/10'
                   }`}
                   aria-current={active ? 'page' : undefined}
                 >
                   {it.label}
                   {active && (
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-industrial-cyan rounded-full" />
+                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-blueprint-amber rounded-full" />
                   )}
                 </Link>
               );
@@ -304,15 +311,15 @@ export default function PublicHeader() {
                   href={href}
                   onClick={() => setMobileOpen(false)}
                   aria-current={active ? 'page' : undefined}
-                  className={`block rounded-md px-3 py-3 text-sm font-medium transition-colors ${
+                  className={`block rounded-blueprint px-3 py-3 text-sm font-medium transition-colors ${
                     active
-                      ? 'bg-primary/5 text-primary'
-                      : 'text-slate-700 hover:bg-slate-50'
+                      ? 'bg-blueprint-amber/10 text-blueprint-amber-deep'
+                      : 'text-blueprint-ink hover:bg-blueprint-line/40'
                   }`}
                 >
                   {it.label}
                   {it.guestHref || it.authHref ? (
-                    <span className="block text-xs font-normal text-slate-400 mt-0.5">
+                    <span className="block text-xs font-normal text-blueprint-ink-soft mt-0.5">
                       {resolveEntryDesc(it, isAuthenticated)}
                     </span>
                   ) : null}
@@ -323,16 +330,16 @@ export default function PublicHeader() {
         </nav>
         <div className="border-t border-border pt-4 mt-3 flex gap-3">
           {isLoading ? (
-            <div className="flex-1 h-10 bg-slate-100 rounded-lg animate-pulse" />
+            <div className="flex-1 h-10 bg-slate-100 rounded-blueprint animate-pulse" />
           ) : isAuthenticated && user ? (
             <>
-              <div className="flex-1 text-center text-sm font-medium text-slate-700 py-2.5 rounded-lg border bg-slate-50 truncate px-2">
+              <div className="flex-1 text-center text-sm font-medium text-blueprint-ink py-2.5 rounded-blueprint border border-blueprint-line bg-blueprint-paper truncate px-2">
                 {user.name || user.email}
               </div>
               <Link
                 href="/dashboard"
                 onClick={() => setMobileOpen(false)}
-                className="flex-1 text-center text-sm font-medium bg-gradient-to-r from-primary to-industrial-cyan text-white py-2.5 rounded-lg hover:opacity-90 transition-opacity"
+                className="flex-1 text-center text-sm font-medium rounded-blueprint bg-blueprint-graphite text-blueprint-paper py-2.5 border border-blueprint-line-dark hover:bg-blueprint-ink transition-colors"
               >
                 工作台
               </Link>
@@ -341,7 +348,7 @@ export default function PublicHeader() {
                   setMobileOpen(false);
                   handleLogout();
                 }}
-                className="flex-1 text-center text-sm font-medium text-red-600 py-2.5 rounded-lg border border-red-200 hover:bg-red-50 transition-colors"
+                className="flex-1 text-center text-sm font-medium text-red-600 py-2.5 rounded-blueprint border border-red-200 hover:bg-red-50 transition-colors"
               >
                 退出
               </button>
@@ -351,14 +358,14 @@ export default function PublicHeader() {
               <Link
                 href="/login"
                 onClick={() => setMobileOpen(false)}
-                className="flex-1 text-center text-sm font-medium text-muted-foreground hover:text-foreground py-2.5 rounded-lg border transition-colors"
+                className="flex-1 text-center text-sm font-medium text-blueprint-ink-soft hover:text-blueprint-ink py-2.5 rounded-blueprint border border-blueprint-line transition-colors"
               >
                 登录
               </Link>
               <Link
                 href="/register"
                 onClick={() => setMobileOpen(false)}
-                className="flex-1 text-center text-sm font-medium bg-gradient-to-r from-primary to-industrial-cyan text-white py-2.5 rounded-lg hover:opacity-90 transition-opacity"
+                className="flex-1 text-center text-sm font-medium rounded-blueprint bg-blueprint-graphite text-blueprint-paper py-2.5 border border-blueprint-line-dark hover:bg-blueprint-ink transition-colors"
               >
                 注册
               </Link>

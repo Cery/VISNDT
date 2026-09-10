@@ -1,0 +1,3270 @@
+﻿node_modules\.bin\jest.cmd : PASS test/e2e/workspace/workspace.e2e-spec.ts (7.694 s)
+At line:15 char:1141
++ ... size=4096"; node_modules\.bin\jest.cmd --config ./test/jest-e2e.json  ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (PASS test/e2e/w...ec.ts (7.694 s):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+FAIL test/e2e/matching/match-flow.e2e-spec.ts
+  ● Matching Engine E2E › Test 1: Basic Matching Flow › should publish demand and trigger matching
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:70:23
+
+      67   await prisma.workflowEvent.deleteMany({ where: { operatorId: existingUser.id } });
+      68   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+      69 }
+    → 70 await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:70:5)
+
+  ● Matching Engine E2E › Test 1: Basic Matching Flow › should publish demand and trigger matching
+
+    PrismaClientValidationError: 
+    Invalid `prisma.product.create()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:208:42
+
+      205     valueNumber?: number;
+      206   }>,
+      207 ): Promise<string> {
+    → 208   const product = await prisma.product.create({
+              data: {
+                name: "E2E_MATCH_Product_Basic",
+                status: "ACTIVE",
+                categoryId: undefined,
+                parameterValues: {
+                  create: [
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "直视",
+                      valueNumber: null
+                    },
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "4",
+                      valueNumber: 4
+                    }
+                  ]
+                },
+            +   category: {
+            +     create: ProductCategoryCreateWithoutProductsInput | ProductCategoryUncheckedCreateWithoutProductsInpu
+t,
+            +     connectOrCreate: ProductCategoryCreateOrConnectWithoutProductsInput,
+            +     connect: ProductCategoryWhereUniqueInput
+            +   }
+              }
+            })
+
+    Argument `category` is missing.
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at wn (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/librar
+y.js:29:1363)
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:6958)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at createProductWithParams (e2e/matching/match-flow.e2e-spec.ts:208:21)
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:282:19)
+
+  ● Matching Engine E2E › Test 1: Basic Matching Flow › should create DemandMatch with score 100
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:70:23
+
+      67   await prisma.workflowEvent.deleteMany({ where: { operatorId: existingUser.id } });
+      68   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+      69 }
+    → 70 await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:70:5)
+
+  ● Matching Engine E2E › Test 1: Basic Matching Flow › should create DemandMatch with score 100
+
+    PrismaClientValidationError: 
+    Invalid `prisma.product.create()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:208:42
+
+      205     valueNumber?: number;
+      206   }>,
+      207 ): Promise<string> {
+    → 208   const product = await prisma.product.create({
+              data: {
+                name: "E2E_MATCH_Product_Basic",
+                status: "ACTIVE",
+                categoryId: undefined,
+                parameterValues: {
+                  create: [
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "直视",
+                      valueNumber: null
+                    },
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "4",
+                      valueNumber: 4
+                    }
+                  ]
+                },
+            +   category: {
+            +     create: ProductCategoryCreateWithoutProductsInput | ProductCategoryUncheckedCreateWithoutProductsInpu
+t,
+            +     connectOrCreate: ProductCategoryCreateOrConnectWithoutProductsInput,
+            +     connect: ProductCategoryWhereUniqueInput
+            +   }
+              }
+            })
+
+    Argument `category` is missing.
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at wn (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/librar
+y.js:29:1363)
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:6958)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at createProductWithParams (e2e/matching/match-flow.e2e-spec.ts:208:21)
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:282:19)
+
+  ● Matching Engine E2E › Test 2: Required Parameter Failure › should publish but NOT create any match due to required 
+failure
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:70:23
+
+      67   await prisma.workflowEvent.deleteMany({ where: { operatorId: existingUser.id } });
+      68   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+      69 }
+    → 70 await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:70:5)
+
+  ● Matching Engine E2E › Test 2: Required Parameter Failure › should publish but NOT create any match due to required 
+failure
+
+    PrismaClientValidationError: 
+    Invalid `prisma.product.create()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:208:42
+
+      205     valueNumber?: number;
+      206   }>,
+      207 ): Promise<string> {
+    → 208   const product = await prisma.product.create({
+              data: {
+                name: "E2E_MATCH_Product_ReqFail",
+                status: "ACTIVE",
+                categoryId: undefined,
+                parameterValues: {
+                  create: [
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "4",
+                      valueNumber: 4
+                    }
+                  ]
+                },
+            +   category: {
+            +     create: ProductCategoryCreateWithoutProductsInput | ProductCategoryUncheckedCreateWithoutProductsInpu
+t,
+            +     connectOrCreate: ProductCategoryCreateOrConnectWithoutProductsInput,
+            +     connect: ProductCategoryWhereUniqueInput
+            +   }
+              }
+            })
+
+    Argument `category` is missing.
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at wn (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/librar
+y.js:29:1363)
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:6958)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at createProductWithParams (e2e/matching/match-flow.e2e-spec.ts:208:21)
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:340:19)
+
+  ● Matching Engine E2E › Test 3: MIN_MATCH_SCORE Filtering › should NOT create match when score < 40
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:70:23
+
+      67   await prisma.workflowEvent.deleteMany({ where: { operatorId: existingUser.id } });
+      68   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+      69 }
+    → 70 await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:70:5)
+
+  ● Matching Engine E2E › Test 3: MIN_MATCH_SCORE Filtering › should NOT create match when score < 40
+
+    PrismaClientValidationError: 
+    Invalid `prisma.product.create()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:208:42
+
+      205     valueNumber?: number;
+      206   }>,
+      207 ): Promise<string> {
+    → 208   const product = await prisma.product.create({
+              data: {
+                name: "E2E_MATCH_Product_LowScore",
+                status: "ACTIVE",
+                categoryId: undefined,
+                parameterValues: {
+                  create: [
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "直视",
+                      valueNumber: null
+                    }
+                  ]
+                },
+            +   category: {
+            +     create: ProductCategoryCreateWithoutProductsInput | ProductCategoryUncheckedCreateWithoutProductsInpu
+t,
+            +     connectOrCreate: ProductCategoryCreateOrConnectWithoutProductsInput,
+            +     connect: ProductCategoryWhereUniqueInput
+            +   }
+              }
+            })
+
+    Argument `category` is missing.
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at wn (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/librar
+y.js:29:1363)
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:6958)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at createProductWithParams (e2e/matching/match-flow.e2e-spec.ts:208:21)
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:384:19)
+
+  ● Matching Engine E2E › Test 4: matchDetails Verification › should create match with valid matchDetails JSON
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:70:23
+
+      67   await prisma.workflowEvent.deleteMany({ where: { operatorId: existingUser.id } });
+      68   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+      69 }
+    → 70 await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:70:5)
+
+  ● Matching Engine E2E › Test 4: matchDetails Verification › should create match with valid matchDetails JSON
+
+    PrismaClientValidationError: 
+    Invalid `prisma.product.create()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:208:42
+
+      205     valueNumber?: number;
+      206   }>,
+      207 ): Promise<string> {
+    → 208   const product = await prisma.product.create({
+              data: {
+                name: "E2E_MATCH_Product_Details",
+                status: "ACTIVE",
+                categoryId: undefined,
+                parameterValues: {
+                  create: [
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "直视",
+                      valueNumber: null
+                    },
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "5",
+                      valueNumber: 5
+                    },
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "1920",
+                      valueNumber: 1920
+                    }
+                  ]
+                },
+            +   category: {
+            +     create: ProductCategoryCreateWithoutProductsInput | ProductCategoryUncheckedCreateWithoutProductsInpu
+t,
+            +     connectOrCreate: ProductCategoryCreateOrConnectWithoutProductsInput,
+            +     connect: ProductCategoryWhereUniqueInput
+            +   }
+              }
+            })
+
+    Argument `category` is missing.
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at wn (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/librar
+y.js:29:1363)
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:6958)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at createProductWithParams (e2e/matching/match-flow.e2e-spec.ts:208:21)
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:426:19)
+
+  ● Matching Engine E2E › Test 4: matchDetails Verification › should have matchScore = 100 (all params matched)
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:70:23
+
+      67   await prisma.workflowEvent.deleteMany({ where: { operatorId: existingUser.id } });
+      68   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+      69 }
+    → 70 await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:70:5)
+
+  ● Matching Engine E2E › Test 4: matchDetails Verification › should have matchScore = 100 (all params matched)
+
+    PrismaClientValidationError: 
+    Invalid `prisma.product.create()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:208:42
+
+      205     valueNumber?: number;
+      206   }>,
+      207 ): Promise<string> {
+    → 208   const product = await prisma.product.create({
+              data: {
+                name: "E2E_MATCH_Product_Details",
+                status: "ACTIVE",
+                categoryId: undefined,
+                parameterValues: {
+                  create: [
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "直视",
+                      valueNumber: null
+                    },
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "5",
+                      valueNumber: 5
+                    },
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "1920",
+                      valueNumber: 1920
+                    }
+                  ]
+                },
+            +   category: {
+            +     create: ProductCategoryCreateWithoutProductsInput | ProductCategoryUncheckedCreateWithoutProductsInpu
+t,
+            +     connectOrCreate: ProductCategoryCreateOrConnectWithoutProductsInput,
+            +     connect: ProductCategoryWhereUniqueInput
+            +   }
+              }
+            })
+
+    Argument `category` is missing.
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at wn (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/librar
+y.js:29:1363)
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:6958)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at createProductWithParams (e2e/matching/match-flow.e2e-spec.ts:208:21)
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:426:19)
+
+  ● Matching Engine E2E › Test 5: UPSERT Idempotency › should create initial match via publish
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:70:23
+
+      67   await prisma.workflowEvent.deleteMany({ where: { operatorId: existingUser.id } });
+      68   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+      69 }
+    → 70 await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:70:5)
+
+  ● Matching Engine E2E › Test 5: UPSERT Idempotency › should create initial match via publish
+
+    PrismaClientValidationError: 
+    Invalid `prisma.product.create()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:208:42
+
+      205     valueNumber?: number;
+      206   }>,
+      207 ): Promise<string> {
+    → 208   const product = await prisma.product.create({
+              data: {
+                name: "E2E_MATCH_Product_Upsert",
+                status: "ACTIVE",
+                categoryId: undefined,
+                parameterValues: {
+                  create: [
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "直视",
+                      valueNumber: null
+                    },
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "4",
+                      valueNumber: 4
+                    }
+                  ]
+                },
+            +   category: {
+            +     create: ProductCategoryCreateWithoutProductsInput | ProductCategoryUncheckedCreateWithoutProductsInpu
+t,
+            +     connectOrCreate: ProductCategoryCreateOrConnectWithoutProductsInput,
+            +     connect: ProductCategoryWhereUniqueInput
+            +   }
+              }
+            })
+
+    Argument `category` is missing.
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at wn (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/librar
+y.js:29:1363)
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:6958)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at createProductWithParams (e2e/matching/match-flow.e2e-spec.ts:208:21)
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:522:19)
+
+  ● Matching Engine E2E › Test 5: UPSERT Idempotency › should NOT create duplicate matches on re-run
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:70:23
+
+      67   await prisma.workflowEvent.deleteMany({ where: { operatorId: existingUser.id } });
+      68   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+      69 }
+    → 70 await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:70:5)
+
+  ● Matching Engine E2E › Test 5: UPSERT Idempotency › should NOT create duplicate matches on re-run
+
+    PrismaClientValidationError: 
+    Invalid `prisma.product.create()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:208:42
+
+      205     valueNumber?: number;
+      206   }>,
+      207 ): Promise<string> {
+    → 208   const product = await prisma.product.create({
+              data: {
+                name: "E2E_MATCH_Product_Upsert",
+                status: "ACTIVE",
+                categoryId: undefined,
+                parameterValues: {
+                  create: [
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "直视",
+                      valueNumber: null
+                    },
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "4",
+                      valueNumber: 4
+                    }
+                  ]
+                },
+            +   category: {
+            +     create: ProductCategoryCreateWithoutProductsInput | ProductCategoryUncheckedCreateWithoutProductsInpu
+t,
+            +     connectOrCreate: ProductCategoryCreateOrConnectWithoutProductsInput,
+            +     connect: ProductCategoryWhereUniqueInput
+            +   }
+              }
+            })
+
+    Argument `category` is missing.
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at wn (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/librar
+y.js:29:1363)
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:6958)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at createProductWithParams (e2e/matching/match-flow.e2e-spec.ts:208:21)
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:522:19)
+
+  ● Matching Engine E2E › Test 5: UPSERT Idempotency › should update matchScore on re-run (upsert)
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:70:23
+
+      67   await prisma.workflowEvent.deleteMany({ where: { operatorId: existingUser.id } });
+      68   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+      69 }
+    → 70 await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:70:5)
+
+  ● Matching Engine E2E › Test 5: UPSERT Idempotency › should update matchScore on re-run (upsert)
+
+    PrismaClientValidationError: 
+    Invalid `prisma.product.create()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:208:42
+
+      205     valueNumber?: number;
+      206   }>,
+      207 ): Promise<string> {
+    → 208   const product = await prisma.product.create({
+              data: {
+                name: "E2E_MATCH_Product_Upsert",
+                status: "ACTIVE",
+                categoryId: undefined,
+                parameterValues: {
+                  create: [
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "直视",
+                      valueNumber: null
+                    },
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "4",
+                      valueNumber: 4
+                    }
+                  ]
+                },
+            +   category: {
+            +     create: ProductCategoryCreateWithoutProductsInput | ProductCategoryUncheckedCreateWithoutProductsInpu
+t,
+            +     connectOrCreate: ProductCategoryCreateOrConnectWithoutProductsInput,
+            +     connect: ProductCategoryWhereUniqueInput
+            +   }
+              }
+            })
+
+    Argument `category` is missing.
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at wn (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/librar
+y.js:29:1363)
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:6958)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at createProductWithParams (e2e/matching/match-flow.e2e-spec.ts:208:21)
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:522:19)
+
+  ● Matching Engine E2E › Test 6: Performance Baseline (100 products) › should match 100 products within acceptable tim
+e
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:70:23
+
+      67   await prisma.workflowEvent.deleteMany({ where: { operatorId: existingUser.id } });
+      68   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+      69 }
+    → 70 await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:70:5)
+
+  ● Matching Engine E2E › Test 6: Performance Baseline (100 products) › should match 100 products within acceptable tim
+e
+
+    PrismaClientValidationError: 
+    Invalid `prisma.product.create()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\match-flow.e2e-spec.ts:208:42
+
+      205     valueNumber?: number;
+      206   }>,
+      207 ): Promise<string> {
+    → 208   const product = await prisma.product.create({
+              data: {
+                name: "E2E_MATCH_Perf_Product_1",
+                status: "ACTIVE",
+                categoryId: undefined,
+                parameterValues: {
+                  create: [
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "直视",
+                      valueNumber: null
+                    },
+                    {
+                      parameterDefinitionId: undefined,
+                      value: "5",
+                      valueNumber: 5
+                    }
+                  ]
+                },
+            +   category: {
+            +     create: ProductCategoryCreateWithoutProductsInput | ProductCategoryUncheckedCreateWithoutProductsInpu
+t,
+            +     connectOrCreate: ProductCategoryCreateOrConnectWithoutProductsInput,
+            +     connect: ProductCategoryWhereUniqueInput
+            +   }
+              }
+            })
+
+    Argument `category` is missing.
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at wn (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/librar
+y.js:29:1363)
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:6958)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at createProductWithParams (e2e/matching/match-flow.e2e-spec.ts:208:21)
+          at async Promise.all (index 0)
+      at Object.<anonymous> (e2e/matching/match-flow.e2e-spec.ts:599:21)
+
+FAIL test/e2e/auth/auth-invitation.e2e-spec.ts
+  ● Console
+
+    console.warn
+      Cleanup warning: 
+      Invalid `prisma.user.deleteMany()` invocation in
+      F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\auth\auth-invitation.e2e-spec.ts:138:25
+      
+        135 await prisma.organizationMember.deleteMany({
+        136   where: { organization: { name: { startsWith: TEST_PREFIX } } },
+        137 });
+      → 138 await prisma.user.deleteMany(
+      Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 143 |[39m       })[33m;[39m
+     [90m 144 |[39m     } [36mcatch[39m (e) {
+    [31m[1m>[22m[39m[90m 145 |[39m       console[33m.[39mwarn([32m'Cleanup warning:'[39m[33m,[39m (e [36ma
+s[39m [33mError[39m)[33m.[39mmessage)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 146 |[39m     }
+     [90m 147 |[39m     [36mawait[39m app[33m.[39mclose()[33m;[39m
+     [90m 148 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> (e2e/auth/auth-invitation.e2e-spec.ts:145:15)
+
+  ● Auth Invitation E2E › Case 1: Register without invitation token › should return 401 for registration without invite
+Token
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\auth\auth-invitation.e2e-spec.ts:57:25
+
+      54 });
+      55 if (existingUser) {
+      56   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+    → 57   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/auth/auth-invitation.e2e-spec.ts:57:7)
+
+  ● Auth Invitation E2E › Case 2: Register with valid invitation token › should return 201 Created
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\auth\auth-invitation.e2e-spec.ts:57:25
+
+      54 });
+      55 if (existingUser) {
+      56   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+    → 57   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/auth/auth-invitation.e2e-spec.ts:57:7)
+
+  ● Auth Invitation E2E › Case 2: Register with valid invitation token › should return accessToken
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\auth\auth-invitation.e2e-spec.ts:57:25
+
+      54 });
+      55 if (existingUser) {
+      56   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+    → 57   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/auth/auth-invitation.e2e-spec.ts:57:7)
+
+  ● Auth Invitation E2E › Case 2: Register with valid invitation token › should return user with organizationId
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\auth\auth-invitation.e2e-spec.ts:57:25
+
+      54 });
+      55 if (existingUser) {
+      56   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+    → 57   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/auth/auth-invitation.e2e-spec.ts:57:7)
+
+  ● Auth Invitation E2E › Case 2: Register with valid invitation token › should create OrganizationMember record
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\auth\auth-invitation.e2e-spec.ts:57:25
+
+      54 });
+      55 if (existingUser) {
+      56   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+    → 57   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/auth/auth-invitation.e2e-spec.ts:57:7)
+
+  ● Auth Invitation E2E › Case 3: Register with duplicate token › should return 401 for used token
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\auth\auth-invitation.e2e-spec.ts:57:25
+
+      54 });
+      55 if (existingUser) {
+      56   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+    → 57   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/auth/auth-invitation.e2e-spec.ts:57:7)
+
+  ● Auth Invitation E2E › Case 4: Register with expired token › should return 401 for expired token
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\auth\auth-invitation.e2e-spec.ts:57:25
+
+      54 });
+      55 if (existingUser) {
+      56   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+    → 57   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/auth/auth-invitation.e2e-spec.ts:57:7)
+
+  ● Auth Invitation E2E › Case 5: Login works › should login with registered user
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\auth\auth-invitation.e2e-spec.ts:57:25
+
+      54 });
+      55 if (existingUser) {
+      56   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+    → 57   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/auth/auth-invitation.e2e-spec.ts:57:7)
+
+  ● Auth Invitation E2E › Case 6: Create invitation › should return 201 for admin creating invitation
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\auth\auth-invitation.e2e-spec.ts:57:25
+
+      54 });
+      55 if (existingUser) {
+      56   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+    → 57   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/auth/auth-invitation.e2e-spec.ts:57:7)
+
+  ● Auth Invitation E2E › Case 6: Create invitation › should return 401 for unauthenticated request
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\auth\auth-invitation.e2e-spec.ts:57:25
+
+      54 });
+      55 if (existingUser) {
+      56   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+    → 57   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/auth/auth-invitation.e2e-spec.ts:57:7)
+
+FAIL test/e2e/users/users-security.e2e-spec.ts
+  ● Console
+
+    console.warn
+      Cleanup warning: 
+      Invalid `prisma.organization.deleteMany()` invocation in
+      F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\users\users-security.e2e-spec.ts:137:33
+      
+        134   }
+        135 }
+        136 await prisma.user.deleteMany({ where: { id: { in: [adminId, memberId, otherUserId].filter(Boolean) } } });
+      → 137 await prisma.organization.deleteMany(
+      Foreign key constraint violated: `organization_member_organization_id_fkey (index)`
+
+    [0m [90m 137 |[39m       [36mawait[39m prisma[33m.[39morganization[33m.[39mdeleteMany({ where[33m:[39m {
+ id[33m:[39m orgId } })[33m;[39m
+     [90m 138 |[39m     } [36mcatch[39m (e) {
+    [31m[1m>[22m[39m[90m 139 |[39m       console[33m.[39mwarn([32m'Cleanup warning:'[39m[33m,[39m (e [36ma
+s[39m [33mError[39m)[33m.[39mmessage)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 140 |[39m     }
+     [90m 141 |[39m     [36mawait[39m app[33m.[39mclose()[33m;[39m
+     [90m 142 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> (e2e/users/users-security.e2e-spec.ts:139:15)
+
+  ● Users Controller Security E2E › Case 1: Unauthenticated requests › GET /users should return 401 without token
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\users\users-security.e2e-spec.ts:56:27
+
+      53 if (existing) {
+      54   await prisma.workflowEvent.deleteMany({ where: { operatorId: existing.id } });
+      55   await prisma.organizationMember.deleteMany({ where: { userId: existing.id } });
+    → 56   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/users/users-security.e2e-spec.ts:56:9)
+
+  ● Users Controller Security E2E › Case 1: Unauthenticated requests › GET /users/:id should return 401 without token
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\users\users-security.e2e-spec.ts:56:27
+
+      53 if (existing) {
+      54   await prisma.workflowEvent.deleteMany({ where: { operatorId: existing.id } });
+      55   await prisma.organizationMember.deleteMany({ where: { userId: existing.id } });
+    → 56   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/users/users-security.e2e-spec.ts:56:9)
+
+  ● Users Controller Security E2E › Case 1: Unauthenticated requests › POST /users should return 401 without token
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\users\users-security.e2e-spec.ts:56:27
+
+      53 if (existing) {
+      54   await prisma.workflowEvent.deleteMany({ where: { operatorId: existing.id } });
+      55   await prisma.organizationMember.deleteMany({ where: { userId: existing.id } });
+    → 56   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/users/users-security.e2e-spec.ts:56:9)
+
+  ● Users Controller Security E2E › Case 1: Unauthenticated requests › PATCH /users/:id should return 401 without token
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\users\users-security.e2e-spec.ts:56:27
+
+      53 if (existing) {
+      54   await prisma.workflowEvent.deleteMany({ where: { operatorId: existing.id } });
+      55   await prisma.organizationMember.deleteMany({ where: { userId: existing.id } });
+    → 56   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/users/users-security.e2e-spec.ts:56:9)
+
+  ● Users Controller Security E2E › Case 2: Authenticated user — own data › GET /users/:id (self) should return 200
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\users\users-security.e2e-spec.ts:56:27
+
+      53 if (existing) {
+      54   await prisma.workflowEvent.deleteMany({ where: { operatorId: existing.id } });
+      55   await prisma.organizationMember.deleteMany({ where: { userId: existing.id } });
+    → 56   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/users/users-security.e2e-spec.ts:56:9)
+
+  ● Users Controller Security E2E › Case 2: Authenticated user — own data › PATCH /users/:id (self) should return 200
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\users\users-security.e2e-spec.ts:56:27
+
+      53 if (existing) {
+      54   await prisma.workflowEvent.deleteMany({ where: { operatorId: existing.id } });
+      55   await prisma.organizationMember.deleteMany({ where: { userId: existing.id } });
+    → 56   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/users/users-security.e2e-spec.ts:56:9)
+
+  ● Users Controller Security E2E › Case 3: Cross-user access rejected › GET /users/:id (other user) should return 403
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\users\users-security.e2e-spec.ts:56:27
+
+      53 if (existing) {
+      54   await prisma.workflowEvent.deleteMany({ where: { operatorId: existing.id } });
+      55   await prisma.organizationMember.deleteMany({ where: { userId: existing.id } });
+    → 56   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/users/users-security.e2e-spec.ts:56:9)
+
+  ● Users Controller Security E2E › Case 3: Cross-user access rejected › PATCH /users/:id (other user) should return 40
+3
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\users\users-security.e2e-spec.ts:56:27
+
+      53 if (existing) {
+      54   await prisma.workflowEvent.deleteMany({ where: { operatorId: existing.id } });
+      55   await prisma.organizationMember.deleteMany({ where: { userId: existing.id } });
+    → 56   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/users/users-security.e2e-spec.ts:56:9)
+
+  ● Users Controller Security E2E › Case 4: ADMIN access › GET /users should return 200 for ADMIN
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\users\users-security.e2e-spec.ts:56:27
+
+      53 if (existing) {
+      54   await prisma.workflowEvent.deleteMany({ where: { operatorId: existing.id } });
+      55   await prisma.organizationMember.deleteMany({ where: { userId: existing.id } });
+    → 56   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/users/users-security.e2e-spec.ts:56:9)
+
+  ● Users Controller Security E2E › Case 4: ADMIN access › GET /users/:id (other) should return 200 for ADMIN
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\users\users-security.e2e-spec.ts:56:27
+
+      53 if (existing) {
+      54   await prisma.workflowEvent.deleteMany({ where: { operatorId: existing.id } });
+      55   await prisma.organizationMember.deleteMany({ where: { userId: existing.id } });
+    → 56   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/users/users-security.e2e-spec.ts:56:9)
+
+  ● Users Controller Security E2E › Case 4: ADMIN access › POST /users should return 201 for ADMIN
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\users\users-security.e2e-spec.ts:56:27
+
+      53 if (existing) {
+      54   await prisma.workflowEvent.deleteMany({ where: { operatorId: existing.id } });
+      55   await prisma.organizationMember.deleteMany({ where: { userId: existing.id } });
+    → 56   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/users/users-security.e2e-spec.ts:56:9)
+
+  ● Users Controller Security E2E › Case 5: Non-admin list all users → 403 › GET /users should return 403 for MEMBER
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\users\users-security.e2e-spec.ts:56:27
+
+      53 if (existing) {
+      54   await prisma.workflowEvent.deleteMany({ where: { operatorId: existing.id } });
+      55   await prisma.organizationMember.deleteMany({ where: { userId: existing.id } });
+    → 56   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/users/users-security.e2e-spec.ts:56:9)
+
+  ● Users Controller Security E2E › Case 5: Non-admin list all users → 403 › POST /users should return 403 for MEMBER
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\users\users-security.e2e-spec.ts:56:27
+
+      53 if (existing) {
+      54   await prisma.workflowEvent.deleteMany({ where: { operatorId: existing.id } });
+      55   await prisma.organizationMember.deleteMany({ where: { userId: existing.id } });
+    → 56   await prisma.user.deleteMany(
+    Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/users/users-security.e2e-spec.ts:56:9)
+
+PASS test/e2e/rfq/rfq-response-decision.e2e-spec.ts
+FAIL test/e2e/matching/performance-benchmark.e2e-spec.ts
+  ● Console
+
+    console.log
+      [Benchmark] Creating 1000 products...
+
+      at Object.<anonymous> (e2e/matching/performance-benchmark.e2e-spec.ts:274:15)
+
+    console.log
+      [Benchmark] Creating 10 categories...
+
+      at Object.<anonymous> (e2e/matching/performance-benchmark.e2e-spec.ts:330:15)
+
+  ● Matching Performance Benchmark › Case 1: 1000 Products — No Category › should match 1000 products under 5 seconds
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\performance-benchmark.e2e-spec.ts:58:23
+
+      55   await prisma.workflowEvent.deleteMany({ where: { operatorId: existingUser.id } });
+      56   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+      57 }
+    → 58 await prisma.user.deleteMany(
+    Foreign key constraint violated: `demand_created_by_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/performance-benchmark.e2e-spec.ts:58:5)
+
+  ● Matching Performance Benchmark › Case 1: 1000 Products — No Category › should match 1000 products under 5 seconds
+
+    PrismaClientValidationError: 
+    Invalid `prisma.product.create()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\performance-benchmark.e2e-spec.ts:192:46
+
+      189 for (let batch = 0; batch < count; batch += batchSize) {
+      190   const end = Math.min(batch + batchSize, count);
+      191   const batchPromises = productData.slice(batch, end).map(async (p) => {
+    → 192     const product = await prisma.product.create({
+                data: {
+                  id: undefined,
+                  name: "E2E_BM_P1K_1",
+                  status: "ACTIVE",
+                  categoryId: undefined,
+              +   category: {
+              +     create: ProductCategoryCreateWithoutProductsInput | ProductCategoryUncheckedCreateWithoutProductsIn
+put,
+              +     connectOrCreate: ProductCategoryCreateOrConnectWithoutProductsInput,
+              +     connect: ProductCategoryWhereUniqueInput
+              +   }
+                }
+              })
+
+    Argument `category` is missing.
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at wn (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/librar
+y.js:29:1363)
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:6958)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at e2e/matching/performance-benchmark.e2e-spec.ts:192:25
+          at async Promise.all (index 0)
+      at bulkCreateProducts (e2e/matching/performance-benchmark.e2e-spec.ts:195:19)
+      at Object.<anonymous> (e2e/matching/performance-benchmark.e2e-spec.ts:277:20)
+
+  ● Matching Performance Benchmark › Case 2: 10K Products — Category Filter › should filter by category and reduce cand
+idates ~10x
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\performance-benchmark.e2e-spec.ts:58:23
+
+      55   await prisma.workflowEvent.deleteMany({ where: { operatorId: existingUser.id } });
+      56   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+      57 }
+    → 58 await prisma.user.deleteMany(
+    Foreign key constraint violated: `demand_created_by_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/performance-benchmark.e2e-spec.ts:58:5)
+
+  ● Matching Performance Benchmark › Case 2: 10K Products — Category Filter › should filter by category and reduce cand
+idates ~10x
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.productCategory.create()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\performance-benchmark.e2e-spec.ts:332:50
+
+      329 // Create 10 categories
+      330 console.log('[Benchmark] Creating 10 categories...');
+      331 for (let i = 0; i < 10; i++) {
+    → 332   const cat = await prisma.productCategory.create(
+    Unique constraint failed on the fields: (`slug`)
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/performance-benchmark.e2e-spec.ts:332:21)
+
+  ● Matching Performance Benchmark › Case 3: Rematch Performance › should measure initial match vs rematch performance
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\performance-benchmark.e2e-spec.ts:58:23
+
+      55   await prisma.workflowEvent.deleteMany({ where: { operatorId: existingUser.id } });
+      56   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+      57 }
+    → 58 await prisma.user.deleteMany(
+    Foreign key constraint violated: `demand_created_by_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/performance-benchmark.e2e-spec.ts:58:5)
+
+  ● Matching Performance Benchmark › Case 3: Rematch Performance › should measure initial match vs rematch performance
+
+    PrismaClientValidationError: 
+    Invalid `prisma.product.create()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\performance-benchmark.e2e-spec.ts:192:46
+
+      189 for (let batch = 0; batch < count; batch += batchSize) {
+      190   const end = Math.min(batch + batchSize, count);
+      191   const batchPromises = productData.slice(batch, end).map(async (p) => {
+    → 192     const product = await prisma.product.create({
+                data: {
+                  id: undefined,
+                  name: "E2E_BM_P_RM_1",
+                  status: "ACTIVE",
+                  categoryId: undefined,
+              +   category: {
+              +     create: ProductCategoryCreateWithoutProductsInput | ProductCategoryUncheckedCreateWithoutProductsIn
+put,
+              +     connectOrCreate: ProductCategoryCreateOrConnectWithoutProductsInput,
+              +     connect: ProductCategoryWhereUniqueInput
+              +   }
+                }
+              })
+
+    Argument `category` is missing.
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at wn (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/librar
+y.js:29:1363)
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:6958)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at e2e/matching/performance-benchmark.e2e-spec.ts:192:25
+          at async Promise.all (index 0)
+      at bulkCreateProducts (e2e/matching/performance-benchmark.e2e-spec.ts:195:19)
+      at Object.<anonymous> (e2e/matching/performance-benchmark.e2e-spec.ts:412:20)
+
+  ● Matching Performance Benchmark › Case 4: Parameter Complexity (5/10/20 params) › should score with 5 parameters
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\performance-benchmark.e2e-spec.ts:58:23
+
+      55   await prisma.workflowEvent.deleteMany({ where: { operatorId: existingUser.id } });
+      56   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+      57 }
+    → 58 await prisma.user.deleteMany(
+    Foreign key constraint violated: `demand_created_by_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/performance-benchmark.e2e-spec.ts:58:5)
+
+  ● Matching Performance Benchmark › Case 4: Parameter Complexity (5/10/20 params) › should score with 5 parameters
+
+    PrismaClientValidationError: 
+    Invalid `prisma.product.create()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\performance-benchmark.e2e-spec.ts:491:44
+
+      488 }
+      489 
+      490 // Create one product with values for all 20 params
+    → 491 const product = await prisma.product.create({
+            data: {
+              name: "E2E_BM_Product_Complex",
+              status: "ACTIVE",
+              categoryId: undefined,
+              parameterValues: {
+                create: [
+                  {
+                    parameterDefinitionId: "9cea76ef-4d81-4ba9-a4d1-ccff2cd07d3e",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "7c04fd6d-3c86-4634-a1a3-dba42c75c96d",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "e366a5ef-7591-40d2-b14e-8d727f4844e7",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "6e39176d-5134-4031-8c97-ed6d9285f8d3",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a5fcc5a2-a838-4837-b290-7a1ceadb1c03",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "22b2ea5b-b34d-471b-8037-680ff7429fce",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "f8c1687c-e5e0-44b0-ac02-de9d60153d83",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "792f888b-dbae-42df-8911-11f4fefa0093",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a96c2dc7-f6ff-46e9-84c7-ad8f77a6cda0",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a6cac445-f774-4ad3-87f2-ce47510e71e1",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "248384ee-2c75-4b06-89a1-298cfcf689f7",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "0e9864f1-01df-452a-bf3e-13c5ed3cea84",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "f96b6278-f35b-42c9-9f3f-31d945e43fd0",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "4bf89490-7e2a-401f-a2ed-155674797a3b",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a5bb8408-7e28-492b-a498-ac4c936f2427",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "610f043d-17ee-456b-b996-aa60557f6627",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a325095a-8009-4f33-beb7-07ed59a744bf",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "38b1a67b-fa05-4810-adbd-402754747364",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "f8167163-709b-41ef-84d6-4d8af9e24c70",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "132b129a-1b0d-4b62-a5f7-d89a3addb8c6",
+                    value: "50",
+                    valueNumber: 50
+                  }
+                ]
+              },
+          +   category: {
+          +     create: ProductCategoryCreateWithoutProductsInput | ProductCategoryUncheckedCreateWithoutProductsInput,
+          +     connectOrCreate: ProductCategoryCreateOrConnectWithoutProductsInput,
+          +     connect: ProductCategoryWhereUniqueInput
+          +   }
+            }
+          })
+
+    Argument `category` is missing.
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at wn (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/librar
+y.js:29:1363)
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:6958)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/performance-benchmark.e2e-spec.ts:491:23)
+
+  ● Matching Performance Benchmark › Case 4: Parameter Complexity (5/10/20 params) › should score with 10 parameters
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\performance-benchmark.e2e-spec.ts:58:23
+
+      55   await prisma.workflowEvent.deleteMany({ where: { operatorId: existingUser.id } });
+      56   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+      57 }
+    → 58 await prisma.user.deleteMany(
+    Foreign key constraint violated: `demand_created_by_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/performance-benchmark.e2e-spec.ts:58:5)
+
+  ● Matching Performance Benchmark › Case 4: Parameter Complexity (5/10/20 params) › should score with 10 parameters
+
+    PrismaClientValidationError: 
+    Invalid `prisma.product.create()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\performance-benchmark.e2e-spec.ts:491:44
+
+      488 }
+      489 
+      490 // Create one product with values for all 20 params
+    → 491 const product = await prisma.product.create({
+            data: {
+              name: "E2E_BM_Product_Complex",
+              status: "ACTIVE",
+              categoryId: undefined,
+              parameterValues: {
+                create: [
+                  {
+                    parameterDefinitionId: "9cea76ef-4d81-4ba9-a4d1-ccff2cd07d3e",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "7c04fd6d-3c86-4634-a1a3-dba42c75c96d",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "e366a5ef-7591-40d2-b14e-8d727f4844e7",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "6e39176d-5134-4031-8c97-ed6d9285f8d3",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a5fcc5a2-a838-4837-b290-7a1ceadb1c03",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "22b2ea5b-b34d-471b-8037-680ff7429fce",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "f8c1687c-e5e0-44b0-ac02-de9d60153d83",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "792f888b-dbae-42df-8911-11f4fefa0093",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a96c2dc7-f6ff-46e9-84c7-ad8f77a6cda0",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a6cac445-f774-4ad3-87f2-ce47510e71e1",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "248384ee-2c75-4b06-89a1-298cfcf689f7",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "0e9864f1-01df-452a-bf3e-13c5ed3cea84",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "f96b6278-f35b-42c9-9f3f-31d945e43fd0",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "4bf89490-7e2a-401f-a2ed-155674797a3b",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a5bb8408-7e28-492b-a498-ac4c936f2427",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "610f043d-17ee-456b-b996-aa60557f6627",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a325095a-8009-4f33-beb7-07ed59a744bf",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "38b1a67b-fa05-4810-adbd-402754747364",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "f8167163-709b-41ef-84d6-4d8af9e24c70",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "132b129a-1b0d-4b62-a5f7-d89a3addb8c6",
+                    value: "50",
+                    valueNumber: 50
+                  }
+                ]
+              },
+          +   category: {
+          +     create: ProductCategoryCreateWithoutProductsInput | ProductCategoryUncheckedCreateWithoutProductsInput,
+          +     connectOrCreate: ProductCategoryCreateOrConnectWithoutProductsInput,
+          +     connect: ProductCategoryWhereUniqueInput
+          +   }
+            }
+          })
+
+    Argument `category` is missing.
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at wn (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/librar
+y.js:29:1363)
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:6958)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/performance-benchmark.e2e-spec.ts:491:23)
+
+  ● Matching Performance Benchmark › Case 4: Parameter Complexity (5/10/20 params) › should score with 20 parameters
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\performance-benchmark.e2e-spec.ts:58:23
+
+      55   await prisma.workflowEvent.deleteMany({ where: { operatorId: existingUser.id } });
+      56   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+      57 }
+    → 58 await prisma.user.deleteMany(
+    Foreign key constraint violated: `demand_created_by_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/performance-benchmark.e2e-spec.ts:58:5)
+
+  ● Matching Performance Benchmark › Case 4: Parameter Complexity (5/10/20 params) › should score with 20 parameters
+
+    PrismaClientValidationError: 
+    Invalid `prisma.product.create()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\performance-benchmark.e2e-spec.ts:491:44
+
+      488 }
+      489 
+      490 // Create one product with values for all 20 params
+    → 491 const product = await prisma.product.create({
+            data: {
+              name: "E2E_BM_Product_Complex",
+              status: "ACTIVE",
+              categoryId: undefined,
+              parameterValues: {
+                create: [
+                  {
+                    parameterDefinitionId: "9cea76ef-4d81-4ba9-a4d1-ccff2cd07d3e",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "7c04fd6d-3c86-4634-a1a3-dba42c75c96d",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "e366a5ef-7591-40d2-b14e-8d727f4844e7",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "6e39176d-5134-4031-8c97-ed6d9285f8d3",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a5fcc5a2-a838-4837-b290-7a1ceadb1c03",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "22b2ea5b-b34d-471b-8037-680ff7429fce",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "f8c1687c-e5e0-44b0-ac02-de9d60153d83",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "792f888b-dbae-42df-8911-11f4fefa0093",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a96c2dc7-f6ff-46e9-84c7-ad8f77a6cda0",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a6cac445-f774-4ad3-87f2-ce47510e71e1",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "248384ee-2c75-4b06-89a1-298cfcf689f7",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "0e9864f1-01df-452a-bf3e-13c5ed3cea84",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "f96b6278-f35b-42c9-9f3f-31d945e43fd0",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "4bf89490-7e2a-401f-a2ed-155674797a3b",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a5bb8408-7e28-492b-a498-ac4c936f2427",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "610f043d-17ee-456b-b996-aa60557f6627",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a325095a-8009-4f33-beb7-07ed59a744bf",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "38b1a67b-fa05-4810-adbd-402754747364",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "f8167163-709b-41ef-84d6-4d8af9e24c70",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "132b129a-1b0d-4b62-a5f7-d89a3addb8c6",
+                    value: "50",
+                    valueNumber: 50
+                  }
+                ]
+              },
+          +   category: {
+          +     create: ProductCategoryCreateWithoutProductsInput | ProductCategoryUncheckedCreateWithoutProductsInput,
+          +     connectOrCreate: ProductCategoryCreateOrConnectWithoutProductsInput,
+          +     connect: ProductCategoryWhereUniqueInput
+          +   }
+            }
+          })
+
+    Argument `category` is missing.
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at wn (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/librar
+y.js:29:1363)
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:6958)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/performance-benchmark.e2e-spec.ts:491:23)
+
+  ● Matching Performance Benchmark › Case 4: Parameter Complexity (5/10/20 params) › should report parameter complexity
+ summary
+
+    PrismaClientKnownRequestError: 
+    Invalid `prisma.user.deleteMany()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\performance-benchmark.e2e-spec.ts:58:23
+
+      55   await prisma.workflowEvent.deleteMany({ where: { operatorId: existingUser.id } });
+      56   await prisma.organizationMember.deleteMany({ where: { userId: existingUser.id } });
+      57 }
+    → 58 await prisma.user.deleteMany(
+    Foreign key constraint violated: `demand_created_by_fkey (index)`
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:7315)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/performance-benchmark.e2e-spec.ts:58:5)
+
+  ● Matching Performance Benchmark › Case 4: Parameter Complexity (5/10/20 params) › should report parameter complexity
+ summary
+
+    PrismaClientValidationError: 
+    Invalid `prisma.product.create()` invocation in
+    F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\performance-benchmark.e2e-spec.ts:491:44
+
+      488 }
+      489 
+      490 // Create one product with values for all 20 params
+    → 491 const product = await prisma.product.create({
+            data: {
+              name: "E2E_BM_Product_Complex",
+              status: "ACTIVE",
+              categoryId: undefined,
+              parameterValues: {
+                create: [
+                  {
+                    parameterDefinitionId: "9cea76ef-4d81-4ba9-a4d1-ccff2cd07d3e",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "7c04fd6d-3c86-4634-a1a3-dba42c75c96d",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "e366a5ef-7591-40d2-b14e-8d727f4844e7",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "6e39176d-5134-4031-8c97-ed6d9285f8d3",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a5fcc5a2-a838-4837-b290-7a1ceadb1c03",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "22b2ea5b-b34d-471b-8037-680ff7429fce",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "f8c1687c-e5e0-44b0-ac02-de9d60153d83",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "792f888b-dbae-42df-8911-11f4fefa0093",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a96c2dc7-f6ff-46e9-84c7-ad8f77a6cda0",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a6cac445-f774-4ad3-87f2-ce47510e71e1",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "248384ee-2c75-4b06-89a1-298cfcf689f7",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "0e9864f1-01df-452a-bf3e-13c5ed3cea84",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "f96b6278-f35b-42c9-9f3f-31d945e43fd0",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "4bf89490-7e2a-401f-a2ed-155674797a3b",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a5bb8408-7e28-492b-a498-ac4c936f2427",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "610f043d-17ee-456b-b996-aa60557f6627",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "a325095a-8009-4f33-beb7-07ed59a744bf",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "38b1a67b-fa05-4810-adbd-402754747364",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "f8167163-709b-41ef-84d6-4d8af9e24c70",
+                    value: "50",
+                    valueNumber: 50
+                  },
+                  {
+                    parameterDefinitionId: "132b129a-1b0d-4b62-a5f7-d89a3addb8c6",
+                    value: "50",
+                    valueNumber: 50
+                  }
+                ]
+              },
+          +   category: {
+          +     create: ProductCategoryCreateWithoutProductsInput | ProductCategoryUncheckedCreateWithoutProductsInput,
+          +     connectOrCreate: ProductCategoryCreateOrConnectWithoutProductsInput,
+          +     connect: ProductCategoryWhereUniqueInput
+          +   }
+            }
+          })
+
+    Argument `category` is missing.
+
+    [0m [90m 24 |[39m     [90m// @ts-ignore: $use is deprecated in Prisma 5 but functional[39m
+     [90m 25 |[39m     [36mthis[39m[33m.[39m$use([36masync[39m (params[33m,[39m next) [33m=>[39m {
+    [31m[1m>[22m[39m[90m 26 |[39m       [36mconst[39m result [33m=[39m [36mawait[39m next(params)[33m;[39
+m
+     [90m    |[39m                      [31m[1m^[22m[39m
+     [90m 27 |[39m
+     [90m 28 |[39m       [90m// Only log mutating operations, skip audit_log itself to avoid infinite recursion[39m
+     [90m 29 |[39m       [36mif[39m ([36mthis[39m[33m.[39misMutatingAction(params[33m.[39maction) [33m&&[39
+m params[33m.[39mmodel [33m&&[39m params[33m.[39mmodel [33m!==[39m [32m'AuditLog'[39m) {[0m
+
+      at wn (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/librar
+y.js:29:1363)
+      at $n.handleRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/cl
+ient/runtime/library.js:121:6958)
+      at $n.handleAndLogRequestError (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@pri
+sma/client/runtime/library.js:121:6623)
+      at $n.request (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtim
+e/library.js:121:6307)
+      at l (../../../node_modules/.pnpm/@prisma+client@5.22.0_prisma@5.22.0/node_modules/@prisma/client/runtime/library
+.js:130:9633)
+      at ../src/prisma/prisma.service.ts:26:22
+      at Object.<anonymous> (e2e/matching/performance-benchmark.e2e-spec.ts:491:23)
+
+[31m[Nest] 12944  - [39m2026/09/10 08:52:10 [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPrismaClientKnownRequ
+estError: 
+Invalid `this.prisma.demandParameter.create()` invocation in
+F:\Desktop\VISNDT\VISNDT\apps\api\src\demands\demands.service.ts:590:40
+
+  587 
+  588 await this.validateParameterDefinition(dto.parameterDefinitionId);
+  589 
+→ 590 return this.prisma.demandParameter.create(
+Unique constraint failed on the fields: (`demand_id`,`parameter_definition_id`)
+    at $n.handleRequestError (F:\Desktop\VISNDT\VISNDT\node_modules\[4m.pnpm[24m\@prisma+client@5.22.0_prisma@5.22.0\
+node_modules\[4m@prisma\client[24m\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (F:\Desktop\VISNDT\VISNDT\node_modules\[4m.pnpm[24m\@prisma+client@5.22.0_prisma@5
+.22.0\node_modules\[4m@prisma\client[24m\runtime\library.js:121:6623)
+    at $n.request (F:\Desktop\VISNDT\VISNDT\node_modules\[4m.pnpm[24m\@prisma+client@5.22.0_prisma@5.22.0\node_module
+s\[4m@prisma\client[24m\runtime\library.js:121:6307)
+    at l (F:\Desktop\VISNDT\VISNDT\node_modules\[4m.pnpm[24m\@prisma+client@5.22.0_prisma@5.22.0\node_modules\[4m@pr
+isma\client[24m\runtime\library.js:130:9633)
+    at [90mF:\Desktop\VISNDT\VISNDT\apps\api\[39msrc\prisma\prisma.service.ts:26:22
+    at DemandsController.addParameter [90m(F:\Desktop\VISNDT\VISNDT\apps\api\[39msrc\demands\demands.controller.ts:17
+8:7[90m)[39m
+    at F:\Desktop\VISNDT\VISNDT\node_modules\[4m.pnpm[24m\@nestjs+core@11.1.28_@nestjs+common@11.1.28_class-transform
+er@0.5.1_class-validator@0.15.1_re_n4yeeium6oouy6pkrfqbgjmsdy\node_modules\[4m@nestjs\core[24m\router\router-executio
+n-context.js:47:62
+    at F:\Desktop\VISNDT\VISNDT\node_modules\[4m.pnpm[24m\@nestjs+core@11.1.28_@nestjs+common@11.1.28_class-transform
+er@0.5.1_class-validator@0.15.1_re_n4yeeium6oouy6pkrfqbgjmsdy\node_modules\[4m@nestjs\core[24m\router\router-proxy.js
+:9:17 {
+  code: [32m'P2002'[39m,
+  clientVersion: [32m'5.22.0'[39m,
+  meta: {
+    modelName: [32m'DemandParameter'[39m,
+    target: [
+      [32m'demand_id'[39m,
+      [32m'parameter_definition_id'[39m
+    ]
+  }
+}
+FAIL test/e2e/demands/demand-flow.e2e-spec.ts
+  ● Console
+
+    console.warn
+      Cleanup warning: 
+      Invalid `prisma.user.deleteMany()` invocation in
+      F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\demands\demand-flow.e2e-spec.ts:171:27
+      
+        168 // 5. Delete User & Organization
+        169 if (userId) {
+        170   await prisma.workflowEvent.deleteMany({ where: { operatorId: userId } });
+      → 171   await prisma.user.deleteMany(
+      Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 173 |[39m       [36mif[39m (orgId) [36mawait[39m prisma[33m.[39morganization[33m.[39mdeleteMany
+({ where[33m:[39m { id[33m:[39m orgId } })[33m;[39m
+     [90m 174 |[39m     } [36mcatch[39m (e) {
+    [31m[1m>[22m[39m[90m 175 |[39m       console[33m.[39mwarn([32m'Cleanup warning:'[39m[33m,[39m (e [36ma
+s[39m [33mError[39m)[33m.[39mmessage)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 176 |[39m     }
+     [90m 177 |[39m     [36mawait[39m app[33m.[39mclose()[33m;[39m
+     [90m 178 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> (e2e/demands/demand-flow.e2e-spec.ts:175:15)
+
+  ● Demand Flow E2E › Case 6: DemandMatch Status Update › should create WorkflowEvent for ACCEPTED action
+
+    expect(received).toBeDefined()
+
+    Received: undefined
+
+    [0m [90m 443 |[39m
+     [90m 444 |[39m       [36mconst[39m acceptedEvent [33m=[39m events[33m.[39mfind((e) [33m=>[39m e[33m.[3
+9maction [33m===[39m [33mWorkflowAction[39m[33m.[39m[33mACCEPTED[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 445 |[39m       expect(acceptedEvent)[33m.[39mtoBeDefined()[33m;[39m
+     [90m     |[39m                             [31m[1m^[22m[39m
+     [90m 446 |[39m       expect(acceptedEvent[33m![39m[33m.[39moperatorId)[33m.[39mtoBe(userId)[33m;[39m
+     [90m 447 |[39m
+     [90m 448 |[39m       [36mconst[39m meta [33m=[39m acceptedEvent[33m![39m[33m.[39mmetadata [36mas[39m 
+[33mRecord[39m[33m<[39m[33mstring[39m[33m,[39m unknown[33m>[39m [33m|[39m [36mnull[39m[33m;[39m[0m
+
+      at Object.<anonymous> (e2e/demands/demand-flow.e2e-spec.ts:445:29)
+
+PASS test/e2e/demands/demand-security.e2e-spec.ts
+  ● Console
+
+    console.warn
+      Cleanup warning: 
+      Invalid `prisma.user.deleteMany()` invocation in
+      F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\demands\demand-security.e2e-spec.ts:243:27
+      
+        240 // 4. Clean Users & Organizations (WorkflowEvents first due to FK)
+        241 if (userAId) {
+        242   await prisma.workflowEvent.deleteMany({ where: { operatorId: userAId } });
+      → 243   await prisma.user.deleteMany(
+      Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 250 |[39m       [36mif[39m (orgBId) [36mawait[39m prisma[33m.[39morganization[33m.[39mdeleteMan
+y({ where[33m:[39m { id[33m:[39m orgBId } })[33m;[39m
+     [90m 251 |[39m     } [36mcatch[39m (e) {
+    [31m[1m>[22m[39m[90m 252 |[39m       console[33m.[39mwarn([32m'Cleanup warning:'[39m[33m,[39m (e [36ma
+s[39m [33mError[39m)[33m.[39mmessage)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 253 |[39m     }
+     [90m 254 |[39m     [36mawait[39m app[33m.[39mclose()[33m;[39m
+     [90m 255 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> (e2e/demands/demand-security.e2e-spec.ts:252:15)
+
+PASS test/e2e/admin/admin-dashboard.e2e-spec.ts
+FAIL test/e2e/organizations/organizations-security.e2e-spec.ts
+  ● Console
+
+    console.warn
+      Cleanup warning: 
+      Invalid `prisma.user.deleteMany()` invocation in
+      F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\organizations\organizations-security.e2e-spec.ts:150:25
+      
+        147     await prisma.organizationMember.deleteMany({ where: { userId: uid } });
+        148   }
+        149 }
+      → 150 await prisma.user.deleteMany(
+      Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 151 |[39m       [36mawait[39m prisma[33m.[39morganization[33m.[39mdeleteMany({ where[33m:[39m {
+ id[33m:[39m { [36min[39m[33m:[39m [org1Id[33m,[39m org2Id][33m.[39mfilter([33mBoolean[39m) } } })[33m;[3
+9m
+     [90m 152 |[39m     } [36mcatch[39m (e) {
+    [31m[1m>[22m[39m[90m 153 |[39m       console[33m.[39mwarn([32m'Cleanup warning:'[39m[33m,[39m (e [36ma
+s[39m [33mError[39m)[33m.[39mmessage)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 154 |[39m     }
+     [90m 155 |[39m     [36mawait[39m app[33m.[39mclose()[33m;[39m
+     [90m 156 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> (e2e/organizations/organizations-security.e2e-spec.ts:153:15)
+
+  ● Organizations Controller Security E2E › Case 1: Unauthenticated requests › GET /organizations/:id should return 401
+ without token
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 401
+    Received: 200
+
+    [0m [90m 168 |[39m     it([32m'GET /organizations/:id should return 401 without token'[39m[33m,[39m [36masy
+nc[39m () [33m=>[39m {
+     [90m 169 |[39m       [36mconst[39m res [33m=[39m [36mawait[39m request(app[33m.[39mgetHttpServer())[33m
+.[39m[36mget[39m([32m`/api/v1/organizations/${org1Id}`[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 170 |[39m       expect(res[33m.[39mstatus)[33m.[39mtoBe([35m401[39m)[33m;[39m
+     [90m     |[39m                          [31m[1m^[22m[39m
+     [90m 171 |[39m     })[33m;[39m
+     [90m 172 |[39m
+     [90m 173 |[39m     it([32m'POST /organizations should return 401 without token'[39m[33m,[39m [36masync[39m
+ () [33m=>[39m {[0m
+
+      at Object.<anonymous> (e2e/organizations/organizations-security.e2e-spec.ts:170:26)
+
+  ● Organizations Controller Security E2E › Case 3: Cross-organization access rejected › GET /organizations/:id (other 
+org) should return 403 for MEMBER
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 403
+    Received: 200
+
+    [0m [90m 209 |[39m         [33m.[39m[36mget[39m([32m`/api/v1/organizations/${org2Id}`[39m)
+     [90m 210 |[39m         [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer ${member1Token
+}`[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 211 |[39m       expect(res[33m.[39mstatus)[33m.[39mtoBe([35m403[39m)[33m;[39m
+     [90m     |[39m                          [31m[1m^[22m[39m
+     [90m 212 |[39m     })[33m;[39m
+     [90m 213 |[39m   })[33m;[39m
+     [90m 214 |[39m[0m
+
+      at Object.<anonymous> (e2e/organizations/organizations-security.e2e-spec.ts:211:26)
+
+  ● Organizations Controller Security E2E › Case 5: Non-admin restricted operations › PATCH /organizations/:id should r
+eturn 403 for MEMBER
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 403
+    Received: 200
+
+    [0m [90m 279 |[39m         [33m.[39m[36mset[39m([32m'Authorization'[39m[33m,[39m [32m`Bearer ${member1T
+oken}`[39m)
+     [90m 280 |[39m         [33m.[39msend({ name[33m:[39m [32m'Hack Attempt'[39m })[33m;[39m
+    [31m[1m>[22m[39m[90m 281 |[39m       expect(res[33m.[39mstatus)[33m.[39mtoBe([35m403[39m)[33m;[39m
+     [90m     |[39m                          [31m[1m^[22m[39m
+     [90m 282 |[39m     })[33m;[39m
+     [90m 283 |[39m   })[33m;[39m
+     [90m 284 |[39m })[33m;[39m[0m
+
+      at Object.<anonymous> (e2e/organizations/organizations-security.e2e-spec.ts:281:26)
+
+[31m[Nest] 12944  - [39m2026/09/10 08:52:15 [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPrismaClientKnownRequ
+estError: 
+Invalid `this.prisma.product.create()` invocation in
+F:\Desktop\VISNDT\VISNDT\apps\api\src\products\products.service.ts:395:32
+
+  392 
+  393 async create(dto: CreateProductDto, createdById?: string) {
+  394   const data = { ...dto, createdById } as any;
+→ 395   return this.prisma.product.create(
+Inconsistent column data: Error creating UUID, invalid character: expected an optional prefix of `urn:uuid:` followed b
+y [0-9a-fA-F-], found `i` at 1
+    at $n.handleRequestError (F:\Desktop\VISNDT\VISNDT\node_modules\[4m.pnpm[24m\@prisma+client@5.22.0_prisma@5.22.0\
+node_modules\[4m@prisma\client[24m\runtime\library.js:121:7315)
+    at $n.handleAndLogRequestError (F:\Desktop\VISNDT\VISNDT\node_modules\[4m.pnpm[24m\@prisma+client@5.22.0_prisma@5
+.22.0\node_modules\[4m@prisma\client[24m\runtime\library.js:121:6623)
+    at $n.request (F:\Desktop\VISNDT\VISNDT\node_modules\[4m.pnpm[24m\@prisma+client@5.22.0_prisma@5.22.0\node_module
+s\[4m@prisma\client[24m\runtime\library.js:121:6307)
+    at l (F:\Desktop\VISNDT\VISNDT\node_modules\[4m.pnpm[24m\@prisma+client@5.22.0_prisma@5.22.0\node_modules\[4m@pr
+isma\client[24m\runtime\library.js:130:9633)
+    at [90mF:\Desktop\VISNDT\VISNDT\apps\api\[39msrc\prisma\prisma.service.ts:26:22
+    at ProductsController.create [90m(F:\Desktop\VISNDT\VISNDT\apps\api\[39msrc\products\products.controller.ts:85:27
+[90m)[39m
+    at F:\Desktop\VISNDT\VISNDT\node_modules\[4m.pnpm[24m\@nestjs+core@11.1.28_@nestjs+common@11.1.28_class-transform
+er@0.5.1_class-validator@0.15.1_re_n4yeeium6oouy6pkrfqbgjmsdy\node_modules\[4m@nestjs\core[24m\router\router-executio
+n-context.js:47:62
+    at F:\Desktop\VISNDT\VISNDT\node_modules\[4m.pnpm[24m\@nestjs+core@11.1.28_@nestjs+common@11.1.28_class-transform
+er@0.5.1_class-validator@0.15.1_re_n4yeeium6oouy6pkrfqbgjmsdy\node_modules\[4m@nestjs\core[24m\router\router-proxy.js
+:9:17 {
+  code: [32m'P2023'[39m,
+  clientVersion: [32m'5.22.0'[39m,
+  meta: {
+    modelName: [32m'Product'[39m,
+    message: [32m'Error creating UUID, invalid character: expected an optional prefix of `urn:uuid:` followed by [0-9a
+-fA-F-], found `i` at 1'[39m
+  }
+}
+PASS test/e2e/products/product-core.e2e-spec.ts
+  ● Console
+
+    console.warn
+      Cleanup warning: 
+      Invalid `prisma.user.deleteMany()` invocation in
+      F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\products\product-core.e2e-spec.ts:142:25
+      
+        139     await prisma.organizationMember.deleteMany({ where: { userId: uid } });
+        140   }
+        141 }
+      → 142 await prisma.user.deleteMany(
+      Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 147 |[39m       [36mawait[39m prisma[33m.[39morganization[33m.[39mdeleteMany({ where[33m:[39m {
+ id[33m:[39m orgId } })[33m;[39m
+     [90m 148 |[39m     } [36mcatch[39m (e) {
+    [31m[1m>[22m[39m[90m 149 |[39m       console[33m.[39mwarn([32m'Cleanup warning:'[39m[33m,[39m (e [36ma
+s[39m [33mError[39m)[33m.[39mmessage)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 150 |[39m     }
+     [90m 151 |[39m     [36mawait[39m app[33m.[39mclose()[33m;[39m
+     [90m 152 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> (e2e/products/product-core.e2e-spec.ts:149:15)
+
+FAIL test/e2e/offers/offer-core.e2e-spec.ts
+  ● Console
+
+    console.warn
+      Cleanup warning: 
+      Invalid `prisma.user.deleteMany()` invocation in
+      F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\offers\offer-core.e2e-spec.ts:170:25
+      
+        167     await prisma.organizationMember.deleteMany({ where: { userId: uid } });
+        168   }
+        169 }
+      → 170 await prisma.user.deleteMany(
+      Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 174 |[39m       [36mawait[39m prisma[33m.[39morganization[33m.[39mdeleteMany({ where[33m:[39m {
+ id[33m:[39m { [36min[39m[33m:[39m [org1Id[33m,[39m org2Id][33m.[39mfilter([33mBoolean[39m) } } })[33m;[3
+9m
+     [90m 175 |[39m     } [36mcatch[39m (e) {
+    [31m[1m>[22m[39m[90m 176 |[39m       console[33m.[39mwarn([32m'Cleanup warning:'[39m[33m,[39m (e [36ma
+s[39m [33mError[39m)[33m.[39mmessage)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 177 |[39m     }
+     [90m 178 |[39m     [36mawait[39m app[33m.[39mclose()[33m;[39m
+     [90m 179 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> (e2e/offers/offer-core.e2e-spec.ts:176:15)
+
+  ● Offer Core E2E › Case 1: Authentication › GET /offers/:id should return 200 without auth (public read)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 401
+
+    [0m [90m 191 |[39m     it([32m'GET /offers/:id should return 200 without auth (public read)'[39m[33m,[39m [
+36masync[39m () [33m=>[39m {
+     [90m 192 |[39m       [36mconst[39m res [33m=[39m [36mawait[39m request(app[33m.[39mgetHttpServer())[33m
+.[39m[36mget[39m([32m`/api/v1/offers/${offerId}`[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 193 |[39m       expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                          [31m[1m^[22m[39m
+     [90m 194 |[39m       expect(res[33m.[39mbody[33m.[39mdata[33m.[39mid)[33m.[39mtoBe(offerId)[33m;[39m
+     [90m 195 |[39m     })[33m;[39m
+     [90m 196 |[39m[0m
+
+      at Object.<anonymous> (e2e/offers/offer-core.e2e-spec.ts:193:26)
+
+  ● Offer Core E2E › Case 3: Query offers › GET /offers/:id should return 404 for non-existent
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 404
+    Received: 401
+
+    [0m [90m 250 |[39m       [36mconst[39m res [33m=[39m [36mawait[39m request(app[33m.[39mgetHttpServer())
+     [90m 251 |[39m         [33m.[39m[36mget[39m([32m'/api/v1/offers/00000000-0000-0000-0000-000000000000'[39m)
+[33m;[39m
+    [31m[1m>[22m[39m[90m 252 |[39m       expect(res[33m.[39mstatus)[33m.[39mtoBe([35m404[39m)[33m;[39m
+     [90m     |[39m                          [31m[1m^[22m[39m
+     [90m 253 |[39m     })[33m;[39m
+     [90m 254 |[39m   })[33m;[39m
+     [90m 255 |[39m[0m
+
+      at Object.<anonymous> (e2e/offers/offer-core.e2e-spec.ts:252:26)
+
+PASS test/e2e/matching/category-filter.e2e-spec.ts
+PASS test/e2e/matching/rematch.e2e-spec.ts
+  ● Console
+
+    console.warn
+      Cleanup warning: 
+      Invalid `prisma.user.deleteMany()` invocation in
+      F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\matching\rematch.e2e-spec.ts:189:27
+      
+        186 if (userId) {
+        187   await prisma.workflowEvent.deleteMany({ where: { operatorId: userId } });
+        188   await prisma.organizationMember.deleteMany({ where: { userId } });
+      → 189   await prisma.user.deleteMany(
+      Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 198 |[39m       [36mawait[39m prisma[33m.[39morganization[33m.[39mdeleteMany({ where[33m:[39m {
+ name[33m:[39m [32m`${TEST_PREFIX}_OtherOrg`[39m } })[33m;[39m
+     [90m 199 |[39m     } [36mcatch[39m (e) {
+    [31m[1m>[22m[39m[90m 200 |[39m       console[33m.[39mwarn([32m'Cleanup warning:'[39m[33m,[39m (e [36ma
+s[39m [33mError[39m)[33m.[39mmessage)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 201 |[39m     }
+     [90m 202 |[39m     [36mawait[39m app[33m.[39mclose()[33m;[39m
+     [90m 203 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> (e2e/matching/rematch.e2e-spec.ts:200:15)
+
+FAIL test/e2e/rfq/rfq-core.e2e-spec.ts
+  ● Console
+
+    console.warn
+      Cleanup warning: 
+      Invalid `prisma.user.deleteMany()` invocation in
+      F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\rfq\rfq-core.e2e-spec.ts:193:25
+      
+        190   where: { demand: { title: { startsWith: TEST_PREFIX } } },
+        191 });
+        192 await prisma.demand.deleteMany({ where: { title: { startsWith: TEST_PREFIX } } });
+      → 193 await prisma.user.deleteMany(
+      Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 194 |[39m       [36mawait[39m prisma[33m.[39morganization[33m.[39mdeleteMany({ where[33m:[39m {
+ id[33m:[39m { [36min[39m[33m:[39m [org1Id[33m,[39m org2Id][33m.[39mfilter([33mBoolean[39m) } } })[33m;[3
+9m
+     [90m 195 |[39m     } [36mcatch[39m (e) {
+    [31m[1m>[22m[39m[90m 196 |[39m       console[33m.[39mwarn([32m'Cleanup warning:'[39m[33m,[39m (e [36ma
+s[39m [33mError[39m)[33m.[39mmessage)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 197 |[39m     }
+     [90m 198 |[39m     [36mawait[39m app[33m.[39mclose()[33m;[39m
+     [90m 199 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> (e2e/rfq/rfq-core.e2e-spec.ts:196:15)
+
+  ● RFQ Core E2E › Case 2: Query RFQ › GET /rfqs/:id should return 200 without auth
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 401
+
+    [0m [90m 241 |[39m     it([32m'GET /rfqs/:id should return 200 without auth'[39m[33m,[39m [36masync[39m ()
+ [33m=>[39m {
+     [90m 242 |[39m       [36mconst[39m res [33m=[39m [36mawait[39m request(app[33m.[39mgetHttpServer())[33m
+.[39m[36mget[39m([32m`/api/v1/rfqs/${rfqId}`[39m)[33m;[39m
+    [31m[1m>[22m[39m[90m 243 |[39m       expect(res[33m.[39mstatus)[33m.[39mtoBe([35m200[39m)[33m;[39m
+     [90m     |[39m                          [31m[1m^[22m[39m
+     [90m 244 |[39m       expect(res[33m.[39mbody[33m.[39mdata[33m.[39mid)[33m.[39mtoBe(rfqId)[33m;[39m
+     [90m 245 |[39m     })[33m;[39m
+     [90m 246 |[39m[0m
+
+      at Object.<anonymous> (e2e/rfq/rfq-core.e2e-spec.ts:243:26)
+
+  ● RFQ Core E2E › Case 2: Query RFQ › GET /rfqs/:id should return 404 for non-existent
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 404
+    Received: 401
+
+    [0m [90m 248 |[39m       [36mconst[39m res [33m=[39m [36mawait[39m request(app[33m.[39mgetHttpServer())
+     [90m 249 |[39m         [33m.[39m[36mget[39m([32m'/api/v1/rfqs/00000000-0000-0000-0000-000000000000'[39m)[
+33m;[39m
+    [31m[1m>[22m[39m[90m 250 |[39m       expect(res[33m.[39mstatus)[33m.[39mtoBe([35m404[39m)[33m;[39m
+     [90m     |[39m                          [31m[1m^[22m[39m
+     [90m 251 |[39m     })[33m;[39m
+     [90m 252 |[39m   })[33m;[39m
+     [90m 253 |[39m[0m
+
+      at Object.<anonymous> (e2e/rfq/rfq-core.e2e-spec.ts:250:26)
+
+PASS test/e2e/admin/admin-matching.e2e-spec.ts
+PASS test/e2e/admin/admin-demand.e2e-spec.ts
+  ● Console
+
+    console.warn
+      Cleanup warning: 
+      Invalid `prisma.user.deleteMany()` invocation in
+      F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\admin\admin-demand.e2e-spec.ts:136:25
+      
+        133   where: { demand: { title: { startsWith: TEST_PREFIX } } },
+        134 });
+        135 await prisma.demand.deleteMany({ where: { title: { startsWith: TEST_PREFIX } } });
+      → 136 await prisma.user.deleteMany(
+      Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 139 |[39m       [36mawait[39m prisma[33m.[39morganization[33m.[39mdeleteMany({ where[33m:[39m {
+ name[33m:[39m { startsWith[33m:[39m [33mTEST_PREFIX[39m } } })[33m;[39m
+     [90m 140 |[39m     } [36mcatch[39m (e) {
+    [31m[1m>[22m[39m[90m 141 |[39m       console[33m.[39mwarn([32m'Cleanup warning:'[39m[33m,[39m (e [36ma
+s[39m [33mError[39m)[33m.[39mmessage)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 142 |[39m     }
+     [90m 143 |[39m     [36mawait[39m app[33m.[39mclose()[33m;[39m
+     [90m 144 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> (e2e/admin/admin-demand.e2e-spec.ts:141:15)
+
+PASS test/e2e/security/rate-limit.e2e-spec.ts
+  ● Console
+
+    console.warn
+      Cleanup warning: 
+      Invalid `prisma.user.deleteMany()` invocation in
+      F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\security\rate-limit.e2e-spec.ts:111:25
+      
+        108 await prisma.demandParameter.deleteMany({ where: { demand: { title: { startsWith: TEST_PREFIX } } } });
+        109 await prisma.demand.deleteMany({ where: { title: { startsWith: TEST_PREFIX } } });
+        110 await prisma.organizationMember.deleteMany({ where: { userId } });
+      → 111 await prisma.user.deleteMany(
+      Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 112 |[39m       [36mawait[39m prisma[33m.[39morganization[33m.[39mdeleteMany({ where[33m:[39m {
+ id[33m:[39m orgId } })[33m;[39m
+     [90m 113 |[39m     } [36mcatch[39m (e) {
+    [31m[1m>[22m[39m[90m 114 |[39m       console[33m.[39mwarn([32m'Cleanup warning:'[39m[33m,[39m (e [36ma
+s[39m [33mError[39m)[33m.[39mmessage)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 115 |[39m     }
+     [90m 116 |[39m     [36mawait[39m app[33m.[39mclose()[33m;[39m
+     [90m 117 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> (e2e/security/rate-limit.e2e-spec.ts:114:15)
+
+PASS test/e2e/workflow/workflow-permission.e2e-spec.ts
+  ● Console
+
+    console.warn
+      Cleanup warning: 
+      Invalid `prisma.user.deleteMany()` invocation in
+      F:\Desktop\VISNDT\VISNDT\apps\api\test\e2e\workflow\workflow-permission.e2e-spec.ts:103:25
+      
+        100 await prisma.organizationMember.deleteMany({
+        101   where: { organization: { name: { startsWith: TEST_PREFIX } } },
+        102 });
+      → 103 await prisma.user.deleteMany(
+      Foreign key constraint violated: `audit_log_operator_id_fkey (index)`
+
+    [0m [90m 108 |[39m       })[33m;[39m
+     [90m 109 |[39m     } [36mcatch[39m (e) {
+    [31m[1m>[22m[39m[90m 110 |[39m       console[33m.[39mwarn([32m'Cleanup warning:'[39m[33m,[39m (e [36ma
+s[39m [33mError[39m)[33m.[39mmessage)[33m;[39m
+     [90m     |[39m               [31m[1m^[22m[39m
+     [90m 111 |[39m     }
+     [90m 112 |[39m     [36mawait[39m app[33m.[39mclose()[33m;[39m
+     [90m 113 |[39m   })[33m;[39m[0m
+
+      at Object.<anonymous> (e2e/workflow/workflow-permission.e2e-spec.ts:110:15)
+
+
+Test Suites: 8 failed, 11 passed, 19 total
+Tests:       48 failed, 117 passed, 165 total
+Snapshots:   0 total
+Time:        28.291 s, estimated 82 s
+Ran all test suites.

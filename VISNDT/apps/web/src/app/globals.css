@@ -249,6 +249,36 @@
   }
 }
 
+/* === 工业蓝图设计语言（首页 + 全局 Header/Footer）坐标原标记 ===
+   照搬 visndt_home_redesign.html .reg::before/::after 四角定位标记。 */
+@layer utilities {
+  .reg {
+    position: relative;
+  }
+  .reg::before,
+  .reg::after {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border: 1.5px solid currentColor;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+  .reg::before {
+    top: -1px;
+    left: -1px;
+    border-right: none;
+    border-bottom: none;
+  }
+  .reg::after {
+    bottom: -1px;
+    right: -1px;
+    border-left: none;
+    border-top: none;
+  }
+}
+
 @keyframes visndPageEnter {
   from { opacity: 0; }
   to { opacity: 1; }

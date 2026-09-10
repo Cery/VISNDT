@@ -220,7 +220,7 @@ function BusinessAnalytics() {
                 <Progress
                   percent={funnel.conversionRates.demandToRfq}
                   showInfo={false}
-                  strokeColor="VISNDT_COLORS.success"
+                  strokeColor={VISNDT_COLORS.success}
                   size="small"
                 />
               </Card>
@@ -235,7 +235,7 @@ function BusinessAnalytics() {
                 <Progress
                   percent={funnel.conversionRates.rfqToOffer}
                   showInfo={false}
-                  strokeColor="VISNDT_COLORS.warning"
+                  strokeColor={VISNDT_COLORS.warning}
                   size="small"
                 />
               </Card>
@@ -441,7 +441,7 @@ function BusinessAnalytics() {
                   suffix="%"
                   valueStyle={{ color: VISNDT_COLORS.success }}
                 />
-                <Progress percent={conversion.conversionRates.demandToRfq} showInfo={false} strokeColor="VISNDT_COLORS.success" size="small" />
+                <Progress percent={conversion.conversionRates.demandToRfq} showInfo={false} strokeColor={VISNDT_COLORS.success} size="small" />
               </Card>
             </Col>
             <Col xs={12} sm={6} lg={4}>
@@ -452,7 +452,7 @@ function BusinessAnalytics() {
                   suffix="%"
                   valueStyle={{ color: VISNDT_COLORS.warning }}
                 />
-                <Progress percent={conversion.conversionRates.rfqToResponse} showInfo={false} strokeColor="VISNDT_COLORS.warning" size="small" />
+                <Progress percent={conversion.conversionRates.rfqToResponse} showInfo={false} strokeColor={VISNDT_COLORS.warning} size="small" />
               </Card>
             </Col>
             <Col xs={12} sm={6} lg={4}>
@@ -519,7 +519,7 @@ function BusinessAnalytics() {
                       <YAxis />
                       <Tooltip />
                       <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                        <Cell fill="VISNDT_COLORS.success" />
+                        <Cell fill={VISNDT_COLORS.success} />
                         <Cell fill="#2563eb" />
                       </Bar>
                     </BarChart>
@@ -607,7 +607,7 @@ function BusinessAnalytics() {
                 <Progress
                   percent={matching.metrics.acceptRate}
                   showInfo={false}
-                  strokeColor="VISNDT_COLORS.success"
+                  strokeColor={VISNDT_COLORS.success}
                   size="small"
                 />
               </Card>
@@ -671,9 +671,9 @@ function BusinessAnalytics() {
                       <YAxis />
                       <Tooltip />
                       <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                        <Cell fill="VISNDT_COLORS.success" />
-                        <Cell fill="VISNDT_COLORS.warning" />
-                        <Cell fill="VISNDT_COLORS.error" />
+                        <Cell fill={VISNDT_COLORS.success} />
+                        <Cell fill={VISNDT_COLORS.warning} />
+                        <Cell fill={VISNDT_COLORS.error} />
                       </Bar>
                     </BarChart>
                   </ResponsiveContainer>
