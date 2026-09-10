@@ -1,4 +1,11 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { OrganizationStatus, Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
@@ -13,21 +20,44 @@ interface RequestUser {
 
 @Injectable()
 export class OrganizationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config: ConfigService,
+  ) {}
 
   /**
-   * Verify that the requesting user belongs to the target organization or is an ADMIN.
+   * Verify that the requesting user belongs to the target organization or is an ADMIN
+   * of the target organization. Only ADMIN of the target organization can update it.
    */
   private async checkOrganizationAccess(
     targetOrgId: string,
     requestUser: RequestUser,
   ): Promise<void> {
     // User belongs to the target organization
-    if (requestUser.organizationId === targetOrgId) return;
+    if (requestUser.organizationId === targetOrgId) {
+      // Target organization is user's own. Check if they are ADMIN in this org.
+      const adminMember = await this.prisma.organizationMember.findFirst({
+        where: { organizationId: targetOrgId, userId: requestUser.id, role: 'ADMIN' },
+      });
+      if (adminMember) return;
+      throw new ForbiddenException('Only organization ADMIN can update this organization');
+    }
 
-    // Check if request user is ADMIN in any organization
+    // Allow cross-organization update if user is ADMIN of the PLATFORM_ORGANIZATION_ID
+    const platformOrgId = this.config.get<string>('PLATFORM_ORGANIZATION_ID');
+    if (platformOrgId && requestUser.organizationId === platformOrgId) {
+      // User belongs to platform organization → allow cross-org update (platform admin governance)
+      const adminMember = await this.prisma.organizationMember.findFirst({
+        where: { organizationId: platformOrgId, userId: requestUser.id, role: 'ADMIN' },
+      });
+      if (adminMember) return;
+    }
+
+    // Only an ADMIN of THIS target organization may access/update it.
+    // (Previously this matched ADMIN in ANY organization, which let an admin
+    // of one org modify every other org — closed as XSS-style cross-org escalation.)
     const adminMember = await this.prisma.organizationMember.findFirst({
-      where: { userId: requestUser.id, role: 'ADMIN' },
+      where: { organizationId: targetOrgId, userId: requestUser.id, role: 'ADMIN' },
     });
     if (adminMember) return;
 

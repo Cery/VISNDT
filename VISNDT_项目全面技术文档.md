@@ -197,6 +197,15 @@ AuditLog（跨实体审计）
 - BusinessAnalytics.tsx 9 处图表颜色字面量 bug 已修复
 - Placeholder.tsx 死代码已删除
 
+### 🔒 本轮新增修复的安全问题（2026-09-10，代码已改并编译+运行时验证）
+1. **workflow-events 未鉴权（信息泄露）** — [workflow-events.controller.ts](file:///f:/Desktop/VISNDT/VISNDT/apps/api/src/workflow-events/workflow-events.controller.ts) 的 `GET /` 与 `GET /:id` 原本无任何守卫；在 controller 级补上 `@UseGuards(JwtAuthGuard)`（POST 原本已有守卫，属漏加）。修复后所有 workflow-events 端点均需登录。**纯代码、不触 schema**。
+2. **org PATCH 跨组织越权（权限提升）** — [organizations.service.ts](file:///f:/Desktop/VISNDT/VISNDT/apps/api/src/organizations/organizations.service.ts) `checkOrganizationAccess` 原本"在**任一**组织为 ADMIN 即允许访问/修改任意组织"→ 任一组织管理员可改所有其他组织。修复：
+   - 引入平台管理员白名单：`.env` 新增 `PLATFORM_ORGANIZATION_ID`（= `VISNDT 平台运营中心` id `3159cda3-…`），该组织 ADMIN 成员保留跨组织治理权限；
+   - 非平台组织的跨组织修改一律 403；目标组织自身 ADMIN 仍可改自己组织。
+   - **运行时验证（真实 DB 断言）**：平台管理员跨组织改他司=ALLOWED；他组织管理员(西安知象)跨改深圳微视=DENIED(403)；目标组织自身 ADMIN=ALLOWED。**越权已关闭，平台治理未破坏**。
+   - 注意：`PLATFORM_ORGANIZATION_ID` 未配置时为保守默认（跨组织改一律 403）。
+   - **隐含设计缺口（待拍板）**：系统无"平台全局管理员"身份标识，`@Roles(ADMIN)` 语义=所在组织成员角色为 ADMIN。平台管理员现靠该条 env 白名单维持跨组织能力；是否引入正式的平台管理员体系（如独立 authority）留待决策。
+
 ## 八、部署与基础设施现状
 - 本地：Docker Compose（postgres + api + admin + minio）
 - 规划路径：Oracle Cloud 永久免费 ARM VM（阶段一）→ 阿里云香港 ECS （阶段二）

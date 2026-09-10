@@ -11,6 +11,8 @@ import { AuthRequest } from '../auth/interfaces/auth-request.interface';
 
 @ApiTags('Workflow Events')
 @Controller('workflow-events')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class WorkflowEventsController {
   constructor(private readonly service: WorkflowEventsService) {}
 
