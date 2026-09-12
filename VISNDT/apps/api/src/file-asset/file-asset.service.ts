@@ -160,6 +160,24 @@ export class FileAssetService {
   }
 
   /**
+   * Get a single FileAsset by ID.
+   *
+   * @param id - FileAsset ID
+   * @returns FileAsset record or throws NotFoundException
+   */
+  async findOne(id: string): Promise<FileAsset> {
+    const fileAsset = await this.prisma.fileAsset.findUnique({
+      where: { id },
+    });
+
+    if (!fileAsset) {
+      throw new NotFoundException(`FileAsset ${id} not found`);
+    }
+
+    return fileAsset;
+  }
+
+  /**
    * Delete a file from S3/MinIO and remove the database record.
    *
    * @param id - FileAsset ID

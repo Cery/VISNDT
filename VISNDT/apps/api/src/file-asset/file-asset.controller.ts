@@ -117,6 +117,17 @@ export class FileAssetController {
   }
 
   /**
+   * Get a single FileAsset metadata by ID.
+   */
+  @Get(':id')
+  @ApiOperation({ summary: 'Get file metadata by ID' })
+  @ApiParam({ name: 'id', description: 'FileAsset UUID' })
+  async findOne(@Param('id') id: string) {
+    const fileAsset = await this.service.findOne(id);
+    return ApiResponse.ok(fileAsset, 'File metadata retrieved');
+  }
+
+  /**
    * Download a file via pre-signed URL redirect.
    */
   @Get(':id/download')

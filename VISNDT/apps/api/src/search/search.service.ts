@@ -59,18 +59,6 @@ interface ContentDiscoveryItem {
 }
 
 /**
- * Lightweight supplier discovery result — aggregated from PUBLISHED SupplierProduct
- * → Organization. Supplier Context base (M34.4). No Offer dependency.
- */
-interface SupplierDiscoveryItem {
-  organizationId: string;
-  organizationName: string;
-  publishedSupplyProductCount: number;
-  productNames: string[];
-  seriesValues: string[];
-}
-
-/**
  * SupplierProduct discovery item — M28.0 M661.5 Unified Discovery Consolidation.
  *
  * Capability-centric DTO projection (Product = Capability Authority).
@@ -110,7 +98,6 @@ export interface UnifiedDiscoveryResponse {
   knowledge: EntitySearchGroup<KnowledgeDiscoveryItem>;
   content: EntitySearchGroup<ContentDiscoveryItem>;
   solutions: EntitySearchGroup<ContentDiscoveryItem>;
-  suppliers: EntitySearchGroup<SupplierDiscoveryItem>;
 }
 
 /** A single parsed product filter: parameter + accepted values */
@@ -145,7 +132,7 @@ export class SearchService {
     const skip = (page - 1) * pageSize;
     const productFilters = this.parseFilters(filters);
 
-    const [products, supplierProducts, knowledge, content, solutions, suppliers] = await Promise.all([
+    const [products, supplierProducts, knowledge, content, solutions] = await Promise.all([
       this.searchProducts(query, skip, pageSize, category, productFilters),
       this.searchSupplierProducts(
         query,
@@ -160,11 +147,10 @@ export class SearchService {
       this.searchKnowledgeEntries(query, skip, pageSize),
       this.searchContent(query, [ContentType.ARTICLE, ContentType.INSIGHT], skip, pageSize),
       this.searchContent(query, [ContentType.SOLUTION], skip, pageSize),
-      this.searchSuppliers(query, skip, pageSize),
     ]);
 
     this.logger.log(
-      `Unified search "${query}": products=${products.total}, supplierProducts=${supplierProducts.total}, knowledge=${knowledge.total}, content=${content.total}, solutions=${solutions.total}, suppliers=${suppliers.total}`,
+      `Unified search "${query}": products=${products.total}, supplierProducts=${supplierProducts.total}, knowledge=${knowledge.total}, content=${content.total}, solutions=${solutions.total}`,
     );
 
     return {
@@ -174,7 +160,6 @@ export class SearchService {
       knowledge,
       content,
       solutions,
-      suppliers,
     };
   }
 
@@ -491,86 +476,5 @@ export class SearchService {
     ]);
 
     return { items: items as ContentDiscoveryItem[], total };
-  }
-
-  // ============================================
-  // Supplier Search Adapter (M34.4 — PUBLISHED SupplierProduct → Organization)
-  // ============================================
-  // Supplier Context source: PUBLISHED SupplierProduct → Organization(type=SUPPLIER).
-  // NOT Offer-only / RFQ-only / Transaction-only. Supplier existence is proven by
-  // a PUBLISHED SupplierProduct owned by the Organization.
-  private async searchSuppliers(
-    keyword: string,
-    skip: number,
-    take: number,
-  ): Promise<EntitySearchGroup<SupplierDiscoveryItem>> {
-    const where = {
-      status: SupplierProductStatus.PUBLISHED,
-      organization: { type: 'SUPPLIER' },
-      OR: [
-        { brand: { contains: keyword, mode: 'insensitive' as const } },
-        { series: { contains: keyword, mode: 'insensitive' as const } },
-        { modelNumber: { contains: keyword, mode: 'insensitive' as const } },
-        {
-          platformProduct: {
-            OR: [
-              { name: { contains: keyword, mode: 'insensitive' as const } },
-              { model: { contains: keyword, mode: 'insensitive' as const } },
-              { description: { contains: keyword, mode: 'insensitive' as const } },
-            ],
-          },
-        },
-      ],
-    };
-
-    const [supplierProducts, totalPublished] = await Promise.all([
-      this.prisma.supplierProduct.findMany({
-        where,
-        orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }, { id: 'asc' }],
-        select: {
-          id: true,
-          brand: true,
-          series: true,
-          modelNumber: true,
-          platformProduct: { select: { name: true } },
-          organization: { select: { id: true, name: true } },
-        },
-      }),
-      this.prisma.supplierProduct.count({ where }),
-    ]);
-
-    // Aggregate PUBLISHED SupplierProduct by organizationId → one SupplierDiscoveryItem
-    // per distinct Organization. total = distinct org groups; items honor skip/take.
-    const orgMap = new Map<string, SupplierDiscoveryItem>();
-    for (const sp of supplierProducts) {
-      const orgId = sp.organization.id;
-      let entry = orgMap.get(orgId);
-      if (!entry) {
-        entry = {
-          organizationId: orgId,
-          organizationName: sp.organization.name,
-          publishedSupplyProductCount: 0,
-          productNames: [],
-          seriesValues: [],
-        };
-        orgMap.set(orgId, entry);
-      }
-      entry.publishedSupplyProductCount++;
-      if (sp.platformProduct?.name && !entry.productNames.includes(sp.platformProduct.name)) {
-        entry.productNames.push(sp.platformProduct.name);
-      }
-      if (sp.series && !entry.seriesValues.includes(sp.series)) {
-        entry.seriesValues.push(sp.series);
-      }
-    }
-
-    if (totalPublished === 0 && orgMap.size === 0) {
-      return { items: [], total: 0 };
-    }
-
-    const allItems = Array.from(orgMap.values());
-    const safeSkip = Math.max(0, Math.min(skip, allItems.length));
-    const items = allItems.slice(safeSkip, safeSkip + take);
-    return { items, total: allItems.length };
   }
 }

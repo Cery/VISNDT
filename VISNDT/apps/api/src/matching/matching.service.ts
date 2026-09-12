@@ -61,8 +61,9 @@ export class MatchingService {
       return { matched: 0, skipped: 0, totalCandidates: 0, elapsedMs: 0 };
     }
 
-    // Step 2: 查询候选产品（ACTIVE + 有 ACTIVE Offer + Category Filter）
+    // Step 2: 查询候选产品（ACTIVE + 有 PUBLISHED SupplierProduct + Category Filter）
     // 如果 Demand 有 categoryId，只查询同分类产品；否则查询全部
+    // 架构决策：Offer 是商业响应，不该承担供给判断职责，改用 SupplierProduct.status=PUBLISHED
     const demandCategoryId = await this.categoryHelper.getDemandCategoryId(demandId);
     const categoryFilter = demandCategoryId
       ? { categoryId: demandCategoryId }
@@ -72,16 +73,16 @@ export class MatchingService {
       where: {
         status: 'ACTIVE',
         ...categoryFilter,
-        offers: {
-          some: { status: 'ACTIVE' },
+        supplierProducts: {
+          some: { status: 'PUBLISHED' },
         },
       },
       include: {
         parameterValues: {
           include: { parameterDefinition: true },
         },
-        offers: {
-          where: { status: 'ACTIVE' },
+        supplierProducts: {
+          where: { status: 'PUBLISHED' },
           orderBy: { createdAt: 'asc' },
         },
       },
