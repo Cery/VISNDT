@@ -16,7 +16,6 @@ const FOOTER_SECTIONS = [
     links: [
       { href: '/products', label: '检测产品' },
       { href: '/products/compare', label: '产品对比' },
-      { href: '/supplier-models', label: '供应型号' },
     ],
   },
   {
