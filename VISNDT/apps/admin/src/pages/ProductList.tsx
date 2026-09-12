@@ -9,9 +9,9 @@ import type { Product, SearchProductParams } from '../types';
 import type { ProductCategory } from '../types/category.types';
 import { ExportButton, BatchActionBar, AdvancedFilterPanel } from '../components/operation';
 import type { ExportColumn } from '../utils/export';
-import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
 import { KpiCard } from '../components/dashboard';
+import { PageHeader } from '../components/common';
 
 type PageState =
   | { status: 'loading' }

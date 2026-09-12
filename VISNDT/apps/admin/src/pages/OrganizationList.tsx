@@ -1,16 +1,14 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Space, Spin, Alert, Button, Typography, message, Modal, Switch } from 'antd';
+import { Table, Space, Spin, Alert, Button, message, Modal, Switch } from 'antd';
 import { EyeOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { organizationService } from '../api';
 import type { Organization, SearchOrganizationParams } from '../types';
 import { ExportButton, BatchActionBar, AdvancedFilterPanel } from '../components/operation';
 import type { ExportColumn } from '../utils/export';
-import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
-
-const { Title, Text } = Typography;
+import { PageHeader } from '../components/common';
 
 type PageState =
   | { status: 'loading' }
@@ -309,24 +307,19 @@ function OrganizationList() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-            <Title level={4} style={{ margin: 0 }}>Organization & Identity Operations</Title>
-          </div>
-          <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-            Manage platform organizations, status and members
-          </Text>
-        </div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => navigate('/organizations/create')}
-        >
-          创建组织
-        </Button>
-      </div>
+      <PageHeader
+        title="组织管理"
+        subtitle="管理平台组织、状态与成员"
+        extra={
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => navigate('/organizations/create')}
+          >
+            创建组织
+          </Button>
+        }
+      />
 
       <Space style={{ marginBottom: 16 }} wrap>
         <AdvancedFilterPanel
