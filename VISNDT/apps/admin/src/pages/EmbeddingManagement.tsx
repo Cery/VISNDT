@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, Statistic, Row, Col, Button, Alert, Progress, Modal, Spin, Typography, Tag, Space, Descriptions } from 'antd';
 import { ReloadOutlined, ThunderboltOutlined, ClusterOutlined, FileTextOutlined, ShoppingOutlined, WarningOutlined } from '@ant-design/icons';
 import { embeddingService, type EmbeddingStatus } from '../api/embedding.service';
+import { PageHeader } from '../components/common';
 
-const { Title, Text, Paragraph } = Typography;
+const { Text, Paragraph } = Typography;
 
 export default function EmbeddingManagement() {
   const [loading, setLoading] = useState(true);
@@ -80,19 +81,20 @@ export default function EmbeddingManagement() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <Space style={{ justifyContent: 'space-between', width: '100%' }}>
-        <Space>
-          <Title level={4} style={{ margin: 0 }}>
-            <ThunderboltOutlined /> AI Data Preparation - Embedding 管理
-          </Title>
-          <Tag color={status.providerAvailable ? 'green' : 'red'}>
-            {status.providerAvailable ? 'Provider: ' + status.providerName : '未配置 Provider'}
-          </Tag>
-        </Space>
-        <Button icon={<ReloadOutlined />} onClick={fetchStatus} loading={loading}>
-          刷新
-        </Button>
-      </Space>
+      <PageHeader
+        title={<><ThunderboltOutlined /> AI Data Preparation - Embedding 管理</>}
+        subtitle="Embedding 生成使用 OpenAI text-embedding-3-small 模型（1536 维）"
+        extra={
+          <Space>
+            <Tag color={status.providerAvailable ? 'green' : 'red'}>
+              {status.providerAvailable ? 'Provider: ' + status.providerName : '未配置 Provider'}
+            </Tag>
+            <Button icon={<ReloadOutlined />} onClick={fetchStatus} loading={loading}>
+              刷新
+            </Button>
+          </Space>
+        }
+      />
 
       {!status.providerAvailable && (
         <Alert

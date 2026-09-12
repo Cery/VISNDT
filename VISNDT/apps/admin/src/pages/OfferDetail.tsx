@@ -18,8 +18,9 @@ import type { Offer } from '../types';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
 import { BusinessIdentityBadge } from '@visndt/design-system';
+import { PageHeader } from '../components/common';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -160,21 +161,15 @@ export default function OfferDetailPage() {
 
   return (
     <div>
-      <Space style={{ marginBottom: 16 }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/offers')}>
-          返回列表
-        </Button>
-      </Space>
-
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>报价详情</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          查看供应商报价详情
-        </Text>
-      </div>
+      <PageHeader
+        title="报价详情"
+        subtitle="查看供应商报价详情"
+        extra={
+          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/offers')}>
+            返回列表
+          </Button>
+        }
+      />
 
       {/* Card 1: Offer Summary */}
       <Card title="报价摘要" style={{ marginBottom: 16 }}>

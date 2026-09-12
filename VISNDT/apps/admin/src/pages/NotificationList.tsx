@@ -1,15 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Select, Space, Spin, Alert, Button, Typography, message, Input } from 'antd';
+import { Table, Select, Space, Spin, Alert, Button, message, Input } from 'antd';
 import { ReloadOutlined, EyeOutlined, SearchOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { notificationService } from '../api';
 import type { Notification, NotificationQueryParams } from '../types';
 import { BatchActionBar } from '../components/operation';
-import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
-
-const { Title, Text } = Typography;
+import { PageHeader } from '../components/common';
 
 type PageState =
   | { status: 'loading' }
@@ -240,15 +238,10 @@ function NotificationList() {
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>Notification Operations</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          Manage platform notifications, delivery status and templates
-        </Text>
-      </div>
+      <PageHeader
+        title="通知管理"
+        subtitle="管理平台通知、发送状态与模板"
+      />
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search

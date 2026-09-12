@@ -20,8 +20,8 @@ import type { FileAsset } from '../types';
 import { getFileTypeIcon, formatFileSize } from '../utils/file-utils';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { BatchActionBar } from '../components/operation';
+import { PageHeader } from '../components/common';
 
-const { Title } = Typography;
 const { confirm } = Modal;
 
 const FILE_TYPE_COLOR: Record<string, string> = {
@@ -223,9 +223,10 @@ function FileAssetOrphanList() {
   if (pageState.status === 'empty') {
     return (
       <div>
-        <Title level={4} style={{ marginBottom: 24 }}>
-          孤立文件
-        </Title>
+        <PageHeader
+          title="孤立文件"
+          subtitle="无任何实体引用的文件资产"
+        />
         <Alert
           type="success"
           message="无孤立文件"
@@ -241,41 +242,35 @@ function FileAssetOrphanList() {
 
   return (
     <div>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 24,
-        }}
-      >
-        <Title level={4} style={{ margin: 0 }}>
-          孤立文件
-        </Title>
-        <Space>
-          <Input.Search
-            placeholder="搜索文件名..."
-            allowClear
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            onSearch={(value) => setSearchText(value)}
-            style={{ width: 200 }}
-            prefix={<SearchOutlined />}
-          />
-          <Select
-            placeholder="文件类型"
-            allowClear
-            value={filterFileType || undefined}
-            onChange={(value) => setFilterFileType(value || '')}
-            options={FILE_TYPE_OPTIONS}
-            style={{ width: 140 }}
-          />
-          <Button icon={<ReloadOutlined />} onClick={() => { setSearchText(''); setFilterFileType(''); fetchOrphans(); }}>
-            重置
-          </Button>
-          <Button onClick={fetchOrphans}>刷新</Button>
-        </Space>
-      </div>
+      <PageHeader
+        title="孤立文件"
+        subtitle="无任何实体引用的文件资产"
+        extra={
+          <Space>
+            <Input.Search
+              placeholder="搜索文件名..."
+              allowClear
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onSearch={(value) => setSearchText(value)}
+              style={{ width: 200 }}
+              prefix={<SearchOutlined />}
+            />
+            <Select
+              placeholder="文件类型"
+              allowClear
+              value={filterFileType || undefined}
+              onChange={(value) => setFilterFileType(value || '')}
+              options={FILE_TYPE_OPTIONS}
+              style={{ width: 140 }}
+            />
+            <Button icon={<ReloadOutlined />} onClick={() => { setSearchText(''); setFilterFileType(''); fetchOrphans(); }}>
+              重置
+            </Button>
+            <Button onClick={fetchOrphans}>刷新</Button>
+          </Space>
+        }
+      />
 
       <BatchActionBar
         selectedRowKeys={selectedRowKeys}

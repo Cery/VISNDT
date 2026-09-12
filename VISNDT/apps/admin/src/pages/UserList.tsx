@@ -1,14 +1,14 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Space, Spin, Alert, Button, Typography, message, Modal } from 'antd';
+import { Table, Space, Spin, Alert, Button, message, Modal } from 'antd';
 import { EyeOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { userService, organizationService } from '../api';
 import type { User, SearchUserParams } from '../types';
 import { ExportButton, BatchActionBar, AdvancedFilterPanel } from '../components/operation';
 import type { ExportColumn } from '../utils/export';
-import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
+import { PageHeader } from '../components/common';
 
 const ORG_TYPE_ROLE_LABEL: Record<string, string> = {
   BUYER: '采购方',
@@ -302,36 +302,30 @@ function UserList() {
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>用户管理</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          管理平台用户、角色与账户状态
-        </Text>
-      </div>
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => navigate('/users/create')}
-        >
-          创建用户
-        </Button>
-        <Space>
-          <ExportButton<User>
-            data={pageState.status === 'success' ? pageState.data : []}
-            columns={USER_EXPORT_COLUMNS}
-            fileName="用户列表"
-            onExportAll={async () => {
-              const all = await userService.getList({ page: 1, pageSize: 10000 });
-              return all.data;
-            }}
-          />
-        </Space>
-      </div>
+      <PageHeader
+        title="用户管理"
+        subtitle="管理平台用户、角色与账户状态"
+        extra={
+          <Space>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => navigate('/users/create')}
+            >
+              创建用户
+            </Button>
+            <ExportButton<User>
+              data={pageState.status === 'success' ? pageState.data : []}
+              columns={USER_EXPORT_COLUMNS}
+              fileName="用户列表"
+              onExportAll={async () => {
+                const all = await userService.getList({ page: 1, pageSize: 10000 });
+                return all.data;
+              }}
+            />
+          </Space>
+        }
+      />
 
       <AdvancedFilterPanel
         fields={[

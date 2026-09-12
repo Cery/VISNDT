@@ -17,8 +17,9 @@ import { productService, organizationService, supplierProductService } from '../
 import type { Organization } from '../types';
 import type { Product } from '../types/product.types';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { PageHeader } from '../components/common';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 /**
  * 816 — Admin create SupplierProduct under a selected Supplier Organization.
@@ -157,21 +158,15 @@ export default function SupplierProductCreate() {
 
   return (
     <div>
-      <Space style={{ marginBottom: 16 }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/supplier-products')}>
-          返回列表
-        </Button>
-      </Space>
-
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>新建产品型号</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          平台治理 — 选择供应商组织（WHO）与平台产品（WHAT），创建归属该组织的产品型号草稿
-        </Text>
-      </div>
+      <PageHeader
+        title="新建产品型号"
+        subtitle="平台治理 — 选择供应商组织（WHO）与平台产品（WHAT），创建归属该组织的产品型号草稿"
+        extra={
+          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/supplier-products')}>
+            返回列表
+          </Button>
+        }
+      />
 
       <Card title="所有权分配" style={{ marginBottom: 16 }}>
         <Form form={form} layout="vertical" onFinish={handleSubmit} requiredMark>

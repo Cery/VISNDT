@@ -14,8 +14,9 @@ import { userService } from '../api';
 import type { User } from '../types';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
+import { PageHeader } from '../components/common';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -83,21 +84,15 @@ export default function UserDetailPage() {
 
   return (
     <div>
-      <Space style={{ marginBottom: 16 }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/users')}>
-          返回列表
-        </Button>
-      </Space>
-
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>User Profile</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          View user details, roles and activity
-        </Text>
-      </div>
+      <PageHeader
+        title="User Profile"
+        subtitle="View user details, roles and activity"
+        extra={
+          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/users')}>
+            返回列表
+          </Button>
+        }
+      />
 
       <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>

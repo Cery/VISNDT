@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import type { OrganizationFormData } from '../../types';
 import { VISNDT_COLORS } from '../../components/design-system/tokens';
+import { PageHeader } from '../common';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 interface OrganizationFormProps {
   mode: 'create' | 'edit';
@@ -59,25 +60,22 @@ export default function OrganizationForm({
 
   const title =
     mode === 'create' ? 'Register Organization' : 'Edit Organization';
+  const subtitle =
+    mode === 'create' ? 'Add a new organization to the platform' : 'Update organization information and status';
   const submitLabel =
     mode === 'create' ? '创建组织' : '更新组织';
 
   return (
     <div>
-      <Space style={{ marginBottom: 16 }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>
-          返回
-        </Button>
-      </Space>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>{title}</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          {mode === 'create' ? 'Add a new organization to the platform' : 'Update organization information and status'}
-        </Text>
-      </div>
+      <PageHeader
+        title={title}
+        subtitle={subtitle}
+        extra={
+          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>
+            返回
+          </Button>
+        }
+      />
       <Form
         form={form}
         layout="vertical"

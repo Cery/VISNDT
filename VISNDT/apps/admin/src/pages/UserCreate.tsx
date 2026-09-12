@@ -3,8 +3,9 @@ import { userService } from '../api';
 import { UserForm } from '../components/user';
 import type { UserFormData } from '../types';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { PageHeader } from '../components/common';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 export default function UserCreate() {
   const handleSubmit = async (data: UserFormData) => {
@@ -19,15 +20,10 @@ export default function UserCreate() {
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>Register User</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          Add a new user to the platform
-        </Text>
-      </div>
+      <PageHeader
+        title="Register User"
+        subtitle="Add a new user to the platform"
+      />
       <UserForm mode="create" onSubmit={handleSubmit} />
     </div>
   );

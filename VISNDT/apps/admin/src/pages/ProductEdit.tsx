@@ -6,8 +6,9 @@ import { productService } from '../api';
 import type { ProductDetail, ProductFormData } from '../types';
 import { ProductForm } from '../components/product';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { PageHeader } from '../components/common';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -84,15 +85,10 @@ export default function ProductEdit() {
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>编辑能力</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          更新能力信息与参数
-        </Text>
-      </div>
+      <PageHeader
+        title="编辑能力"
+        subtitle="更新能力信息与参数"
+      />
       <ProductForm
         initialValues={initialValues}
         onSubmit={handleSubmit}

@@ -39,8 +39,9 @@ import type { ProductDetail, ProductParameterValue } from '../types';
 import { VISNDT_COLORS, resolveStatusTone, TONE_TO_HEX } from '../components/design-system/tokens';
 import { BusinessIdentityBadge } from '@visndt/design-system';
 import { StatusTag } from '../components/design-system';
+import { PageHeader } from '../components/common';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 /** Get file type icon based on mediaType */
 function getFileTypeIcon(mediaType: string): React.ReactNode {
@@ -200,22 +201,20 @@ export default function ProductDetailPage() {
         <Breadcrumb.Item>{product.name}</Breadcrumb.Item>
       </Breadcrumb>
 
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>能力详情</Title>
-          <StatusTag status={product.status} label={STATUS_LABEL_MAP[product.status] || '未知状态'} />
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          查看能力详情、参数与媒体
-        </Text>
-      </div>
-
-      <div style={{ marginBottom: 16, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/products')}>
-          返回列表
-        </Button>
-        <Button
+      <PageHeader
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span>能力详情</span>
+            <StatusTag status={product.status} label={STATUS_LABEL_MAP[product.status] || '未知状态'} />
+          </div>
+        }
+        subtitle="查看能力详情、参数与媒体"
+        extra={
+          <Space wrap>
+            <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/products')}>
+              返回列表
+            </Button>
+            <Button
           icon={<EditOutlined />}
           type="primary"
           onClick={() => navigate(`/products/${id}/edit`)}

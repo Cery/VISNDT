@@ -16,8 +16,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import { BusinessIdentityBadge } from '@visndt/design-system';
 import { rfqResponseService } from '../api';
 import type { RfqResponse } from '../types';
-
-const { Title } = Typography;
+import { PageHeader } from '../components/common';
 
 type PageState =
   | { status: 'loading' }
@@ -118,13 +117,15 @@ export default function RfqResponseDetailPage() {
 
   return (
     <div>
-      <Space style={{ marginBottom: 16 }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>
-          返回
-        </Button>
-      </Space>
-
-      <Title level={3}>RFQ 响应详情</Title>
+      <PageHeader
+        title="RFQ 响应详情"
+        subtitle="供应商对询价单的响应"
+        extra={
+          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>
+            返回
+          </Button>
+        }
+      />
 
       <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>

@@ -20,8 +20,9 @@ import KnowledgeContextPanel from './match/KnowledgeContextPanel';
 import type { MatchDetail } from '../types';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
+import { PageHeader } from '../components/common';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -234,26 +235,20 @@ export default function MatchDetailPage() {
 
   return (
     <div>
-      <Space style={{ marginBottom: 16 }}>
-        <Button
-          icon={<ArrowLeftOutlined />}
-          onClick={() =>
-            navigate(demandId ? `/demands/${demandId}` : '/demands')
-          }
-        >
-          返回需求
-        </Button>
-      </Space>
-
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>Match Analysis</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          View match scores, parameter comparison and knowledge context
-        </Text>
-      </div>
+      <PageHeader
+        title="Match Analysis"
+        subtitle="View match scores, parameter comparison and knowledge context"
+        extra={
+          <Button
+            icon={<ArrowLeftOutlined />}
+            onClick={() =>
+              navigate(demandId ? `/demands/${demandId}` : '/demands')
+            }
+          >
+            返回需求
+          </Button>
+        }
+      />
 
       {/* Card 1: Match Summary */}
       <Card title="匹配摘要" style={{ marginBottom: 16 }}>

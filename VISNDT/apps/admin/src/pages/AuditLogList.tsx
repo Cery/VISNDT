@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Table, Spin, Alert, Button, Tag, Typography, Card, Space } from 'antd';
+import { Table, Spin, Alert, Button, Tag, Card, Space } from 'antd';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { ReloadOutlined } from '@ant-design/icons';
 import { auditLogService } from '../api';
@@ -7,8 +7,7 @@ import type { AuditLog, AuditAction } from '../types';
 import { AdvancedFilterPanel, ExportButton } from '../components/operation';
 import { RoleCapabilityCard } from '../components/permission';
 import type { ExportColumn } from '../utils/export';
-
-const { Title } = Typography;
+import { PageHeader } from '../components/common';
 
 const ACTION_LABEL_MAP: Record<string, string> = {
   CREATE: '创建',
@@ -245,15 +244,31 @@ function AuditLogList() {
 
   return (
     <div>
-      <Title level={4} style={{ marginBottom: 16 }}>
-        审计日志
-      </Title>
+      <PageHeader
+        title="审计日志"
+        subtitle="查看平台操作记录与安全审计"
+        extra={
+          <Space>
+            <Button icon={<ReloadOutlined />} onClick={handleRefresh}>
+              刷新
+            </Button>
+            <ExportButton<AuditLog>
+              data={pageState.status === 'success' ? pageState.data : []}
+              columns={AUDIT_EXPORT_COLUMNS}
+              fileName="审计日志"
+              onExportAll={async () => {
+                const all = await auditLogService.getList({ page: 1, pageSize: 10000 });
+                return all.data;
+              }}
+            />
+          </Space>
+        }
+      />
 
       <RoleCapabilityCard />
 
       <Card size="small" style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
-          <AdvancedFilterPanel
+        <AdvancedFilterPanel
             fields={[
               { key: 'keyword', label: '操作者', type: 'keyword', placeholder: '按操作者姓名或邮箱搜索', width: 240 },
               { key: 'action', label: '操作类型', type: 'select', options: ACTION_OPTIONS, width: 140 },

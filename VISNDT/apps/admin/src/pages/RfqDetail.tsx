@@ -20,8 +20,9 @@ import type { Rfq, RfqResponse } from '../types';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
 import { BusinessIdentityBadge, WorkflowTimeline, buildRfqTimeline } from '@visndt/design-system';
+import { PageHeader } from '../components/common';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -229,21 +230,15 @@ export default function RfqDetailPage() {
 
   return (
     <div>
-      <Space style={{ marginBottom: 16 }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/rfqs')}>
-          返回列表
-        </Button>
-      </Space>
-
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>询价单详情</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          查看询价单详情、响应与匹配结果
-        </Text>
-      </div>
+      <PageHeader
+        title="询价单详情"
+        subtitle="查看询价单详情、响应与匹配结果"
+        extra={
+          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/rfqs')}>
+            返回列表
+          </Button>
+        }
+      />
 
       <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>

@@ -11,8 +11,9 @@ import {
 import { matchService } from '../api';
 import { useNavigate } from 'react-router-dom';
 import type { MatchingStats } from '../types';
+import { PageHeader } from '../components/common';
 
-const { Title, Paragraph } = Typography;
+const { Paragraph } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -69,9 +70,10 @@ function MatchingMonitor() {
 
   return (
     <div style={{ padding: 24 }}>
-      <Title level={4} style={{ marginBottom: 24 }}>
-        匹配监控
-      </Title>
+      <PageHeader
+        title="匹配监控"
+        subtitle="实时监控需求匹配状态与统计数据"
+      />
 
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} lg={6}>

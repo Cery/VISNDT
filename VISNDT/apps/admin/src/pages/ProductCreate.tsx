@@ -3,8 +3,9 @@ import { productService } from '../api';
 import type { ProductFormData } from '../types';
 import { ProductForm } from '../components/product';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { PageHeader } from '../components/common';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 export default function ProductCreate() {
   const handleSubmit = async (data: ProductFormData) => {
@@ -20,15 +21,10 @@ export default function ProductCreate() {
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>注册新能力</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          添加新的工业检测能力到能力目录
-        </Text>
-      </div>
+      <PageHeader
+        title="注册新能力"
+        subtitle="添加新的工业检测能力到能力目录"
+      />
       <ProductForm onSubmit={handleSubmit} submitLabel="创建能力" title="创建能力" />
     </div>
   );

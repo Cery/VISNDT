@@ -38,8 +38,9 @@ import {
 } from '@visndt/design-system';
 import type { MediaGovernanceState } from '@visndt/design-system';
 import { mediaCompletenessRule } from '@visndt/rule-engine-contract';
+import { PageHeader } from '../components/common';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const FILE_TYPE_COLOR: Record<string, string> = {
   IMAGE: 'blue',
@@ -516,48 +517,34 @@ function MediaList() {
 
   return (
     <div>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: 12,
-          marginBottom: 16,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary }} />
-          <Title level={4} style={{ margin: 0 }}>
-            媒体中心
-          </Title>
-          <Text type="secondary" style={{ fontSize: 13 }}>
-            统一管理平台所有上传的文件资产，按类型 / 实体 / 组织分开浏览
-          </Text>
-        </div>
-        <Space>
-          <Button
-            icon={<UploadOutlined />}
-            onClick={() => {
-              setUploadFiles([]);
-              setUploadOpen(true);
-            }}
-          >
-            批量上传
-          </Button>
-          <Button
-            danger
-            icon={<DeleteOutlined />}
-            disabled={selectedRowKeys.length === 0}
-            onClick={handleBatchDelete}
-          >
-            批量删除{selectedRowKeys.length > 0 ? ` (${selectedRowKeys.length})` : ''}
-          </Button>
-          <Button icon={<DeleteOutlined />} onClick={() => navigate('/files/orphans')}>
-            孤立文件清理
-          </Button>
-        </Space>
-      </div>
+      <PageHeader
+        title="媒体中心"
+        subtitle="统一管理平台所有上传的文件资产，按类型 / 实体 / 组织分开浏览"
+        extra={
+          <Space>
+            <Button
+              icon={<UploadOutlined />}
+              onClick={() => {
+                setUploadFiles([]);
+                setUploadOpen(true);
+              }}
+            >
+              批量上传
+            </Button>
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              disabled={selectedRowKeys.length === 0}
+              onClick={handleBatchDelete}
+            >
+              批量删除{selectedRowKeys.length > 0 ? ` (${selectedRowKeys.length})` : ''}
+            </Button>
+            <Button icon={<DeleteOutlined />} onClick={() => navigate('/files/orphans')}>
+              孤立文件清理
+            </Button>
+          </Space>
+        }
+      />
 
       <Space
         wrap

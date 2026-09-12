@@ -8,6 +8,7 @@ import OverviewCards from './analytics/OverviewCards';
 import TrendChart from './analytics/TrendChart';
 import TopProductsTable from './analytics/TopProductsTable';
 import TopContentTable from './analytics/TopContentTable';
+import { PageHeader } from '../components/common';
 
 const { RangePicker } = DatePicker;
 const { Text } = Typography;
@@ -76,24 +77,28 @@ export default function Analytics() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <Space style={{ justifyContent: 'space-between', width: '100%' }}>
-        <Space>
-          <Text strong>时间范围：</Text>
-          <RangePicker
-            value={dateRange}
-            onChange={handleDateChange}
-            allowClear
-            placeholder={['开始日期', '结束日期']}
-          />
-        </Space>
-        <Button
-          icon={<ReloadOutlined />}
-          onClick={handleRefresh}
-          loading={loading}
-        >
-          刷新
-        </Button>
-      </Space>
+      <PageHeader
+        title="数据分析"
+        subtitle="平台运营数据统计与趋势分析"
+        extra={
+          <Space>
+            <Text strong>时间范围：</Text>
+            <RangePicker
+              value={dateRange}
+              onChange={handleDateChange}
+              allowClear
+              placeholder={['开始日期', '结束日期']}
+            />
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={handleRefresh}
+              loading={loading}
+            >
+              刷新
+            </Button>
+          </Space>
+        }
+      />
       <OverviewCards data={data.summary} />
       <TrendChart data={data.trend} />
       <Row gutter={[16, 16]}>

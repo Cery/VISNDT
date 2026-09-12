@@ -18,8 +18,9 @@ import { supplierProductService } from '../api';
 import type { SupplierProduct } from '../types';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
+import { PageHeader } from '../components/common';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -222,21 +223,15 @@ export default function SupplierProductDetailPage() {
 
   return (
     <div>
-      <Space style={{ marginBottom: 16 }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/supplier-products')}>
-          返回列表
-        </Button>
-      </Space>
-
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>产品型号详情</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          产品型号审核详情 — 审核 / 通过 / 发布 / 治理
-        </Text>
-      </div>
+      <PageHeader
+        title="产品型号详情"
+        subtitle="产品型号审核详情 — 审核 / 通过 / 发布 / 治理"
+        extra={
+          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/supplier-products')}>
+            返回列表
+          </Button>
+        }
+      />
 
       {/* Card: SupplierProduct Identity */}
       <Card title="产品型号身份" style={{ marginBottom: 16 }}>

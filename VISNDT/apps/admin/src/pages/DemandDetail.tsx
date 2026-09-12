@@ -19,8 +19,7 @@ import type { Demand, DemandParameter, DemandMatch } from '../types';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
 import { BusinessIdentityBadge, WorkflowTimeline, buildDemandTimeline } from '@visndt/design-system';
-
-const { Title } = Typography;
+import { PageHeader } from '../components/common';
 
 type PageState =
   | { status: 'loading' }
@@ -286,13 +285,15 @@ export default function DemandDetailPage() {
 
   return (
     <div>
-      <Space style={{ marginBottom: 16 }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/demands')}>
-          返回列表
-        </Button>
-      </Space>
-
-      <Title level={3}>需求详情</Title>
+      <PageHeader
+        title="需求详情"
+        subtitle="买方发布的检测需求"
+        extra={
+          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/demands')}>
+            返回列表
+          </Button>
+        }
+      />
 
       <Card title="基本信息" style={{ marginBottom: 16 }}>
         <Descriptions bordered column={{ xs: 1, sm: 2 }}>

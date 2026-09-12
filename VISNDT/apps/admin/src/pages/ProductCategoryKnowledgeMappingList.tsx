@@ -5,8 +5,7 @@ import { PlusOutlined, ReloadOutlined, LinkOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { productCategoryKnowledgeMappingService, extractErrorMessage } from '../api';
 import type { ProductCategoryKnowledgeMapping } from '../api/product-category-knowledge-mapping.service';
-
-const { Title } = Typography;
+import { PageHeader } from '../components/common';
 
 type PageState =
   | { status: 'loading' }
@@ -175,30 +174,19 @@ function ProductCategoryKnowledgeMappingList() {
 
   return (
     <div>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 16,
-        }}
-      >
-        <div>
-          <Title level={4} style={{ margin: 0 }}>
-            产品-知识分类映射
-          </Title>
-          <Typography.Text type="secondary" style={{ fontSize: 13 }}>
-            ProductCategory ↔ KnowledgeCategory 映射管理 (M24.1.1)
-          </Typography.Text>
-        </div>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => navigate('/product-category-knowledge-mappings/create')}
-        >
-          创建映射
-        </Button>
-      </div>
+      <PageHeader
+        title="产品-知识分类映射"
+        subtitle="ProductCategory ↔ KnowledgeCategory 映射管理 (M24.1.1)"
+        extra={
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => navigate('/product-category-knowledge-mappings/create')}
+          >
+            创建映射
+          </Button>
+        }
+      />
 
       {pageState.status === 'empty' ? (
         <Alert

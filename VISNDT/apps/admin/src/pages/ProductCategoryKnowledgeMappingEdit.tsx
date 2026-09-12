@@ -3,8 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Form, InputNumber, Button, Card, Spin, Alert, Typography, message, Switch, Descriptions } from 'antd';
 import { productCategoryKnowledgeMappingService, extractErrorMessage } from '../api';
 import type { ProductCategoryKnowledgeMapping } from '../api/product-category-knowledge-mapping.service';
-
-const { Title } = Typography;
+import { PageHeader } from '../components/common';
 
 type PageState =
   | { status: 'loading' }
@@ -96,7 +95,10 @@ function ProductCategoryKnowledgeMappingEdit() {
 
   return (
     <div style={{ maxWidth: 600 }}>
-      <Title level={4}>编辑产品-知识分类映射</Title>
+      <PageHeader
+        title="编辑产品-知识分类映射"
+        subtitle="更新映射排序和状态"
+      />
 
       <Card style={{ marginBottom: 16 }}>
         <Descriptions title="映射信息" column={1} size="small">

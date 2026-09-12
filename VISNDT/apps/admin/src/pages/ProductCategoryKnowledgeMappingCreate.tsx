@@ -4,8 +4,7 @@ import { Form, InputNumber, Button, Card, Select, Spin, Alert, Typography, messa
 import { productCategoryKnowledgeMappingService, extractErrorMessage, categoryService } from '../api';
 import type { ProductCategory } from '../types/category.types';
 import { apiClient } from '../api/client';
-
-const { Title } = Typography;
+import { PageHeader } from '../components/common';
 
 interface KnowledgeCategoryOption {
   id: string;
@@ -101,7 +100,10 @@ function ProductCategoryKnowledgeMappingCreate() {
 
   return (
     <div style={{ maxWidth: 600 }}>
-      <Title level={4}>创建产品-知识分类映射</Title>
+      <PageHeader
+        title="创建产品-知识分类映射"
+        subtitle="建立产品分类与知识分类的关联"
+      />
       <Card>
         <Form
           form={form}

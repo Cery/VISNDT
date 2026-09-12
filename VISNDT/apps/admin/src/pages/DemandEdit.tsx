@@ -25,8 +25,7 @@ import type {
   ParameterOption,
 } from '../types/parameter-definition.types';
 import type { ProductCategory } from '../types/category.types';
-
-const { Title } = Typography;
+import { PageHeader } from '../components/common';
 const { TextArea } = Input;
 
 type PageState =
@@ -545,13 +544,15 @@ export default function DemandEdit() {
 
   return (
     <div>
-      <Space style={{ marginBottom: 16 }}>
-        <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(`/demands/${id}`)}>
-          返回详情
-        </Button>
-      </Space>
-
-      <Title level={3}>编辑需求</Title>
+      <PageHeader
+        title="编辑需求"
+        subtitle="修改买方发布的检测需求"
+        extra={
+          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(`/demands/${id}`)}>
+            返回详情
+          </Button>
+        }
+      />
 
       <Card>
         <Form

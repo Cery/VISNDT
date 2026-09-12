@@ -21,8 +21,9 @@ import type {
   BusinessFunnel, BusinessLifecycle, BusinessConversion, BusinessMatching,
 } from '../types';
 import { VISNDT_COLORS, CHART_PALETTE } from '../components/design-system/tokens';
+import { PageHeader } from '../components/common';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const PIE_COLORS = CHART_PALETTE.slice(0, 8);
 const FUNNEL_COLORS = CHART_PALETTE.slice(0, 6);
@@ -690,27 +691,16 @@ function BusinessAnalytics() {
 
   return (
     <div style={{ padding: 24 }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 16,
-        }}
-      >
-        <div>
-          <Title level={4} style={{ marginBottom: 4 }}>
-            业务分析
-          </Title>
-          <Text type="secondary" style={{ fontSize: 13 }}>
-            平台业务链路状态、转化趋势与关键指标
-          </Text>
-        </div>
-        <ReloadOutlined
-          onClick={fetchData}
-          style={{ cursor: 'pointer', fontSize: 18, color: '#2563eb' }}
-        />
-      </div>
+      <PageHeader
+        title="业务分析"
+        subtitle="平台业务链路状态、转化趋势与关键指标"
+        extra={
+          <ReloadOutlined
+            onClick={fetchData}
+            style={{ cursor: 'pointer', fontSize: 18, color: '#2563eb' }}
+          />
+        }
+      />
 
       <Tabs
         defaultActiveKey="funnel"

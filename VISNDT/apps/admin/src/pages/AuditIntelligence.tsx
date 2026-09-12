@@ -26,8 +26,9 @@ import {
 import { auditIntelligenceService } from '../api';
 import type { AuditIntelligenceOverview, ActorActivity, RiskLevel } from '../types';
 import { VISNDT_COLORS, CHART_PALETTE } from '../components/design-system/tokens';
+import { PageHeader } from '../components/common';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 // ============================================
 // Colors
@@ -127,35 +128,23 @@ function AuditIntelligence() {
 
   return (
     <div style={{ padding: 24 }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 16,
-          flexWrap: 'wrap',
-          gap: 12,
-        }}
-      >
-        <div>
-          <Title level={4} style={{ marginBottom: 4 }}>
-            审计智能
-          </Title>
-          <Text type="secondary" style={{ fontSize: 13 }}>
-            审计概览 · 操作趋势 · 实体分布 · 用户活动 · 风险指标
-          </Text>
-        </div>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <Segmented
-            options={TIME_RANGES}
-            value={days}
-            onChange={(v) => setDays(v as number)}
-          />
-          <ReloadOutlined
-            onClick={fetchData}
-            style={{ cursor: 'pointer', fontSize: 18, color: '#2563eb' }}
-          />
-        </div>
+      <PageHeader
+        title="审计智能"
+        subtitle="审计概览 · 操作趋势 · 实体分布 · 用户活动 · 风险指标"
+        extra={
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <Segmented
+              options={TIME_RANGES}
+              value={days}
+              onChange={(v) => setDays(v as number)}
+            />
+            <ReloadOutlined
+              onClick={fetchData}
+              style={{ cursor: 'pointer', fontSize: 18, color: '#2563eb' }}
+            />
+          </div>
+        }
+      />
       </div>
 
       {/* ============================================

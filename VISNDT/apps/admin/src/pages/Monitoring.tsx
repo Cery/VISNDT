@@ -16,8 +16,9 @@ import {
 import { monitoringService } from '../api';
 import type { MonitoringOverview, MonitoringResult, HealthStatus } from '../types';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
+import { PageHeader } from '../components/common';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 // ============================================
 // Status Colors & Icons
@@ -235,27 +236,16 @@ function Monitoring() {
 
   return (
     <div style={{ padding: 24 }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 16,
-        }}
-      >
-        <div>
-          <Title level={4} style={{ marginBottom: 4 }}>
-            运营监控
-          </Title>
-          <Text type="secondary" style={{ fontSize: 13 }}>
-            系统健康 · 业务风险 · 匹配健康 · Embedding 覆盖 · Analytics 管道
-          </Text>
-        </div>
-        <ReloadOutlined
-          onClick={fetchData}
-          style={{ cursor: 'pointer', fontSize: 18, color: '#2563eb' }}
-        />
-      </div>
+      <PageHeader
+        title="运营监控"
+        subtitle="系统健康 · 业务风险 · 匹配健康 · Embedding覆盖 · Analytics管道"
+        extra={
+          <ReloadOutlined
+            onClick={fetchData}
+            style={{ cursor: 'pointer', fontSize: 18, color: '#2563eb' }}
+          />
+        }
+      />
 
       <OverallBanner overview={overview} />
 

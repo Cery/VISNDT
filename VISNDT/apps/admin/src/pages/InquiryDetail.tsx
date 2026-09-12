@@ -17,8 +17,9 @@ import type { Inquiry, InquiryStatus } from '../types';
 import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
 import { BusinessIdentityBadge } from '@visndt/design-system';
+import { PageHeader } from '../components/common';
 
-const { Title, Text, Paragraph } = Typography;
+const { Text, Paragraph } = Typography;
 
 const STATUS_OPTIONS: { label: string; value: InquiryStatus }[] = [
   { label: '新建', value: 'NEW' },
@@ -110,24 +111,18 @@ export default function InquiryDetailPage() {
 
   return (
     <div>
-      <Space style={{ marginBottom: 16 }}>
-        <Button
-          icon={<ArrowLeftOutlined />}
-          onClick={() => navigate('/inquiries')}
-        >
-          返回列表
-        </Button>
-      </Space>
-
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>询价详情</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          查看询价详情、供应商响应与状态
-        </Text>
-      </div>
+      <PageHeader
+        title="询价详情"
+        subtitle="查看询价详情、供应商响应与状态"
+        extra={
+          <Button
+            icon={<ArrowLeftOutlined />}
+            onClick={() => navigate('/inquiries')}
+          >
+            返回列表
+          </Button>
+        }
+      />
 
       {/* Card 1: Inquiry Summary */}
       <Card title="询价摘要" style={{ marginBottom: 16 }}>

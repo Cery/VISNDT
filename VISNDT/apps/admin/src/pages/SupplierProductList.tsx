@@ -1,15 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Table, Spin, Alert, Button, Typography, Select, Space } from 'antd';
+import { Table, Spin, Alert, Button, Select, Space } from 'antd';
 import type { Key } from 'react';
 import { ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import { supplierProductService } from '../api';
 import type { SupplierProduct } from '../types';
-import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
-
-const { Title, Text } = Typography;
+import { PageHeader } from '../components/common';
 
 type PageState =
   | { status: 'loading' }
@@ -88,18 +86,6 @@ function SupplierProductList() {
     setQuery({ page: 1, pageSize: 20, status: '' });
   }, []);
 
-  const renderHeader = () => (
-    <div style={{ marginBottom: 24 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-        <Title level={4} style={{ margin: 0 }}>产品型号管理</Title>
-      </div>
-      <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-        产品型号审核池 — 平台级审核，跨组织
-      </Text>
-    </div>
-  );
-
   const renderToolbar = () => (
     <Space style={{ marginBottom: 16 }} wrap>
       <Select
@@ -112,13 +98,6 @@ function SupplierProductList() {
       />
       <Button icon={<ReloadOutlined />} onClick={handleReset}>
         重置
-      </Button>
-      <Button
-        type="primary"
-        icon={<PlusOutlined />}
-        onClick={() => navigate('/supplier-products/create')}
-      >
-        新建产品型号
       </Button>
     </Space>
   );
@@ -150,7 +129,19 @@ function SupplierProductList() {
   if (pageState.status === 'empty') {
     return (
       <div>
-        {renderHeader()}
+        <PageHeader
+          title="产品型号管理"
+          subtitle="产品型号审核池 — 平台级审核，跨组织"
+          extra={
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => navigate('/supplier-products/create')}
+            >
+              新建产品型号
+            </Button>
+          }
+        />
         {renderToolbar()}
         <Alert
           type="info"
@@ -221,7 +212,19 @@ function SupplierProductList() {
 
   return (
     <div>
-      {renderHeader()}
+      <PageHeader
+        title="产品型号管理"
+        subtitle="产品型号审核池 — 平台级审核，跨组织"
+        extra={
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => navigate('/supplier-products/create')}
+          >
+            新建产品型号
+          </Button>
+        }
+      />
       {renderToolbar()}
       {selectedRowKeys.length > 0 && (
         <Alert
