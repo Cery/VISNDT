@@ -125,7 +125,7 @@ export class MatchingService {
           id: candidate.id,
           name: candidate.name,
           parameterValues: candidate.parameterValues,
-          offers: candidate.offers,
+          supplierProducts: candidate.supplierProducts,
         },
       );
 
@@ -135,12 +135,13 @@ export class MatchingService {
         continue;
       }
 
-      // 选择最佳 Offer（第一个 ACTIVE）
-      const bestOffer = candidate.offers[0] ?? null;
+      // 注意：offerId 字段保留是为了兼容现有 DemandMatch schema
+      // 未来 schema 改动时应移除，改用 supplierProductId
+      const bestOffer = null; // 暂时设为 null，等待 schema 改动
 
       scoredResults.push({
         productId: candidate.id,
-        offerId: bestOffer?.id ?? null,
+        offerId: bestOffer,
         matchScore: scoreResult.totalScore,
         matchDetails: {
           algorithm: 'weighted_v1',

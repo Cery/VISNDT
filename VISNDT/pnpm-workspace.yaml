@@ -6,7 +6,7 @@ allowBuilds:
   '@prisma/client': false
   '@prisma/engines': false
   '@scarf/scarf': false
-  bcrypt: false
+  bcrypt: true
   esbuild: true
   prisma: false
   sharp: false

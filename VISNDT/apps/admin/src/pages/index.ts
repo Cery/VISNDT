@@ -2,7 +2,6 @@ export { default as DemandDetail } from './DemandDetail';
 export { default as DemandEdit } from './DemandEdit';
 export { default as DemandList } from './DemandList';
 export { default as FileAssetOrphanList } from './FileAssetOrphanList';
-export { default as Home } from './Home';
 export { default as Analytics } from './Analytics';
 export { default as BusinessAnalytics } from './BusinessAnalytics';
 export { default as Login } from './Login';
