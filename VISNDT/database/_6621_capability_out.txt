@@ -1,9 +1,0 @@
-﻿=== Capability Detail: VX-6000 (Level 3 multi-supplier) ===
-platformProduct: VX-6000 高清视频内窥镜 | status=ACTIVE
-supplierProducts count: 2
-  - [SP] 锐视 | 高端系列 | VX-6000-MAX | status=PUBLISHED
-      org=锐视检测技术有限公司 | media=0 | offerSummary=1/1 | price=62000-62000 CNY
-      offers: 【662.1 Scale】锐视 VX-6000-MAX 报价(62000 CNY)
-  - [SP] 明视 | 高清智能系列 | VX-6000-PRO | status=PUBLISHED
-      org=明视工业检测设备有限公司-D5reg | media=1 | offerSummary=1/1 | price=68000-68000 CNY
-      offers: 明视 VX-6000 高清视频内窥镜报价(68000 CNY)

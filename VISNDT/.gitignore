@@ -34,6 +34,32 @@ npm-debug.log*
 # Coverage
 coverage/
 
+# === Credentials / Session data (never commit) ===
+*cookies*.txt
+*login_body*.json
+hash.txt
+*.pem
+*.key
+
+# Browser automation profiles
+.cdp_profile/
+.edge-cdp-profile*/
+_ux_verify/
+
+# === One-off debug/audit scripts (numbered pattern) ===
+# These rules apply to root, VISNDT/, and database/ directories
+_[0-9]*.mjs
+_[0-9]*.sql
+_[0-9]*.ts
+_[0-9]*.cjs
+_[0-9]*.ps1
+_[0-9]*.txt
+_[0-9]*.json
+-[0-9]*.sql
+-[0-9]*.mjs
+-[0-9]*.html
+.trae-*.mjs
+
 # Browser automation / CDP profiling artifacts (large ORT models, screenshots, dumps)
 /database/.edge-cdp-*/
 /database/_cdp_*
@@ -52,5 +78,8 @@ coverage/
 # Prisma error-output stray (Prisma diff error redirect)
 /database/prisma/migrations/new_migration.sql
 
-# Local node modules
-node_modules/
+# Temporary files
+tmp_*
+_probe*.mjs
+_probe*.ts
+query

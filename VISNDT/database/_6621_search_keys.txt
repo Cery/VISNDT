@@ -1,3 +1,0 @@
-top keys: query, products, supplierProducts, knowledge, content, solutions, suppliers, supplierProductFacets
-data keys: no data
-NO supplierProducts key in data
