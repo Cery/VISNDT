@@ -1,15 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Table, Spin, Alert, Button, Typography, Select, Input, Space, message, Modal } from 'antd';
-import { ReloadOutlined } from '@ant-design/icons';
+import { Table, Spin, Alert, Button, Select, Input, Space, message, Modal } from 'antd';
+import { ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import { offerService } from '../api';
 import type { Offer } from '../types';
 import { BatchActionBar } from '../components/operation';
-import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
-
-const { Title, Text } = Typography;
+import { PageHeader } from '../components/common';
 
 type PageState =
   | { status: 'loading' }
@@ -191,15 +189,15 @@ function OfferList() {
   if (pageState.status === 'empty') {
     return (
       <div>
-        <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>报价管理</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          管理供应商报价与状态
-        </Text>
-      </div>
+        <PageHeader
+          title="报价管理"
+          subtitle="管理供应商报价与状态"
+          extra={
+            <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/offers/new')}>
+              创建报价
+            </Button>
+          }
+        />
         <Space style={{ marginBottom: 16 }} wrap>
           <Input.Search
             placeholder="搜索报价/描述..."
@@ -313,15 +311,15 @@ function OfferList() {
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>报价管理</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          管理供应商报价与状态
-        </Text>
-      </div>
+      <PageHeader
+        title="报价管理"
+        subtitle="管理供应商报价与状态"
+        extra={
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/offers/new')}>
+            创建报价
+          </Button>
+        }
+      />
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search

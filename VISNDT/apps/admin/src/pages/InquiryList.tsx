@@ -1,15 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Table, Spin, Alert, Button, Typography, Select, Input, Space, message, Modal } from 'antd';
+import { Table, Spin, Alert, Button, Select, Input, Space, message, Modal } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
 import { inquiryService } from '../api';
 import type { Inquiry } from '../types';
 import { BatchActionBar } from '../components/operation';
-import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
-
-const { Title, Text } = Typography;
+import { PageHeader } from '../components/common';
 
 const INQUIRY_STATUS_LABEL_MAP: Record<string, string> = {
   NEW: '新建',
@@ -190,15 +188,10 @@ function InquiryList() {
   if (pageState.status === 'empty') {
     return (
       <div>
-        <div style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-            <Title level={4} style={{ margin: 0 }}>询价管理</Title>
-          </div>
-          <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-            管理买方询价、供应商响应与状态
-          </Text>
-        </div>
+        <PageHeader
+          title="询价管理"
+          subtitle="管理买方询价、供应商响应与状态"
+        />
         <Space style={{ marginBottom: 16 }} wrap>
           <Input.Search
             placeholder="搜索联系人/邮箱..."
@@ -295,15 +288,10 @@ function InquiryList() {
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>询价管理</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          管理买方询价、供应商响应与状态
-        </Text>
-      </div>
+      <PageHeader
+        title="询价管理"
+        subtitle="管理买方询价、供应商响应与状态"
+      />
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search

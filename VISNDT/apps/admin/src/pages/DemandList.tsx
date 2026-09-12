@@ -1,17 +1,15 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Table, Input, Select, Space, Spin, Alert, Button, Typography, message, Modal } from 'antd';
-import { SearchOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Table, Input, Select, Space, Spin, Alert, Button, message, Modal } from 'antd';
+import { SearchOutlined, ReloadOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table';
 import type { SorterResult } from 'antd/es/table/interface';
 import { useNavigate } from 'react-router-dom';
 import { demandService } from '../api';
 import type { Demand, SearchDemandParams } from '../types';
 import { BatchActionBar } from '../components/operation';
-import { VISNDT_COLORS } from '../components/design-system/tokens';
 import { StatusTag } from '../components/design-system';
+import { PageHeader } from '../components/common';
 import { formatBudgetRange } from '../utils/format';
-
-const { Title, Text } = Typography;
 
 type PageState =
   | { status: 'loading' }
@@ -306,15 +304,19 @@ function DemandList() {
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 4, height: 20, borderRadius: 2, background: VISNDT_COLORS.primary, flexShrink: 0 }} />
-          <Title level={4} style={{ margin: 0 }}>需求管理</Title>
-        </div>
-        <Text type="secondary" style={{ fontSize: 12, marginLeft: 12, display: 'block', marginTop: 4 }}>
-          管理买方需求提交、状态与生命周期
-        </Text>
-      </div>
+      <PageHeader
+        title="需求管理"
+        subtitle="管理买方需求提交、状态与生命周期"
+        extra={
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => navigate('/demands/create')}
+          >
+            创建需求
+          </Button>
+        }
+      />
 
       <Space style={{ marginBottom: 16 }} wrap>
         <Input.Search
