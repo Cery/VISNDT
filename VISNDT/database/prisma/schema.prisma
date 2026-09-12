@@ -877,14 +877,14 @@ model AuditLog {
   entityType String      @map("entity_type")
   entityId   String      @map("entity_id") @db.Uuid
   action     AuditAction
-  operatorId String      @map("operator_id") @db.Uuid
+  operatorId String?     @map("operator_id") @db.Uuid
   oldValue   Json?       @map("old_value") @db.JsonB
   newValue   Json?       @map("new_value") @db.JsonB
   ipAddress  String?     @map("ip_address")
 
   createdAt DateTime @default(now()) @map("created_at")
 
-  operator User @relation(fields: [operatorId], references: [id])
+  operator User? @relation(fields: [operatorId], references: [id], onDelete: SetNull)
 
   @@index([entityType, entityId])
   @@index([operatorId])

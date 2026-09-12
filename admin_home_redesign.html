@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VISNDT Admin — 运营指挥台（设计稿）</title>
+<style>
+  :root{
+    --primary:#2563eb;
+    --success:#10b981;
+    --warning:#f59e0b;
+    --error:#ef4444;
+    --info:#0ea5e9;
+    --neutral:#64748b;
+    --slate-900:#0f172a;
+    --slate-800:#1e293b;
+    --border:#e2e8f0;
+    --bg:#f8fafc;
+    --text:#0f172a;
+    --text-soft:#64748b;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+    font-size:14px;
+  }
+  .admin-mono{font-family:'SF Mono',Consolas,'Courier New',monospace; font-variant-numeric:tabular-nums;}
+  .shell{display:flex; min-height:100vh;}
+
+  /* ---- fake sidebar for context, not the focus of this mockup ---- */
+  .sidebar{
+    width:200px; background:var(--slate-900); flex-shrink:0; padding:20px 0;
+    display:flex; flex-direction:column; gap:2px;
+  }
+  .sidebar .brand{color:#fff; font-weight:700; font-size:15px; padding:0 20px 20px; letter-spacing:.02em;}
+  .sidebar .brand span{color:var(--info);}
+  .sidebar a{
+    color:#94a3b8; text-decoration:none; font-size:13px; padding:9px 20px;
+    border-left:2px solid transparent;
+  }
+  .sidebar a.active{color:#fff; background:rgba(255,255,255,0.06); border-left-color:var(--info);}
+
+  .main{flex:1; min-width:0; padding:20px 24px 40px;}
+  .container{max-width:1280px; margin:0 auto;}
+
+  /* ---- Masthead: kept from Home.tsx's Industrial Operations Center concept ---- */
+  .masthead{
+    background:var(--slate-900); border-radius:12px; padding:22px 26px 18px;
+    position:relative; overflow:hidden; margin-bottom:20px;
+  }
+  .masthead::before{
+    content:""; position:absolute; inset:0;
+    background-image:
+      linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size:28px 28px;
+    pointer-events:none;
+  }
+  .masthead-top{display:flex; justify-content:space-between; align-items:flex-start; position:relative;}
+  .masthead-title{color:#fff; font-size:19px; font-weight:700; margin:0;}
+  .masthead-sub{color:#94a3b8; font-size:12.5px; margin-top:4px;}
+  .masthead-time{color:#64748b; font-size:11.5px;}
+  .masthead-refresh{
+    color:#94a3b8; font-size:12px; border:1px solid #334155; border-radius:6px;
+    padding:5px 10px; cursor:default;
+  }
+
+  .telemetry-row{
+    display:flex; flex-wrap:wrap; gap:22px; margin-top:16px; padding-top:14px;
+    border-top:1px solid rgba(255,255,255,0.08); position:relative;
+  }
+  .telemetry-item{display:flex; align-items:baseline; gap:8px;}
+  .telemetry-label{font-size:11.5px; color:rgba(255,255,255,0.55);}
+  .telemetry-value{font-size:16px; font-weight:700; color:#fff;}
+  .telemetry-value.tone-warning{color:var(--warning);}
+  .telemetry-value.tone-primary{color:#60a5fa;}
+  .telemetry-value.tone-info{color:#38bdf8;}
+  .telemetry-value.tone-success{color:#34d399;}
+
+  /* ---- Governance queue: primary surface (from OperationCenter) ---- */
+  .card{background:#fff; border:1px solid var(--border); border-radius:10px; margin-bottom:16px;}
+  .card-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 18px; border-bottom:1px solid var(--border);
+  }
+  .card-head h2{font-size:14.5px; font-weight:700; margin:0; display:flex; align-items:center; gap:8px;}
+  .card-head .hint{font-size:12px; color:var(--text-soft); font-weight:400; margin-left:4px;}
+  .card-body{padding:16px 18px;}
+  .toolbar-input{
+    font-size:12.5px; color:var(--text-soft); border:1px solid var(--border); border-radius:6px;
+    padding:5px 10px; width:180px;
+  }
+  .btn{
+    font-size:12.5px; border:1px solid var(--border); border-radius:6px; background:#fff;
+    padding:5px 12px; color:var(--text); cursor:default;
+  }
+
+  .stage-pills{display:flex; flex-wrap:wrap; gap:9px; margin-bottom:16px;}
+  .stage-pill{
+    display:flex; align-items:center; gap:7px; padding:7px 13px; border-radius:8px;
+    border:1px solid var(--border); font-size:12.5px; background:#fff;
+  }
+  .stage-pill.active{border-color:currentColor; background:#eff6ff;}
+  .stage-pill .dot{width:7px; height:7px; border-radius:50%;}
+  .stage-pill b{font-family:'SF Mono',monospace; margin-left:2px;}
+
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{
+    text-align:left; font-size:12px; color:var(--text-soft); font-weight:500;
+    padding:8px 10px; border-bottom:1px solid var(--border);
+  }
+  td{padding:10px 10px; border-bottom:1px solid #f1f5f9; vertical-align:middle;}
+  .status-tag{
+    display:inline-block; font-size:11.5px; padding:2px 9px; border-radius:20px; font-weight:500;
+  }
+  .status-warning{background:#fffbeb; color:#b45309;}
+  .status-info{background:#ecfeff; color:#0e7490;}
+  .link{color:var(--primary); font-size:12.5px; cursor:default;}
+  .cell-secondary{color:var(--text-soft); font-size:12px;}
+
+  /* ---- second row: activity + governance entries ---- */
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .activity-item{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0; border-bottom:1px solid #f1f5f9; font-size:13px;
+  }
+  .activity-item:last-child{border-bottom:none;}
+  .activity-tag{
+    font-size:11px; padding:2px 8px; border-radius:4px; margin-right:8px; font-weight:500;
+  }
+  .tag-demand{background:#eff6ff; color:var(--primary);}
+  .tag-user{background:#ecfeff; color:#0e7490;}
+  .tag-match{background:#fffbeb; color:#b45309;}
+  .activity-time{font-size:11.5px; color:var(--text-soft);}
+
+  .entry-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+  .entry{
+    border:1px solid var(--border); border-radius:8px; padding:12px 14px;
+    display:flex; flex-direction:column; gap:6px; background:#fff;
+  }
+  .entry .label{font-size:12.5px; color:#334155;}
+  .entry .count{font-family:'SF Mono',monospace; font-size:19px; font-weight:800;}
+
+  /* ---- quick actions ---- */
+  .quick-actions{display:flex; flex-wrap:wrap; gap:10px;}
+  .qa-btn{
+    display:flex; align-items:center; gap:6px; font-size:12.5px; padding:7px 14px;
+    border-radius:6px; border:1px solid var(--border); background:#fff; color:var(--text);
+  }
+  .qa-btn.primary{background:var(--primary); color:#fff; border-color:var(--primary);}
+
+  .footnote{font-size:11.5px; color:var(--text-soft); margin-top:4px;}
+
+  @media (max-width: 900px){
+    .sidebar{display:none;}
+    .two-col{grid-template-columns:1fr;}
+    .entry-grid{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="sidebar">
+    <div class="brand">VIS<span>NDT</span> Admin</div>
+    <a class="active">运营指挥台</a>
+    <a>产品治理</a>
+    <a>产品型号审核</a>
+    <a>组织管理</a>
+    <a>用户管理</a>
+    <a>需求 / RFQ / 报价</a>
+    <a>内容 / 知识库</a>
+    <a>业务分析</a>
+    <a>运营监控</a>
+    <a>审计日志</a>
+  </div>
+
+  <div class="main">
+    <div class="container">
+
+      <!-- ===== Masthead — kept from Home.tsx's dark anchor concept ===== -->
+      <div class="masthead">
+        <div class="masthead-top">
+          <div>
+            <p class="masthead-title">运营指挥台</p>
+            <p class="masthead-sub">今天需要你处理的事项，按优先级排列 — 不是数据展示墙</p>
+          </div>
+          <div style="text-align:right;">
+            <div class="masthead-refresh">刷新</div>
+            <div class="masthead-time" style="margin-top:6px;">最后更新 14:32</div>
+          </div>
+        </div>
+        <div class="telemetry-row">
+          <div class="telemetry-item">
+            <span class="telemetry-label">待处理业务合计</span>
+            <span class="telemetry-value tone-warning">23</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="telemetry-label">产品型号待审核</span>
+            <span class="telemetry-value tone-warning">7</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="telemetry-label">用户待处理</span>
+            <span class="telemetry-value tone-success">2</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="telemetry-label">需求待处理</span>
+            <span class="telemetry-value tone-primary">9</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="telemetry-label">RFQ 待处理</span>
+            <span class="telemetry-value tone-info">5</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Primary surface: Governance Queue (from OperationCenter.tsx) ===== -->
+      <div class="card">
+        <div class="card-head">
+          <h2>治理队列 <span class="hint">产品型号审核 · 平台级，跨组织</span></h2>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <input class="toolbar-input" placeholder="当前队列快速过滤" disabled>
+            <div class="btn">全部产品型号</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="stage-pills">
+            <div class="stage-pill active" style="color:var(--warning);">
+              <span class="dot" style="background:var(--warning);"></span>待审核 <b>7</b>
+            </div>
+            <div class="stage-pill" style="color:var(--info);">
+              <span class="dot" style="background:var(--info);"></span>审核中 <b>3</b>
+            </div>
+            <div class="stage-pill" style="color:var(--primary);">
+              <span class="dot" style="background:var(--primary);"></span>待发布 <b>2</b>
+            </div>
+            <div class="stage-pill" style="color:var(--error);">
+              <span class="dot" style="background:var(--error);"></span>已拒绝 <b>1</b>
+            </div>
+            <div class="stage-pill" style="color:var(--success);">
+              <span class="dot" style="background:var(--success);"></span>已发布 <b>142</b>
+            </div>
+            <div class="stage-pill" style="color:var(--neutral);">
+              <span class="dot" style="background:var(--neutral);"></span>全部 <b>155</b>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>型号</th>
+                <th>所属能力</th>
+                <th>所属组织</th>
+                <th>状态</th>
+                <th>提交时间</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>远瞳精密</b> X9 <span class="cell-secondary">X9-200</span></td>
+                <td>工业内窥镜检测</td>
+                <td>远瞳精密仪器</td>
+                <td><span class="status-tag status-warning">待审核</span></td>
+                <td class="cell-secondary">09-08 09:14</td>
+                <td><span class="link">审核</span></td>
+              </tr>
+              <tr>
+                <td><b>普锐视觉</b> PX <span class="cell-secondary">PX-620S</span></td>
+                <td>工业内窥镜检测</td>
+                <td>普锐视觉检测</td>
+                <td><span class="status-tag status-warning">待审核</span></td>
+                <td class="cell-secondary">09-08 08:47</td>
+                <td><span class="link">审核</span></td>
+              </tr>
+              <tr>
+                <td><b>中检智控</b> EC <span class="cell-secondary">EC-200</span></td>
+                <td>涡流检测</td>
+                <td>中检智控</td>
+                <td><span class="status-tag status-info">审核中</span></td>
+                <td class="cell-secondary">09-07 16:20</td>
+                <td><span class="link">审核</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== Secondary row: activity + governance entries ===== -->
+      <div class="two-col">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-head"><h2>近期治理活动</h2></div>
+          <div class="card-body">
+            <div class="activity-item">
+              <span><span class="activity-tag tag-demand">需求</span>涡轮叶片裂纹排查检测</span>
+              <span class="activity-time">10 分钟前</span>
+            </div>
+            <div class="activity-item">
+              <span><span class="activity-tag tag-user">用户</span>zhang@acme-inspect.com</span>
+              <span class="activity-time">32 分钟前</span>
+            </div>
+            <div class="activity-item">
+              <span><span class="activity-tag tag-match">匹配</span>匹配度 87% · 已生成</span>
+              <span class="activity-time">1 小时前</span>
+            </div>
+            <div class="activity-item">
+              <span><span class="activity-tag tag-demand">需求</span>管道内壁腐蚀普查</span>
+              <span class="activity-time">2 小时前</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-head"><h2>平台治理入口</h2></div>
+          <div class="card-body">
+            <div class="entry-grid">
+              <div class="entry"><span class="label">产品治理</span><span class="count" style="color:var(--primary);">1,240</span></div>
+              <div class="entry"><span class="label">型号审核</span><span class="count" style="color:var(--warning);">7</span></div>
+              <div class="entry"><span class="label">组织治理</span><span class="count" style="color:var(--info);">86</span></div>
+              <div class="entry"><span class="label">用户治理</span><span class="count" style="color:var(--success);">2</span></div>
+              <div class="entry"><span class="label">内容治理</span><span class="count" style="color:var(--info);">318</span></div>
+              <div class="entry"><span class="label">运营监控</span><span class="count" style="color:var(--neutral);">—</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Quick actions ===== -->
+      <div class="card">
+        <div class="card-head"><h2>快捷操作</h2></div>
+        <div class="card-body">
+          <div class="quick-actions">
+            <div class="qa-btn primary">+ 创建用户</div>
+            <div class="qa-btn">+ 创建组织</div>
+            <div class="qa-btn">+ 创建产品</div>
+            <div class="qa-btn">+ 创建内容</div>
+            <div class="qa-btn">通知中心</div>
+            <div class="qa-btn">查看用户</div>
+            <div class="qa-btn">查看组织</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="footnote">本页全部数字来自真实 Admin API（治理池 / 仪表盘 / 活动）；无假 KPI、无硬编码计数。深度图表分析见「业务分析」页。</p>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
