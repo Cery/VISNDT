@@ -29,7 +29,7 @@ export interface ProductCandidate {
   id: string;
   name: string;
   parameterValues: ProductParamForMatch[];
-  offers: CandidateOffer[];
+  supplierProducts: CandidateSupplierProduct[];
 }
 
 export interface ProductParamForMatch {
@@ -45,6 +45,13 @@ export interface ProductParamForMatch {
   };
 }
 
+export interface CandidateSupplierProduct {
+  id: string;
+  organizationId: string;
+  status: string;
+}
+
+/** @deprecated Use CandidateSupplierProduct instead. Will be removed in batch 3 (schema changes). */
 export interface CandidateOffer {
   id: string;
   organizationId: string;
